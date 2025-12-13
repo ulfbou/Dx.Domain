@@ -1,0 +1,62 @@
+name: Enforce Dx.Domain DPI on Core changes
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  enforce-dpi:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect Core changes
+        id: core
+        run: |
+          git fetch origin "${{ github.event.pull_request.base.ref }}" --depth=1
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed.txt
+
+          if grep -qE '(^|/)Dx\.Domain/' changed.txt || \
+             grep -qE '(^|/)src/Dx\.Domain/' changed.txt; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Write PR body to file
+        if: steps.core.outputs.changed == 'true'
+        run: |
+          printf '%s\n' "${{ github.event.pull_request.body }}" > pr_body.txt
+
+      - name: Enforce DPI checklist
+        if: steps.core.outputs.changed == 'true'
+        run: |
+          required=(
+            "Enforces an invariant"
+            "Removes accidental complexity"
+            "Increases what the compiler can prove"
+            "Makes misuse impossible"
+            "Upholds the Manifesto"
+            "Violates no Non-Goals"
+            "Correct placement"
+          )
+
+          for item in "${required[@]}"; do
+            if ! grep -Fq "$item" pr_body.txt; then
+              echo "ERROR: Missing DPI checklist item: $item"
+              exit 1
+            fi
+          done
+
+          echo "DPI checklist verified."
+
+      - name: No Core changes detected
+        if: steps.core.outputs.changed == 'false'
+        run: echo "No Dx.Domain.Core changes detected; DPI enforcement skipped."
