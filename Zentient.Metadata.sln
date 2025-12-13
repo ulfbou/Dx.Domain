@@ -1,0 +1,162 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{12345678-1234-5678-9ABC-DEF012345678}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		CHANGELOG.md = CHANGELOG.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		docfx.json = docfx.json
+		favicon.png = favicon.png
+		LICENSE = LICENSE
+		README.md = README.md
+		test.runsettings = test.runsettings
+		toc.yml = toc.yml
+		Zentient.snk = Zentient.snk
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{87654321-4321-8765-CBA9-210FEDCBA987}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Analyzer.props = Directory.Analyzer.props
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		Directory.Core.props = Directory.Core.props
+		Directory.Core.targets = Directory.Core.targets
+		Directory.Documentation.props = Directory.Documentation.props
+		Directory.Documentation.targets = Directory.Documentation.targets
+		Directory.Pack.props = Directory.Pack.props
+		Directory.Pack.targets = Directory.Pack.targets
+		Directory.Performance.props = Directory.Performance.props
+		Directory.Performance.targets = Directory.Performance.targets
+		Directory.Quality.props = Directory.Quality.props
+		Directory.Quality.targets = Directory.Quality.targets
+		Directory.Security.props = Directory.Security.props
+		Directory.Security.targets = Directory.Security.targets
+		Directory.Sign.props = Directory.Sign.props
+		Directory.Sign.targets = Directory.Sign.targets
+		Directory.Test.props = Directory.Test.props
+		Directory.Test.targets = Directory.Test.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{ABCDEF12-3456-7890-ABCD-EF1234567890}"
+	ProjectSection(SolutionItems) = preProject
+		docs\architecture.md = docs\architecture.md
+		docs\getting-started.md = docs\getting-started.md
+		docs\toc.yml = docs\toc.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zentient.Metadata.Tests", "tests\Zentient.Metadata.Tests.csproj", "{47E5B74C-F319-4EB8-B86E-3A6672932894}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zentient.Metadata", "src\Zentient.Metadata\Zentient.Metadata.csproj", "{D2A46F0E-9224-4862-B411-BED314148A27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zentient.Metadata.Attributes", "src\Zentient.Metadata.Attributes\Zentient.Metadata.Attributes.csproj", "{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{6C52AEF7-A1A8-4817-9097-1F4261C62F9C}"
+	ProjectSection(SolutionItems) = preProject
+		analyzers\Zentient.ruleset = analyzers\Zentient.ruleset
+		analyzers\Zentient.Tests.ruleset = analyzers\Zentient.Tests.ruleset
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zentient.Metadata.Analyzers", "src\Zentient.Metadata.Analyzers\Zentient.Metadata.Analyzers.csproj", "{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zentient.Metadata.Abstractions", "src\Zentient.Metadata.Abstractions\Zentient.Metadata.Abstractions.csproj", "{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Actions", "Github Actions", "{EEC8BDFA-DC4D-4F65-B04D-F9D53D0C7E89}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci-cd.yml = .github\workflows\ci-cd.yml
+		.github\workflows\docfx.yml = .github\workflows\docfx.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Debug|x64.Build.0 = Debug|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Debug|x86.Build.0 = Debug|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Release|x64.ActiveCfg = Release|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Release|x64.Build.0 = Release|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Release|x86.ActiveCfg = Release|Any CPU
+		{47E5B74C-F319-4EB8-B86E-3A6672932894}.Release|x86.Build.0 = Release|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Debug|x64.Build.0 = Debug|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Debug|x86.Build.0 = Debug|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Release|x64.ActiveCfg = Release|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Release|x64.Build.0 = Release|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Release|x86.ActiveCfg = Release|Any CPU
+		{D2A46F0E-9224-4862-B411-BED314148A27}.Release|x86.Build.0 = Release|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Debug|x64.Build.0 = Debug|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Debug|x86.Build.0 = Debug|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Release|x64.ActiveCfg = Release|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Release|x64.Build.0 = Release|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Release|x86.ActiveCfg = Release|Any CPU
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C}.Release|x86.Build.0 = Release|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Debug|x64.Build.0 = Debug|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Debug|x86.Build.0 = Debug|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Release|x64.ActiveCfg = Release|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Release|x64.Build.0 = Release|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Release|x86.ActiveCfg = Release|Any CPU
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE}.Release|x86.Build.0 = Release|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Debug|x64.Build.0 = Debug|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Debug|x86.Build.0 = Debug|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Release|x64.ActiveCfg = Release|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Release|x64.Build.0 = Release|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Release|x86.ActiveCfg = Release|Any CPU
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{47E5B74C-F319-4EB8-B86E-3A6672932894} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{D2A46F0E-9224-4862-B411-BED314148A27} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{4CB19B33-5FC1-4434-883F-6E64E3C5A30C} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{8F285835-9471-DDC6-AD3C-7F7E03FD6EFE} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{EE0C1B91-2CE7-4954-8800-FE342F9F3B83} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11111111-2222-3333-4444-555555555555}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "ms-dotnettools.csharp",
+        "k--kato.docomment",
+        "editorconfig.editorconfig",
+        "jmrog.vscode-nuget-package-manager",
+        "roslynator.roslynator",
+        "formulahendry.dotnet-test-explorer"
+    ]
+}

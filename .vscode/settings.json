@@ -1,0 +1,11 @@
+{
+    "editor.formatOnSave": true,
+    "csharp.format.enable": true,
+    "csharp.referencesCodeLens.enabled": true,
+    "csharp.testsCodeLens.enabled": true,
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true
+    },
+    "dotnet-test-explorer.testProjectPath": "tests"
+}

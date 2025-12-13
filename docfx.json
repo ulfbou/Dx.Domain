@@ -1,0 +1,88 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "src/**/*.csproj"
+          ],
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**"
+          ]
+        }
+      ],
+      "dest": "api",
+      "filter": "filterConfig.yml"
+    }
+  ],
+  "build": {
+    "content": [
+      { "files": [ "api/**.yml", "api/index.md" ] },
+      { "files": [ "docs/**.md", "docs/**/toc.yml" ], "exclude": [ "**/bin/**", "**/obj/**", "_site/**" ] },
+      { "files": [ "README.md", "CHANGELOG.md", "CONTRIBUTING.md" ] },
+      { "files": [ "toc.yml", "*.md" ], "exclude": [ "LICENSE", "obj/**", "_site/**" ] }
+    ],
+    "resource": [
+      { "files": [ "images/**" ], "exclude": [ "**/bin/**", "**/obj/**" ] },
+      { "files": [ "docs/images/**" ] }
+    ],
+    "dest": "_site",
+    "template": [ "default" ],
+    "globalMetadata": {
+      "_appTitle": "Zentient.Metadata Documentation",
+      "_appName": "Zentient.Metadata",
+      "_appFooter": "Copyright © 2025 Zentient Framework Team. All rights reserved.",
+      "_enableSearch": true,
+      "_enableNewTab": true,
+      "_disableNavbar": false,
+      "_disableBreadcrumb": false,
+      "_disableAffix": false,
+      "_disableContribution": false,
+      "_gitContribute": {
+        "repo": "https://github.com/ulfbou/Zentient.Metadata",
+        "branch": "main"
+      },
+      "_gitUrlPattern": "github",
+      "_customMetadata": {
+        "company": "Zentient Framework Team",
+        "version": "1.0.0",
+        "framework": "net8.0;net9.0"
+      }
+    },
+    "fileMetadata": {
+      "_tocTitle": {
+        "api/**.yml": "API Reference"
+      },
+      "_tocRel": {
+        "api/**.md": "../toc.yml"
+      }
+    },
+    "markdownEngineName": "markdig",
+    "markdownEngineProperties": {
+      "markdigExtensions": [
+        "abbreviations",
+        "autoidentifiers",
+        "citations",
+        "customcontainers",
+        "definitionlists",
+        "emphasisextras",
+        "figures",
+        "footers",
+        "footnotes",
+        "gridtables",
+        "mathematics",
+        "medialinks",
+        "pipetables",
+        "listextras",
+        "tasklists",
+        "diagrams",
+        "autolinks",
+        "attributes"
+      ]
+    }
+  },
+  "serve": {
+    "port": 8080
+  }
+}

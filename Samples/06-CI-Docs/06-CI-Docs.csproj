@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>Samples.CIDocs</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Zentient.Abstractions" Version="3.0.2" />
+    <PackageReference Include="Zentient.Metadata" Version="1.0.0" />
+    <PackageReference Include="Zentient.Metadata.Attributes" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
