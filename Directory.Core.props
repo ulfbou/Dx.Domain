@@ -20,7 +20,7 @@
     <!-- Build configuration -->
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <TargetFrameworks Condition="'$(TargetFrameworks)' == ''">net9.0</TargetFrameworks>
+    <TargetFramework Condition="'$(TargetFrameworks)' == ''">net10.0</TargetFramework>
 
     <!-- Language and framework settings -->
     <LangVersion>latest</LangVersion>
@@ -48,7 +48,8 @@
     <IsPackable Condition="'$(IsPackable)' == '' AND '$(OutputType)' == 'Library'">true</IsPackable>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release' AND '$(IsPackable)' == 'true'">true</GeneratePackageOnBuild>
     <PackageTags Condition="'$(PackageTags)' == '' AND '$(IsPackable)' == 'true'">
-      domain-driven-design;ddd;functional;invariants;result-pattern</PackageTags>
+      domain-driven-design;ddd;functional;invariants;result-pattern
+    </PackageTags>
     <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">
       https://github.com/ulfbou/Dx.Domain.git
     </PackageProjectUrl>

@@ -1,0 +1,88 @@
+<!-- Dx.Domain.Analyzers Project file -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Template Symbols -->
+    <ProjectName>Dx.Domain.Analyzers</ProjectName>
+    <Authors>Ulf Bourelius;Dx.Domain Team</Authors>
+    <Company>Dx.Domain Team</Company>
+    <Description>
+      The Dx.Domain.Analyzers package provides a powerful, attribute-based system for declaring and discovering metadata in your .NET applications. It shifts metadata management from an imperative, code-heavy process to a simple, declarative one, enhancing the discoverability and extensibility of your components.
+
+      This library is built as an extension to the core Dx.Domain system, focusing on analyzer-related functionalities. It offers attributes and tools to define how domain entities should be analyzed, validated, and managed within various contexts, ensuring that your domain models remain clean and focused on business logic.
+    </Description>
+    <Tags>
+      dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern
+    </Tags>
+    <Copyright>Copyright © 2025 Dx.Domain Team. All rights reserved.</Copyright>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</RepositoryUrl>
+
+    <!-- Build Defaults -->
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
+
+    <!-- Assembly Info -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+    <!-- Output Configuration -->
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+
+    <!-- Packaging -->
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <PackageReleaseNotes>See CHANGELOG.md for release notes and docs/ for full specification.</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>
+    <PackageAuthors>Ulf Bourelius;Dx.Domain Team</PackageAuthors>
+
+    <!-- Feature Flags -->
+    <EnableSigning Condition="'$(EnableSigning)' == ''">true</EnableSigning>
+    <EnableTesting Condition="'$(EnableTesting)' == ''">true</EnableTesting>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
+    <EnableSecurity Condition="'$(EnableSecurity)' == ''">true</EnableSecurity>
+    <EnableDocumentation Condition="'$(EnableDocumentation)' == ''">true</EnableDocumentation>
+    <EnablePerformance Condition="'$(EnablePerformance)' == ''">false</EnablePerformance>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyTitle>Dx.Domain</AssemblyTitle>
+    <Description>Analyzers for Dx.Domain. See README.md and CHANGELOG.md for details.</Description>
+    <Company>Dx.Domain Team</Company>
+    <Authors>Dx.Domain Team</Authors>
+    <Copyright>Copyright © 2025 Dx.Domain Team. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/ulfbou/Dx.Domain.git</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</RepositoryUrl>
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == '' AND '$(Configuration)' == 'Debug'">dev</VersionSuffix>
+    <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition="'$(Version)' == ''">$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Dx.Domain.Abstractions" />
+    <InternalsVisibleTo Include="Dx.Domain.Attributes" />
+    <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
+    <InternalsVisibleTo Include="Dx.Domain.Tests" />
+  </ItemGroup>
+
+  <!-- Imports -->
+  <Import Project="Directory.Pack.props" Condition="Exists('Directory.Pack.props')" />
+  <Import Project="Directory.Sign.props" Condition="Exists('Directory.Sign.props') AND '$(EnableSigning)' == 'true'" />
+  <Import Project="Directory.Test.props" Condition="Exists('Directory.Test.props') AND '$(EnableTesting)' == 'true'" />
+  <Import Project="Directory.Quality.props" Condition="Exists('Directory.Quality.props') AND '$(EnableQuality)' == 'true'" />
+  <Import Project="Directory.Security.props" Condition="Exists('Directory.Security.props') AND '$(EnableSecurity)' == 'true'" />
+  <Import Project="Directory.Documentation.props" Condition="Exists('Directory.Documentation.props') AND '$(EnableDocumentation)' == 'true'" />
+  <Import Project="Directory.Performance.props" Condition="Exists('Directory.Performance.props') AND '$(EnablePerformance)' == 'true'" />
+
+</Project>
