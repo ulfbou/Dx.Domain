@@ -32,4 +32,7 @@
   <Import Project="Directory.Performance.props"
           Condition="Exists('Directory.Performance.props') AND '$(EnablePerformance)' == 'true'" />
 
+  <!-- Single Source global usings for Dx.Domain when enabled -->
+  <Import Project="src/Dx.Domain/build/Dx.Domain.props" Condition="Exists('src/Dx.Domain/build/Dx.Domain.props') AND '$(DxDomainSingleSource)' == 'true'" />
+
 </Project>
