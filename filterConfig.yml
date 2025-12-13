@@ -1,0 +1,5 @@
+# Minimal DocFX filter configuration to include all symbols
+# Placeholder to avoid missing file errors in CI
+apiRules:
+  - exclude:
+      uidRegex: "^$"
