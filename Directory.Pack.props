@@ -27,7 +27,7 @@
     <PackageReleaseNotes Condition="'$(PackageReleaseNotes)' == ''">See CHANGELOG.md for release notes.</PackageReleaseNotes>
 
     <!-- Package tags and categorization -->
-    <PackageTags Condition="'$(PackageTags)' == ''">zentient;framework;library;abstractions</PackageTags>
+    <PackageTags Condition="'$(PackageTags)' == ''">domain-driven-design;ddd;functional;invariants;result-pattern</PackageTags>
     <DevelopmentDependency Condition="'$(DevelopmentDependency)' == ''">false</DevelopmentDependency>
 
     <!-- Package output configuration -->
@@ -64,21 +64,21 @@
   <!-- Package Content Files -->
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <!-- Include README in package -->
-    <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('README.md')" />
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)README.md')" />
 
     <!-- Include changelog in package -->
-    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" Condition="Exists('CHANGELOG.md')" />
+    <None Include="$(MSBuildThisFileDirectory)CHANGELOG.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)CHANGELOG.md')" />
 
     <!-- Include license in package -->
-    <None Include="LICENSE" Pack="true" PackagePath="\" Condition="Exists('LICENSE')" />
-    <None Include="LICENSE.txt" Pack="true" PackagePath="\" Condition="Exists('LICENSE.txt')" />
-    <None Include="LICENSE.md" Pack="true" PackagePath="\" Condition="Exists('LICENSE.md')" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)LICENSE')" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE.txt" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)LICENSE.txt')" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)LICENSE.md')" />
 
     <!-- Include documentation files -->
-    <None Include="docs\**\*.md" Pack="true" PackagePath="docs\" Condition="Exists('docs')" />
+    <None Include="$(MSBuildThisFileDirectory)docs\**\*.md" Pack="true" PackagePath="docs\" Condition="Exists('$(MSBuildThisFileDirectory)docs')" />
 
     <!-- Include documentation -->
-    <None Include="docs\**\*" Pack="true" PackagePath="docs\" Condition="Exists('docs')" />
+    <None Include="$(MSBuildThisFileDirectory)docs\**\*" Pack="true" PackagePath="docs\" Condition="Exists('$(MSBuildThisFileDirectory)docs')" />
   </ItemGroup>
 
   <!-- Package Icon Configuration -->

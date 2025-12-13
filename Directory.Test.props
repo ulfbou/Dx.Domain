@@ -4,9 +4,9 @@
 
   <PropertyGroup Label="Test Configuration">
     <!-- Test framework configuration -->
-    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests'))">true</IsTestProject>
-    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.IntegrationTests'))">true</IsTestProject>
-    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.UnitTests'))">true</IsTestProject>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('IntegrationTests'))">true</IsTestProject>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('UnitTests'))">true</IsTestProject>
 
     <!-- Analyzer suppression for test projects -->
     <NoWarn>$(NoWarn);RS0016;RS0017;RS0022;CS1591;RS0037</NoWarn>
