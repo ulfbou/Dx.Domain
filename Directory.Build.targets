@@ -32,4 +32,10 @@
   <Import Project="Directory.Performance.targets"
           Condition="Exists('Directory.Performance.targets') AND '$(EnablePerformance)' == 'true'" />
 
+  <!-- Documentation quality gate: promote documentation warnings to errors when enabled -->
+  <PropertyGroup Condition="'$(EnableDocumentation)' == 'true'">
+    <WarningsAsErrors>$(WarningsAsErrors);$(DocumentationWarningsAsErrors)</WarningsAsErrors>
+    <TreatWarningsAsErrors Condition="'$(DocumentationWarningsAsErrors)' != ''">true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
 </Project>
