@@ -1,6 +1,6 @@
 namespace Dx.Domain
 {
-    using Dx.Domain.Errors.Dx.Domain;
+    using Dx.Domain.Errors;
 
     using System.Runtime.CompilerServices;
 
@@ -9,7 +9,7 @@ namespace Dx.Domain
     /// with a standard <see cref="DomainError"/>.
     /// </summary>
     /// <remarks>
-    /// This is a thin wrapper around <see cref="Result{TValue, TError}"/> where <typeparamref name="TError"/> is fixed to <see cref="DomainError"/>.
+    /// This is a thin wrapper around <see cref="Result{TValue, TError}"/> where the error type is fixed to <see cref="DomainError"/>.
     /// </remarks>
     /// <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
     public readonly struct Result<TValue> where TValue : notnull
@@ -82,10 +82,12 @@ namespace Dx.Domain
         public static Result<TValue> Failure(DomainError error) => new Result<TValue>(Result<TValue, DomainError>.Failure(error));
 
         /// <summary>
-        /// Converts a value of type TValue to a successful Result<TValue> instance containing the specified value.
+        /// Converts a value of type <typeparamref name="TValue"/> to a successful <see cref="Result{TValue}"/> instance containing the specified value.
         /// </summary>
-        /// <remarks>This implicit conversion allows a TValue to be used wherever a Result<TValue> is
-        /// expected, simplifying code that returns or assigns results.</remarks>
+        /// <remarks>
+        /// This implicit conversion allows a <typeparamref name="TValue"/> to be used wherever a <see cref="Result{TValue}"/> is
+        /// expected, simplifying code that returns or assigns results.
+        /// </remarks>
         /// <param name="value">The value to wrap in a successful result.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Result<TValue>(TValue value) => Ok(value);

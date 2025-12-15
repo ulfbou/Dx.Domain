@@ -1,6 +1,6 @@
 namespace Dx.Domain.Results
 {
-    using Dx.Domain.Errors.Dx.Domain;
+    using Dx.Domain.Errors;
 
     using System.Reflection;
     using System.Runtime.CompilerServices;
