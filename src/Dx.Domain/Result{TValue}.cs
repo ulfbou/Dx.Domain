@@ -59,7 +59,7 @@ namespace Dx.Domain
         /// <summary>
         /// Gets the error value associated with the result, if any.
         /// </summary>
-        public DomainError Error
+        internal DomainError Error
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _inner.Error;

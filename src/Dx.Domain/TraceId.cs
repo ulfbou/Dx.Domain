@@ -1,8 +1,7 @@
-// File: Dx.Domain/TraceId.cs
-using System.Diagnostics;
-
 namespace Dx.Domain
 {
+    using System.Diagnostics;
+
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct TraceId : IEquatable<TraceId>
     {
@@ -12,40 +11,20 @@ namespace Dx.Domain
         private readonly ulong _lo;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TraceId(ulong hi, ulong lo)
+        private TraceId(ulong hi, ulong lo)
         {
             _hi = hi;
             _lo = lo;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TraceId FromBytes(ReadOnlySpan<byte> bytes)
+        public static TraceId New()
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(bytes.Length, 16, nameof(bytes));
-
-            ulong hi = 0, lo = 0;
-
-            for (int i = 0; i < 8; i++)
-                hi = (hi << 8) | bytes[i];
-
-            for (int i = 8; i < 16; i++)
-                lo = (lo << 8) | bytes[i];
-
+            Span<byte> buffer = stackalloc byte[16];
+            Random.Shared.NextBytes(buffer);
+            ulong hi = BitConverter.ToUInt64(buffer.Slice(0, 8));
+            ulong lo = BitConverter.ToUInt64(buffer.Slice(8, 8));
             return new TraceId(hi, lo);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ToBytes(Span<byte> destination)
-        {
-            ArgumentOutOfRangeException.ThrowIfLessThan(destination.Length, 16, nameof(destination));
-
-            ulong v = _hi;
-            for (int i = 7; i >= 0; i--)
-            { destination[i] = (byte)(v & 0xFF); v >>= 8; }
-
-            v = _lo;
-            for (int i = 15; i >= 8; i--)
-            { destination[i] = (byte)(v & 0xFF); v >>= 8; }
         }
 
         public bool IsEmpty

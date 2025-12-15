@@ -52,7 +52,7 @@ namespace Dx.Domain.Invariants
             => value.CompareTo(threshold) < 0 ? Result<T>.Ok(value) : Result<T>.Failure(error);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Result<TEnum> IsDefinedEnum<TEnum>(TEnum value, DomainError error) where TEnum : struct, Enum
+        public static Result<TEnum> IsDefined<TEnum>(TEnum value, DomainError error) where TEnum : struct, Enum
             => Enum.IsDefined(value) ? Result<TEnum>.Ok(value) : Result<TEnum>.Failure(error);
 
         // Guid
