@@ -1,8 +1,6 @@
-﻿
 namespace Dx.Domain.Errors
 {
-    [Serializable]
-    internal class DomainErrorException : Exception
+    public class DomainErrorException : Exception
     {
         public DomainErrorException()
         {

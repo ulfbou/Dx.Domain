@@ -8,9 +8,8 @@
 
     <Using Include="Dx.Domain.Results" />
     <Using Include="Dx.Domain.Errors" />
-    <Using Include="Dx.Domain.Primitives" />
 
     <Using Include="static System.Diagnostics.Debug" />
-    <Using Include="static Dx.Domain.Invariants.Guard" />
+    <Using Include="static Dx.Domain.Guard" />
   </ItemGroup>
 </Project>

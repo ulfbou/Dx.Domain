@@ -1,7 +1,6 @@
-// File: Dx.Domain/Guards/Guard.Helpers.cs
-namespace Dx.Domain.Guards;
+namespace Dx.Domain;
 
-internal static partial class Guard
+public static partial class Guard
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<T> AgainstNull<T>(T? value, DomainError error)
