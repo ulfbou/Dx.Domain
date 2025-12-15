@@ -147,16 +147,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 At the bottom of the changelog, include comparison links:
 
 ```markdown
-[Unreleased]: https://github.com/user/repo/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/user/repo/releases/tag/v1.0.0
+[Unreleased]: [https://github.com/user/repo/compare/v1.0.0...HEAD](https://github.com/user/repo/compare/v1.0.0...HEAD)
+[1.0.0]: [https://github.com/user/repo/releases/tag/v1.0.0](https://github.com/user/repo/releases/tag/v1.0.0)
 ```
 
 ### Automation
 
 This changelog should be updated:
-- **Automatically**: Through CI/CD pipeline for version bumps
-- **Manually**: For each pull request that adds user-facing changes
-- **Before Release**: Review and organize entries before creating a release
+
+  - **Automatically**: Through CI/CD pipeline for version bumps
+  - **Manually**: For each pull request that adds user-facing changes
+  - **Before Release**: Review and organize entries before creating a release
 
 ### Integration with Release Process
 

@@ -58,20 +58,20 @@ Use these placement rules:
 
 - **Adapters** (`Dx.Domain.Persistence.*`, HTTP, messaging, frameworks)  
   - Translate domain values, results, and errors to external concerns
-    (databases, transports, frameworks).  
-  - Never redefine invariants.  
+    (databases, transports, frameworks). 
+  - Never redefine invariants. 
   - Never smuggle transport or persistence details into core types.
 
 - **Generators** (`Dx.Domain.Generators`)  
-  - Remove repetition without altering semantics.  
-  - Generate code that *strengthens* invariants or results, not bypasses them.  
+  - Remove repetition without altering semantics. 
+  - Generate code that *strengthens* invariants or results, not bypasses them. 
   - Never introduce magic behavior that is invisible in the surface API.
 
 - **Analyzers** (`Dx.Domain.Analyzers`)  
-  - Encode rules the compiler cannot express on its own.  
-  - Push consumers toward idiomatic use of results, invariants, and errors.  
+  - Encode rules the compiler cannot express on its own. 
+  - Push consumers toward idiomatic use of results, invariants, and errors. 
   - Prefer diagnostics that are specific, actionable, and mechanically
-    enforceable.  
+    enforceable. 
   - Static analysis must distinguish between **semantic expansion** (flag) and
     **mechanical enforcement** (do not flag if internal and non‑extensible).
 
