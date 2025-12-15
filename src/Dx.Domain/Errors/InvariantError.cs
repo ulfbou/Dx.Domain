@@ -1,66 +1,25 @@
-namespace Dx.Domain.Errors
+namespace Dx.Domain
 {
     using System.Diagnostics;
 
-    /// <summary>
-    /// Diagnostic carrier for invariant violations in the Dx platform.
-    /// <para>
-    /// <b>InvariantError</b> is <b>NOT</b> a domain value and MUST NOT:
-    /// <list type="bullet">
-    /// <item>appear in <c>Result</c></item>
-    /// <item>cross process boundaries</item>
-    /// <item>be persisted</item>
-    /// <item>be returned from APIs</item>
-    /// </list>
-    /// It exists solely to explain <i>why the program is wrong</i> at an invariant failure site.
-    /// </para>
-    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly record struct InvariantError
+    public sealed class InvariantError
     {
-        /// <summary>The canonical domain meaning of the violation.</summary>
         public DomainError DomainError { get; }
-
-        /// <summary>Optional override message for this specific violation.</summary>
         public string? MessageOverride { get; }
-
-        /// <summary>Member name at the throw site.</summary>
         public string Member { get; }
-
-        /// <summary>Source file at the throw site.</summary>
-        public string File { get; }
-
-        /// <summary>Source line at the throw site.</summary>
+        public string FileName { get; }
         public int Line { get; }
-
-        /// <summary>Correlation identifier (semantic).</summary>
         public CorrelationId CorrelationId { get; }
-
-        /// <summary>Trace identifier (opaque).</summary>
         public TraceId TraceId { get; }
-
-        /// <summary>Span identifier (opaque).</summary>
         public SpanId SpanId { get; }
-
-        /// <summary>UTC timestamp captured at creation.</summary>
         public DateTime UtcTimestamp { get; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvariantError"/> class.
-        /// </summary>
-        /// <param name="domainError">The canonical domain meaning of the violation.</param>
-        /// <param name="messageOverride">Optional override message for this specific violation.</param>
-        /// <param name="member">Member name at the throw site.</param>
-        /// <param name="file">Source file at the throw site.</param>
-        /// <param name="line">Source line at the throw site.</param>
-        /// <param name="correlationId">Correlation identifier (semantic).</param>
-        /// <param name="traceId">Trace identifier (opaque).</param>
-        /// <param name="spanId">Span identifier (opaque).</param>
         private InvariantError(
             DomainError domainError,
             string? messageOverride,
             string member,
-            string file,
+            string fileName,
             int line,
             CorrelationId correlationId,
             TraceId traceId,
@@ -69,7 +28,7 @@ namespace Dx.Domain.Errors
             DomainError = domainError;
             MessageOverride = messageOverride;
             Member = member;
-            File = file;
+            FileName = fileName;
             Line = line;
             CorrelationId = correlationId;
             TraceId = traceId;
@@ -77,27 +36,8 @@ namespace Dx.Domain.Errors
             UtcTimestamp = DateTime.UtcNow;
         }
 
-        // ------------------------------------
-        // Factory (used only by invariants)
-        // ------------------------------------
-
-        /// <summary>
-        /// Creates an <see cref="InvariantError"/> for diagnostic purposes at invariant failure sites.
-        /// <para>
-        /// Intended to be called only at invariant failure sites. This type must never be used as a domain value, nor cross boundaries, nor be persisted.
-        /// </para>
-        /// </summary>
-        /// <param name="domainError">The canonical domain meaning of the violation.</param>
-        /// <param name="messageOverride">Optional override message for this specific violation.</param>
-        /// <param name="correlationId">Correlation identifier (semantic).</param>
-        /// <param name="traceId">Trace identifier (opaque).</param>
-        /// <param name="spanId">Span identifier (opaque).</param>
-        /// <param name="member">Member name at the throw site.</param>
-        /// <param name="file">Source file at the throw site.</param>
-        /// <param name="line">Source line at the throw site.</param>
-        /// <returns>A new <see cref="InvariantError"/> instance for diagnostics.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static InvariantError Create(
+        internal static InvariantError Create(
             DomainError domainError,
             string? messageOverride = null,
             CorrelationId correlationId = default,
@@ -107,34 +47,27 @@ namespace Dx.Domain.Errors
             [CallerFilePath] string file = "",
             [CallerLineNumber] int line = 0)
         {
+            var fileName = string.IsNullOrEmpty(file)
+                ? string.Empty
+                : Path.GetFileName(file);
+
             return new InvariantError(
                 domainError,
                 messageOverride,
                 member,
-                file,
+                fileName,
                 line,
                 correlationId,
                 traceId,
                 spanId);
         }
 
-        /// <summary>Effective message for diagnostics and exceptions.</summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public string EffectiveMessage
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => MessageOverride ?? DomainError.Message;
-        }
+        public string EffectiveMessage => MessageOverride ?? DomainError.Message;
 
-        /// <inheritdoc/>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
             => $"{DomainError.Code}: {EffectiveMessage} @ {Member}:{Line}";
 
         private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => $"{DomainError.Code} @ {Member}:{Line}";
-        }
+            => $"{DomainError.Code} @ {Member}:{Line}";
     }
 }
