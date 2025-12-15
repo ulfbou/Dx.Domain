@@ -77,6 +77,80 @@ patterns by being **unable to express the wrong ones**.
 
 ---
 
+## Kernel Rule: Mechanics vs. Semantics
+
+> The kernel forbids semantic expansion, not mechanical support.
+
+Dx.Domain refuses to add new domain meaning or architectural surface to the kernel.  
+It does, however, permit internal, mechanical code that enforces or constructs existing primitives safely and efficiently.
+
+### Allowed: Mechanical Support Code
+
+The Dx.Domain kernel **explicitly allows** internal code whose purpose is *mechanical*, not *semantic*.
+
+Mechanical support code:
+
+- has no independent domain meaning  
+- does not introduce new nouns into the model  
+- does not encode workflows, policies, or lifecycles  
+- exists solely to construct, validate, or enforce existing primitives
+
+Examples of allowed mechanical support include:
+
+- Internal factory methods for value creation  
+  (e.g. `TraceId.New()`, `SpanId.New()`)
+
+- Internal invariant enforcement helpers  
+  (e.g. `Invariant.That(...)`)
+
+- Internal requirement helpers that return existing primitives  
+  (e.g. `Require.NotNull`, `Require.That`)
+
+- Performance‑oriented utilities  
+  (e.g. `AggressiveInlining`, `stackalloc`, bit‑level operations)
+
+- Caller‑info capture for diagnostics  
+  (`CallerMemberName`, `CallerFilePath`, etc.)
+
+Such code:
+
+- must be `internal`  
+- must not introduce new semantic concepts  
+- must not be extensible by consumers  
+- must not escape the kernel boundary
+
+Mechanical helpers are implementation detail, not part of the domain vocabulary.
+
+### Forbidden: Semantic Helpers
+
+The following are **not allowed**, even if implemented as helpers or utilities:
+
+- Types or methods that introduce new domain concepts  
+  (e.g. `AggregateRoot`, `DomainEvent`, `CommandContext`)
+
+- Helpers that imply workflow or progression  
+  (e.g. `Apply`, `Handle`, `When`, `TransitionTo`)
+
+- Helpers that encode policy decisions  
+  (e.g. “success must produce facts”)
+
+- Helpers that perform dispatch, publishing, or coordination
+
+If a helper can be named meaningfully by a domain expert, it does not belong in the kernel.
+
+### Invariants and Requirements
+
+Invariant and requirement helpers are permitted because they:
+
+- do not introduce new domain meaning  
+- only enforce already‑defined rules  
+- always fail by producing existing kernel values (`DomainError`, `Result<T>`)
+
+They are guardrails, not abstractions.  
+They exist to make incorrect code impossible to ignore, not to express business logic.
+
+---
+
 ## What Dx.Domain Demands
 
 ### Explicit Invariants
@@ -130,4 +204,6 @@ This manifesto is not documentation; it is the **guardrail against drift**.
 Every change answers one question:
 
 > Does this uphold the refusal – or compromise it?
+
+---
 
