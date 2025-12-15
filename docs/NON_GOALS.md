@@ -2,7 +2,7 @@
 
 ## A Declaration of Permanent Refusal
 
-Dx.Domain is defined as much by what it **excludes** as by what it enforces.  
+Dx.Domain is defined as much by what it **excludes** as by what it enforces. 
 These are not “out of scope for now.” They are **structural refusals** that
 protect the kernel described in the [Manifesto](MANIFESTO.md).
 
@@ -27,6 +27,23 @@ semantic clarity, it does not belong. Prefer:
 over putting “useful” helpers in the core.
 
 Note: The kernel may contain **internal mechanical support** (e.g., value factories like `TraceId.New()`, invariant/require helpers, caller‑info capture, perf utilities) that exist solely to construct or enforce existing primitives. These are not consumer APIs, do not add domain meaning, and must not escape the kernel boundary.
+
+### Forbidden: Semantic Helpers
+
+The following are **not allowed**, even if implemented as helpers or utilities:
+
+- Types or methods that introduce new domain concepts  
+  (e.g. `AggregateRoot`, `DomainEvent`, `CommandContext`)
+
+- Helpers that imply workflow or progression  
+  (e.g. `Apply`, `Handle`, `When`, `TransitionTo`)
+
+- Helpers that encode policy decisions  
+  (e.g. “success must produce facts”)
+
+- Helpers that perform dispatch, publishing, or coordination
+
+If a helper’s name describes *business meaning* rather than *mechanical action*, it does not belong in the kernel.
 
 ### 2. A DDD Pattern Museum
 

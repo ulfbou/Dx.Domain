@@ -11,13 +11,13 @@ If you have not read the Manifesto, Non‑Goals, and the Design Pressure Index, 
 
 ## Placement Guidance
 
-- **Core**: only executable invariants, error primitives, and minimal kernel primitives.
-- **Values**: strongly typed value objects and identity types.
-- **Analyzers**: static enforcement that can be applied without runtime impact.
-- **Generators**: code generation to remove repetition without changing semantics.
-- **Persistence**: adapters and integrations only.
+  - **Core**: only executable invariants, error primitives, and minimal kernel primitives.
+  - **Values**: strongly typed value objects and identity types.
+  - **Analyzers**: static enforcement that can be applied without runtime impact.
+  - **Generators**: code generation to remove repetition without changing semantics.
+  - **Persistence**: adapters and integrations only.
 
 ## Enforcement
 
-- Pull requests must include the DPI checklist and a one-line justification for placement.
-- Maintainers will move misplaced changes to the correct package and may close pull requests that violate Non‑Goals.
+  - Pull requests must include the DPI checklist and a one-line justification for placement.
+  - Maintainers will move misplaced changes to the correct package and may close pull requests that violate Non‑Goals.
