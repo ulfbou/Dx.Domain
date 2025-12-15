@@ -1,59 +1,101 @@
-# Zentient.Metadata
+# Dx.Domain
 
-<<<<<<< HEAD
-A modern, extensible metadata platform for .NET. This monorepo contains the core packages used to declare, compose, discover, and analyze metadata in libraries and applications.
+Compiler-assisted domain safety for .NET.
 
-[![CI](https://github.com/ulfbou/Zentient.Metadata/actions/workflows/ci-cd.yml/badge.svg)](.github/workflows/ci-cd.yml)
-=======
-[![.github/workflows/ci-cd.yml](https://github.com/ulfbou/Zentient.Metadata/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/ulfbou/Zentient.Metadata/actions/workflows/ci-cd.yml)
->>>>>>> origin/main
-[![NuGet](https://img.shields.io/nuget/v/Zentient.Metadata.svg)](https://www.nuget.org/packages/Zentient.Metadata)
+Dx.Domain is a small, opinionated kernel for expressing invariants, results, and structured domain errors.
+It exists to make incorrect domain modeling impossible to ignore – not to provide general-purpose helpers.
 
-What’s inside
-- Zentient.Metadata — Core metadata engine (immutable metadata, fluent builder, scanners)
-- Zentient.Metadata.Attributes — Attribute-based metadata discovery and conversion
-- Zentient.Metadata.Abstractions — Interfaces and contracts used across packages
-- Zentient.Metadata.Analyzers — Roslyn analyzers for best practices and correctness
-- Zentient.Metadata.Diagnostics — Diagnostic helpers and profiles
+> Time, causation, invariants, results, values — this is the spine. Everything else lives outside or on top.
 
-Goals
-- Provide a small, stable set of abstractions for metadata composition and discovery
-- Offer a flexible runtime model with first-class support for attribute-driven metadata
-- Deliver tooling (analyzers and diagnostics) to improve developer experience
+---
 
-Quick start
-1. Add the package you need:
+## Core Concepts
 
-```bash
-dotnet add package Zentient.Metadata
-# or
-dotnet add package Zentient.Metadata.Attributes
-```
+- `DomainError` – canonical, boundary-safe error value for domain failures.
+- `Result<TValue>` / `Result<TValue, TError>` – explicit success/failure results with typed errors.
+- `Invariant` – guard-style APIs for enforcing executable invariants.
+- Invariant diagnostics – `InvariantError` and `InvariantViolationException` explain why the program is wrong
+  without leaking diagnostics into domain values.
 
-2. Build metadata using the fluent API:
+The kernel is intentionally small and frozen; evolution happens in analyzers, generators, and adapters that
+push correctness pressure toward the edges.
+
+---
+
+## Philosophy
+
+Dx.Domain is defined as much by what it refuses as by what it provides:
+
+- Not a convenience library or kitchen-sink utility layer.
+- Not a DDD pattern museum (no generic repositories, services, or aggregate frameworks).
+- Not a persistence or transport framework; those live as adapters on top.
+- Not a runtime-first safety net; correctness is primarily compile-time and invariant-driven.
+
+The design favors friction that teaches. Misuse should be mechanically hard or impossible. Correct usage should
+be obvious from the types.
+
+For the full rationale, see:
+
+- [ `docs/MANIFESTO.md`](./docs/MANIFESTO.md) – the core refusals and demands.
+- [`docs/NON_GOALS.md` ](./docs/NON_GOALS.md) – what Dx.Domain will never become.
+- [`docs/DPI.md`](./docs/DPI.md) – the Design Pressure Index that governs whether a change belongs in the core.
+
+---
+
+## Packages
+
+The repository is organized as a small core plus edge packages:
+
+- `Dx.Domain` – core invariants, results, errors, time/causation primitives.
+- `Dx.Domain.Analyzers` – Roslyn analyzers that enforce idioms and migrate legacy code toward the model.
+- `Dx.Domain.Generators` – source generators that remove boilerplate without weakening invariants.
+- `Dx.Domain.Persistence.*` – persistence and transport adapters that respect, but do not redefine, the core.
+
+---
+
+## Using Dx.Domain (sketch)
 
 ```csharp
-var metadata = Metadata.Create()
-    .SetTag("Version", "1.0.0")
-    .SetTag("Author", "Zentient Team")
-    .Build();
+using Dx.Domain;
+using Dx.Domain.Errors;
 
-var version = metadata.GetValueOrDefault<string>("Version");
+public static Result<OrderId> CreateOrder(string? customerId)
+{
+    Invariant.NotNullOrWhiteSpace(
+        customerId,
+        DomainError.Create("order.customer.missing", "Customer id is required."));
+
+    var id = OrderId.New();
+    return Result.Ok(id);
+}
 ```
 
-Documentation
-- API reference: https://ulfbou.github.io/Zentient.Metadata/
-- Specification and design docs: docs/
-- CHANGELOG: CHANGELOG.md
+Results and domain errors are designed to cross boundaries (APIs, persistence, tests). Invariant diagnostics are not.
 
-CI / Release
-- The repository uses GitHub Actions (.github/workflows/ci-cd.yml) to run restore, build, test, pack, and publish.
-- Releases are triggered by tags using the form `vMAJOR.MINOR.PATCH` and publish packages to NuGet.org.
+---
 
-Contributing
-- See CONTRIBUTING.md for contribution and release guidelines.
-- Open issues and PRs on GitHub; all changes should include tests and updates to CHANGELOG.md when applicable.
+## Documentation
 
-License
-- MIT — see LICENSE file.
+- Manifesto & rationale: `docs/MANIFESTO.md`
+- Non-goals & scope guardrails: `docs/NON_GOALS.md`
+- Design Pressure Index (how changes are judged): `docs/DPI.md`
+- API reference: generated from the `Dx.Domain` assemblies (TBD).
 
+---
+
+## Contributing
+
+Contributions are welcome, but every change must pass the Design Pressure Index:
+
+- Enforces a domain invariant that cannot be enforced elsewhere.
+- Reduces accidental complexity or misuse.
+- Increases what the compiler can prove.
+- Aligns with the Manifesto and violates none of the Non-Goals.
+
+If a feature does not belong in the core, it may fit as an analyzer, generator, or adapter – or outside this repo entirely.
+
+---
+
+## License
+
+Licensed under the MIT License. See [`LICENSE`](./LICENSE) for details.

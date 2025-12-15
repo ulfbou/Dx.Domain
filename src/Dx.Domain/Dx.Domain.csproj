@@ -91,4 +91,15 @@
     <None Include="build\Dx.Domain.props" Pack="true" PackagePath="build" />
     <None Include="build\Dx.Domain.props" Pack="true" PackagePath="buildMultiTargeting" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="docs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="C:\repos\Dx.Domain\CHANGELOG.md" Link="docs\CHANGELOG.md" />
+    <None Update="C:\repos\Dx.Domain\docs\DPI.md" Link="docs\DPI.md" />
+    <None Update="C:\repos\Dx.Domain\docs\MANIFESTO.md" Link="docs\MANIFESTO.md" />
+    <None Update="C:\repos\Dx.Domain\docs\NON_GOALS.md" Link="docs\NON_GOALS.md" />
+    <None Update="C:\repos\Dx.Domain\LICENSE" Link="docs\LICENSE" />
+    <None Update="C:\repos\Dx.Domain\README.md" Link="docs\README.md" />
+  </ItemGroup>
 </Project>
