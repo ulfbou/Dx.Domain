@@ -73,6 +73,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Dx.Domain\Dx.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="Dx.Domain.Abstractions" />
     <InternalsVisibleTo Include="Dx.Domain.Attributes" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
