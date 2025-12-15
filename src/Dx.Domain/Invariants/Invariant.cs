@@ -1,6 +1,6 @@
 namespace Dx.Domain.Invariants
 {
-    public static class Invariant
+    internal static class Invariant
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void That(
