@@ -26,6 +26,8 @@ semantic clarity, it does not belong. Prefer:
 
 over putting “useful” helpers in the core.
 
+Note: The kernel may contain **internal mechanical support** (e.g., value factories like `TraceId.New()`, invariant/require helpers, caller‑info capture, perf utilities) that exist solely to construct or enforce existing primitives. These are not consumer APIs, do not add domain meaning, and must not escape the kernel boundary.
+
 ### 2. A DDD Pattern Museum
 
 Dx.Domain does not re‑implement aggregates, repositories, factories, or
@@ -63,6 +65,8 @@ boundary must be **explicit and minimal**. Prefer:
 
 If a feature primarily adds runtime checks that the type system could
 enforce, it does not belong.
+
+(Clarification: `Invariant` and `Require` helpers are permitted because they enforce already‑declared rules and fail via kernel values; they do not add semantics.)
 
 ### 5. A Convenience Layer
 
@@ -102,3 +106,6 @@ Before adding any new surface, ask:
 > or does it quietly expand the scope of the kernel?
 
 If it is the latter, the change belongs elsewhere.
+
+---
+

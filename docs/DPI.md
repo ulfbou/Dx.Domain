@@ -41,6 +41,10 @@ A change may enter **`Dx.Domain` core** only if **all** of the following are tru
    It violates none of the [Non‑Goals](NON_GOALS.md). If it drifts toward
    “convenience library,” “pattern museum,” or “kitchen sink,” it is rejected.
 
+7. **No Semantic Expansion**  
+   It provides mechanical support only (construction, validation, enforcement),
+   without introducing new domain nouns, lifecycles, workflows, policies, or coordination.
+
 If any item fails, the change is **not core**.
 
 ---
@@ -67,7 +71,9 @@ Use these placement rules:
   - Encode rules the compiler cannot express on its own.  
   - Push consumers toward idiomatic use of results, invariants, and errors.  
   - Prefer diagnostics that are specific, actionable, and mechanically
-    enforceable.
+    enforceable.  
+  - Static analysis must distinguish between **semantic expansion** (flag) and
+    **mechanical enforcement** (do not flag if internal and non‑extensible).
 
 - **Outside `Dx.Domain`**  
   - Anything that does not enforce invariants or increase correctness of
@@ -96,6 +102,10 @@ When reviewing a change, ask in order:
    If so, the proposal is not a feature request – it is a request to change
    the project’s identity.
 
+5. **Is this mechanical support or semantic expansion?**  
+   Purely mechanical, internal helpers that do not add vocabulary are acceptable;
+   anything that adds new domain nouns, workflow, policy, or coordination is not.
+
 Document DPI reasoning in the PR description when the decision is subtle.
 
 ---
@@ -110,4 +120,6 @@ Document DPI reasoning in the PR description when the decision is subtle.
   **outside this repo**.
 
 Rejection is not failure. **Misplacement is.**
+
+---
 
