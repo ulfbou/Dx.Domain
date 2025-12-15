@@ -1,11 +1,6 @@
 namespace Dx.Domain.Results
 {
-    using Dx.Domain.Errors;
-
-    using System.Reflection;
     using System.Runtime.CompilerServices;
-
-    using static Dx.Domain.Invariant;
 
     /// <summary>
     /// Represents the immutable result of an operation that can succeed with a value of type <typeparamref name="TValue"/> or fail
@@ -38,7 +33,7 @@ namespace Dx.Domain.Results
         public TValue Value
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsSuccess ? _value! : throw new DomainErrorException($"Value is not present in a failure result. Error: {_error}");
+            get => IsSuccess ? _value! : throw new InvalidOperationException($"Value is not present in a failure result. Error: {_error}");
         }
 
         /// <summary>
@@ -47,7 +42,7 @@ namespace Dx.Domain.Results
         public TError Error
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsFailure ? _error! : throw new DomainErrorException($"Error is not present in a successful result. Value: {_value}");
+            get => IsFailure ? _error! : throw new InvalidOperationException($"Error is not present in a successful result. Value: {_value}");
         }
 
 
