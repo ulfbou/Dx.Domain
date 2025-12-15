@@ -36,7 +36,6 @@ namespace Dx.Domain
             UtcTimestamp = DateTime.UtcNow;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static InvariantError Create(
             DomainError domainError,
             string? messageOverride = null,
@@ -47,9 +46,7 @@ namespace Dx.Domain
             [CallerFilePath] string file = "",
             [CallerLineNumber] int line = 0)
         {
-            var fileName = string.IsNullOrEmpty(file)
-                ? string.Empty
-                : Path.GetFileName(file);
+            var fileName = string.IsNullOrEmpty(file) ? string.Empty : Path.GetFileName(file);
 
             return new InvariantError(
                 domainError,
@@ -67,7 +64,6 @@ namespace Dx.Domain
         public override string ToString()
             => $"{DomainError.Code}: {EffectiveMessage} @ {Member}:{Line}";
 
-        private string DebuggerDisplay
-            => $"{DomainError.Code} @ {Member}:{Line}";
+        private string DebuggerDisplay => $"{DomainError.Code} @ {Member}:{Line}";
     }
 }
