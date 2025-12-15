@@ -20,8 +20,7 @@ namespace Dx.Domain
             ) =>
                 DomainError.Create(
                     code: "Result.NullErrorNotAllowed",
-                    message: "A null DomainError is not allowed. All Result failures must provide an explicit error object.",
-                    member, file, line);
+                    message: "A null DomainError is not allowed. All Result failures must provide an explicit error object.");
 
             /// <summary>
             /// Error for when a null value was supplied where a non-null was required.
@@ -33,8 +32,7 @@ namespace Dx.Domain
             ) =>
                 DomainError.Create(
                     code: "Result.NullValueNotAllowed",
-                    message: "A null value is not allowed for a successful Result. All successes must provide a concrete value.",
-                    member, file, line);
+                    message: "A null value is not allowed for a successful Result. All successes must provide a concrete value.");
         }
 
         public static partial class Aggregate
@@ -51,8 +49,7 @@ namespace Dx.Domain
                 [CallerLineNumber] int line = 0)
                 => DomainError.Create(
                     code: "Validation.MissingRequiredField",
-                    message: $"Required field '{fieldName}' is missing.",
-                    member, file, line);
+                    message: $"Required field '{fieldName}' is missing.");
         }
     }
 }

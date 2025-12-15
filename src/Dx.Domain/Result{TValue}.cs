@@ -70,6 +70,7 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="value">The value to be wrapped in a successful result.</param>
         /// <returns>A <see cref="Result{TValue}"/> representing a successful operation with the provided value.</returns>
+        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Static factories on the generic result type are an intentional part of the API.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Result<TValue> Ok(TValue value) => new Result<TValue>(Result<TValue, DomainError>.Ok(value));
 
@@ -78,6 +79,7 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="error">The domain error that describes the reason for the failure. Cannot be null.</param>
         /// <returns>A result representing a failure, containing the specified domain error.</returns>
+        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Static factories on the generic result type are an intentional part of the API.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Result<TValue> Failure(DomainError error) => new Result<TValue>(Result<TValue, DomainError>.Failure(error));
 
