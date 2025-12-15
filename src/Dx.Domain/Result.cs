@@ -191,14 +191,18 @@ namespace Dx.Domain
         /// Creates a new result object by converting a non-error result to a result type that includes an explicit
         /// error value.
         /// </summary>
-        /// <remarks>Use this method to adapt a Result<TValue> to a Result<TValue, TError> when you need
+        /// <remarks>
+        /// Use this method to adapt a <see cref="Result{TValue}"/> to a <see cref="Result{TValue, TError}"/> when you need
         /// to work with a result type that explicitly represents both success and error values. The error value is cast
-        /// to TError; ensure that the error type is compatible with TError to avoid runtime exceptions.</remarks>
+        /// to <typeparamref name="TError"/>; ensure that the runtime type is compatible to avoid invalid cast exceptions.
+        /// </remarks>
         /// <typeparam name="TValue">The type of the value contained in the result.</typeparam>
         /// <typeparam name="TError">The type of the error value to associate with a failed result.</typeparam>
         /// <param name="result">The result to convert. Must not be null.</param>
-        /// <returns>A result of type Result<TValue, TError> containing the value if successful, or the error converted to TError
-        /// if failed.</returns>
+        /// <returns>
+        /// A result of type <see cref="Result{TValue, TError}"/> containing the value if successful,
+        /// or the error converted to <typeparamref name="TError"/> if failed.
+        /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Result<TValue, TError> From<TValue, TError>(Result<TValue> result) where TValue : notnull where TError : notnull
         {
