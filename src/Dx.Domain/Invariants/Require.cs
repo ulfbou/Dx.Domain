@@ -1,8 +1,8 @@
-namespace Dx.Domain
+namespace Dx.Domain.Invariants
 {
     using System.Text.RegularExpressions;
 
-    public static partial class Require
+    internal static partial class Require
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Result<Unit> That(bool condition, DomainError error)
