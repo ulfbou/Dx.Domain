@@ -19,7 +19,7 @@ namespace Dx.Domain.Invariants
 
             var diagnostic = InvariantError.Create(
                 error,
-                message,
+                message ?? error.Message,
                 correlationId,
                 traceId,
                 spanId,

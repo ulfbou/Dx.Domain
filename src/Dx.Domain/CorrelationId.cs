@@ -12,9 +12,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CorrelationId(Guid value) => Value = value;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static CorrelationId New() => new(Guid.NewGuid());
-
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsEmpty
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,6 +41,11 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(CorrelationId a, CorrelationId b) => !a.Equals(b);
 
-        private string DebuggerDisplay => IsEmpty ? "CorrelationId.Empty" : ToString();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => IsEmpty ? "CorrelationId.Empty" : ToString();
+        }
     }
 }

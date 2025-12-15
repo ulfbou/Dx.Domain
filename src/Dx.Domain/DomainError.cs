@@ -38,16 +38,12 @@ namespace Dx.Domain
         {
             if (string.IsNullOrWhiteSpace(code))
             {
-                throw new ArgumentException(
-                    "Code cannot be null or whitespace.",
-                    nameof(code));
+                throw new ArgumentException(DomainErrors.Code.NullOrWhitespace, nameof(code));
             }
 
             if (string.IsNullOrWhiteSpace(message))
             {
-                throw new ArgumentException(
-                    "Message cannot be null or whitespace.",
-                    nameof(message));
+                throw new ArgumentException(DomainErrors.Message.NullOrWhitespace, nameof(message));
             }
 
             return new DomainError(code, message);

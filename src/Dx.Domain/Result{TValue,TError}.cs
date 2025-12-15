@@ -33,7 +33,7 @@ namespace Dx.Domain.Results
         public TValue Value
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsSuccess ? _value! : throw new InvalidOperationException($"Value is not present in a failure result. Error: {_error}");
+            get => IsSuccess ? _value! : throw new InvalidOperationException(DomainErrors.Result.MissingValue(_error?.ToString()));
         }
 
         /// <summary>
@@ -42,9 +42,8 @@ namespace Dx.Domain.Results
         public TError Error
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsFailure ? _error! : throw new InvalidOperationException($"Error is not present in a successful result. Value: {_value}");
+            get => IsFailure ? _error! : throw new InvalidOperationException(DomainErrors.Result.MissingError(_value?.ToString()));
         }
-
 
         /// <summary>
         /// Initializes a new instance of the Result class with the specified value.

@@ -14,27 +14,11 @@ namespace Dx.Domain
         public SpanId(ulong value) => _value = value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SpanId FromBytes(ReadOnlySpan<byte> bytes)
+        public static SpanId New()
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(bytes.Length, 8, nameof(bytes));
-
-            ulong v = 0;
-            for (int i = 0; i < 8; i++)
-                v = (v << 8) | bytes[i];
-            return new SpanId(v);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ToBytes(Span<byte> destination)
-        {
-            ArgumentOutOfRangeException.ThrowIfLessThan(destination.Length, 8, nameof(destination));
-
-            ulong v = _value;
-            for (int i = 7; i >= 0; i--)
-            {
-                destination[i] = (byte)(v & 0xFF);
-                v >>= 8;
-            }
+            Span<byte> buffer = stackalloc byte[8];
+            Random.Shared.NextBytes(buffer);
+            return new SpanId(BitConverter.ToUInt64(buffer));
         }
 
         public bool IsEmpty
