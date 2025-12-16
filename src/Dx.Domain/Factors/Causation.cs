@@ -1,34 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>Causation.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the causation value object used to capture correlation, trace, actor, and timestamp
-//                 metadata for domain facts and operations.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
-// <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Causation.cs" company="Dx.Domain Team">
-//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
-// </copyright>
-// <license>
-//     This software is licensed under the MIT License.
-//     See the project's root <c>LICENSE</c> file for details.
-//     Contributions are welcome, subject to the terms of the project's license.
-//     See the repository root <c>CONTRIBUTING.md</c> file for details.
-// </license>
-// ----------------------------------------------------------------------------------
-
 namespace Dx.Domain.Factors
 {
     using Dx.Domain.Invariants;
@@ -36,14 +5,15 @@ namespace Dx.Domain.Factors
     using System.Diagnostics;
 
     /// <summary>
-    /// Represents contextual information that identifies the origin and trace of an operation, including correlation,
-    /// trace, actor, and timestamp data.
+    /// Captures correlation, trace, actor, and timestamp information that explains why a fact or operation occurred.
     /// </summary>
-    /// <remarks>Use this struct to propagate causation details across service boundaries or between
-    /// components to enable distributed tracing, correlation, and auditing. Causation information is typically attached
-    /// to messages, events, or logs to provide end-to-end visibility into the flow of operations. All properties are
-    /// immutable.</remarks>
-    [DebuggerDisplay($"{{{nameof(DebuggerDisplay)},nq}}")]
+    /// <remarks>
+    /// Typical usage when emitting a fact:
+    /// <code>
+    /// var causation = Causation.Create(correlationId, traceId, actorId);
+    /// var fact = Fact.Create("OrderPlaced", payload, causation);
+    /// </code>
+    /// </remarks>
     public readonly struct Causation : IEquatable<Causation>
     {
         /// <summary>Gets the correlation identifier that groups related operations.</summary>
@@ -58,7 +28,6 @@ namespace Dx.Domain.Factors
         /// <summary>Gets the UTC timestamp when the causation was recorded.</summary>
         public DateTime UtcTimestamp { get; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Causation(CorrelationId correlationId, TraceId traceId, ActorId? actorId, DateTime utcTimestamp)
         {
             CorrelationId = correlationId;
@@ -73,7 +42,14 @@ namespace Dx.Domain.Factors
         /// <param name="correlationId">The correlation identifier. Must not be empty.</param>
         /// <param name="traceId">The trace identifier. Must not be empty.</param>
         /// <param name="actorId">The optional actor responsible for the action.</param>
-        /// <returns>A new <see cref="Causation"/> instance.</returns>
+        /// <returns>A new <see cref="Causation"/> instance whose <see cref="UtcTimestamp"/> is set to <see cref="DateTime.UtcNow"/>.</returns>
+        /// <remarks>
+        /// This method enforces the invariant that both <paramref name="correlationId"/> and <paramref name="traceId"/>
+        /// are non-empty. If either identifier is empty, an invariant violation is raised.
+        /// </remarks>
+        /// <exception cref="InvariantViolationException">
+        /// Thrown if <paramref name="correlationId"/> or <paramref name="traceId"/> is empty.
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
         {
@@ -83,7 +59,6 @@ namespace Dx.Domain.Factors
         }
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Causation other)
             => CorrelationId == other.CorrelationId &&
                TraceId == other.TraceId &&
@@ -91,27 +66,26 @@ namespace Dx.Domain.Factors
                UtcTimestamp == other.UtcTimestamp;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is Causation other && Equals(other);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
             => HashCode.Combine(CorrelationId, TraceId, ActorId, UtcTimestamp);
 
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Determines whether two <see cref="Causation"/> values are equal.
+        /// </summary>
+        /// <param name="left">The first value to compare.</param>
+        /// <param name="right">The second value to compare.</param>
+        /// <returns><see langword="true"/> if the values are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(Causation left, Causation right) => left.Equals(right);
 
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Determines whether two <see cref="Causation"/> values are not equal.
+        /// </summary>
+        /// <param name="left">The first value to compare.</param>
+        /// <param name="right">The second value to compare.</param>
+        /// <returns><see langword="true"/> if the values are not equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator !=(Causation left, Causation right) => !left.Equals(right);
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => $"Causation {{ CorrelationId = {CorrelationId}, TraceId = {TraceId}, ActorId = {ActorId}, UtcTimestamp = {UtcTimestamp:u} }}";
-        }
     }
 }

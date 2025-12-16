@@ -36,7 +36,7 @@ namespace Dx.Domain
     /// <summary>
     /// Represents detailed diagnostic information for a violated invariant.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("InvariantError {DomainError.Code} @ {Member}:{Line}")]
     public sealed class InvariantError
     {
         /// <summary>Gets the domain error associated with the invariant violation.</summary>
@@ -66,7 +66,6 @@ namespace Dx.Domain
         /// <summary>Gets the UTC timestamp when the invariant violation was recorded.</summary>
         public DateTime UtcTimestamp { get; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private InvariantError(
             DomainError domainError,
             string? messageOverride,
@@ -91,7 +90,6 @@ namespace Dx.Domain
         /// <summary>
         /// Creates a new <see cref="InvariantError"/> instance with the specified diagnostic information.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static InvariantError Create(
             DomainError domainError,
             string? messageOverride = null,
@@ -124,8 +122,5 @@ namespace Dx.Domain
         /// <inheritdoc />
         public override string ToString()
             => $"{DomainError.Code}: {EffectiveMessage} @ {Member}:{Line}";
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => $"{DomainError.Code} @ {Member}:{Line}";
     }
 }

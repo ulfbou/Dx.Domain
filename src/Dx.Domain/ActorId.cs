@@ -32,24 +32,27 @@
 namespace Dx.Domain
 {
     using System.Diagnostics;
+    using System.Globalization;
 
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    /// <summary>
+    /// Strongly-typed identifier for an actor (user, service, or system) participating in domain operations.
+    /// </summary>
+    [DebuggerDisplay("ActorId = {Value}")]
     public readonly struct ActorId : IEquatable<ActorId>
     {
         /// <summary>
-        ///     An <see cref="ActorId"/> with an empty <see cref="Guid"/> value.
+        /// Gets an <see cref="ActorId"/> whose underlying value is <see cref="Guid.Empty"/>.
         /// </summary>
-        public static readonly ActorId Empty = new(null);
+        public static readonly ActorId Empty = new(Guid.Empty);
 
         /// <summary>
-        ///     The underlying <see cref="Guid"/> value of this <see cref="ActorId"/>.
+        /// Gets the underlying <see cref="Guid"/> value for this actor.
         /// </summary>
         public Guid Value { get; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ActorId(Guid? guid)
+        private ActorId(Guid value)
         {
-            Value = guid ?? Guid.Empty;
+            Value = value;
         }
 
         /// <summary>
@@ -62,42 +65,35 @@ namespace Dx.Domain
         /// <summary>
         /// Gets a value indicating whether this instance represents <see cref="Empty"/>.
         /// </summary>
-        public bool IsEmpty
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Value == Guid.Empty;
-        }
+        public bool IsEmpty => Value == Guid.Empty;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(ActorId other) => Value.Equals(other.Value);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is ActorId other && Equals(other);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Value.GetHashCode();
 
-        /// <inheritdoc/>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Determines whether two <see cref="ActorId"/> values are equal.
+        /// </summary>
+        /// <param name="a">The first identifier to compare.</param>
+        /// <param name="b">The second identifier to compare.</param>
+        /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(ActorId a, ActorId b) => a.Equals(b);
 
-        /// <inheritdoc/>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Determines whether two <see cref="ActorId"/> values are not equal.
+        /// </summary>
+        /// <param name="a">The first identifier to compare.</param>
+        /// <param name="b">The second identifier to compare.</param>
+        /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator !=(ActorId a, ActorId b) => !a.Equals(b);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
-            => IsEmpty ? "ActorId.Empty" : $"ActorId({Value})";
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ToString();
-        }
+            => IsEmpty ? "ActorId.Empty" : $"ActorId({Value.ToString("N", CultureInfo.InvariantCulture)})";
     }
 }

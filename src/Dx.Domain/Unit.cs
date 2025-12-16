@@ -48,7 +48,6 @@ namespace Dx.Domain
         /// </summary>
         public static Unit Value
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_value == null)

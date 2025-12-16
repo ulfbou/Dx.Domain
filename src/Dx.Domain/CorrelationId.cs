@@ -36,7 +36,7 @@ namespace Dx.Domain
     /// <summary>
     /// Represents a correlation identifier used to group related operations or requests.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("CorrelationId = {Value:N}")]
     public readonly struct CorrelationId : IEquatable<CorrelationId>
     {
         /// <summary>
@@ -49,52 +49,34 @@ namespace Dx.Domain
         /// </summary>
         public Guid Value { get; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CorrelationId(Guid value) => Value = value;
 
         /// <summary>
         /// Gets a value indicating whether this identifier is empty.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsEmpty
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Value == Guid.Empty;
-        }
+        public bool IsEmpty => Value == Guid.Empty;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public bool TryFormat(Span<char> destination, out int charsWritten)
             => Value.TryFormat(destination, out charsWritten, "N");
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => Value.ToString("N");
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(CorrelationId other) => Value.Equals(other.Value);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is CorrelationId other && Equals(other);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Value.GetHashCode();
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(CorrelationId a, CorrelationId b) => a.Equals(b);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(CorrelationId a, CorrelationId b) => !a.Equals(b);
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsEmpty ? "CorrelationId.Empty" : ToString();
-        }
     }
 }
