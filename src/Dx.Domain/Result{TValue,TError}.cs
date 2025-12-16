@@ -1,3 +1,34 @@
+// <summary>
+//     <list type="bullet">
+//         <item>
+//             <term>File:</term>
+//             <description>Result{TValue,TError}.cs</description>
+//         </item>
+//         <item>
+//             <term>Project:</term>
+//             <description>Dx.Domain</description>
+//         </item>
+//         <item>
+//             <term>Description:</term>
+//             <description>
+//                 The canonical, generic Result type (discriminated union) used to explicitly model
+//                 success and failure paths with distinct value and error types.
+//             </description>
+//         </item>
+//     </list>
+// </summary>
+// <authors>Ulf Bourelius (Original Author)</authors>
+// <copyright file="Result{TValue,TError}.cs" company="Dx.Domain Team">
+//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
+
 namespace Dx.Domain.Results
 {
     using System.Runtime.CompilerServices;
@@ -19,7 +50,7 @@ namespace Dx.Domain.Results
 
         /// <summary>
         /// Gets a value indicating whether the operation completed successfully.
-        /// </summary>
+        /// </summary> 
         public bool IsSuccess => _error is null;
 
         /// <summary>
