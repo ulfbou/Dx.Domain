@@ -27,7 +27,7 @@ namespace Dx.Domain.Factors
     /// if (result.IsSuccess) { /* persist newState and facts */ }
     /// </code>
     /// </remarks>
-    [DebuggerDisplay("TransitionResult<{nameof(TState}}> IsSuccess = {IsSuccess}, Facts = {Facts.Count}")]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct TransitionResult<TState>
         where TState : notnull
     {
@@ -82,5 +82,9 @@ namespace Dx.Domain.Factors
             => new TransitionResult<TState>(
                 Result.Failure<TState>(error),
                 Array.Empty<IDomainFact>());
+
+        private string DebuggerDisplay => IsSuccess
+                ? $"Success: State = {Outcome.Value}, Facts.Count = {Facts.Count}"
+                : $"Failure: Error = {Outcome.Error}";
     }
 }

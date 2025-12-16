@@ -1,23 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>Result{TValue}.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the canonical, generic result type that fixes the error type to <see cref="DomainError"/>,
-//                 providing a convenient wrapper over <see cref="Result{TValue, TError}"/> for domain operations
-//                 that follow the standard Dx.Domain error model.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="Result{TValue}.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -44,7 +24,7 @@ namespace Dx.Domain
     /// It is the canonical result type for domain operations that use the shared <see cref="DomainError"/> model.
     /// </remarks>
     /// <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
-    [DebuggerDisplay("Result<{nameof(TValue)}> IsSuccess = {IsSuccess}, HasError = {IsFailure}")]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct Result<TValue> where TValue : notnull
     {
         private readonly Result<TValue, DomainError> _inner;
@@ -190,5 +170,8 @@ namespace Dx.Domain
         {
             error = IsFailure ? Error : default;
         }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => $"Result<{typeof(TValue).Name}> IsSuccess = {IsSuccess}, HasError = {IsFailure}";
     }
 }

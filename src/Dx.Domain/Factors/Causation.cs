@@ -1,3 +1,15 @@
+// <authors>Ulf Bourelius (Original Author)</authors>
+// <copyright file="Causation.cs" company="Dx.Domain Team">
+//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
+
 namespace Dx.Domain.Factors
 {
     using Dx.Domain.Invariants;
@@ -14,6 +26,7 @@ namespace Dx.Domain.Factors
     /// var fact = Fact.Create("OrderPlaced", payload, causation);
     /// </code>
     /// </remarks>
+    [DebuggerDisplay("Causation CorrelationId = {CorrelationId}, TraceId = {TraceId}, ActorId = {ActorId}, Utc = {UtcTimestamp:u}")]
     public readonly struct Causation : IEquatable<Causation>
     {
         /// <summary>Gets the correlation identifier that groups related operations.</summary>

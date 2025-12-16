@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>CorrelationId.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines a strongly-typed correlation identifier for grouping related operations or requests
-//                 across components and services.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="CorrelationId.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -34,8 +15,13 @@ namespace Dx.Domain
     using System.Diagnostics;
 
     /// <summary>
-    /// Represents a correlation identifier used to group related operations or requests.
+    /// Represents a strongly-typed identifier used to correlate related operations or requests across system
+    /// boundaries.
     /// </summary>
+    /// <remarks>A CorrelationId encapsulates a GUID value to provide a consistent way to track and associate
+    /// activities, such as logging or distributed tracing, throughout an application's workflow. Use
+    /// <see cref="CorrelationId.Empty"/> to represent an uninitialized or absent correlation identifier. This 
+    /// struct is immutable and can be compared for equality.</remarks>
     [DebuggerDisplay("CorrelationId = {Value:N}")]
     public readonly struct CorrelationId : IEquatable<CorrelationId>
     {
@@ -57,7 +43,17 @@ namespace Dx.Domain
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsEmpty => Value == Guid.Empty;
 
-
+        /// <summary>
+        /// Attempts to format the value as a 32-digit hexadecimal string without hyphens into the provided character
+        /// span.
+        /// </summary>
+        /// <remarks>The formatted string uses the "N" format, which consists of 32 digits without
+        /// hyphens. Ensure that the destination span is large enough to contain the entire formatted value; otherwise,
+        /// the method returns false and no data is written.</remarks>
+        /// <param name="destination">The span of characters in which to write the formatted value.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters written to the destination span.</param>
+        /// <returns><see langword="true"/> if the formatting was successful and the value was written to the destination span; otherwise,
+        /// <see langword="false"/>.</returns>
         public bool TryFormat(Span<char> destination, out int charsWritten)
             => Value.TryFormat(destination, out charsWritten, "N");
 
