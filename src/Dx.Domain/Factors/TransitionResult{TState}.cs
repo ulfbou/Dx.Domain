@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>TransitionResult{TState}.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the result type returned from state transitions, bundling the outcome and any
-//                 domain facts emitted during the transition.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="TransitionResult{TState}.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -33,10 +14,20 @@ namespace Dx.Domain.Factors
 {
     using Dx.Domain.Invariants;
 
+    using System.Diagnostics;
+
     /// <summary>
-    /// Represents the outcome of a state transition along with the domain facts it produced.
+    /// Represents the outcome of a state transition and the domain facts it emitted.
     /// </summary>
     /// <typeparam name="TState">The type of the resulting state.</typeparam>
+    /// <remarks>
+    /// This type is typically returned from aggregate state transition methods:
+    /// <code>
+    /// var result = TransitionResult&lt;OrderState&gt;.Success(newState, facts);
+    /// if (result.IsSuccess) { /* persist newState and facts */ }
+    /// </code>
+    /// </remarks>
+    [DebuggerDisplay("TransitionResult<{nameof(TState}}> IsSuccess = {IsSuccess}, Facts = {Facts.Count}")]
     public readonly struct TransitionResult<TState>
         where TState : notnull
     {
@@ -49,7 +40,9 @@ namespace Dx.Domain.Factors
         /// <summary>Gets a value indicating whether the transition was successful.</summary>
         public bool IsSuccess => Outcome.IsSuccess;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>Gets a value indicating whether the transition failed.</summary>
+        public bool IsFailure => Outcome.IsFailure;
+
         private TransitionResult(
             Result<TState> outcome,
             IReadOnlyList<IDomainFact> facts)
@@ -58,6 +51,15 @@ namespace Dx.Domain.Factors
             Facts = facts;
         }
 
+        /// <summary>
+        /// Creates a successful transition result with the specified state and emitted facts.
+        /// </summary>
+        /// <param name="state">The resulting state after the transition.</param>
+        /// <param name="facts">The domain facts emitted by the transition. Must contain at least one fact.</param>
+        /// <returns>A <see cref="TransitionResult{TState}"/> representing a successful transition.</returns>
+        /// <exception cref="InvariantViolationException">
+        /// Thrown if <paramref name="facts"/> is empty.
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static TransitionResult<TState> Success(
             TState state,
@@ -68,7 +70,14 @@ namespace Dx.Domain.Factors
             return new TransitionResult<TState>(Result.Ok(state), facts);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Creates a failed transition result from the specified domain error.
+        /// </summary>
+        /// <param name="error">The error that caused the transition to fail.</param>
+        /// <returns>
+        /// A <see cref="TransitionResult{TState}"/> whose <see cref="Outcome"/> is a failed result and whose
+        /// <see cref="Facts"/> collection is empty.
+        /// </returns>
         internal static TransitionResult<TState> Failure(DomainError error)
             => new TransitionResult<TState>(
                 Result.Failure<TState>(error),

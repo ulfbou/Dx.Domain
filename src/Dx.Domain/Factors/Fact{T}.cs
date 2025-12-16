@@ -38,7 +38,7 @@ namespace Dx.Domain.Factors
     /// Represents a domain fact carrying a payload, causation metadata, and a timestamp.
     /// </summary>
     /// <typeparam name="T">The type of the payload associated with the fact.</typeparam>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("Fact<{typeof(T).Name}> Id = {Id}, Type = {FactType}")]
     public readonly struct Fact<T> : IDomainFact where T : notnull
     {
         /// <inheritdoc />
@@ -56,7 +56,6 @@ namespace Dx.Domain.Factors
         /// <inheritdoc />
         public DateTimeOffset UtcTimestamp { get; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Fact(FactId id, string factType, T payload, Causation causation, DateTimeOffset utcTimestamp)
         {
             Id = id;
@@ -79,13 +78,6 @@ namespace Dx.Domain.Factors
         {
             Invariant.That(!string.IsNullOrWhiteSpace(factType), DomainErrors.Fact.MissingType);
             return new Fact<T>(FactId.New(), factType, payload, causation, DateTimeOffset.UtcNow);
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => $"Fact<{typeof(T).Name}> {{ Id = {Id}, FactType = {FactType}, UtcTimestamp = {UtcTimestamp:u} }}";
         }
     }
 }

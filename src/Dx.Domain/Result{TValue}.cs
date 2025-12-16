@@ -44,7 +44,7 @@ namespace Dx.Domain
     /// It is the canonical result type for domain operations that use the shared <see cref="DomainError"/> model.
     /// </remarks>
     /// <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("Result<{nameof(TValue)}> IsSuccess = {IsSuccess}, HasError = {IsFailure}")]
     public readonly struct Result<TValue> where TValue : notnull
     {
         private readonly Result<TValue, DomainError> _inner;
@@ -54,46 +54,29 @@ namespace Dx.Domain
         /// <see cref="Result{TValue, TError}"/> with <see cref="DomainError"/> as the error type.
         /// </summary>
         /// <param name="inner">The inner result value that encapsulates either a successful value or a domain error.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Result(Result<TValue, DomainError> inner) => _inner = inner;
 
         /// <summary>
         /// Gets a value indicating whether the operation completed successfully.
         /// </summary>
-        public bool IsSuccess
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _inner.IsSuccess;
-        }
+        public bool IsSuccess => _inner.IsSuccess;
 
         /// <summary>
         /// Gets a value indicating whether the result represents a failure state.
         /// </summary>
-        public bool IsFailure
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _inner.IsFailure;
-        }
+        public bool IsFailure => _inner.IsFailure;
 
         /// <summary>
         /// Gets the value contained in the current instance.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown if the result represents a failure.</exception>
-        public TValue Value
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _inner.Value;
-        }
+        public TValue Value => _inner.Value;
 
         /// <summary>
         /// Gets the error value associated with the result, if any.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown if the result represents a success.</exception>
-        internal DomainError Error
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _inner.Error;
-        }
+        internal DomainError Error => _inner.Error;
 
         /// <summary>
         /// Creates a successful result containing the specified value.
@@ -138,15 +121,12 @@ namespace Dx.Domain
         public static implicit operator Result<TValue>(DomainError error) => Failure(error);
 
         /// <inheritdoc/>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => _inner.ToString();
 
         /// <inheritdoc/>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Result<TValue> other) => _inner.Equals(other._inner);
 
         /// <inheritdoc/>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => _inner.GetHashCode();
 
         /// <summary>
@@ -161,7 +141,6 @@ namespace Dx.Domain
         /// for the type.</param>
         /// <param name="error">When this method returns, contains the error information if the result represents a failure; otherwise, <see
         /// langword="null"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out bool isSuccess, out TValue? value, out DomainError? error)
         {
             isSuccess = IsSuccess;
@@ -181,7 +160,6 @@ namespace Dx.Domain
         /// <param name="error">When this method returns, contains the associated <see cref="DomainError"/> if the result is a failure;
         /// otherwise, <see langword="null"/>.</param>
         /// <param name="value">When this method returns, contains the value if the result is successful; otherwise, <see langword="null"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out bool isFailure, out DomainError? error, out TValue? value)
         {
             isFailure = IsFailure;
@@ -198,7 +176,6 @@ namespace Dx.Domain
         /// </remarks>
         /// <param name="value">When this method returns, contains the value if the operation was successful; otherwise, the default value for the
         /// type.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out TValue? value)
         {
             value = IsSuccess ? Value : default;
@@ -209,19 +186,9 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="error">When this method returns, contains the associated error if the result is a failure; otherwise, <see
         /// langword="null"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out DomainError? error)
         {
             error = IsFailure ? Error : default;
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsSuccess
-                ? $"Success({_inner.Value} "
-                : $"Failure({_inner.Error})";
         }
     }
 }
