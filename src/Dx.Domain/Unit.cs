@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>Unit.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the <see cref="Unit"/> record struct, representing a single, value-less result used
-//                 when an operation conceptually returns no data.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="Unit.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.

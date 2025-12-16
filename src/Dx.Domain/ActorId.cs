@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>ActorId.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines a strongly-typed identifier for actors (users, services, or systems) participating
-//                 in domain operations.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="ActorId.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -35,8 +16,12 @@ namespace Dx.Domain
     using System.Globalization;
 
     /// <summary>
-    /// Strongly-typed identifier for an actor (user, service, or system) participating in domain operations.
+    /// Represents a strongly typed identifier for an actor, backed by a GUID value.
     /// </summary>
+    /// <remarks>Use the ActorId type to uniquely identify actors within a distributed system or application.
+    /// ActorId provides value-based equality and can be compared, serialized, or used as a key in collections. An
+    /// ActorId with a value equal to Guid.Empty is considered empty and can be accessed via the static Empty
+    /// property.</remarks>
     [DebuggerDisplay("ActorId = {Value}")]
     public readonly struct ActorId : IEquatable<ActorId>
     {
@@ -59,7 +44,6 @@ namespace Dx.Domain
         /// Creates a new <see cref="ActorId"/> with a freshly generated <see cref="Guid"/> value.
         /// </summary>
         /// <returns>A non-empty <see cref="ActorId"/>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ActorId New() => new ActorId(Guid.NewGuid());
 
         /// <summary>

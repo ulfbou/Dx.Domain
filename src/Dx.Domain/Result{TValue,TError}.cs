@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>Result{TValue,TError}.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the canonical, generic result type (discriminated union) used to explicitly model
-//                 success and failure paths with distinct value and error types.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="Result{TValue,TError}.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -63,20 +44,16 @@ namespace Dx.Domain
         /// <summary>
         /// Gets the value contained in the current instance, if one is present.
         /// </summary>
-        public TValue Value
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsSuccess ? _value! : throw new InvalidOperationException(DomainErrors.Result.MissingValue(_error?.ToString()));
-        }
+        public TValue Value => IsSuccess
+            ? _value! :
+            throw new InvalidOperationException(DomainErrors.Result.MissingValue(_error?.ToString()));
 
         /// <summary>
         /// Gets the error value associated with the result, if any.
         /// </summary>
-        public TError Error
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsFailure ? _error! : throw new InvalidOperationException(DomainErrors.Result.MissingError(_value?.ToString()));
-        }
+        public TError Error => IsFailure
+            ? _error!
+            : throw new InvalidOperationException(DomainErrors.Result.MissingError(_value?.ToString()));
 
         /// <summary>
         /// Initializes a new instance of the Result class with the specified value.

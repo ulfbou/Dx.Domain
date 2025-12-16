@@ -1,10 +1,25 @@
+// <authors>Ulf Bourelius (Original Author)</authors>
+// <copyright file="SpanId.cs" company="Dx.Domain Team">
+//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
+
 namespace Dx.Domain
 {
     using System.Diagnostics;
 
     /// <summary>
-    /// Represents a span identifier used to correlate work within a single trace.
+    /// Represents a unique identifier for a span within a distributed tracing system.
     /// </summary>
+    /// <remarks>A SpanId is typically used to correlate and track individual operations or requests across
+    /// system boundaries. The value is a 64-bit unsigned integer, and a SpanId with a value of 0 is considered empty.
+    /// SpanId is immutable and supports value equality comparison.</remarks>
     [DebuggerDisplay("SpanId = {Value}")]
     public readonly struct SpanId : IEquatable<SpanId>
     {

@@ -1,10 +1,26 @@
+// <authors>Ulf Bourelius (Original Author)</authors>
+// <copyright file="TraceId.cs" company="Dx.Domain Team">
+//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
+
 namespace Dx.Domain
 {
     using System.Diagnostics;
 
     /// <summary>
-    /// Represents a 128-bit trace identifier used for distributed tracing.
+    /// Represents a 128-bit unique identifier for distributed tracing scenarios.
     /// </summary>
+    /// <remarks>A TraceId is typically used to uniquely identify a trace across process and service
+    /// boundaries in distributed systems. It provides equality comparison, string representation, and supports
+    /// generation of random identifiers suitable for tracing use cases. The struct is immutable and
+    /// thread-safe.</remarks>
     [DebuggerDisplay("TraceId = hi={_hi}, lo={_lo}")]
     public readonly struct TraceId : IEquatable<TraceId>
     {

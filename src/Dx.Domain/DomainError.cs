@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>DomainError.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the core domain error value object used to represent business and validation failures
-//                 throughout the Dx.Domain result and invariant model.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="DomainError.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -50,7 +31,6 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="code">The unique code that identifies the domain error. Cannot be <see langword="null"/> or empty.</param>
         /// <param name="message">The descriptive message that explains the domain error. Cannot be <see langword="null"/> or empty.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private DomainError(string code, string message)
         {
             Code = code;
@@ -64,7 +44,6 @@ namespace Dx.Domain
         /// <param name="message">The descriptive message that explains the domain error. Cannot be <see langword="null"/> or whitespace.</param>
         /// <returns>A <see cref="DomainError"/> instance initialized with the specified code and message.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="code"/> or <paramref name="message"/> is <see langword="null"/> or consists only of white-space characters.</exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DomainError Create(string code, string message)
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -81,27 +60,21 @@ namespace Dx.Domain
         }
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(DomainError other) => Code == other.Code;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is DomainError other && Equals(other);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Code.GetHashCode(StringComparison.Ordinal);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(DomainError a, DomainError b) => a.Equals(b);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(DomainError a, DomainError b) => !a.Equals(b);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => Code;
     }
 }
