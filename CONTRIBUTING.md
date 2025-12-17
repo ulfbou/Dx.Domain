@@ -21,6 +21,12 @@ The `Dx` class is the **only** public entry point for creating Kernel primitives
 These types are public *data carriers*, but their creation logic is locked. 
 * **Constraint:** Factories must be `internal`. Instantiation must flow through the `Dx` Gateway.
 
+### 3. Core vs. Values
+To maintain the "spine" of the domain, the boundary between Core and Values is defined as follows:
+* **Core**: only executable invariants, error primitives, and minimal kernel primitives. 
+  * *Amendment:* Identity and time/causation value types that participate directly in invariants, errors, or results (e.g., `TraceId`, `Causation`) are considered part of the core kernel.
+* **Values**: strongly typed value objects and identity types that represent domain-specific concepts (e.g., `Email`, `Money`, `OrderId`).
+
 ## Mechanics vs. Semantics
 
 The kernel forbids semantic expansion, not mechanical support. Static analysis and reviewers enforce this distinction rigorously.
