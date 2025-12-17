@@ -29,6 +29,14 @@ Every domain concept must be **explicit**.
 
 If a value can be wrong, it must fail **loudly and deterministically**.
 
+### No Magic Strings
+
+We do not use strings to drive logic, identify states, or configure behavior in an ad-hoc manner.
+
+- **Refusal:** No `if (status == "Active")`. No string-based reflection for core logic.
+- **Demand:** Use strongly-typed identifiers or enums for state.
+- **Clarification:** Canonical identifiers expressed as strings (such as error codes or fact types) are permitted only when they are centralized, validated, and treated as semantic identifiers rather than ad-hoc literals. They must represent a unique identity in the global domain space, not a local variable.
+
 ### Accidental Complexity
 
 Boilerplate, ceremony, and leaky abstractions are eliminated.
