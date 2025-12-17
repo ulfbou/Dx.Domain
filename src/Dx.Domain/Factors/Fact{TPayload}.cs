@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>Fact{T}.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the generic domain fact value object that carries a payload, causation metadata,
-//                 and a timestamp.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="Fact{T}.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -29,17 +10,24 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx;
+
+using static Dx.Dx;
+
+using System.Diagnostics;
+
 namespace Dx.Domain.Factors
 {
-    using Dx.Domain.Invariants;
-    using System.Diagnostics;
-
     /// <summary>
-    /// Represents a domain fact carrying a payload, causation metadata, and a timestamp.
+    /// Represents an immutable domain fact with a strongly typed payload and associated metadata.
     /// </summary>
-    /// <typeparam name="T">The type of the payload associated with the fact.</typeparam>
+    /// <remarks>A fact encapsulates a discrete event or piece of information within a domain, including its
+    /// type, payload, causation metadata, and timestamp. Facts are typically used to record domain events or state
+    /// changes in event sourcing and domain-driven design scenarios. This struct is immutable and
+    /// thread-safe.</remarks>
+    /// <typeparam name="TPayload">The type of the payload carried by the fact. Must be non-nullable.</typeparam>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly struct Fact<T> : IDomainFact where T : notnull
+    public readonly struct Fact<TPayload> : IDomainFact where TPayload : notnull
     {
         /// <inheritdoc />
         public FactId Id { get; }
@@ -48,7 +36,7 @@ namespace Dx.Domain.Factors
         public string FactType { get; }
 
         /// <summary>Gets the payload associated with this fact.</summary>
-        public T Payload { get; }
+        public TPayload Payload { get; }
 
         /// <inheritdoc />
         public Causation Causation { get; }
@@ -56,14 +44,22 @@ namespace Dx.Domain.Factors
         /// <inheritdoc />
         public DateTimeOffset UtcTimestamp { get; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Fact(FactId id, string factType, T payload, Causation causation, DateTimeOffset utcTimestamp)
+        /// <summary>
+        /// Initializes a new instance of the Fact class with the specified identifier, fact type, payload, causation,
+        /// and optional UTC timestamp.
+        /// </summary>
+        /// <param name="id">The unique identifier for the fact.</param>
+        /// <param name="factType">The type or category of the fact. Cannot be null or empty.</param>
+        /// <param name="payload">The payload data associated with the fact.</param>
+        /// <param name="causation">The causation information that describes the origin or reason for the fact.</param>
+        /// <param name="utcTimestamp">The UTC timestamp when the fact occurred. If null, the current UTC time is used.</param>
+        private Fact(FactId id, string factType, TPayload payload, Causation causation, DateTimeOffset? utcTimestamp = null)
         {
             Id = id;
             FactType = factType;
             Payload = payload;
             Causation = causation;
-            UtcTimestamp = utcTimestamp;
+            UtcTimestamp = utcTimestamp ?? DateTimeOffset.UtcNow;
         }
 
         /// <summary>
@@ -75,17 +71,13 @@ namespace Dx.Domain.Factors
         /// <returns>A new <see cref="Fact{T}"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        public static Fact<T> Create(string factType, T payload, Causation causation)
+        public static Fact<TPayload> Create(string factType, TPayload payload, Causation causation)
         {
             Invariant.That(!string.IsNullOrWhiteSpace(factType), DomainErrors.Fact.MissingType);
-            return new Fact<T>(FactId.New(), factType, payload, causation, DateTimeOffset.UtcNow);
+            return new Fact<TPayload>(FactId.New(), factType, payload, causation, DateTimeOffset.UtcNow);
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => $"Fact<{typeof(T).Name}> {{ Id = {Id}, FactType = {FactType}, UtcTimestamp = {UtcTimestamp:u} }}";
-        }
+        private string DebuggerDisplay => $"Fact<{typeof(TPayload).Name}> Id={Id}, Type={FactType}";
     }
 }

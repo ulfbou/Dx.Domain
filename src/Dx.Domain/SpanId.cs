@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>SpanId.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines a strongly-typed span identifier used to correlate work within a single trace
-//                 or operation segment.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="SpanId.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -29,14 +10,17 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using System.Diagnostics;
-
 namespace Dx.Domain
 {
+    using System.Diagnostics;
+
     /// <summary>
-    /// Represents a span identifier used to correlate work within a single trace.
+    /// Represents a unique identifier for a span within a distributed tracing system.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    /// <remarks>A SpanId is typically used to correlate and track individual operations or requests across
+    /// system boundaries. The value is a 64-bit unsigned integer, and a SpanId with a value of 0 is considered empty.
+    /// SpanId is immutable and supports value equality comparison.</remarks>
+    [DebuggerDisplay("SpanId = {Value}")]
     public readonly struct SpanId : IEquatable<SpanId>
     {
         /// <summary>
@@ -44,14 +28,23 @@ namespace Dx.Domain
         /// </summary>
         public static readonly SpanId Empty = new(0UL);
 
+        /// <summary>
+        /// Gets the underlying numeric span value.
+        /// </summary>
+        public ulong Value => _value;
+
         private readonly ulong _value;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SpanId(ulong value) => _value = value;
+        /// <summary>
+        /// Initializes a new <see cref="SpanId"/> with the provided numeric value.
+        /// </summary>
+        /// <param name="value">The underlying span value.</param>
+        private SpanId(ulong value) => _value = value;
 
         /// <summary>
         /// Creates a new random <see cref="SpanId"/> instance.
         /// </summary>
+        /// <returns>A new <see cref="SpanId"/> whose <see cref="Value"/> is non-zero with high probability.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static SpanId New()
         {
@@ -63,42 +56,35 @@ namespace Dx.Domain
         /// <summary>
         /// Gets a value indicating whether this identifier is empty.
         /// </summary>
-        public bool IsEmpty
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _value == 0UL;
-        }
+        public bool IsEmpty => _value == 0UL;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(SpanId other) => _value == other._value;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is SpanId other && Equals(other);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => _value.GetHashCode();
 
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Determines whether two <see cref="SpanId"/> values are equal.
+        /// </summary>
+        /// <param name="a">The first identifier to compare.</param>
+        /// <param name="b">The second identifier to compare.</param>
+        /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(SpanId a, SpanId b) => a.Equals(b);
 
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Determines whether two <see cref="SpanId"/> values are not equal.
+        /// </summary>
+        /// <param name="a">The first identifier to compare.</param>
+        /// <param name="b">The second identifier to compare.</param>
+        /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator !=(SpanId a, SpanId b) => !a.Equals(b);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
             => IsEmpty ? "SpanId.Empty" : $"SpanId(v={_value})";
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ToString();
-        }
     }
 }

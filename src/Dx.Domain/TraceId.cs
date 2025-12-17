@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>TraceId.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines a strongly-typed trace identifier used for end-to-end distributed tracing of
-//                 operations within and across services.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="TraceId.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -34,9 +15,13 @@ namespace Dx.Domain
     using System.Diagnostics;
 
     /// <summary>
-    /// Represents a trace identifier used for distributed tracing scenarios.
+    /// Represents a 128-bit unique identifier for distributed tracing scenarios.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    /// <remarks>A TraceId is typically used to uniquely identify a trace across process and service
+    /// boundaries in distributed systems. It provides equality comparison, string representation, and supports
+    /// generation of random identifiers suitable for tracing use cases. The struct is immutable and
+    /// thread-safe.</remarks>
+    [DebuggerDisplay("TraceId = hi={_hi}, lo={_lo}")]
     public readonly struct TraceId : IEquatable<TraceId>
     {
         /// <summary>
@@ -47,7 +32,6 @@ namespace Dx.Domain
         private readonly ulong _hi;
         private readonly ulong _lo;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private TraceId(ulong hi, ulong lo)
         {
             _hi = hi;
@@ -57,6 +41,7 @@ namespace Dx.Domain
         /// <summary>
         /// Creates a new random <see cref="TraceId"/> instance.
         /// </summary>
+        /// <returns>A new <see cref="TraceId"/> with a uniformly random 128-bit value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TraceId New()
         {
@@ -70,42 +55,35 @@ namespace Dx.Domain
         /// <summary>
         /// Gets a value indicating whether this identifier is empty.
         /// </summary>
-        public bool IsEmpty
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _hi == 0UL && _lo == 0UL;
-        }
+        public bool IsEmpty => _hi == 0UL && _lo == 0UL;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(TraceId other) => _hi == other._hi && _lo == other._lo;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is TraceId other && Equals(other);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => HashCode.Combine(_hi, _lo);
 
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Determines whether two <see cref="TraceId"/> values are equal.
+        /// </summary>
+        /// <param name="a">The first identifier to compare.</param>
+        /// <param name="b">The second identifier to compare.</param>
+        /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(TraceId a, TraceId b) => a.Equals(b);
 
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Determines whether two <see cref="TraceId"/> values are not equal.
+        /// </summary>
+        /// <param name="a">The first identifier to compare.</param>
+        /// <param name="b">The second identifier to compare.</param>
+        /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator !=(TraceId a, TraceId b) => !a.Equals(b);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
             => IsEmpty ? "TraceId.Empty" : $"TraceId(hi={_hi},lo={_lo})";
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ToString();
-        }
     }
 }

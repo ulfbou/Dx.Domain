@@ -6,8 +6,9 @@
     <Using Include="System.Diagnostics.CodeAnalysis" />
     <Using Include="System.Runtime.CompilerServices" />
 
-    <Using Include="Dx.Domain.Results" />
-
     <Using Include="static System.Diagnostics.Debug" />
+
+    <Using Include="Dx" />
+    <Using Include="Dx.Domain" />
   </ItemGroup>
 </Project>
