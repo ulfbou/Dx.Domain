@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>InvariantViolationException.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the exception type thrown when a domain invariant is violated, carrying
-//                 structured diagnostic information.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="InvariantViolationException.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -29,11 +10,11 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// Represents an exception that is thrown when an invariant condition is violated.
     /// </summary>

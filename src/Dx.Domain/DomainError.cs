@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>DomainError.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the core domain error value object used to represent business and validation failures
-//                 throughout the Dx.Domain result and invariant model.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="DomainError.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -29,14 +10,23 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx;
+
+using static Dx.Dx;
+
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
 namespace Dx.Domain
 {
     /// <summary>
     /// Represents a domain-specific error with a code and descriptive message.
     /// </summary>
-    /// <remarks>Use this struct to convey business or validation errors within a domain model. Two
-    /// <see cref="DomainError"/> instances are considered equal if their <see cref="Code"/> values are equal. This type is
-    /// immutable and can be used as a value object in domain-driven design.</remarks>
+    /// <remarks>
+    /// This struct is used to standardize error reporting across the domain layer. It avoids the overhead
+    /// of exceptions for control flow and provides a serializable error format.
+    /// </remarks>
+    [DebuggerDisplay("{Code,nq} @ {Message,nq}")]
     public readonly struct DomainError : IEquatable<DomainError>
     {
         /// <summary>Gets the error code.</summary>
@@ -50,7 +40,6 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="code">The unique code that identifies the domain error. Cannot be <see langword="null"/> or empty.</param>
         /// <param name="message">The descriptive message that explains the domain error. Cannot be <see langword="null"/> or empty.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private DomainError(string code, string message)
         {
             Code = code;
@@ -60,22 +49,14 @@ namespace Dx.Domain
         /// <summary>
         /// Creates a new instance of the <see cref="DomainError"/> struct with the specified error code and message.
         /// </summary>
-        /// <param name="code">The unique code that identifies the domain error. Cannot be <see langword="null"/> or whitespace.</param>
-        /// <param name="message">The descriptive message that explains the domain error. Cannot be <see langword="null"/> or whitespace.</param>
+        /// <param name="code">The unique code that identifies the domain error. Cannot be null or whitespace.</param>
+        /// <param name="message">The descriptive message that explains the domain error. Cannot be null or whitespace.</param>
         /// <returns>A <see cref="DomainError"/> instance initialized with the specified code and message.</returns>
-        /// <exception cref="ArgumentException">Thrown if <paramref name="code"/> or <paramref name="message"/> is <see langword="null"/> or consists only of white-space characters.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DomainError Create(string code, string message)
         {
-            if (string.IsNullOrWhiteSpace(code))
-            {
-                throw new ArgumentException(DomainErrors.Code.NullOrWhitespace, nameof(code));
-            }
-
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                throw new ArgumentException(DomainErrors.Message.NullOrWhitespace, nameof(message));
-            }
+            Invariant.That(!string.IsNullOrWhiteSpace(code), DomainError.Create(DomainErrors.Code.NullOrWhitespace, DomainErrors.Message.NullOrWhitespace));
+            Invariant.That(!string.IsNullOrWhiteSpace(message), DomainError.Create(DomainErrors.Message.NullOrWhitespace, DomainErrors.Code.NullOrWhitespace));
 
             return new DomainError(code, message);
         }
@@ -85,23 +66,18 @@ namespace Dx.Domain
         public bool Equals(DomainError other) => Code == other.Code;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is DomainError other && Equals(other);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Code.GetHashCode(StringComparison.Ordinal);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(DomainError a, DomainError b) => a.Equals(b);
+        public static bool operator ==(DomainError left, DomainError right) => left.Equals(right);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(DomainError a, DomainError b) => !a.Equals(b);
+        public static bool operator !=(DomainError left, DomainError right) => !left.Equals(right);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => Code;
     }
 }

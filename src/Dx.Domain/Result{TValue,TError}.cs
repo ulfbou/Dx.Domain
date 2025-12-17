@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>Result{TValue,TError}.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the canonical, generic result type (discriminated union) used to explicitly model
-//                 success and failure paths with distinct value and error types.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="Result{TValue,TError}.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -34,6 +15,8 @@ namespace Dx.Domain
     using System.Diagnostics;
     using System.Runtime.CompilerServices;
 
+    using static global::Dx.Dx;
+
     /// <summary>
     /// Represents the immutable result of an operation that can succeed with a value of type <typeparamref name="TValue"/> or fail
     /// with an error of type <typeparamref name="TError"/>.
@@ -44,7 +27,7 @@ namespace Dx.Domain
     /// </remarks>
     /// <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
     /// <typeparam name="TError">The type of the error returned when the operation fails.</typeparam>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("Result<{nameof(TValue)}, {nameof(TError}> IsSuccess = {IsSuccess}, HasError = {IsFailure}")]
     public readonly struct Result<TValue, TError> where TValue : notnull where TError : notnull
     {
         private readonly TValue? _value;
@@ -65,8 +48,12 @@ namespace Dx.Domain
         /// </summary>
         public TValue Value
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsSuccess ? _value! : throw new InvalidOperationException(DomainErrors.Result.MissingValue(_error?.ToString()));
+            [DebuggerStepThrough]
+            get
+            {
+                Invariant.That(IsSuccess, DomainErrors.Result.MissingValue<TValue, TError>(_error!));
+                return _value!;
+            }
         }
 
         /// <summary>
@@ -74,28 +61,31 @@ namespace Dx.Domain
         /// </summary>
         public TError Error
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsFailure ? _error! : throw new InvalidOperationException(DomainErrors.Result.MissingError(_value?.ToString()));
+            [DebuggerStepThrough]
+            get
+            {
+                Invariant.That(IsFailure, DomainErrors.Result.MissingError<TValue, TError>(_value!));
+                return _error!;
+            }
         }
 
         /// <summary>
         /// Initializes a new instance of the Result class with the specified value.
         /// </summary>
         /// <param name="value">The value to be encapsulated by the Result instance.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Result(TValue value) => _value = value;
 
         /// <summary>
         /// Initializes a new instance of the Result class that represents a failed result with the specified error.
         /// </summary>
         /// <param name="error">The error value associated with the failed result. Cannot be null if TError is a reference type.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Result(TError error) => _error = error;
 
         /// <summary>
         /// Creates a successful result containing the specified value.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DebuggerStepThrough]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
         public static Result<TValue, TError> Ok(TValue value) => new Result<TValue, TError>(value);
 
@@ -103,11 +93,11 @@ namespace Dx.Domain
         /// Creates a failed result containing the specified error value.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DebuggerStepThrough]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
         public static Result<TValue, TError> Failure(TError error) => new Result<TValue, TError>(error);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => IsSuccess ? $"Ok({_value})" : $"Failure({_error})";
 
         /// <summary>
@@ -121,7 +111,6 @@ namespace Dx.Domain
         /// for the type.</param>
         /// <param name="error">When this method returns, contains the error information if the result represents a failure; otherwise, <see
         /// langword="null"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out bool isSuccess, out TValue? value, out TError? error)
         {
             isSuccess = IsSuccess;
@@ -139,7 +128,6 @@ namespace Dx.Domain
         /// <param name="error">When this method returns, contains the associated <see cref="DomainError"/> if the result is a failure;
         /// otherwise, <see langword="null"/>.</param>
         /// <param name="value">When this method returns, contains the value if the result is successful; otherwise, <see langword="null"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out bool isFailure, out TError? error, out TValue? value)
         {
             isFailure = IsFailure;
@@ -154,7 +142,6 @@ namespace Dx.Domain
         /// component using tuple deconstruction.</remarks>
         /// <param name="value">When this method returns, contains the value if the operation was successful; otherwise, the default value for the
         /// type.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out TValue? value)
         {
             value = _value;
@@ -165,19 +152,9 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="error">When this method returns, contains the associated error if the result is a failure; otherwise, <see
         /// langword="null"/>.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out TError? error)
         {
             error = _error;
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsSuccess
-                ? $"Success: {_value}"
-                : $"Failure: {_error}";
         }
     }
 }

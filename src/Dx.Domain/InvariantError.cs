@@ -1,22 +1,3 @@
-// <summary>
-//     <list type="bullet">
-//         <item>
-//             <term>File:</term>
-//             <description>InvariantError.cs</description>
-//         </item>
-//         <item>
-//             <term>Project:</term>
-//             <description>Dx.Domain</description>
-//         </item>
-//         <item>
-//             <term>Description:</term>
-//             <description>
-//                 Defines the diagnostic payload captured when an invariant is violated, including
-//                 domain error, source location, correlation, and timing information.
-//             </description>
-//         </item>
-//     </list>
-// </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="InvariantError.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
@@ -29,14 +10,14 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-
     /// <summary>
     /// Represents detailed diagnostic information for a violated invariant.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("InvariantError {DomainError.Code} @ {Member}:{Line}")]
     public sealed class InvariantError
     {
         /// <summary>Gets the domain error associated with the invariant violation.</summary>
@@ -66,7 +47,6 @@ namespace Dx.Domain
         /// <summary>Gets the UTC timestamp when the invariant violation was recorded.</summary>
         public DateTime UtcTimestamp { get; }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private InvariantError(
             DomainError domainError,
             string? messageOverride,
@@ -89,9 +69,25 @@ namespace Dx.Domain
         }
 
         /// <summary>
-        /// Creates a new <see cref="InvariantError"/> instance with the specified diagnostic information.
+        /// Creates a new instance of the InvariantError class with the specified domain error and optional contextual
+        /// information.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <remarks>This method is intended for internal use to capture detailed context about where and
+        /// why an invariant violation occurred. Caller information is automatically populated by the compiler and
+        /// should not be set manually.</remarks>
+        /// <param name="domainError">The domain error that describes the invariant violation. Cannot be null.</param>
+        /// <param name="messageOverride">An optional message to override the default error message. If null, the default message from the domain
+        /// error is used.</param>
+        /// <param name="correlationId">An optional correlation identifier used to trace the error across systems. Defaults to an empty value if not
+        /// specified.</param>
+        /// <param name="traceId">An optional trace identifier for distributed tracing. Defaults to an empty value if not specified.</param>
+        /// <param name="spanId">An optional span identifier for distributed tracing. Defaults to an empty value if not specified.</param>
+        /// <param name="member">The name of the member that invoked this method. This value is automatically provided by the compiler.</param>
+        /// <param name="file">The full path of the source file that contains the caller. This value is automatically provided by the
+        /// compiler.</param>
+        /// <param name="line">The line number in the source file at which this method is called. This value is automatically provided by
+        /// the compiler.</param>
+        /// <returns>An InvariantError instance containing the specified domain error and contextual information.</returns>
         internal static InvariantError Create(
             DomainError domainError,
             string? messageOverride = null,
@@ -124,8 +120,5 @@ namespace Dx.Domain
         /// <inheritdoc />
         public override string ToString()
             => $"{DomainError.Code}: {EffectiveMessage} @ {Member}:{Line}";
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => $"{DomainError.Code} @ {Member}:{Line}";
     }
 }
