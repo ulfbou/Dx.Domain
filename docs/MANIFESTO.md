@@ -4,12 +4,11 @@
 
 Dx.Domain exists to make **incorrect domain modeling impossible to ignore**.
 
-This is not a convenience library. 
-This is not a toolkit of helpers. 
+This is not a convenience library.  
+This is not a toolkit of helpers.  
 This is a **line in the sand**.
 
-The kernel is small, opinionated, and compiler‑assisted. Everything else
-belongs at the edges.
+The kernel is small, opinionated, and compiler‑assisted. Everything else belongs at the edges.
 
 See also:
 
@@ -24,8 +23,8 @@ See also:
 
 Every domain concept must be **explicit**.
 
-- No magic strings. 
-- No implicit defaults. 
+- No magic strings.  
+- No implicit defaults.  
 - No silent fallbacks.
 
 If a value can be wrong, it must fail **loudly and deterministically**.
@@ -43,8 +42,8 @@ Correctness is **compiler‑assisted**.
 
 If the compiler cannot help prove safety, the API should not exist. Prefer:
 
-- Stronger types over defensive conditionals. 
-- Invariant enforcement close to the type. 
+- Stronger types over defensive conditionals.  
+- Invariant enforcement close to the type.  
 - Analyzers and generators over manual checklists.
 
 ### Silent Failure
@@ -58,8 +57,8 @@ structured results and errors.
 
 Errors are **structured, centralized, and provenance‑aware**.
 
-- No scattered string messages. 
-- No improvised codes. 
+- No scattered string messages.  
+- No improvised codes.  
 - No ambiguity about origin or intent.
 
 Domain failures use `DomainError` and `Result<…>`; invariant violations use
@@ -81,7 +80,7 @@ patterns by being **unable to express the wrong ones**.
 
 > The kernel forbids semantic expansion, not mechanical support.
 
-Dx.Domain refuses to add new domain meaning or architectural surface to the kernel. 
+Dx.Domain refuses to add new domain meaning or architectural surface to the kernel.  
 It does, however, permit internal, mechanical code that enforces or constructs existing primitives safely and efficiently.
 
 ### Allowed: Mechanical Support Code
@@ -138,7 +137,8 @@ The following are **not allowed**, even if implemented as helpers or utilities:
 
 - Helpers that perform dispatch, publishing, or coordination
 
-If a helper can be named meaningfully by a domain expert, it does not belong in the kernel.
+If a helper can be named meaningfully by a domain expert, it does not belong in the kernel.  
+If a helper’s name describes **business meaning** rather than **mechanical action**, it does not belong in the kernel.
 
 ### Invariants and Requirements
 
@@ -148,7 +148,7 @@ Invariant and requirement helpers are permitted because they:
 - only enforce already‑defined rules  
 - always fail by producing existing kernel values (`DomainError`, `Result<T>`)
 
-They are guardrails, not abstractions. 
+They are guardrails, not abstractions.  
 They exist to make incorrect code impossible to ignore, not to express business logic.
 
 ---
@@ -181,8 +181,8 @@ usual.
 
 The architecture should teach by **constraining expression**:
 
-- Illegal states are unrepresentable. 
-- Incoherent error flows are hard to write. 
+- Illegal states are unrepresentable.  
+- Incoherent error flows are hard to write.  
 - Ambiguous semantics feel unnatural or impossible.
 
 Developers should feel where the invariants live simply by using the types.
@@ -193,10 +193,10 @@ Developers should feel where the invariants live simply by using the types.
 
 The ecosystem is organized around a spine and its edges:
 
-- `Dx.Domain` — invariants, results, errors, time, causation primitives. 
-- `Dx.Domain.Values` — identities, primitives, enforced value objects. 
-- `Dx.Domain.Analyzers` — compile‑time enforcement, migration pressure. 
-- `Dx.Domain.Generators` — boilerplate reduction that preserves semantics. 
+- `Dx.Domain` — invariants, results, errors, time, causation primitives.  
+- `Dx.Domain.Values` — identities, primitives, enforced value objects.  
+- `Dx.Domain.Analyzers` — compile‑time enforcement, migration pressure.  
+- `Dx.Domain.Generators` — boilerplate reduction that preserves semantics.  
 - `Dx.Domain.Persistence.*` — adapters, never dependencies.
 
 Names may evolve. **Principles do not.**
@@ -206,6 +206,3 @@ This manifesto is not documentation; it is the **guardrail against drift**.
 Every change answers one question:
 
 > Does this uphold the refusal – or compromise it?
-
----
-
