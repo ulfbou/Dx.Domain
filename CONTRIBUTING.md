@@ -31,6 +31,10 @@ To maintain the "spine" of the domain, the boundary between Core and Values is d
 
 The kernel forbids semantic expansion, not mechanical support. Static analysis and reviewers enforce this distinction rigorously.
 
+### Architectural Visibility
+
+In this project, **"Internal" refers to architectural visibility first and language visibility second.** A construct may be technically visible (via `internal` keyword, `InternalsVisibleTo`, or friend assemblies) for testing or tooling, but it must not be treated as part of the public domain vocabulary or leaked to external consumers.
+
 ### Allowed: Mechanical Support Code
 Code that purely enforces structural correctness or handles low-level operations without implying business meaning.
 * **Examples:** Null checks, range validation, ID generation, immutable transformations.

@@ -50,6 +50,8 @@ Dx.Domain is defined as much by what it refuses as by what it provides:
 - Not a runtime-first safety net; correctness is primarily compile-time and invariant-driven.
 - The kernel forbids semantic expansion, not mechanical support.
 
+**The principle of "Internal" applies to architectural intent.** While the C# `internal` keyword is our primary enforcement tool, the boundary is defined by the public domain vocabulary. Even if a primitive is technically accessible to infrastructure via testing bridges, it remains "internal" to the kernel's mechanics.
+
 The design favors friction that teaches. Misuse should be mechanically hard or impossible. Correct usage should
 be obvious from the types.
 
