@@ -10,12 +10,14 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx;
+
+using static Dx.Dx;
+
+using System.Diagnostics;
+
 namespace Dx.Domain.Factors
 {
-    using Dx.Domain.Invariants;
-
-    using System.Diagnostics;
-
     /// <summary>
     /// Represents an immutable domain fact with a strongly typed payload and associated metadata.
     /// </summary>
@@ -42,6 +44,15 @@ namespace Dx.Domain.Factors
         /// <inheritdoc />
         public DateTimeOffset UtcTimestamp { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the Fact class with the specified identifier, fact type, payload, causation,
+        /// and optional UTC timestamp.
+        /// </summary>
+        /// <param name="id">The unique identifier for the fact.</param>
+        /// <param name="factType">The type or category of the fact. Cannot be null or empty.</param>
+        /// <param name="payload">The payload data associated with the fact.</param>
+        /// <param name="causation">The causation information that describes the origin or reason for the fact.</param>
+        /// <param name="utcTimestamp">The UTC timestamp when the fact occurred. If null, the current UTC time is used.</param>
         private Fact(FactId id, string factType, TPayload payload, Causation causation, DateTimeOffset? utcTimestamp = null)
         {
             Id = id;

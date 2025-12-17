@@ -10,10 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-
     /// <summary>
     /// Represents detailed diagnostic information for a violated invariant.
     /// </summary>

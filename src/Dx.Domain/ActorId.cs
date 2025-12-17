@@ -10,48 +10,78 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+using static Dx.Dx;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-    using System.Globalization;
-
     /// <summary>
-    /// Represents a strongly typed identifier for an actor, backed by a GUID value.
+    /// Represents a strongly typed identifier for an actor, backed by a <see cref="Guid"/> value.
     /// </summary>
-    /// <remarks>Use the ActorId type to uniquely identify actors within a distributed system or application.
-    /// ActorId provides value-based equality and can be compared, serialized, or used as a key in collections. An
-    /// ActorId with a value equal to Guid.Empty is considered empty and can be accessed via the static Empty
-    /// property.</remarks>
-    [DebuggerDisplay("ActorId = {Value}")]
+    /// <remarks>
+    /// Use the <see cref="ActorId"/> type to uniquely identify actors within a distributed system or application.
+    /// <see cref="ActorId"/> provides value-based equality and can be compared, serialized, or used as a key in collections.
+    /// </remarks>
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct ActorId : IEquatable<ActorId>
     {
         /// <summary>
-        /// Gets an <see cref="ActorId"/> whose underlying value is <see cref="Guid.Empty"/>.
+        /// Represents an uninitialized or default value of the ActorId type.
         /// </summary>
-        public static readonly ActorId Empty = new(Guid.Empty);
+        /// <remarks>Use this field to represent a scenario where no valid actor identifier is available
+        /// or assigned. The value of Empty is equivalent to an ActorId constructed with Guid.Empty.</remarks>
+        public static readonly ActorId Empty = new ActorId(Guid.Empty);
 
         /// <summary>
         /// Gets the underlying <see cref="Guid"/> value for this actor.
         /// </summary>
         public Guid Value { get; }
 
-        private ActorId(Guid value)
-        {
-            Value = value;
-        }
+        /// <summary>
+        /// Initializes a new instance of the ActorId struct using the specified <see cref="Guid"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Guid"/> value that uniquely identifies the actor.</param>
+        private ActorId(Guid value) => Value = value;
 
         /// <summary>
         /// Creates a new <see cref="ActorId"/> with a freshly generated <see cref="Guid"/> value.
         /// </summary>
-        /// <returns>A non-empty <see cref="ActorId"/>.</returns>
+        /// <returns>A new unique <see cref="ActorId"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ActorId New() => new ActorId(Guid.NewGuid());
 
         /// <summary>
-        /// Gets a value indicating whether this instance represents <see cref="Empty"/>.
+        /// Creates a new ActorId instance from the specified GUID value.
         /// </summary>
-        public bool IsEmpty => Value == Guid.Empty;
+        /// <param name="value">The <see cref="Guid"/> value to use for the ActorId. Must not be Guid.Empty.</param>
+        /// <returns>An <see cref="ActorId"/> that represents the specified <see cref="Guid"/> value.</returns>
+        /// <exception cref="InvariantViolationException">Thrown if the provided <see cref="Guid"/> value is <see cref="Guid.Empty"/>.</exception>
+        /// <remarks>The method enforces the invariant that the provided <see cref="Guid"/> value is not
+        /// <see cref="Guid.Empty"/>. If the value is <see cref="Guid.Empty"/>, an invariant violation is raised.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ActorId Create(Guid value)
+        {
+            Invariant.That(value != Guid.Empty,
+                InvariantError.Create(
+                    Dx.DomainErrors.FactoryBypass("ActorId cannot be default or empty. Use ActorId.New()")));
+
+            return new ActorId(value);
+        }
+
+        /// <summary>
+        /// Attempts to format the value as a 32-digit hexadecimal string without hyphens into the provided character span.
+        /// </summary>
+        /// <param name="destination">The span to write the formatted string to.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters written to the span.</param>
+        /// <returns><see langword="true"/> if the formatting was successful; otherwise, <see langword="false"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten)
+            => Value.TryFormat(destination, out charsWritten, "N");
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(ActorId other) => Value.Equals(other.Value);
 
         /// <inheritdoc />
@@ -60,24 +90,18 @@ namespace Dx.Domain
         /// <inheritdoc />
         public override int GetHashCode() => Value.GetHashCode();
 
-        /// <summary>
-        /// Determines whether two <see cref="ActorId"/> values are equal.
-        /// </summary>
-        /// <param name="a">The first identifier to compare.</param>
-        /// <param name="b">The second identifier to compare.</param>
-        /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
-        public static bool operator ==(ActorId a, ActorId b) => a.Equals(b);
-
-        /// <summary>
-        /// Determines whether two <see cref="ActorId"/> values are not equal.
-        /// </summary>
-        /// <param name="a">The first identifier to compare.</param>
-        /// <param name="b">The second identifier to compare.</param>
-        /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
-        public static bool operator !=(ActorId a, ActorId b) => !a.Equals(b);
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(ActorId left, ActorId right) => left.Equals(right);
 
         /// <inheritdoc />
-        public override string ToString()
-            => IsEmpty ? "ActorId.Empty" : $"ActorId({Value.ToString("N", CultureInfo.InvariantCulture)})";
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(ActorId left, ActorId right) => !left.Equals(right);
+
+        /// <inheritdoc />
+        public override string ToString() => Value.ToString("N");
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => Value.ToString("N");
     }
 }

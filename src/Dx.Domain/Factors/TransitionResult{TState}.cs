@@ -10,12 +10,14 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx;
+
+using static Dx.Dx;
+
+using System.Diagnostics;
+
 namespace Dx.Domain.Factors
 {
-    using Dx.Domain.Invariants;
-
-    using System.Diagnostics;
-
     /// <summary>
     /// Represents the outcome of a state transition and the domain facts it emitted.
     /// </summary>

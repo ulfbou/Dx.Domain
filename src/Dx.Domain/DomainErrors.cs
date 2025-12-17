@@ -10,6 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx;
+
+using static Dx.Dx;
+
 namespace Dx.Domain
 {
     /// <summary>
@@ -17,26 +21,17 @@ namespace Dx.Domain
     /// </summary>
     internal sealed partial class DomainErrors
     {
-        /// <summary>
-        /// Provides predefined domain errors related to causation metadata requirements.
-        /// </summary>
         public static partial class Causation
         {
-            /// <summary>
-            /// Gets a domain error that indicates a required correlation identifier is missing or empty.
-            /// </summary>
             public static DomainError MissingCorrelation
-                => DomainError.Create(
-                    "Causation.MissingCorrelation",
-                    "Causation requires a non-empty CorrelationId.");
+            => DomainError.Create(
+            "Causation.MissingCorrelation",
+            "Causation requires a non-empty CorrelationId.");
 
-            /// <summary>
-            /// Gets a domain error that indicates a required TraceId is missing for causation operations.
-            /// </summary>
             public static DomainError MissingTrace
-                => DomainError.Create(
-                    "Causation.MissingTrace",
-                    "Causation requires a non-empty TraceId.");
+            => DomainError.Create(
+            "Causation.MissingTrace",
+            "Causation requires a non-empty TraceId.");
         }
 
         /// <summary>
@@ -84,7 +79,10 @@ namespace Dx.Domain
             /// <summary>
             /// Represents the error message used when a transition failure does not provide a non-null DomainError.
             /// </summary>
-            public const string MissingError = "Transition failure must provide a non-null DomainError.";
+            public static DomainError MissingError
+                => DomainError.Create(
+                    "Transition.MissingError",
+                    "Transition failure must provide a non-null DomainError.");
 
             /// <summary>
             /// Gets a domain error that indicates a transition did not produce any facts as required.
@@ -118,18 +116,39 @@ namespace Dx.Domain
                     "A null value is not allowed for a successful Result. All successes must provide a concrete value.");
 
             /// <summary>
-            /// Creates an error message indicating that a value is missing from a failure result.
+            /// Represents the error code used to indicate a missing value result.
             /// </summary>
-            /// <param name="error">The error message to include in the returned string. Can be null.</param>
-            /// <returns>A string describing that the value is not present, including the specified error message.</returns>
-            public static string MissingValue(string? error) => $"Value is not present in a failure result. Error: {error}";
+            public const string MissingValueCode = "Result.MissingValue";
 
             /// <summary>
-            /// Generates an error message indicating that an error is not present in a successful result.
+            /// Creates a message indicating that a value is missing from a failure result, including the specified
+            /// error description if provided.
             /// </summary>
-            /// <param name="value">The value associated with the successful result. Can be null.</param>
-            /// <returns>A string containing the error message, including the specified value.</returns>
-            public static string MissingError(string? value) => $"Error is not present in a successful result. Value: {value}";
+            /// <param name="error">An optional error description to include in the message. If null, a default message is used.</param>
+            /// <returns>A string message indicating that the value is not present, including the specified error description or
+            /// a default message if none is provided.</returns>
+            public static string MissingValueMessage(string? error)
+                => $"Value is not present in a failure result. Error: {error ?? "Not specified"}";
+
+            public static string MissingErrorMessage(string? value)
+                => $"Error is not present in a successful result. Value: {value ?? "Not specified"}";
+
+            /// <summary>
+            /// Creates a domain error indicating that an error value was accessed in a successful result where no error is present.
+            /// </summary>
+            /// <remarks>Use this method to generate a consistent error when an error value is accessed from a result that
+            /// does not contain an error. This helps enforce correct usage patterns in result-handling code.</remarks>
+            /// <typeparam name="TValue">The type of the value expected in the successful result.</typeparam>
+            /// <typeparam name="TError">The type of the error associated with the result.</typeparam>
+            /// <param name="error">The error value that was incorrectly accessed in a successful result.</param>
+            /// <returns>A DomainError representing the invalid access of an error value in a successful result.</returns>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static DomainError MissingValue<TValue, TError>(TError error) where TValue : notnull where TError : notnull
+                => DomainError.Create($"Result.MissingValue.{typeof(TValue)}", $"Error is not present in a successful result. Error: {error}");
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static DomainError MissingError<TValue, TError>(TValue value) where TValue : notnull where TError : notnull
+                => DomainError.Create("Result.MissingError", $"Error is not present in a successful result. Value: {value}");
         }
 
         /// <summary>
@@ -142,13 +161,9 @@ namespace Dx.Domain
             /// </summary>
             /// <param name="fieldName">The name of the required field that is missing. Cannot be null or empty.</param>
             /// <returns>A <see cref="DomainError"/> representing the missing required field error.</returns>
-            /// <exception cref="ArgumentException">Thrown if <paramref name="fieldName"/> is null or empty.</exception>
             public static DomainError MissingRequiredField(string fieldName)
             {
-                if (string.IsNullOrEmpty(fieldName))
-                {
-                    throw new ArgumentException("Field name must be provided.", nameof(fieldName));
-                }
+                Invariant.That(!string.IsNullOrEmpty(fieldName), DomainError.Create("Validation.InvalidFieldName", "Field name cannot be null or empty."));
 
                 return DomainError.Create(
                     code: "Validation.MissingRequiredField",

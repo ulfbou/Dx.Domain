@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using static Dx.Dx;
+
 using System.Diagnostics;
 
 namespace Dx.Domain.Factors
@@ -17,12 +19,19 @@ namespace Dx.Domain.Factors
     /// <summary>
     /// Strongly-typed identifier for a domain fact.
     /// </summary>
-    [DebuggerDisplay("FactId = {Value:N}")]
+    /// <remarks>
+    /// Uniquely identifies a fact within the event stream or persistence store.
+    /// </remarks>
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct FactId : IEquatable<FactId>
     {
         /// <summary>Gets the underlying <see cref="Guid"/> value.</summary>
         public Guid Value { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the FactId struct with the specified <see cref="Guid"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Guid"/> value to assign to the FactId.</param>
         private FactId(Guid value) => Value = value;
 
         /// <summary>
@@ -33,51 +42,50 @@ namespace Dx.Domain.Factors
         public static FactId New() => new(Guid.NewGuid());
 
         /// <summary>
-        /// Creates a <see cref="FactId"/> from an existing <see cref="Guid"/> value.
+        /// Creates a new FactId instance from the specified Guid value.
         /// </summary>
-        /// <param name="value">The GUID to wrap.</param>
-        /// <returns>A <see cref="FactId"/> whose <see cref="Value"/> is <paramref name="value"/>.</returns>
-        public static FactId From(Guid value) => new(value);
+        /// <param name="value">The Guid value to use for the FactId. Must not be <see cref="Guid.Empty"/>.</param>
+        /// <returns>A FactId that represents the specified <see cref="Guid"/> value.</returns>
+        /// <exception cref="InvariantViolationException">Thrown if the provided <see cref="Guid"/> value is <see cref="Guid.Empty"/>.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static FactId FromGuid(Guid value)
+        {
+            Invariant.That(value != Guid.Empty, Dx.DomainErrors.FactoryBypass("FactId cannot be default or empty. Use FactId.New()"));
+            return new(value);
+        }
+
+        /// <summary>
+        /// Attempts to format the value as a 32-digit hexadecimal string without hyphens into the provided character span.
+        /// </summary>
+        /// <param name="destination">The span to write the formatted string to.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters written to the span.</param>
+        /// <returns><see langword="true"/> if the formatting was successful; otherwise, <see langword="false"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten)
+            => Value.TryFormat(destination, out charsWritten, "N");
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(FactId other) => Value.Equals(other.Value);
 
         /// <inheritdoc />
         public override bool Equals(object? obj) => obj is FactId other && Equals(other);
 
-        /// <summary>
-        /// Determines whether two <see cref="FactId"/> values are equal.
-        /// </summary>
-        /// <param name="left">The first identifier to compare.</param>
-        /// <param name="right">The second identifier to compare.</param>
-        /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(FactId left, FactId right) => left.Equals(right);
 
-        /// <summary>
-        /// Determines whether two <see cref="FactId"/> values are not equal.
-        /// </summary>
-        /// <param name="left">The first identifier to compare.</param>
-        /// <param name="right">The second identifier to compare.</param>
-        /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(FactId left, FactId right) => !left.Equals(right);
-
-        /// <summary>
-        /// Implicitly converts a <see cref="Guid"/> to a <see cref="FactId"/>.
-        /// </summary>
-        /// <param name="value">The GUID to wrap.</param>
-        /// <returns>A new <see cref="FactId"/> with <see cref="Value"/> set to <paramref name="value"/>.</returns>
-        /// <remarks>This conversion is lossless and never throws.</remarks>
-        public static implicit operator FactId(Guid value) => From(value);
-
-        /// <summary>
-        /// Explicitly converts a <see cref="FactId"/> to its underlying <see cref="Guid"/> value.
-        /// </summary>
-        /// <param name="factId">The identifier to unwrap.</param>
-        /// <returns>The underlying <see cref="Guid"/> value.</returns>
-        /// <remarks>This conversion is lossless and never throws.</remarks>
-        public static explicit operator Guid(FactId factId) => factId.Value;
 
         /// <inheritdoc />
         public override int GetHashCode() => Value.GetHashCode();
+
+        /// <inheritdoc />
+        public override string ToString() => Value.ToString("N");
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => Value.ToString("N");
     }
 }
