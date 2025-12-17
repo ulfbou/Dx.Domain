@@ -11,7 +11,7 @@
 //         <item>
 //             <term>Description:</term>
 //             <description>
-//                 The canonical, generic Result type (discriminated union) used to explicitly model
+//                 Defines the canonical, generic result type (discriminated union) used to explicitly model
 //                 success and failure paths with distinct value and error types.
 //             </description>
 //         </item>
@@ -29,8 +29,9 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain.Results
+namespace Dx.Domain
 {
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
 
     /// <summary>
@@ -43,6 +44,7 @@ namespace Dx.Domain.Results
     /// </remarks>
     /// <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
     /// <typeparam name="TError">The type of the error returned when the operation fails.</typeparam>
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct Result<TValue, TError> where TValue : notnull where TError : notnull
     {
         private readonly TValue? _value;
@@ -104,7 +106,7 @@ namespace Dx.Domain.Results
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
         public static Result<TValue, TError> Failure(TError error) => new Result<TValue, TError>(error);
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => IsSuccess ? $"Ok({_value})" : $"Failure({_error})";
 
@@ -167,6 +169,15 @@ namespace Dx.Domain.Results
         public void Deconstruct(out TError? error)
         {
             error = _error;
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => IsSuccess
+                ? $"Success: {_value}"
+                : $"Failure: {_error}";
         }
     }
 }

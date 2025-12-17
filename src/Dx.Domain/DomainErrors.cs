@@ -1,3 +1,34 @@
+// <summary>
+//     <list type="bullet">
+//         <item>
+//             <term>File:</term>
+//             <description>DomainErrors.cs</description>
+//         </item>
+//         <item>
+//             <term>Project:</term>
+//             <description>Dx.Domain</description>
+//         </item>
+//         <item>
+//             <term>Description:</term>
+//             <description>
+//                 Provides a centralized catalog of strongly-typed <see cref="DomainError"/> factories and
+//                 constants used across the Dx.Domain result and invariants infrastructure.
+//             </description>
+//         </item>
+//     </list>
+// </summary>
+// <authors>Ulf Bourelius (Original Author)</authors>
+// <copyright file="DomainErrors.cs" company="Dx.Domain Team">
+//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
+
 namespace Dx.Domain
 {
     /// <summary>
