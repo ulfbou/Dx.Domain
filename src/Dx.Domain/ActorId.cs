@@ -2,7 +2,7 @@
 //     <list type="bullet">
 //         <item>
 //             <term>File:</term>
-//             <description>SpanId.cs</description>
+//             <description>ActorId.cs</description>
 //         </item>
 //         <item>
 //             <term>Project:</term>
@@ -11,14 +11,14 @@
 //         <item>
 //             <term>Description:</term>
 //             <description>
-//                 Defines a strongly-typed span identifier used to correlate work within a single trace
-//                 or operation segment.
+//                 Defines a strongly-typed identifier for actors (users, services, or systems) participating
+//                 in domain operations.
 //             </description>
 //         </item>
 //     </list>
 // </summary>
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="SpanId.cs" company="Dx.Domain Team">
+// <copyright file="ActorId.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -29,70 +29,69 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using System.Diagnostics;
-
 namespace Dx.Domain
 {
-    /// <summary>
-    /// Represents a span identifier used to correlate work within a single trace.
-    /// </summary>
+    using System.Diagnostics;
+
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly struct SpanId : IEquatable<SpanId>
+    public readonly struct ActorId : IEquatable<ActorId>
     {
         /// <summary>
-        /// Gets an empty <see cref="SpanId"/> with a value of <c>0</c>.
+        ///     An <see cref="ActorId"/> with an empty <see cref="Guid"/> value.
         /// </summary>
-        public static readonly SpanId Empty = new(0UL);
-
-        private readonly ulong _value;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SpanId(ulong value) => _value = value;
+        public static readonly ActorId Empty = new(null);
 
         /// <summary>
-        /// Creates a new random <see cref="SpanId"/> instance.
+        ///     The underlying <see cref="Guid"/> value of this <see cref="ActorId"/>.
         /// </summary>
+        public Guid Value { get; }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SpanId New()
+        private ActorId(Guid? guid)
         {
-            Span<byte> buffer = stackalloc byte[8];
-            Random.Shared.NextBytes(buffer);
-            return new SpanId(BitConverter.ToUInt64(buffer));
+            Value = guid ?? Guid.Empty;
         }
 
         /// <summary>
-        /// Gets a value indicating whether this identifier is empty.
+        /// Creates a new <see cref="ActorId"/> with a freshly generated <see cref="Guid"/> value.
+        /// </summary>
+        /// <returns>A non-empty <see cref="ActorId"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ActorId New() => new ActorId(Guid.NewGuid());
+
+        /// <summary>
+        /// Gets a value indicating whether this instance represents <see cref="Empty"/>.
         /// </summary>
         public bool IsEmpty
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _value == 0UL;
+            get => Value == Guid.Empty;
         }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(SpanId other) => _value == other._value;
+        public bool Equals(ActorId other) => Value.Equals(other.Value);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object? obj) => obj is SpanId other && Equals(other);
+        public override bool Equals(object? obj) => obj is ActorId other && Equals(other);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() => _value.GetHashCode();
+        public override int GetHashCode() => Value.GetHashCode();
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(SpanId a, SpanId b) => a.Equals(b);
+        public static bool operator ==(ActorId a, ActorId b) => a.Equals(b);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(SpanId a, SpanId b) => !a.Equals(b);
+        public static bool operator !=(ActorId a, ActorId b) => !a.Equals(b);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
-            => IsEmpty ? "SpanId.Empty" : $"SpanId(v={_value})";
+            => IsEmpty ? "ActorId.Empty" : $"ActorId({Value})";
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay
