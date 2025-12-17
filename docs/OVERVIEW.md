@@ -26,6 +26,18 @@ Value types in the kernel may expose static factory methods for safe, efficient 
 
 This protects random ID generation, time capture, and optimized memory usage without opening the door to builders or mutability.
 
+### Identifiers and Semantic Strings
+
+While the kernel demands strong typing, it recognizes that certain identifiers must be serializable and human-readable to cross system boundaries.
+
+**Canonical identifiers (such as error codes and fact types) are permitted as strings provided they are:**
+
+1. **Centralized** – Defined in a single location (for example, a `Faults` or `FactTypes` static class).
+2. **Intentional** – Represent permanent semantic contracts, not transient or local values.
+3. **Validated** – Subject to internal invariants (such as `NotNullOrWhiteSpace`) and, where applicable, structural rules.
+
+These strings are treated as *identities*, not configuration knobs. By contrast, ad-hoc literals used directly in control flow (for example, `if (role == "admin")`) remain violations of the "No Magic Strings" rule and should be modeled via dedicated types or enums.
+
 ---
 
 ## Philosophy
