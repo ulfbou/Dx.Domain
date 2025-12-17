@@ -27,7 +27,7 @@ namespace Dx.Domain
     /// </remarks>
     /// <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
     /// <typeparam name="TError">The type of the error returned when the operation fails.</typeparam>
-    [DebuggerDisplay("Result<{nameof(TValue)}, {nameof(TError}> IsSuccess = {IsSuccess}, HasError = {IsFailure}")]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct Result<TValue, TError> where TValue : notnull where TError : notnull
     {
         private readonly TValue? _value;
@@ -51,7 +51,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsSuccess, DomainErrors.Result.MissingValue<TValue, TError>(_error!));
+                Invariant.That(IsSuccess, Dx.Faults.Result.MissingValueOnFailure<TValue, TError>(_error!));
                 return _value!;
             }
         }
@@ -64,7 +64,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsFailure, DomainErrors.Result.MissingError<TValue, TError>(_value!));
+                Invariant.That(IsFailure, Dx.Faults.Result.MissingErrorOnSuccess<TValue, TError>(_value!));
                 return _error!;
             }
         }
@@ -87,7 +87,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DebuggerStepThrough]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        public static Result<TValue, TError> Ok(TValue value) => new Result<TValue, TError>(value);
+        internal static Result<TValue, TError> InternalOk(TValue value) => new Result<TValue, TError>(value);
 
         /// <summary>
         /// Creates a failed result containing the specified error value.
@@ -95,7 +95,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DebuggerStepThrough]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        public static Result<TValue, TError> Failure(TError error) => new Result<TValue, TError>(error);
+        internal static Result<TValue, TError> InternalFailure(TError error) => new Result<TValue, TError>(error);
 
         /// <inheritdoc />
         public override string ToString() => IsSuccess ? $"Ok({_value})" : $"Failure({_error})";
@@ -156,5 +156,8 @@ namespace Dx.Domain
         {
             error = _error;
         }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => IsSuccess ? $"Ok({_value})" : $"Failure({_error})";
     }
 }

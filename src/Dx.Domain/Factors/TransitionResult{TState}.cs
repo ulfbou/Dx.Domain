@@ -10,11 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx;
-
-using static Dx.Dx;
-
 using System.Diagnostics;
+using static Dx.Dx;
 
 namespace Dx.Domain.Factors
 {
@@ -66,11 +63,7 @@ namespace Dx.Domain.Factors
         internal static TransitionResult<TState> Success(
             TState state,
             IReadOnlyList<IDomainFact> facts)
-        {
-            Invariant.That(facts.Count > 0, DomainErrors.Transition.MissingFacts);
-
-            return new TransitionResult<TState>(Result.Ok(state), facts);
-        }
+            => new TransitionResult<TState>(Result.Ok(state), facts);
 
         /// <summary>
         /// Creates a failed transition result from the specified domain error.

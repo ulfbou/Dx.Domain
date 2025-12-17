@@ -30,8 +30,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
     <!-- Output Configuration -->
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+    <BaseIntermediateOutputPath>obj</BaseIntermediateOutputPath>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
 
     <!-- Packaging -->

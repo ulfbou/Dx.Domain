@@ -89,6 +89,6 @@ namespace Dx.Domain
         public static bool operator !=(CorrelationId left, CorrelationId right) => !left.Equals(right);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => Value.ToString("N");
+        private string DebuggerDisplay => $"CorrelationId={ToString()}";
     }
 }

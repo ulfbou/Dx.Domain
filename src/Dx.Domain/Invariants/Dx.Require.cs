@@ -10,22 +10,20 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain;
-
 using System.Text.RegularExpressions;
 
 namespace Dx
 {
     /// <summary>
-    /// Provides domain validation and error creation utilities for enforcing invariants, performing functional-style
-    /// precondition checks, and generating strongly-typed domain errors within the domain layer.
+    /// Provides the primary gateway for the Dx Domain Kernel, offering a unified facade for result creation 
+    /// while encapsulating internal mechanical enforcement and validation utilities.
     /// </summary>
-    /// <remarks>The Dx class contains static helpers for asserting domain invariants, validating
-    /// preconditions without exceptions, and constructing context-rich domain errors. These utilities are intended for
-    /// use within the domain layer to ensure business rule consistency, model failures explicitly, and provide detailed
-    /// diagnostic information for error handling and debugging. Use the Invariant class to enforce conditions that must
-    /// always hold true, the Require class for functional-style validations that return Result types, and the
-    /// DomainErrors class to create or retrieve standardized domain errors for various failure scenarios.</remarks>
+    /// <remarks>
+    /// This class serves as the singular public entry point for domain primitives.
+    /// <para><b>Public Surface:</b> Use <see cref="Result"/> for functional flow control.</para>
+    /// <para><b>Internal Mechanics:</b> The <c>Invariant</c> and <c>Require</c> systems are reserved 
+    /// for kernel-internal enforcement and are not visible to external consumers.</para>
+    /// </remarks>
     public static partial class Dx
     {
         /// <summary>
@@ -47,7 +45,7 @@ namespace Dx
             /// <returns>A successful or failed <see cref="Result{Unit}"/> depending on the condition.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<Unit> That(bool condition, DomainError error)
-                => condition ? Result<Unit>.Ok(Unit.Value) : Result<Unit>.Failure(error);
+                => condition ? Result<Unit>.InternalOk(Unit.Value) : Result<Unit>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that the specified condition is <see langword="true"/>, returning a successful
@@ -59,7 +57,7 @@ namespace Dx
             /// <returns>A successful or failed <see cref="Result{Unit}"/> depending on the condition.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<Unit> That(bool condition, Func<DomainError> errorFactory)
-                => condition ? Result<Unit>.Ok(Unit.Value) : Result<Unit>.Failure(errorFactory());
+                => condition ? Result<Unit>.InternalOk(Unit.Value) : Result<Unit>.InternalFailure(errorFactory());
 
             /// <summary>
             /// Ensures that the specified reference value is not <see langword="null"/>.
@@ -73,7 +71,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<T> NotNull<T>(T? value, DomainError error) where T : class
-                => value is null ? Result<T>.Failure(error) : Result<T>.Ok(value);
+                => value is null ? Result<T>.InternalFailure(error) : Result<T>.InternalOk(value);
 
             /// <summary>
             /// Ensures that the specified reference value is not <see langword="null"/>, using an error factory.
@@ -87,7 +85,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<T> NotNull<T>(T? value, Func<DomainError> errorFactory) where T : class
-                => value is null ? Result<T>.Failure(errorFactory()) : Result<T>.Ok(value);
+                => value is null ? Result<T>.InternalFailure(errorFactory()) : Result<T>.InternalOk(value);
 
             /// <summary>
             /// Ensures that a string is not <see langword="null"/> or whitespace.
@@ -100,7 +98,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<string> NotNullOrWhiteSpace(string? value, DomainError error)
-                => string.IsNullOrWhiteSpace(value) ? Result<string>.Failure(error) : Result<string>.Ok(value!);
+                => string.IsNullOrWhiteSpace(value) ? Result<string>.InternalFailure(error) : Result<string>.InternalOk(value!);
 
             /// <summary>
             /// Ensures that a string is not <see langword="null"/> or empty.
@@ -113,7 +111,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<string> NotNullOrEmpty(string? value, DomainError error)
-                => string.IsNullOrEmpty(value) ? Result<string>.Failure(error) : Result<string>.Ok(value!);
+                => string.IsNullOrEmpty(value) ? Result<string>.InternalFailure(error) : Result<string>.InternalOk(value!);
 
             /// <summary>
             /// Ensures that a string matches the specified regular expression pattern.
@@ -128,7 +126,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<string> Matches(string? value, string pattern, DomainError error, RegexOptions options = RegexOptions.None)
-                => value is not null && Regex.IsMatch(value, pattern, options) ? Result<string>.Ok(value) : Result<string>.Failure(error);
+                => value is not null && Regex.IsMatch(value, pattern, options) ? Result<string>.InternalOk(value) : Result<string>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a string's length falls within the specified inclusive range.
@@ -143,7 +141,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<string> LengthInRange(string? value, int minInclusive, int maxInclusive, DomainError error)
-                => value is not null && value.Length >= minInclusive && value.Length <= maxInclusive ? Result<string>.Ok(value) : Result<string>.Failure(error);
+                => value is not null && value.Length >= minInclusive && value.Length <= maxInclusive ? Result<string>.InternalOk(value) : Result<string>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a comparable value lies within the specified inclusive range.
@@ -159,7 +157,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<T> InRange<T>(T value, T minInclusive, T maxInclusive, DomainError error) where T : IComparable<T>
-                => value.CompareTo(minInclusive) >= 0 && value.CompareTo(maxInclusive) <= 0 ? Result<T>.Ok(value) : Result<T>.Failure(error);
+                => value.CompareTo(minInclusive) >= 0 && value.CompareTo(maxInclusive) <= 0 ? Result<T>.InternalOk(value) : Result<T>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a comparable value is greater than the specified threshold.
@@ -174,7 +172,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<T> GreaterThan<T>(T value, T threshold, DomainError error) where T : IComparable<T>
-                => value.CompareTo(threshold) > 0 ? Result<T>.Ok(value) : Result<T>.Failure(error);
+                => value.CompareTo(threshold) > 0 ? Result<T>.InternalOk(value) : Result<T>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a comparable value is less than the specified threshold.
@@ -189,7 +187,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<T> LessThan<T>(T value, T threshold, DomainError error) where T : IComparable<T>
-                => value.CompareTo(threshold) < 0 ? Result<T>.Ok(value) : Result<T>.Failure(error);
+                => value.CompareTo(threshold) < 0 ? Result<T>.InternalOk(value) : Result<T>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that the specified enum value is defined for its enum type.
@@ -203,7 +201,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<TEnum> IsDefined<TEnum>(TEnum value, DomainError error) where TEnum : struct, Enum
-                => Enum.IsDefined(value) ? Result<TEnum>.Ok(value) : Result<TEnum>.Failure(error);
+                => Enum.IsDefined(value) ? Result<TEnum>.InternalOk(value) : Result<TEnum>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a <see cref="Guid"/> value is not <see cref="Guid.Empty"/>.
@@ -216,7 +214,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<Guid> NotEmpty(Guid value, DomainError error)
-                => value != Guid.Empty ? Result<Guid>.Ok(value) : Result<Guid>.Failure(error);
+                => value != Guid.Empty ? Result<Guid>.InternalOk(value) : Result<Guid>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a <see cref="DateTimeOffset"/> value represents a UTC instant.
@@ -229,7 +227,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<DateTimeOffset> IsUtc(DateTimeOffset value, DomainError error)
-                => value.Offset == TimeSpan.Zero ? Result<DateTimeOffset>.Ok(value) : Result<DateTimeOffset>.Failure(error);
+                => value.Offset == TimeSpan.Zero ? Result<DateTimeOffset>.InternalOk(value) : Result<DateTimeOffset>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a <see cref="DateTimeOffset"/> value does not lie in the future relative to
@@ -243,7 +241,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<DateTimeOffset> NotInFuture(DateTimeOffset value, DomainError error)
-                => value <= DateTimeOffset.UtcNow ? Result<DateTimeOffset>.Ok(value) : Result<DateTimeOffset>.Failure(error);
+                => value <= DateTimeOffset.UtcNow ? Result<DateTimeOffset>.InternalOk(value) : Result<DateTimeOffset>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a <see cref="DateTimeOffset"/> value does not lie in the past relative to
@@ -257,7 +255,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<DateTimeOffset> NotInPast(DateTimeOffset value, DomainError error)
-                => value >= DateTimeOffset.UtcNow ? Result<DateTimeOffset>.Ok(value) : Result<DateTimeOffset>.Failure(error);
+                => value >= DateTimeOffset.UtcNow ? Result<DateTimeOffset>.InternalOk(value) : Result<DateTimeOffset>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a collection is not <see langword="null"/> and contains at least one element.
@@ -271,7 +269,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<IReadOnlyCollection<T>> NotEmpty<T>(IEnumerable<T>? collection, DomainError error)
-                => collection is not null && System.Linq.Enumerable.Any(collection) ? Result<IReadOnlyCollection<T>>.Ok(System.Linq.Enumerable.ToArray(collection)) : Result<IReadOnlyCollection<T>>.Failure(error);
+                => collection is not null && Enumerable.Any(collection) ? Result<IReadOnlyCollection<T>>.InternalOk((IReadOnlyCollection<T>)Enumerable.ToArray(collection)) : Result<IReadOnlyCollection<T>>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that a collection is not <see langword="null"/> and does not contain any <see langword="null"/> elements.
@@ -285,7 +283,7 @@ namespace Dx
             /// </returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<IReadOnlyCollection<T>> NoNullElements<T>(IEnumerable<T>? collection, DomainError error)
-                => collection is not null && !System.Linq.Enumerable.Any(collection, e => e is null) ? Result<IReadOnlyCollection<T>>.Ok(System.Linq.Enumerable.ToArray(collection)) : Result<IReadOnlyCollection<T>>.Failure(error);
+                => collection is not null && !Enumerable.Any(collection, e => e is null) ? Result<IReadOnlyCollection<T>>.InternalOk((IReadOnlyCollection<T>)Enumerable.ToArray(collection)) : Result<IReadOnlyCollection<T>>.InternalFailure(error);
 
             /// <summary>
             /// Ensures that the specified value satisfies a given predicate.
@@ -303,7 +301,7 @@ namespace Dx
                 where TValue : notnull
             {
                 ArgumentNullException.ThrowIfNull(predicate);
-                return predicate(value) ? Result<TValue>.Ok(value) : Result<TValue>.Failure(error);
+                return predicate(value) ? Result<TValue>.InternalOk(value) : Result<TValue>.InternalFailure(error);
             }
 
             /// <summary>
@@ -325,11 +323,11 @@ namespace Dx
                 ArgumentNullException.ThrowIfNull(tryParse);
                 if (input is null)
                 {
-                    return Result<TValue>.Failure(error);
+                    return Result<TValue>.InternalFailure(error);
                 }
 
                 var (ok, value) = tryParse(input);
-                return ok ? Result<TValue>.Ok(value) : Result<TValue>.Failure(error);
+                return ok ? Result<TValue>.InternalOk(value) : Result<TValue>.InternalFailure(error);
             }
         }
     }
