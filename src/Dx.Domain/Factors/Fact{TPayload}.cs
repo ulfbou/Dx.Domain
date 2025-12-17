@@ -10,11 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx;
-
-using static Dx.Dx;
-
 using System.Diagnostics;
+using static Dx.Dx;
 
 namespace Dx.Domain.Factors
 {
@@ -73,8 +70,10 @@ namespace Dx.Domain.Factors
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
         public static Fact<TPayload> Create(string factType, TPayload payload, Causation causation)
         {
-            Invariant.That(!string.IsNullOrWhiteSpace(factType), DomainErrors.Fact.MissingType);
-            return new Fact<TPayload>(FactId.New(), factType, payload, causation, DateTimeOffset.UtcNow);
+            Invariant.That(!string.IsNullOrWhiteSpace(factType), Dx.Faults.Fact.MissingFactType);
+            Invariant.That(causation.TraceId != TraceId.Empty, Dx.Faults.Fact.MissingTrace);
+            Invariant.That(payload is not null, Dx.Faults.Fact.MissingPayload);
+            return new(FactId.New(), factType, payload!, causation, DateTimeOffset.UtcNow);
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

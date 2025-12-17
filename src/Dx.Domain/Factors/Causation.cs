@@ -10,10 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx;
-
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
+using static Dx.Dx;
 
 namespace Dx.Domain.Factors
 {
@@ -27,7 +25,7 @@ namespace Dx.Domain.Factors
     /// var fact = Fact.Create("OrderPlaced", payload, causation);
     /// </code>
     /// </remarks>
-    [DebuggerDisplay("Causation CorrelationId = {CorrelationId.Value:N}, TraceId = {TraceId}, ActorId = {ActorId}, Utc = {UtcTimestamp:u}")]
+    [DebuggerDisplay("{DebuggerDisplay, nq")]
     public readonly struct Causation : IEquatable<Causation>
     {
         /// <summary>Gets the correlation identifier that groups related operations.</summary>
@@ -73,10 +71,10 @@ namespace Dx.Domain.Factors
         /// Thrown if <paramref name="correlationId"/> or <paramref name="traceId"/> is empty.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
+        internal static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
         {
-            Dx.Invariant.That(correlationId.Value != Guid.Empty, DomainErrors.Causation.MissingCorrelation);
-            Dx.Invariant.That(!traceId.IsEmpty, DomainErrors.Causation.MissingTrace);
+            Dx.Invariant.That(correlationId.Value != Guid.Empty, Faults.Causation.MissingCorrelation);
+            Dx.Invariant.That(!traceId.IsEmpty, Faults.Causation.MissingTrace);
             return new Causation(correlationId, traceId, actorId, DateTimeOffset.UtcNow);
         }
 
@@ -99,5 +97,8 @@ namespace Dx.Domain.Factors
 
         /// <inheritdoc />
         public static bool operator !=(Causation left, Causation right) => !left.Equals(right);
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => $"Causation={CorrelationId}, {TraceId}, {ActorId}, {UtcTimestamp:O}";
     }
 }

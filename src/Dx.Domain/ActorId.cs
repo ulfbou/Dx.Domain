@@ -11,7 +11,6 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 using static Dx.Dx;
 
@@ -61,11 +60,9 @@ namespace Dx.Domain
         /// <remarks>The method enforces the invariant that the provided <see cref="Guid"/> value is not
         /// <see cref="Guid.Empty"/>. If the value is <see cref="Guid.Empty"/>, an invariant violation is raised.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ActorId Create(Guid value)
+        internal static ActorId Create(Guid value)
         {
-            Invariant.That(value != Guid.Empty,
-                InvariantError.Create(
-                    Dx.DomainErrors.FactoryBypass("ActorId cannot be default or empty. Use ActorId.New()")));
+            Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("ActorId cannot be default or empty. Use ActorId.New()"));
 
             return new ActorId(value);
         }
@@ -102,6 +99,7 @@ namespace Dx.Domain
         public override string ToString() => Value.ToString("N");
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => Value.ToString("N");
+        private string DebuggerDisplay => $"ActorId={Value.ToString("N")}";
     }
 }
+

@@ -11,7 +11,6 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace Dx.Domain
 {
@@ -40,5 +39,8 @@ namespace Dx.Domain
         {
             Diagnostic = diagnostic;
         }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => $"InvariantViolationException: {Message}";
     }
 }

@@ -10,9 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using static Dx.Dx;
-
 using System.Diagnostics;
+using static Dx.Dx;
 
 namespace Dx.Domain.Factors
 {
@@ -50,7 +49,7 @@ namespace Dx.Domain.Factors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FactId FromGuid(Guid value)
         {
-            Invariant.That(value != Guid.Empty, Dx.DomainErrors.FactoryBypass("FactId cannot be default or empty. Use FactId.New()"));
+            Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("FactId cannot be default or empty. Use FactId.New()"));
             return new(value);
         }
 
@@ -86,6 +85,6 @@ namespace Dx.Domain.Factors
         public override string ToString() => Value.ToString("N");
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => Value.ToString("N");
+        private string DebuggerDisplay => $"FactId={ToString()}";
     }
 }
