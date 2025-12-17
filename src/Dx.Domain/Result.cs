@@ -10,10 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Runtime.CompilerServices;
+
 namespace Dx.Domain
 {
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// Provides static factory methods for creating and converting result objects that represent success or failure
     /// outcomes in domain operations.

@@ -39,7 +39,7 @@ namespace Dx.Domain
         /// Initializes a new <see cref="SpanId"/> with the provided numeric value.
         /// </summary>
         /// <param name="value">The underlying span value.</param>
-        public SpanId(ulong value) => _value = value;
+        private SpanId(ulong value) => _value = value;
 
         /// <summary>
         /// Creates a new random <see cref="SpanId"/> instance.

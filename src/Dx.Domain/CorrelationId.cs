@@ -13,35 +13,47 @@
 namespace Dx.Domain
 {
     using System.Diagnostics;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents a strongly-typed identifier used to correlate related operations or requests across system
     /// boundaries.
     /// </summary>
-    /// <remarks>A CorrelationId encapsulates a GUID value to provide a consistent way to track and associate
-    /// activities, such as logging or distributed tracing, throughout an application's workflow. Use
-    /// <see cref="CorrelationId.Empty"/> to represent an uninitialized or absent correlation identifier. This 
-    /// struct is immutable and can be compared for equality.</remarks>
-    [DebuggerDisplay("CorrelationId = {Value:N}")]
+    /// <remarks>
+    /// The <see cref="CorrelationId"/> is essential for tracking the flow of a request through distributed components.
+    /// It wraps a <see cref="Guid"/> to ensure uniqueness and type safety.
+    /// A <see cref="CorrelationId"/> with a value of <see cref="Guid.Empty"/> is considered to be a context with no correlation.
+    /// </remarks>
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct CorrelationId : IEquatable<CorrelationId>
     {
         /// <summary>
-        /// Gets an empty <see cref="CorrelationId"/> whose underlying value is <see cref="Guid.Empty"/>.
+        /// Gets an empty correlation identifier whose underlying value is all zeros.
         /// </summary>
+        /// <remarks>Use this property to represent an uninitialized or default correlation identifier.
+        /// The empty identifier is equivalent to a correlation ID constructed with a Guid value of all zeros.</remarks>
         public static readonly CorrelationId Empty = new(Guid.Empty);
-
-        /// <summary>
-        /// Gets the underlying <see cref="Guid"/> value.
-        /// </summary>
-        public Guid Value { get; }
-
-        public CorrelationId(Guid value) => Value = value;
 
         /// <summary>
         /// Gets a value indicating whether this identifier is empty.
         /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsEmpty => Value == Guid.Empty;
+
+        /// <summary>Gets the underlying <see cref="Guid"/> value.</summary>
+        public Guid Value { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the CorrelationId struct with the specified <see cref="Guid"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Guid"/> value to assign to the correlation identifier.</param>
+        private CorrelationId(Guid value) => Value = value;
+
+        /// <summary>
+        /// Creates a new <see cref="CorrelationId"/> with a freshly generated <see cref="Guid"/> value.
+        /// </summary>
+        /// <returns>A new unique <see cref="CorrelationId"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static CorrelationId New() => new CorrelationId(Guid.NewGuid());
 
         /// <summary>
         /// Attempts to format the value as a 32-digit hexadecimal string without hyphens into the provided character
@@ -54,6 +66,7 @@ namespace Dx.Domain
         /// <param name="charsWritten">When this method returns, contains the number of characters written to the destination span.</param>
         /// <returns><see langword="true"/> if the formatting was successful and the value was written to the destination span; otherwise,
         /// <see langword="false"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryFormat(Span<char> destination, out int charsWritten)
             => Value.TryFormat(destination, out charsWritten, "N");
 
@@ -70,9 +83,12 @@ namespace Dx.Domain
         public override int GetHashCode() => Value.GetHashCode();
 
         /// <inheritdoc />
-        public static bool operator ==(CorrelationId a, CorrelationId b) => a.Equals(b);
+        public static bool operator ==(CorrelationId left, CorrelationId right) => left.Equals(right);
 
         /// <inheritdoc />
-        public static bool operator !=(CorrelationId a, CorrelationId b) => !a.Equals(b);
+        public static bool operator !=(CorrelationId left, CorrelationId right) => !left.Equals(right);
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => Value.ToString("N");
     }
 }

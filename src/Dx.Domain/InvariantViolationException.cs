@@ -10,11 +10,11 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// Represents an exception that is thrown when an invariant condition is violated.
     /// </summary>
