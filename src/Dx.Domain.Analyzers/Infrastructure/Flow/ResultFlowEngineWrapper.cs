@@ -22,9 +22,21 @@ namespace Dx.Domain.Analyzers.Infrastructure.Flow
             AnalyzerConfigOptions options,
             CancellationToken ct)
         {
-            var key = BuildKey(method);
-            return _cache.GetOrAdd(key,
-                _ => _engine.Analyze(method, compilation, options, ct));
+            try
+            {
+                var key = BuildKey(method);
+                return _cache.GetOrAdd(key,
+                    _ => _engine.Analyze(method, compilation, options, ct));
+            }
+            catch
+            {
+                // Fail-open: return invalid empty graph on any error
+                return new FlowGraph(
+                    ImmutableArray<ResultNode>.Empty,
+                    ImmutableDictionary<ResultNode, ResultState>.Empty,
+                    ImmutableArray<FlowDiagnostic>.Empty,
+                    isValid: false);
+            }
         }
 
         private static string BuildKey(IMethodSymbol method)
@@ -34,7 +46,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Flow
             var checksumBytes = tree.GetText().GetChecksum();
             var checksum = BitConverter.ToString(checksumBytes.ToArray()).Replace("-", string.Empty);
 
-            return $"{method.ContainingType.ToDisplayString()}::{method.Name}::{checksum}";
+            var symbolId = method.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+            return $"{symbolId}::{checksum}";
         }
     }
 }
