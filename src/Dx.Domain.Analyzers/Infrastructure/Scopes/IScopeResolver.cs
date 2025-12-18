@@ -57,8 +57,8 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
                     continue;
 
                 var parts = entry.Split('=');
-                if (parts.Length == 2 && Enum.TryParse(parts[1], out Scope scope))
-                    builder[parts[0]] = scope;
+                if (parts.Length == 2 && Enum.TryParse(parts[1].Trim(), out Scope scope))
+                    builder[parts[0].Trim()] = scope;
             }
 
             return builder.ToImmutable();

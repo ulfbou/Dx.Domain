@@ -1,4 +1,6 @@
 using Dx.Domain.Analyzers.Infrastructure.Facades;
+using Dx.Domain.Analyzers.Infrastructure.Flow;
+using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
 using Dx.Domain.Analyzers.Infrastructure.Semantics;
 
@@ -12,10 +14,8 @@ namespace System.Runtime.CompilerServices
 
 namespace Dx.Domain.Analyzers.Infrastructure
 {
-    // Placeholder interfaces used by analyzers; defined to allow the project to compile.
+    // Placeholder interface used by analyzers; defined to allow the project to compile.
     public interface IExceptionIntentClassifier { }
-    public sealed class ResultFlowEngineWrapper { }
-    public interface IGeneratedCodeDetector { }
 
     public sealed record AnalyzerServices(
         IScopeResolver Scope,
