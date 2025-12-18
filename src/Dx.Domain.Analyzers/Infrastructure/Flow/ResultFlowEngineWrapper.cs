@@ -3,8 +3,11 @@ using Dx.Domain.Analyzers.ResultFlow;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Flow
 {

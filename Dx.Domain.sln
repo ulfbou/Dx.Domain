@@ -67,6 +67,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6
 		docs\NON_GOALS.md = docs\NON_GOALS.md
 		docs\OVERVIEW.md = docs\OVERVIEW.md
 		README.md = README.md
+		..\Notes\Dx.Domain\docs\ROADMAP.md = ..\Notes\Dx.Domain\docs\ROADMAP.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dx", "Dx", "{61BE2535-9F7C-4B8F-96F2-EB1A190DC0A8}"
