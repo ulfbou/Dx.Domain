@@ -7,9 +7,8 @@
     <Authors>Ulf Bourelius;Dx.Domain Team</Authors>
     <Company>Dx.Domain Team</Company>
     <Description>
-      The Dx.Domain.Analyzers package provides a powerful, attribute-based system for declaring and discovering metadata in your .NET applications. It shifts metadata management from an imperative, code-heavy process to a simple, declarative one, enhancing the discoverability and extensibility of your components.
-
-      This library is built as an extension to the core Dx.Domain system, focusing on analyzer-related functionalities. It offers attributes and tools to define how domain entities should be analyzed, validated, and managed within various contexts, ensuring that your domain models remain clean and focused on business logic.
+      The Dx.Domain.Analyzers package provides Roslyn analyzers and code fixes for the Dx.Domain kernel.
+      It is referenced as an analyzer package by consuming projects and should not produce a standalone application.
     </Description>
     <Tags>
       dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern
@@ -20,41 +19,23 @@
     <!-- Build Defaults -->
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
 
-    <!-- Assembly Info -->
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-
-    <!-- Output Configuration -->
-    <OutputPath>bin\$(Configuration)</OutputPath>
-    <BaseIntermediateOutputPath>obj</BaseIntermediateOutputPath>
-    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
-
-    <!-- Packaging -->
+    <!-- Analyzer project configuration -->
+    <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
-    <PackageReleaseNotes>See CHANGELOG.md for release notes and docs/ for full specification.</PackageReleaseNotes>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>
-    <PackageAuthors>Ulf Bourelius;Dx.Domain Team</PackageAuthors>
-
-    <!-- Feature Flags -->
-    <EnableSigning Condition="'$(EnableSigning)' == ''">true</EnableSigning>
-    <EnableTesting Condition="'$(EnableTesting)' == ''">true</EnableTesting>
-    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
-    <EnableSecurity Condition="'$(EnableSecurity)' == ''">true</EnableSecurity>
-    <EnableDocumentation Condition="'$(EnableDocumentation)' == ''">true</EnableDocumentation>
-    <EnablePerformance Condition="'$(EnablePerformance)' == ''">false</EnablePerformance>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyTitle>Dx.Domain</AssemblyTitle>
-    <Description>Analyzers for Dx.Domain. See README.md and CHANGELOG.md for details.</Description>
+    <AssemblyTitle>Dx.Domain.Analyzers</AssemblyTitle>
+    <Description>Roslyn analyzers for Dx.Domain. See README.md and CHANGELOG.md for details.</Description>
     <Company>Dx.Domain Team</Company>
     <Authors>Dx.Domain Team</Authors>
     <Copyright>Copyright © 2025 Dx.Domain Team. All rights reserved.</Copyright>
@@ -69,15 +50,43 @@
     <InformationalVersion>$(Version)</InformationalVersion>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Suppress assembly unification warnings caused by mixing netstandard2.0 with Dx.Domain/net10.0 in this analyzer project -->
+    <ResolveAssemblyReferenceIgnoreTargetFrameworkAttributeVersionMismatch>true</ResolveAssemblyReferenceIgnoreTargetFrameworkAttributeVersionMismatch>
+    <ResolveAssemblyReferenceIgnoreTargetFrameworkAttributeVersionMismatchPaths>Dx.Domain</ResolveAssemblyReferenceIgnoreTargetFrameworkAttributeVersionMismatchPaths>
+    <MSBuildWarningsNotAsErrors>MSB3277;$(MSBuildWarningsNotAsErrors)</MSBuildWarningsNotAsErrors>
+    <NoWarn>MSB3277;$(NoWarn)</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+
   <ItemGroup>
-    <InternalsVisibleTo Include="Dx.Domain.Abstractions" />
-    <InternalsVisibleTo Include="Dx.Domain.Attributes" />
-    <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
-    <InternalsVisibleTo Include="Dx.Domain.Tests" />
+    <None Remove="F:\repos\dx.domain\docs\internal\analyzer-acceptance-criteria.md~" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dx.Domain\Dx.Domain.csproj" />
+    <!-- Roslyn analyzer dependencies (kept internal to the analyzer package) -->
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Analyzer needs Dx.Domain symbols at compile time; use assembly reference to avoid TF incompatibility with netstandard2.0 -->
+    <!--<ProjectReference Include="..\Dx.Domain\Dx.Domain.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />-->
+    <Reference Include="Dx.Domain">
+      <HintPath>..\Dx.Domain\bin\$(Configuration)\net10.0\Dx.Domain.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sample\" />
   </ItemGroup>
 
   <!-- Imports -->
