@@ -52,17 +52,17 @@ namespace Dx.Domain
         /// <param name="validate">If set to <see langword="true"/>, performs invariant validation on the input parameters.</param>
         /// <returns>A <see cref="DomainError"/> instance initialized with the specified code and message.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static DomainError Create(string code, string message, bool validate = true)
+        internal static DomainError InternalCreate(string code, string message, bool validate = true)
         {
             if (validate)
             {
                 // Note: We use a bypass/raw fault here to prevent infinite recursion in the invariant system 
                 // if the validation itself fails.
-                Invariant.That(!string.IsNullOrWhiteSpace(code), () => DomainError.Create("DomainError.NullCode", "The error code cannot be null or whitespace.", false));
-                Invariant.That(!string.IsNullOrWhiteSpace(message), () => DomainError.Create("DomainError.NullMessage", "The error message cannot be null or whitespace.", false));
+                Invariant.That(!string.IsNullOrWhiteSpace(code), () => DomainError.InternalCreate("DomainError.NullCode", "The error code cannot be null or whitespace.", false));
+                Invariant.That(!string.IsNullOrWhiteSpace(message), () => DomainError.InternalCreate("DomainError.NullMessage", "The error message cannot be null or whitespace.", false));
             }
 
-            return DomainError.Create(code, message);
+            return new DomainError(code, message);
         }
 
         /// <summary>

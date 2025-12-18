@@ -71,7 +71,7 @@ namespace Dx
             /// <returns>A failed result containing the specified error information.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<TValue> Failure<TValue>(string code, string message) where TValue : notnull
-                => Result<TValue>.InternalFailure(DomainError.Create(code, message));
+                => Result<TValue>.InternalFailure(DomainError.InternalCreate(code, message));
 
             /// <summary>
             /// Creates a successful result containing the specified value.

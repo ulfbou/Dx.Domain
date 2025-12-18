@@ -84,7 +84,7 @@ namespace Dx
                     file,
                     line);
 
-                throw new InvariantViolationException(diagnostic);
+                throw InvariantViolationException.Create(diagnostic);
             }
 
             /// <summary>
@@ -141,7 +141,7 @@ namespace Dx
                     file,
                     line);
 
-                throw new InvariantViolationException(diagnostic);
+                throw InvariantViolationException.Create(diagnostic);
             }
         }
     }
