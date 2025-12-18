@@ -10,11 +10,13 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+using static global::Dx.Dx;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// Represents a strongly-typed identifier used to correlate related operations or requests across system
     /// boundaries.
@@ -53,7 +55,14 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new unique <see cref="CorrelationId"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static CorrelationId New() => new CorrelationId(Guid.NewGuid());
+        internal static CorrelationId InternalNew() => new CorrelationId(Guid.NewGuid());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static CorrelationId InternalFrom(Guid value)
+        {
+            Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("CorrelationId cannot be default or empty. Use CorrelationId.New()"));
+            return new CorrelationId(value);
+        }
 
         /// <summary>
         /// Attempts to format the value as a 32-digit hexadecimal string without hyphens into the provided character
@@ -67,6 +76,8 @@ namespace Dx.Domain
         /// <returns><see langword="true"/> if the formatting was successful and the value was written to the destination span; otherwise,
         /// <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+}
+
         public bool TryFormat(Span<char> destination, out int charsWritten)
             => Value.TryFormat(destination, out charsWritten, "N");
 

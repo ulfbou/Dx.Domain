@@ -49,7 +49,7 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new unique <see cref="ActorId"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ActorId New() => new ActorId(Guid.NewGuid());
+        internal static ActorId InternalNew() => new ActorId(Guid.NewGuid());
 
         /// <summary>
         /// Creates a new ActorId instance from the specified GUID value.
@@ -60,7 +60,7 @@ namespace Dx.Domain
         /// <remarks>The method enforces the invariant that the provided <see cref="Guid"/> value is not
         /// <see cref="Guid.Empty"/>. If the value is <see cref="Guid.Empty"/>, an invariant violation is raised.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ActorId Create(Guid value)
+        internal static ActorId InternalFrom(Guid value)
         {
             Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("ActorId cannot be default or empty. Use ActorId.New()"));
 
