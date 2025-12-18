@@ -1,4 +1,5 @@
 using Dx.Domain.Analyzers.Infrastructure;
+using Dx.Domain.Analyzers.Infrastructure.Exceptions;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Flow;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -87,7 +88,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
             var scopeResolver = new ScopeResolver(mockConfig.Object);
             var facadeResolver = new DxFacadeResolver(compilation);
             var semanticClassifier = new SemanticClassifier(compilation);
-            var exceptionClassifier = Mock.Of<IExceptionIntentClassifier>();
+            var exceptionClassifier = new ExceptionIntentClassifier();
             var flowWrapper = new ResultFlowEngineWrapper();
             var generatedDetector = new GeneratedCodeDetector(mockConfig.Object);
 
