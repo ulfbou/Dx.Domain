@@ -46,7 +46,7 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new <see cref="SpanId"/> whose <see cref="Value"/> is non-zero with high probability.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SpanId New()
+        internal static SpanId New()
         {
             Span<byte> buffer = stackalloc byte[8];
             Random.Shared.NextBytes(buffer);

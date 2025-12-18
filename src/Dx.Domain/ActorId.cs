@@ -49,7 +49,7 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new unique <see cref="ActorId"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ActorId New() => new ActorId(Guid.NewGuid());
+        internal static ActorId New() => new ActorId(Guid.NewGuid());
 
         /// <summary>
         /// Creates a new ActorId instance from the specified GUID value.

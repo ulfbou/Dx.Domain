@@ -53,7 +53,7 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new unique <see cref="CorrelationId"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static CorrelationId New() => new CorrelationId(Guid.NewGuid());
+        internal static CorrelationId New() => new CorrelationId(Guid.NewGuid());
 
         /// <summary>
         /// Attempts to format the value as a 32-digit hexadecimal string without hyphens into the provided character

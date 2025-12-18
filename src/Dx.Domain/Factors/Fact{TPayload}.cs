@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
+
 using static Dx.Dx;
 
 namespace Dx.Domain.Factors
@@ -68,7 +69,7 @@ namespace Dx.Domain.Factors
         /// <returns>A new <see cref="Fact{T}"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        public static Fact<TPayload> Create(string factType, TPayload payload, Causation causation)
+        internal static Fact<TPayload> Create(string factType, TPayload payload, Causation causation)
         {
             Invariant.That(!string.IsNullOrWhiteSpace(factType), Dx.Faults.Fact.MissingFactType);
             Invariant.That(causation.TraceId != TraceId.Empty, Dx.Faults.Fact.MissingTrace);

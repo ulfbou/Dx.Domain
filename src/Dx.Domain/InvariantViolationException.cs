@@ -20,7 +20,7 @@ namespace Dx.Domain
     /// <remarks>This exception is typically used to signal that a program invariant has been broken,
     /// indicating a serious error in program logic. The associated diagnostic information provides details about the
     /// specific invariant that was violated.</remarks>
-    [DebuggerDisplay("{Message,nq}")]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public sealed class InvariantViolationException : Exception
     {
         /// <summary>Gets the diagnostic information describing the violated invariant.</summary>
@@ -34,11 +34,15 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="diagnostic">The diagnostic information for the violated invariant.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public InvariantViolationException(InvariantError diagnostic)
+        private InvariantViolationException(InvariantError diagnostic)
             : base(diagnostic.EffectiveMessage)
         {
             Diagnostic = diagnostic;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal InvariantViolationException Create(InvariantError diagnostic)
+            => new InvariantViolationException(diagnostic);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay => $"InvariantViolationException: {Message}";
