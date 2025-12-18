@@ -15,6 +15,7 @@ namespace Dx.Domain
     using System;
     using System.Diagnostics;
     using System.Runtime.CompilerServices;
+
     using static global::Dx.Dx;
 
     /// <summary>
@@ -30,13 +31,6 @@ namespace Dx.Domain
     public readonly struct Result<TValue> where TValue : notnull
     {
         private readonly Result<TValue, DomainError> _inner;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Result{TValue}"/> struct that wraps an existing
-        /// <see cref="Result{TValue, TError}"/> with <see cref="DomainError"/> as the error type.
-        /// </summary>
-        /// <param name="inner">The inner result value that encapsulates either a successful value or a domain error.</param>
-        private Result(Result<TValue, DomainError> inner) => _inner = inner;
 
         /// <summary>
         /// Gets a value indicating whether the operation completed successfully.
@@ -60,6 +54,13 @@ namespace Dx.Domain
         /// <exception cref="InvalidOperationException">Thrown if the result represents a success.</exception>
         internal DomainError Error => _inner.Error;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Result{TValue}"/> struct that wraps an existing
+        /// <see cref="Result{TValue, TError}"/> with <see cref="DomainError"/> as the error type.
+        /// </summary>
+        /// <param name="inner">The inner result value that encapsulates either a successful value or a domain error.</param>
+        private Result(Result<TValue, DomainError> inner) => _inner = inner;
+
         // ------------------------------------------------------------
         // PUBLIC FACTORIES REMOVED
         // Consumers must use Dx.Result.Ok(...)
@@ -72,7 +73,7 @@ namespace Dx.Domain
         /// <returns>A <see cref="Result{TValue}"/> representing a successful operation with the provided value.</returns>
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Static factories on the generic result type are an intentional part of the API.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Result<TValue> InternalOk(TValue value) => new Result<TValue>(Result<TValue, DomainError>.InternalOk(value));
+        internal static Result<TValue> InternalOk(TValue value) => new(Result<TValue, DomainError>.InternalOk(value));
 
         /// <summary>
         /// Creates a failed result with the specified domain error.
@@ -81,7 +82,7 @@ namespace Dx.Domain
         /// <returns>A result representing a failure, containing the specified domain error.</returns>
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Static factories on the generic result type are an intentional part of the API.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Result<TValue> InternalFailure(DomainError error) => new Result<TValue>(Result<TValue, DomainError>.InternalFailure(error));
+        internal static Result<TValue> InternalFailure(DomainError error) => new(Result<TValue, DomainError>.InternalFailure(error));
 
         /// <summary>
         /// Converts a successful <see cref="Result{TValue}"/> to its underlying value of type <typeparamref name="TValue"/>.

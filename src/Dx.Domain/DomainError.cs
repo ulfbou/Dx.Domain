@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
+
 using static Dx.Dx;
 
 namespace Dx.Domain
@@ -51,7 +52,7 @@ namespace Dx.Domain
         /// <param name="validate">If set to <see langword="true"/>, performs invariant validation on the input parameters.</param>
         /// <returns>A <see cref="DomainError"/> instance initialized with the specified code and message.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DomainError Create(string code, string message, bool validate = true)
+        internal static DomainError Create(string code, string message, bool validate = true)
         {
             if (validate)
             {
@@ -61,7 +62,7 @@ namespace Dx.Domain
                 Invariant.That(!string.IsNullOrWhiteSpace(message), () => DomainError.Create("DomainError.NullMessage", "The error message cannot be null or whitespace.", false));
             }
 
-            return new DomainError(code, message);
+            return DomainError.Create(code, message);
         }
 
         /// <summary>

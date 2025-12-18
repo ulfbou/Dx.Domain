@@ -70,16 +70,16 @@ namespace Dx.Domain
         }
 
         /// <summary>
-        /// Initializes a new instance of the Result class with the specified value.
-        /// </summary>
-        /// <param name="value">The value to be encapsulated by the Result instance.</param>
-        private Result(TValue value) => _value = value;
-
-        /// <summary>
         /// Initializes a new instance of the Result class that represents a failed result with the specified error.
         /// </summary>
         /// <param name="error">The error value associated with the failed result. Cannot be null if TError is a reference type.</param>
         private Result(TError error) => _error = error;
+
+        /// <summary>
+        /// Initializes a new instance of the Result class with the specified value.
+        /// </summary>
+        /// <param name="value">The value to be encapsulated by the Result instance.</param>
+        private Result(TValue value) => _value = value;
 
         /// <summary>
         /// Creates a successful result containing the specified value.
@@ -87,7 +87,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DebuggerStepThrough]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        internal static Result<TValue, TError> InternalOk(TValue value) => new Result<TValue, TError>(value);
+        internal static Result<TValue, TError> InternalOk(TValue value) => new(value);
 
         /// <summary>
         /// Creates a failed result containing the specified error value.
@@ -95,7 +95,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DebuggerStepThrough]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        internal static Result<TValue, TError> InternalFailure(TError error) => new Result<TValue, TError>(error);
+        internal static Result<TValue, TError> InternalFailure(TError error) => new(error);
 
         /// <inheritdoc />
         public override string ToString() => IsSuccess ? $"Ok({_value})" : $"Failure({_error})";
