@@ -34,14 +34,14 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="diagnostic">The diagnostic information for the violated invariant.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private InvariantViolationException(InvariantError diagnostic)
+        internal InvariantViolationException(InvariantError diagnostic)
             : base(diagnostic.EffectiveMessage)
         {
             Diagnostic = diagnostic;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal InvariantViolationException Create(InvariantError diagnostic)
+        internal static InvariantViolationException Create(InvariantError diagnostic)
             => new InvariantViolationException(diagnostic);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

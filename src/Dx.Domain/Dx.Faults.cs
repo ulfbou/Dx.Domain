@@ -40,10 +40,10 @@ namespace Dx
             public static class Guard
             {
                 /// <summary> Gets a domain error that indicates a provided error code is null or whitespace. </summary>
-                public static DomainError NullOrWhitespaceCode => DomainError.Create("Faults.Code.Null", "Code cannot be null or whitespace.", false);
+                public static DomainError NullOrWhitespaceCode => DomainError.InternalCreate("Faults.Code.Null", "Code cannot be null or whitespace.", false);
 
                 /// <summary> Gets a domain error that indicates a provided error message is null or whitespace. </summary>
-                public static DomainError NullOrWhitespaceMessage => DomainError.Create("Faults.Message.Null", "Message cannot be null or whitespace.", false);
+                public static DomainError NullOrWhitespaceMessage => DomainError.InternalCreate("Faults.Message.Null", "Message cannot be null or whitespace.", false);
             }
 
             /// <summary>
@@ -51,14 +51,14 @@ namespace Dx
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static DomainError FactoryBypass(string detail)
-                => DomainError.Create("Faults.FactoryBypass", detail, false);
+                => DomainError.InternalCreate("Faults.FactoryBypass", detail, false);
 
             /// <summary>
             /// Errors related to invalid internal input processing.
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static DomainError InvalidInput(string detail)
-                => DomainError.Create("Faults.InvalidInput", detail, false);
+                => DomainError.InternalCreate("Faults.InvalidInput", detail, false);
 
             /// <summary>
             /// Provides predefined domain errors related to causation validation.
@@ -69,7 +69,7 @@ namespace Dx
                 /// Gets a domain error that indicates a required correlation identifier is missing or empty.
                 /// </summary>
                 public static DomainError MissingCorrelation
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Causation.MissingCorrelation",
                         "Causation requires a non-empty CorrelationId.",
                         false);
@@ -78,7 +78,7 @@ namespace Dx
                 /// Gets a domain error that indicates a required TraceId is missing for causation operations.
                 /// </summary>
                 public static DomainError MissingTrace
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Causation.MissingTrace",
                         "Causation requires a non-empty TraceId.",
                         false);
@@ -93,7 +93,7 @@ namespace Dx
                 /// Gets a domain error that indicates a required fact type is missing from a domain fact declaration.
                 /// </summary>
                 public static DomainError MissingFactType
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Fact.MissingFactType",
                         "Domain facts must declare a fact type.",
                         false);
@@ -102,7 +102,7 @@ namespace Dx
                 /// Gets the domain error that indicates a required TraceId is missing from the causation of a domain fact.
                 /// </summary>
                 public static DomainError MissingTrace
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Fact.MissingTrace",
                         "Domain facts require a non-empty TraceId in their Causation.",
                         false);
@@ -111,7 +111,7 @@ namespace Dx
                 /// Gets a domain error that indicates a required payload is missing for a domain fact.
                 /// </summary>
                 public static DomainError MissingPayload
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Fact.MissingPayload",
                         "Domain facts require a non-null payload.",
                         false);
@@ -131,7 +131,7 @@ namespace Dx
                 /// <returns>A <see cref="DomainError"/> representing the invalid state access.</returns>
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 public static DomainError MissingValueOnFailure<TValue, TError>(TError error) where TValue : notnull where TError : notnull
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Result.InvalidState.MissingValue",
                         $"Cannot access Value of a failure result. Error context: {error}",
                         false);
@@ -145,7 +145,7 @@ namespace Dx
                 /// <returns>A domain error representing the invalid attempt to access an error from a successful result.</returns>
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 public static DomainError MissingErrorOnSuccess<TValue, TError>(TValue value) where TValue : notnull where TError : notnull
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Result.InvalidState.MissingError",
                         $"Cannot access Error of a successful result. Value context: {value}",
                         false);
@@ -155,7 +155,7 @@ namespace Dx
                 /// </summary>
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 public static DomainError MissingPayload()
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Result.InvalidState.MissingPayload",
                         "Result is missing expected payload data.",
                         false);
@@ -170,7 +170,7 @@ namespace Dx
                 /// Represents the error message used when a transition failure does not provide a non-null DomainError.
                 /// </summary>
                 public static DomainError MissingError
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Transition.MissingError",
                         "Transition failure must provide a non-null DomainError.",
                         false);
@@ -179,7 +179,7 @@ namespace Dx
                 /// Gets a domain error that indicates a transition did not produce any facts as required.
                 /// </summary>
                 public static DomainError MissingFacts
-                    => DomainError.Create(
+                    => DomainError.InternalCreate(
                         "Transition.MissingFacts",
                         "Successful transitions must produce at least one fact.",
                         false);
@@ -198,9 +198,9 @@ namespace Dx
                 public static DomainError MissingRequiredField(string fieldName)
                 {
                     // Internal check to ensure the fault generator itself is used correctly.
-                    Invariant.That(!string.IsNullOrEmpty(fieldName), DomainError.Create("Validation.InvalidFieldName", "Field name cannot be null or empty.", false));
+                    Invariant.That(!string.IsNullOrEmpty(fieldName), DomainError.InternalCreate("Validation.InvalidFieldName", "Field name cannot be null or empty.", false));
 
-                    return DomainError.Create(
+                    return DomainError.InternalCreate(
                         code: "Validation.MissingRequiredField",
                         message: $"Required field '{fieldName}' is missing.",
                         false);

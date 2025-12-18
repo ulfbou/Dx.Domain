@@ -76,8 +76,6 @@ namespace Dx.Domain
         /// <returns><see langword="true"/> if the formatting was successful and the value was written to the destination span; otherwise,
         /// <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-}
-
         public bool TryFormat(Span<char> destination, out int charsWritten)
             => Value.TryFormat(destination, out charsWritten, "N");
 
