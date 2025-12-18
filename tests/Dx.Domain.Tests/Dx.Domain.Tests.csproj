@@ -1,9 +1,9 @@
-<!-- Zentient.Metadata.Tests project file -->
+<!-- Dx.Domain.Tests project file -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- Target both .NET 8.0 and .NET 9.0 for test discovery compatibility -->
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <!-- Target test framework to match the Dx.Domain library under test -->
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -23,37 +23,33 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyTitle>Zentient.Metadata.Tests</AssemblyTitle>
-    <Description>Test suite for Zentient.Metadata and related packages.</Description>
-    <Company>Zentient Framework Team</Company>
-    <Authors>Zentient Framework Team</Authors>
-    <Copyright>Copyright © 2025 Zentient Framework Team. All rights reserved.</Copyright>
-    <PackageProjectUrl>https://github.com/ulfbou/Zentient.Metadata.git</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ulfbou/Zentient.Metadata.git</RepositoryUrl>
+    <AssemblyTitle>Dx.Domain.Tests</AssemblyTitle>
+    <Description>Test suite for Dx.Domain core kernel.</Description>
+    <Company>Dx.Domain Team</Company>
+    <Authors>Dx.Domain Team</Authors>
+    <Copyright>Copyright © 2025 Dx.Domain Team. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/ulfbou/Dx.Domain.git</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</RepositoryUrl>
   </PropertyGroup>
 
   <!-- Test Framework Dependencies -->
   <ItemGroup>
     <!-- Essential for test discovery and execution -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
 
     <!-- Core xUnit packages for library testing -->
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.3">
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
 
     <!-- Test utilities for library testing -->
-    <PackageReference Include="FluentAssertions" Version="8.5.0" />
+    <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Zentient.Metadata.Abstractions\Zentient.Metadata.Abstractions.csproj" />
-    <ProjectReference Include="..\src\Zentient.Metadata.Attributes\Zentient.Metadata.Attributes.csproj" />
-    <ProjectReference Include="..\src\Zentient.Metadata\Zentient.Metadata.csproj" />
+    <ProjectReference Include="..\..\src\Dx.Domain\Dx.Domain.csproj" />
   </ItemGroup>
 
   <!-- xUnit Global Usings -->
@@ -74,4 +70,4 @@
     <PackageReference Update="SonarAnalyzer.CSharp" Version="10.15.0.120848" />
   </ItemGroup>
 
-</Project> 
+</Project>
