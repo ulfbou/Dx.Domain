@@ -39,7 +39,7 @@ namespace Dx.Domain.Factors
         /// </summary>
         /// <returns>A new <see cref="FactId"/> where <see cref="Value"/> is non-empty.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static FactId New() => new(Guid.NewGuid());
+        internal static FactId InternalNew() => new(Guid.NewGuid());
 
         /// <summary>
         /// Creates a new FactId instance from the specified Guid value.
@@ -48,7 +48,7 @@ namespace Dx.Domain.Factors
         /// <returns>A FactId that represents the specified <see cref="Guid"/> value.</returns>
         /// <exception cref="InvariantViolationException">Thrown if the provided <see cref="Guid"/> value is <see cref="Guid.Empty"/>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static FactId FromGuid(Guid value)
+        internal static FactId InternalFrom(Guid value)
         {
             Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("FactId cannot be default or empty. Use FactId.New()"));
             return new(value);

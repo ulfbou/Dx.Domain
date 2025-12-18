@@ -15,11 +15,13 @@ namespace Dx
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// The Gateway to the Domain Kernel.
+    /// Root facade into the Dx Domain Kernel, exposing public factories for results, identities,
+    /// causation, and related primitives while keeping enforcement mechanics internal.
     /// </summary>
     /// <remarks>
-    /// This class provides the ONLY public entry points for creating Results,
-    /// while hiding the mechanical enforcement tools (Invariant, Require) internally.
+    /// All partial implementations of <see cref="Dx"/> contribute focused entry points (for example
+    /// results, identities, causation, invariants, and preconditions) but present a single, cohesive
+    /// surface to consumers of the domain kernel.
     /// </remarks>
     public static partial class Dx
     {

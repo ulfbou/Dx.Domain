@@ -47,10 +47,10 @@ namespace Dx.Domain.Factors
         /// and optional UTC timestamp.
         /// </summary>
         /// <param name="id">The unique identifier for the fact.</param>
-        /// <param name="factType">The type or category of the fact. Cannot be null or empty.</param>
+        /// <param name="factType">The type or category of the fact. Cannot be <see langword="null"/> or empty.</param>
         /// <param name="payload">The payload data associated with the fact.</param>
         /// <param name="causation">The causation information that describes the origin or reason for the fact.</param>
-        /// <param name="utcTimestamp">The UTC timestamp when the fact occurred. If null, the current UTC time is used.</param>
+        /// <param name="utcTimestamp">The UTC timestamp when the fact occurred. if <see langword="null"/>, the current UTC time is used.</param>
         private Fact(FactId id, string factType, TPayload payload, Causation causation, DateTimeOffset? utcTimestamp = null)
         {
             Id = id;
@@ -66,15 +66,15 @@ namespace Dx.Domain.Factors
         /// <param name="factType">The logical type or category of the fact. Must not be null or whitespace.</param>
         /// <param name="payload">The fact payload.</param>
         /// <param name="causation">The causation metadata associated with this fact.</param>
+        /// <param name="utcTimestamp">The UTC timestamp when the fact occurred. if <see langword="null"/>, the current UTC time is used.</param>
         /// <returns>A new <see cref="Fact{T}"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        internal static Fact<TPayload> Create(string factType, TPayload payload, Causation causation)
+        internal static Fact<TPayload> InternalCreate(string factType, TPayload payload, Causation causation, DateTimeOffset? utcTimestamp = null)
         {
             Invariant.That(!string.IsNullOrWhiteSpace(factType), Dx.Faults.Fact.MissingFactType);
             Invariant.That(causation.TraceId != TraceId.Empty, Dx.Faults.Fact.MissingTrace);
-            Invariant.That(payload is not null, Dx.Faults.Fact.MissingPayload);
-            return new(FactId.New(), factType, payload!, causation, DateTimeOffset.UtcNow);
+            return new(FactId.InternalNew(), factType, payload!, causation, DateTimeOffset.UtcNow);
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

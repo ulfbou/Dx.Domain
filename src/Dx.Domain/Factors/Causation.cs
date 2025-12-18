@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
+
 using static Dx.Dx;
 
 namespace Dx.Domain.Factors
@@ -71,7 +72,7 @@ namespace Dx.Domain.Factors
         /// Thrown if <paramref name="correlationId"/> or <paramref name="traceId"/> is empty.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
+        internal static Causation InternalCreate(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
         {
             Dx.Invariant.That(correlationId.Value != Guid.Empty, Faults.Causation.MissingCorrelation);
             Dx.Invariant.That(!traceId.IsEmpty, Faults.Causation.MissingTrace);
