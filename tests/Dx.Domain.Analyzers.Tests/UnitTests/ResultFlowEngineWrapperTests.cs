@@ -106,6 +106,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
             Assert.NotNull(result);
             Assert.NotNull(result.ResultNodes);
             Assert.NotNull(result.Diagnostics);
+            // IsValid property is available for rules to check fail-open semantics
         }
 
         [Fact]
