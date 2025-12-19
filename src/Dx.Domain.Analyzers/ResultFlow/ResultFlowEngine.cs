@@ -1,3 +1,15 @@
+// <authors>Ulf Bourelius (Original Author)</authors>
+// <copyright file="ResultFlowEngine.cs" company="Dx.Domain Team">
+//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -62,23 +74,15 @@ namespace Dx.Domain.Analyzers.ResultFlow
         public FlowGraph(
         ImmutableArray<ResultNode> resultNodes,
         ImmutableDictionary<ResultNode, ResultState> nodeStates,
-        ImmutableArray<FlowDiagnostic> diagnostics,
-        bool isValid = true)
+        ImmutableArray<FlowDiagnostic> diagnostics)
         {
             ResultNodes = resultNodes;
             NodeStates = nodeStates;
             Diagnostics = diagnostics;
-            IsValid = isValid;
         }
         public ImmutableArray<ResultNode> ResultNodes { get; }
         public ImmutableDictionary<ResultNode, ResultState> NodeStates { get; }
         public ImmutableArray<FlowDiagnostic> Diagnostics { get; }
-        
-        /// <summary>
-        /// Indicates whether the flow analysis was successful.
-        /// When false, the graph should not be used for diagnostics (fail-open semantics).
-        /// </summary>
-        public bool IsValid { get; }
     }
     public interface IResultFlowEngine
     {
@@ -114,8 +118,7 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 return new FlowGraph(
                 ImmutableArray<ResultNode>.Empty,
                 ImmutableDictionary<ResultNode, ResultState>.Empty,
-                ImmutableArray<FlowDiagnostic>.Empty,
-                isValid: false);
+                ImmutableArray<FlowDiagnostic>.Empty);
             }
             var cfg = ControlFlowGraph.Create(operation, CancellationToken.None);
             if (cfg is null)
@@ -123,8 +126,7 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 return new FlowGraph(
                 ImmutableArray<ResultNode>.Empty,
                 ImmutableDictionary<ResultNode, ResultState>.Empty,
-                ImmutableArray<FlowDiagnostic>.Empty,
-                isValid: false);
+                ImmutableArray<FlowDiagnostic>.Empty);
             }
             var context = new AnalysisContext(method, compilation, model, options, _options, cancellationToken);
             var analyzer = new MethodFlowAnalyzer(context, cfg);
@@ -419,8 +421,7 @@ namespace Dx.Domain.Analyzers.ResultFlow
         public ImmutableHashSet<string> ResultTypeMetadataNames { get; init; } =
         ImmutableHashSet.Create(
         "Dx.Domain.Result",
-        "Dx.Domain.Result`1",
-        "Dx.Domain.Result`2");
+        "Dx.Domain.Result`1");
         public ImmutableHashSet<string> InspectionMemberNames { get; init; } =
         ImmutableHashSet.Create("IsSuccess", "IsFailure", "Match", "Map", "Bind");
         public string HandlerConfigKey { get; init; } = "dx.result.handlers";

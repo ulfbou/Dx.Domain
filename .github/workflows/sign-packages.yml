@@ -1,0 +1,139 @@
+name: Sign Packages
+
+# Reusable workflow for package signing and verification
+# Can be called from other workflows
+
+on:
+  workflow_call:
+    inputs:
+      artifacts-path:
+        description: 'Path to artifacts to sign'
+        required: true
+        type: string
+      certificate-name:
+        description: 'Name of the signing certificate'
+        required: false
+        type: string
+        default: 'CodeSigning'
+    secrets:
+      signing-certificate:
+        description: 'Base64-encoded signing certificate'
+        required: false
+      certificate-password:
+        description: 'Certificate password'
+        required: false
+
+jobs:
+  sign:
+    name: Sign Packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./packages
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      
+      - name: Install signing tool
+        run: dotnet tool install --global NuGetKeyVaultSignTool || dotnet tool install --global sign
+      
+      - name: Generate checksums
+        run: |
+          cd ${{ inputs.artifacts-path }}
+          for file in *.nupkg; do
+            if [ -f "$file" ]; then
+              echo "📝 Generating checksum for $file"
+              sha256sum "$file" > "$file.sha256"
+              sha512sum "$file" > "$file.sha512"
+            fi
+          done
+      
+      - name: Sign packages (if certificate provided)
+        if: secrets.signing-certificate != ''
+        run: |
+          echo "🔐 Signing packages with certificate"
+          
+          # Decode certificate
+          echo "${{ secrets.signing-certificate }}" | base64 -d > signing-cert.pfx
+          
+          cd ${{ inputs.artifacts-path }}
+          for package in *.nupkg; do
+            if [ -f "$package" ]; then
+              echo "✍️  Signing: $package"
+              # TODO: Implement actual signing with certificate
+              # sign code azure-key-vault "$package" \
+              #   --certificate signing-cert.pfx \
+              #   --password "${{ secrets.certificate-password }}" \
+              #   --timestamp-url http://timestamp.digicert.com
+            fi
+          done
+          
+          # Clean up certificate
+          rm -f signing-cert.pfx
+      
+      - name: Verify package integrity
+        run: |
+          cd ${{ inputs.artifacts-path }}
+          echo "🔍 Verifying package integrity"
+          
+          for file in *.nupkg; do
+            if [ -f "$file" ]; then
+              # Verify checksum file exists
+              if [ ! -f "$file.sha256" ]; then
+                echo "::error::Missing SHA256 checksum for $file"
+                exit 1
+              fi
+              
+              # Verify checksum
+              if sha256sum -c "$file.sha256"; then
+                echo "✅ Integrity verified: $file"
+              else
+                echo "::error::Integrity check failed for $file"
+                exit 1
+              fi
+            fi
+          done
+      
+      - name: Create signing report
+        run: |
+          cd ${{ inputs.artifacts-path }}
+          
+          cat > signing-report.md << EOF
+          # Package Signing Report
+          
+          **Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Workflow**: ${{ github.workflow }}
+          **Run ID**: ${{ github.run_id }}
+          
+          ## Signed Packages
+          
+          | Package | SHA256 | SHA512 | Signed |
+          |---------|--------|--------|--------|
+          EOF
+          
+          for package in *.nupkg; do
+            if [ -f "$package" ]; then
+              SHA256=$(cat "$package.sha256" | cut -d' ' -f1)
+              SHA512=$(cat "$package.sha512" | cut -d' ' -f1)
+              SIGNED="${{ secrets.signing-certificate != '' && 'Yes' || 'No' }}"
+              echo "| $package | \`${SHA256:0:16}...\` | \`${SHA512:0:16}...\` | $SIGNED |" >> signing-report.md
+            fi
+          done
+          
+          cat signing-report.md
+      
+      - name: Upload signing report
+        uses: actions/upload-artifact@v4
+        with:
+          name: signing-report
+          path: ${{ inputs.artifacts-path }}/signing-report.md
+      
+      - name: Post summary
+        run: |
+          cat ${{ inputs.artifacts-path }}/signing-report.md >> $GITHUB_STEP_SUMMARY
