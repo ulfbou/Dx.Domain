@@ -59,15 +59,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}"
 	ProjectSection(SolutionItems) = preProject
-		CHANGELOG.md = CHANGELOG.md
-		CONTRIBUTING.md = CONTRIBUTING.md
-		docs\DPI.md = docs\DPI.md
-		LICENSE = LICENSE
-		docs\MANIFESTO.md = docs\MANIFESTO.md
-		docs\NON_GOALS.md = docs\NON_GOALS.md
-		docs\OVERVIEW.md = docs\OVERVIEW.md
-		README.md = README.md
-		..\Notes\Dx.Domain\docs\ROADMAP.md = ..\Notes\Dx.Domain\docs\ROADMAP.md
+		docs\README.md = docs\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dx.Domain", "Dx.Domain", "{61BE2535-9F7C-4B8F-96F2-EB1A190DC0A8}"
