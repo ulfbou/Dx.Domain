@@ -1,12 +1,9 @@
-using System.Collections.Generic;
-
 using Microsoft.CodeAnalysis;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Facades
 {
     public interface IDxFacadeResolver
     {
-        // Was: IReadOnlySet<IMethodSymbol> FacadeFactories { get; }
         IReadOnlyCollection<IMethodSymbol> FacadeFactories { get; }
 
         bool IsDxFacadeFactory(IMethodSymbol method);
@@ -46,6 +43,6 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
 
         public IMethodSymbol? FindFacadeFactoryForType(ITypeSymbol type) =>
             _methods.FirstOrDefault(m =>
-                SymbolEqualityComparer.Default.Equals(m.ReturnType, type));
+                    SymbolEqualityComparer.Default.Equals(m.ReturnType, type));
     }
 }
