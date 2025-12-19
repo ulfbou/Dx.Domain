@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.CodeAnalysis.Operations;
+using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Dx.Domain.Analyzers.ResultFlow
 {
@@ -73,7 +67,7 @@ namespace Dx.Domain.Analyzers.ResultFlow
         public ImmutableArray<ResultNode> ResultNodes { get; }
         public ImmutableDictionary<ResultNode, ResultState> NodeStates { get; }
         public ImmutableArray<FlowDiagnostic> Diagnostics { get; }
-        
+
         /// <summary>
         /// Indicates whether the flow analysis was successful.
         /// When false, the graph should not be used for diagnostics (fail-open semantics).
@@ -112,19 +106,19 @@ namespace Dx.Domain.Analyzers.ResultFlow
             if (operation is null)
             {
                 return new FlowGraph(
-                ImmutableArray<ResultNode>.Empty,
-                ImmutableDictionary<ResultNode, ResultState>.Empty,
-                ImmutableArray<FlowDiagnostic>.Empty,
-                isValid: false);
+            ImmutableArray<ResultNode>.Empty,
+            ImmutableDictionary<ResultNode, ResultState>.Empty,
+            ImmutableArray<FlowDiagnostic>.Empty,
+            isValid: false);
             }
             var cfg = ControlFlowGraph.Create(operation, CancellationToken.None);
             if (cfg is null)
             {
                 return new FlowGraph(
-                ImmutableArray<ResultNode>.Empty,
-                ImmutableDictionary<ResultNode, ResultState>.Empty,
-                ImmutableArray<FlowDiagnostic>.Empty,
-                isValid: false);
+            ImmutableArray<ResultNode>.Empty,
+            ImmutableDictionary<ResultNode, ResultState>.Empty,
+            ImmutableArray<FlowDiagnostic>.Empty,
+            isValid: false);
             }
             var context = new AnalysisContext(method, compilation, model, options, _options, cancellationToken);
             var analyzer = new MethodFlowAnalyzer(context, cfg);
@@ -133,12 +127,12 @@ namespace Dx.Domain.Analyzers.ResultFlow
         private sealed class AnalysisContext
         {
             public AnalysisContext(
-            IMethodSymbol method,
-            Compilation compilation,
-            SemanticModel semanticModel,
-            AnalyzerConfigOptions options,
-            ResultFlowEngineOptions engineOptions,
-            CancellationToken cancellationToken)
+        IMethodSymbol method,
+        Compilation compilation,
+        SemanticModel semanticModel,
+        AnalyzerConfigOptions options,
+        ResultFlowEngineOptions engineOptions,
+        CancellationToken cancellationToken)
             {
                 Method = method;
                 Compilation = compilation;
@@ -176,12 +170,12 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 DiscoverProducers();
                 AnalyzeUsage();
                 var nodeStates = _nodes.ToDictionary(
-                n => n,
-                n => n.State == ResultState.Created ? ResultState.Ignored : n.State);
+            n => n,
+            n => n.State == ResultState.Created ? ResultState.Ignored : n.State);
                 return new FlowGraph(
-                _nodes.ToImmutableArray(),
-                nodeStates.ToImmutableDictionary(),
-                _diagnostics.ToImmutableArray());
+            _nodes.ToImmutableArray(),
+            nodeStates.ToImmutableDictionary(),
+            _diagnostics.ToImmutableArray());
             }
             private void DiscoverProducers()
             {
@@ -200,15 +194,15 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 switch (op)
                 {
                     case IInvocationOperation invocation
-                when _ctx.ResultTypeResolver.IsResultType(invocation.Type):
+            when _ctx.ResultTypeResolver.IsResultType(invocation.Type):
                         RegisterNode(invocation);
                         break;
                     case IObjectCreationOperation creation
-                when _ctx.ResultTypeResolver.IsResultType(creation.Type):
+            when _ctx.ResultTypeResolver.IsResultType(creation.Type):
                         RegisterNode(creation);
                         break;
                     case IPropertyReferenceOperation propertyRef
-                when _ctx.ResultTypeResolver.IsResultType(propertyRef.Type):
+            when _ctx.ResultTypeResolver.IsResultType(propertyRef.Type):
                         RegisterNode(propertyRef);
                         break;
                 }
@@ -222,9 +216,9 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 if (_producerToNode.TryGetValue(producer, out var existing))
                     return existing;
                 var node = new ResultNode(
-                id: _nodes.Count,
-                producer: producer,
-                type: producer.Type!);
+            id: _nodes.Count,
+            producer: producer,
+            type: producer.Type!);
                 node.State = ResultState.Created;
                 _nodes.Add(node);
                 _producerToNode.Add(producer, node);
@@ -257,10 +251,10 @@ namespace Dx.Domain.Analyzers.ResultFlow
                         HandleInvocation(invocation);
                         break;
                     case IConditionalAccessOperation or
-                IConditionalAccessInstanceOperation or
-                IConditionalOperation or
-                IIsPatternOperation or
-                IIsTypeOperation:
+            IConditionalAccessInstanceOperation or
+            IConditionalOperation or
+            IIsPatternOperation or
+            IIsTypeOperation:
                         HandleCondition(op);
                         break;
                 }
@@ -310,8 +304,8 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 foreach (var descendant in op.Descendants())
                 {
                     if (descendant is IInvocationOperation invocation &&
-                    invocation.Instance is { } instance &&
-                    _ctx.ResultTypeResolver.IsResultLikeInstance(instance))
+            invocation.Instance is { } instance &&
+            _ctx.ResultTypeResolver.IsResultLikeInstance(instance))
                     {
                         var node = FindNodeFor(instance);
                         if (node is not null)
@@ -320,8 +314,8 @@ namespace Dx.Domain.Analyzers.ResultFlow
                         }
                     }
                     if (descendant is IPropertyReferenceOperation property &&
-                    property.Instance is { } instance2 &&
-                    _ctx.ResultTypeResolver.IsResultLikeInstance(instance2))
+            property.Instance is { } instance2 &&
+            _ctx.ResultTypeResolver.IsResultLikeInstance(instance2))
                     {
                         var node = FindNodeFor(instance2);
                         if (node is not null)
@@ -357,8 +351,8 @@ namespace Dx.Domain.Analyzers.ResultFlow
                         foreach (var descendant in op.DescendantsAndSelf())
                         {
                             if (descendant is ISimpleAssignmentOperation assignment &&
-                            assignment.Target is ILocalReferenceOperation localRef &&
-                            SymbolEqualityComparer.Default.Equals(localRef.Local, local))
+                assignment.Target is ILocalReferenceOperation localRef &&
+                SymbolEqualityComparer.Default.Equals(localRef.Local, local))
                             {
                                 if (_producerToNode.TryGetValue(assignment.Value, out var node))
                                     return node;
@@ -513,7 +507,7 @@ namespace Dx.Domain.Analyzers.ResultFlow
             if (set.IsEmpty)
                 return false;
             var containingTypeName = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-            .Replace("global::", string.Empty);
+        .Replace("global::", string.Empty);
             var key = new HandlerKey(containingTypeName, method.Name);
             return set.Contains(key);
         }
@@ -527,8 +521,8 @@ namespace Dx.Domain.Analyzers.ResultFlow
             public string ContainingType { get; }
             public string MethodName { get; }
             public bool Equals(HandlerKey other)
-            => string.Equals(ContainingType, other.ContainingType, StringComparison.Ordinal) &&
-            string.Equals(MethodName, other.MethodName, StringComparison.Ordinal);
+        => string.Equals(ContainingType, other.ContainingType, StringComparison.Ordinal) &&
+        string.Equals(MethodName, other.MethodName, StringComparison.Ordinal);
             public override bool Equals(object? obj) => obj is HandlerKey other && Equals(other);
             public override int GetHashCode()
             {

@@ -1,10 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-
-using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Generated
 {
@@ -27,19 +23,19 @@ namespace Dx.Domain.Analyzers.Infrastructure.Generated
 
             _namespaceMarkers = new HashSet<string>(
                 raw.Split(NamespaceSeparators, StringSplitOptions.RemoveEmptyEntries)
-                   .Select(s => s.Trim()));
+        .Select(s => s.Trim()));
 
         }
 
         public bool IsGenerated(ISymbol symbol)
         {
             if (symbol.GetAttributes().Any(a =>
-                a.AttributeClass?.ToDisplayString() ==
-                typeof(GeneratedCodeAttribute).FullName))
+                       a.AttributeClass?.ToDisplayString() ==
+                       typeof(GeneratedCodeAttribute).FullName))
                 return true;
 
             if (symbol.GetAttributes().Any(a =>
-                a.AttributeClass?.Name == "CompilerGeneratedAttribute"))
+                       a.AttributeClass?.Name == "CompilerGeneratedAttribute"))
                 return true;
 
             var ns = symbol.ContainingNamespace?.ToDisplayString();
