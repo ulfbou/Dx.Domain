@@ -1,0 +1,272 @@
+name: Security Scanning
+
+# Comprehensive security scanning with CodeQL and dependency review
+# Runs on PRs and scheduled
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  schedule:
+    # Run weekly on Monday at 8 AM UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp' ]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+          config: |
+            paths-ignore:
+              - '**/bin'
+              - '**/obj'
+              - '**/_site'
+              - '**/TestResults'
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+      
+      - name: Restore dependencies
+        run: dotnet restore Dx.Domain.sln
+        working-directory: ./Dx.Domain.2
+      
+      - name: Build for analysis
+        run: |
+          dotnet build Dx.Domain.sln \
+            --configuration Release \
+            --no-restore \
+            /p:UseSharedCompilation=false
+        working-directory: ./Dx.Domain.2
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+          upload: true
+      
+      - name: Upload SARIF results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ../results
+        continue-on-error: true
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          fail-on-scopes: runtime
+          comment-summary-in-pr: always
+
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  nuget-package-scan:
+    name: NuGet Package Security
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      
+      - name: Restore dependencies
+        run: dotnet restore Dx.Domain.sln
+        working-directory: ./Dx.Domain.2
+      
+      - name: Check for vulnerable packages
+        run: |
+          echo "# NuGet Package Security Report" > security-report.md
+          echo "" >> security-report.md
+          echo "**Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> security-report.md
+          echo "**Commit**: ${{ github.sha }}" >> security-report.md
+          echo "" >> security-report.md
+          
+          # Check for vulnerabilities
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable.txt
+          
+          if grep -q "has the following vulnerable packages" vulnerable.txt; then
+            echo "## ⚠️ Vulnerable Packages Detected" >> security-report.md
+            echo "" >> security-report.md
+            echo "\`\`\`" >> security-report.md
+            cat vulnerable.txt >> security-report.md
+            echo "\`\`\`" >> security-report.md
+            
+            # Create summary
+            cat security-report.md >> $GITHUB_STEP_SUMMARY
+            
+            echo "::error::Vulnerable packages detected. Please update them."
+            exit 1
+          else
+            echo "## ✅ No Vulnerable Packages" >> security-report.md
+            echo "" >> security-report.md
+            echo "All packages are secure." >> security-report.md
+            cat security-report.md >> $GITHUB_STEP_SUMMARY
+          fi
+        working-directory: ./Dx.Domain.2
+      
+      - name: Check for outdated packages
+        run: |
+          echo "" >> security-report.md
+          echo "## Package Update Status" >> security-report.md
+          echo "" >> security-report.md
+          
+          dotnet list package --outdated 2>&1 | tee outdated.txt
+          
+          if grep -q "has the following updates" outdated.txt; then
+            echo "### 📦 Outdated Packages" >> security-report.md
+            echo "" >> security-report.md
+            echo "\`\`\`" >> security-report.md
+            cat outdated.txt >> security-report.md
+            echo "\`\`\`" >> security-report.md
+          else
+            echo "### ✅ All Packages Up to Date" >> security-report.md
+          fi
+          
+          cat security-report.md >> $GITHUB_STEP_SUMMARY
+        working-directory: ./Dx.Domain.2
+        continue-on-error: true
+      
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: ./Dx.Domain.2/security-report.md
+
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      
+      - name: Install license checker
+        run: dotnet tool install --global dotnet-project-licenses
+      
+      - name: Generate license report
+        run: |
+          cd Dx.Domain.2
+          dotnet-project-licenses --input Dx.Domain.sln --output-directory ./licenses --export-license-texts --output markdown
+          
+          if [ -f "./licenses/licenses.md" ]; then
+            echo "# 📜 License Compliance Report" >> $GITHUB_STEP_SUMMARY
+            cat ./licenses/licenses.md >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+      
+      - name: Upload license report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: ./Dx.Domain.2/licenses/
+        continue-on-error: true
+
+  security-summary:
+    name: Security Summary
+    needs: [codeql-analysis, nuget-package-scan, secret-scanning]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check security status
+        run: |
+          echo "# 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| CodeQL Analysis | ${{ needs.codeql-analysis.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Package Security | ${{ needs.nuget-package-scan.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scanning | ${{ needs.secret-scanning.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.codeql-analysis.result }}" != "success" ] || \
+             [ "${{ needs.nuget-package-scan.result }}" != "success" ] || \
+             [ "${{ needs.secret-scanning.result }}" != "success" ]; then
+            echo "::error::Security scans failed. Please review the results."
+            echo "⚠️ **Action Required**: Security issues detected. Please review and address them." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ **All Security Checks Passed**" >> $GITHUB_STEP_SUMMARY
+          fi
