@@ -40,7 +40,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Semantics
         public bool IsKernelResultType(ITypeSymbol type) =>
             type is INamedTypeSymbol nt &&
             _resultTypes.Any(r =>
-                SymbolEqualityComparer.Default.Equals(nt.ConstructedFrom, r));
+                 SymbolEqualityComparer.Default.Equals(nt.ConstructedFrom, r));
 
         public bool IsDomainErrorType(ITypeSymbol type) =>
             _domainError != null &&
