@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Fact{T}.cs" company="Dx.Domain Team">
+// <copyright file="Fact.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
