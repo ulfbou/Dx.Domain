@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Result{TValue}.cs" company="Dx.Domain Team">
+// <copyright file="Result.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,14 +10,12 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
+using static Dx.Dx;
+
 namespace Dx.Domain
 {
-    using System;
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-
-    using static global::Dx.Dx;
-
     /// <summary>
     /// Represents the common result of an operation that can succeed with a value of type <typeparamref name="TValue"/> or fail
     /// with a standard <see cref="DomainError"/>.

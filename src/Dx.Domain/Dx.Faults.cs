@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Faults.cs" company="Dx.Domain Team">
+// <copyright file="Dx.Faults.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -12,17 +12,6 @@
 
 namespace Dx
 {
-    using System.Runtime.CompilerServices;
-
-    /// <summary>
-    /// Root facade into the Dx Domain Kernel, exposing public factories for results, identities,
-    /// causation, and related primitives while keeping enforcement mechanics internal.
-    /// </summary>
-    /// <remarks>
-    /// All partial implementations of <see cref="Dx"/> contribute focused entry points (for example
-    /// results, identities, causation, invariants, and preconditions) but present a single, cohesive
-    /// surface to consumers of the domain kernel.
-    /// </remarks>
     public static partial class Dx
     {
         // ---------------------------------------------------------
@@ -40,10 +29,12 @@ namespace Dx
             public static class Guard
             {
                 /// <summary> Gets a domain error that indicates a provided error code is null or whitespace. </summary>
-                public static DomainError NullOrWhitespaceCode => DomainError.InternalCreate("Faults.Code.Null", "Code cannot be null or whitespace.", false);
+                public static DomainError NullOrWhitespaceCode
+                    => DomainError.InternalCreate("Faults.Code.Null", "Code cannot be null or whitespace.", false);
 
                 /// <summary> Gets a domain error that indicates a provided error message is null or whitespace. </summary>
-                public static DomainError NullOrWhitespaceMessage => DomainError.InternalCreate("Faults.Message.Null", "Message cannot be null or whitespace.", false);
+                public static DomainError NullOrWhitespaceMessage
+                    => DomainError.InternalCreate("Faults.Message.Null", "Message cannot be null or whitespace.", false);
             }
 
             /// <summary>

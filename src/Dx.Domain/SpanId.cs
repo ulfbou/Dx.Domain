@@ -10,10 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-
     /// <summary>
     /// Represents a unique identifier for a span within a distributed tracing system.
     /// </summary>

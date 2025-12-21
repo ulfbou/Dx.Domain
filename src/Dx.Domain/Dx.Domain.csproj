@@ -23,6 +23,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
 
@@ -30,8 +31,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
     <!-- Output Configuration -->
-    <OutputPath>bin\$(Configuration)</OutputPath>
-    <BaseIntermediateOutputPath>obj</BaseIntermediateOutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
 
     <!-- Packaging -->
@@ -41,7 +42,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>zentient;metadata;core;builder;scanner;immutable;runtime;reflection;extensible</PackageTags>
-    <PackageAuthors>Ulf Bourelius;Zentient Framework Team</PackageAuthors>
+    <PackageAuthors>Ulf Bourelius;Dx Framework Team</PackageAuthors>
 
     <!-- Feature Flags -->
     <EnableSigning Condition="'$(EnableSigning)' == ''">true</EnableSigning>
@@ -68,8 +69,53 @@
     <FileVersion>$(VersionPrefix).0</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Zentient.Abstractions" Version="3.0.2" />
+    <None Remove="F:\repos\dx-framework\CHANGELOG.md" />
+    <None Remove="F:\repos\dx-framework\docs\DPI.md" />
+    <None Remove="F:\repos\dx-framework\docs\DPI.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md~" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-contracts.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-contracts.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-contracts.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-contracts.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\canonical-scope-model.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\canonical-scope-model.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\canonical-scope-model.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\canonical-scope-model.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\chat.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\chat.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\chat.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\chat.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\design-decisions.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\design-decisions.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\design-decisions.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\design-decisions.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\implementation-status.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\implementation-status.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\implementation-status.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\implementation-status.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\rules.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\rules.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\rules.md" />
+    <None Remove="F:\repos\dx-framework\docs\internal\rules.md" />
+    <None Remove="F:\repos\dx-framework\docs\MANIFESTO.md" />
+    <None Remove="F:\repos\dx-framework\docs\MANIFESTO.md" />
+    <None Remove="F:\repos\dx-framework\docs\NON_GOALS.md" />
+    <None Remove="F:\repos\dx-framework\docs\NON_GOALS.md" />
+    <None Remove="F:\repos\dx-framework\docs\revert-notes.md" />
+    <None Remove="F:\repos\dx-framework\docs\revert-notes.md" />
+    <None Remove="F:\repos\dx-framework\docs\ROADMAP.md" />
+    <None Remove="F:\repos\dx-framework\docs\ROADMAP.md" />
+    <None Remove="F:\repos\dx-framework\docs\todo.md" />
+    <None Remove="F:\repos\dx-framework\docs\todo.md" />
+    <None Remove="F:\repos\dx-framework\LICENSE" />
+    <None Remove="F:\repos\dx-framework\README.md" />
+    <None Remove="F:\repos\dx.domain\docs\#README.md#" />
   </ItemGroup>
 
   <ItemGroup>
@@ -87,13 +133,6 @@
   <Import Project="Directory.Security.props" Condition="Exists('Directory.Security.props') AND '$(EnableSecurity)' == 'true'" />
   <Import Project="Directory.Documentation.props" Condition="Exists('Directory.Documentation.props') AND '$(EnableDocumentation)' == 'true'" />
   <Import Project="Directory.Performance.props" Condition="Exists('Directory.Performance.props') AND '$(EnablePerformance)' == 'true'" />
-  <ItemGroup>
-    <None Include="build\Dx.Domain.props" Pack="true" PackagePath="build" />
-    <None Include="build\Dx.Domain.props" Pack="true" PackagePath="buildMultiTargeting" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="docs\" />
-  </ItemGroup>
   <ItemGroup>
     <None Update="C:\repos\Dx.Domain\CHANGELOG.md" Link="docs\CHANGELOG.md" />
     <None Update="C:\repos\Dx.Domain\docs\DPI.md" Link="docs\DPI.md" />

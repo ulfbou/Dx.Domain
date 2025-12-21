@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="TransitionResult{TState}.cs" company="Dx.Domain Team">
+// <copyright file="TransitionResult.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
+
 using static Dx.Dx;
 
 namespace Dx.Domain.Factors
