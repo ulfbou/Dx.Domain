@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 using static Dx.Dx;
 
@@ -102,4 +103,3 @@ namespace Dx.Domain
         private string DebuggerDisplay => $"ActorId={Value.ToString("N")}";
     }
 }
-

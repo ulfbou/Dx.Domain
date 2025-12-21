@@ -11,9 +11,8 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
-using static global::Dx.Dx;
+using static Dx.Dx;
 
 namespace Dx.Domain
 {

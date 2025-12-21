@@ -14,15 +14,6 @@ using Dx.Domain.Factors;
 
 namespace Dx
 {
-    /// <summary>
-    /// Root facade into the Dx Domain Kernel, exposing public factories for results, identities,
-    /// causation, and related primitives while keeping enforcement mechanics internal.
-    /// </summary>
-    /// <remarks>
-    /// All partial implementations of <see cref="Dx"/> contribute focused entry points (for example
-    /// results, identities, causation, invariants, and preconditions) but present a single, cohesive
-    /// surface to consumers of the domain kernel.
-    /// </remarks>
     public static partial class Dx
     {
         /// <summary>
@@ -122,6 +113,29 @@ namespace Dx
             public static Fact<TPayload> Create<TPayload>(string factType, TPayload payload, Causation causation)
                 where TPayload : notnull
                 => Fact<TPayload>.InternalCreate(factType, payload, causation);
+        }
+
+        /// <summary>
+        /// Provides factory methods for creating instances of the Causation class with specified correlation and trace
+        /// information.
+        /// </summary>
+        /// <remarks>This static class is intended to simplify the creation of Causation objects by
+        /// encapsulating the required identifiers. All members are thread safe.</remarks>
+        public static partial class CausationFactory
+        {
+            /// <summary>
+            /// Creates a new Causation instance with the specified correlation and trace identifiers, and an optional
+            /// actor identifier.
+            /// </summary>
+            /// <param name="correlationId">The correlation identifier that links related operations for tracing and diagnostic purposes.</param>
+            /// <param name="traceId">The trace identifier that represents the distributed trace context for the operation.</param>
+            /// <param name="actorId">The optional identifier of the actor responsible for the causation. If null, no actor is associated.</param>
+            /// <returns>A new Causation instance initialized with the provided identifiers.</returns>
+            public static Causation Create(
+                CorrelationId correlationId,
+                TraceId traceId,
+                ActorId? actorId = null)
+                => Causation.InternalCreate(correlationId, traceId, actorId);
         }
     }
 }

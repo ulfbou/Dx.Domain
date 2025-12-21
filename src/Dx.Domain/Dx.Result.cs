@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Result.cs" company="Dx.Domain Team">
+// <copyright file="Dx.Result.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -200,19 +200,5 @@ namespace Dx
                     ? Result<TValue, TError>.InternalOk(result.Value)
                     : Result<TValue, TError>.InternalFailure((TError)(object)result.Error!);
         }
-
-        // ---------------------------------------------------------
-        // INTERNAL MECHANICS (The "Back Office")
-        // ---------------------------------------------------------
-
-        /// <summary>
-        /// Internal mechanical enforcement for the domain kernel.
-        /// </summary>
-        internal static partial class Invariant { }
-
-        /// <summary>
-        /// Internal functional-style precondition checks.
-        /// </summary>
-        internal static partial class Require { }
     }
 }
