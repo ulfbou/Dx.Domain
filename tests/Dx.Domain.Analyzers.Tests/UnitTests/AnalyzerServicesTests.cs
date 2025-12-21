@@ -86,9 +86,9 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
             mockConfig.Setup(c => c.GlobalOptions).Returns(mockOptions.Object);
 
             var scopeResolver = new ScopeResolver(mockConfig.Object);
-            var facadeResolver = new DxFacadeResolver(compilation);
+            var facadeResolver = new DxFacadeResolver(compilation, mockConfig.Object);
             var semanticClassifier = new SemanticClassifier(compilation);
-            var exceptionClassifier = new ExceptionIntentClassifier();
+            var exceptionClassifier = new ExceptionIntentClassifier(compilation, mockConfig.Object);
             var flowWrapper = new ResultFlowEngineWrapper();
             var generatedDetector = new GeneratedCodeDetector(mockConfig.Object);
 
