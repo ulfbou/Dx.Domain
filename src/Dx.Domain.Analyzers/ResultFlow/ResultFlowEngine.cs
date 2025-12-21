@@ -74,15 +74,18 @@ namespace Dx.Domain.Analyzers.ResultFlow
         public FlowGraph(
         ImmutableArray<ResultNode> resultNodes,
         ImmutableDictionary<ResultNode, ResultState> nodeStates,
-        ImmutableArray<FlowDiagnostic> diagnostics)
+        ImmutableArray<FlowDiagnostic> diagnostics,
+        bool isValid = true)
         {
             ResultNodes = resultNodes;
             NodeStates = nodeStates;
             Diagnostics = diagnostics;
+            IsValid = isValid;
         }
         public ImmutableArray<ResultNode> ResultNodes { get; }
         public ImmutableDictionary<ResultNode, ResultState> NodeStates { get; }
         public ImmutableArray<FlowDiagnostic> Diagnostics { get; }
+        public bool IsValid { get; }
     }
     public interface IResultFlowEngine
     {
