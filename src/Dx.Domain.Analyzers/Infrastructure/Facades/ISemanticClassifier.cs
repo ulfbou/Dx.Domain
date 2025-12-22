@@ -22,6 +22,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Semantics
         bool IsKernelResultType(ITypeSymbol type);
         bool IsDomainErrorType(ITypeSymbol type);
         bool IsInvariantException(ITypeSymbol type);
+        bool IsDomainType(ITypeSymbol type);
     }
     public sealed class SemanticClassifier : ISemanticClassifier
     {
@@ -60,6 +61,19 @@ namespace Dx.Domain.Analyzers.Infrastructure.Semantics
             }
 
             return false;
+        }
+
+        public bool IsDomainType(ITypeSymbol type)
+        {
+            // Centralized domain type detection
+            var ns = type.ContainingNamespace?.ToDisplayString();
+            if (ns == null)
+                return false;
+
+            // Check for Dx.Domain namespace or domain-related namespaces
+            return ns.StartsWith("Dx.Domain", System.StringComparison.Ordinal) ||
+                   ns.Contains(".Domain.", System.StringComparison.Ordinal) ||
+                   ns.EndsWith(".Domain", System.StringComparison.Ordinal);
         }
 
         private static ImmutableHashSet<INamedTypeSymbol> LoadResultTypes(Compilation c)
