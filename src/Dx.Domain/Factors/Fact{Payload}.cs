@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Fact{T}.cs" company="Dx.Domain Team">
+// <copyright file="Fact.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,11 +10,9 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx;
+using System.Diagnostics;
 
 using static Dx.Dx;
-
-using System.Diagnostics;
 
 namespace Dx.Domain.Factors
 {
@@ -49,10 +47,10 @@ namespace Dx.Domain.Factors
         /// and optional UTC timestamp.
         /// </summary>
         /// <param name="id">The unique identifier for the fact.</param>
-        /// <param name="factType">The type or category of the fact. Cannot be null or empty.</param>
+        /// <param name="factType">The type or category of the fact. Cannot be <see langword="null"/> or empty.</param>
         /// <param name="payload">The payload data associated with the fact.</param>
         /// <param name="causation">The causation information that describes the origin or reason for the fact.</param>
-        /// <param name="utcTimestamp">The UTC timestamp when the fact occurred. If null, the current UTC time is used.</param>
+        /// <param name="utcTimestamp">The UTC timestamp when the fact occurred. if <see langword="null"/>, the current UTC time is used.</param>
         private Fact(FactId id, string factType, TPayload payload, Causation causation, DateTimeOffset? utcTimestamp = null)
         {
             Id = id;
@@ -68,13 +66,15 @@ namespace Dx.Domain.Factors
         /// <param name="factType">The logical type or category of the fact. Must not be null or whitespace.</param>
         /// <param name="payload">The fact payload.</param>
         /// <param name="causation">The causation metadata associated with this fact.</param>
+        /// <param name="utcTimestamp">The UTC timestamp when the fact occurred. if <see langword="null"/>, the current UTC time is used.</param>
         /// <returns>A new <see cref="Fact{T}"/> instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        public static Fact<TPayload> Create(string factType, TPayload payload, Causation causation)
+        internal static Fact<TPayload> InternalCreate(string factType, TPayload payload, Causation causation, DateTimeOffset? utcTimestamp = null)
         {
-            Invariant.That(!string.IsNullOrWhiteSpace(factType), DomainErrors.Fact.MissingType);
-            return new Fact<TPayload>(FactId.New(), factType, payload, causation, DateTimeOffset.UtcNow);
+            Invariant.That(!string.IsNullOrWhiteSpace(factType), Dx.Faults.Fact.MissingFactType);
+            Invariant.That(causation.TraceId != TraceId.Empty, Dx.Faults.Fact.MissingTrace);
+            return new(FactId.InternalNew(), factType, payload!, causation, DateTimeOffset.UtcNow);
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
