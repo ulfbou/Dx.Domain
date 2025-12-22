@@ -1,0 +1,54 @@
+<!-- Dx.Domain.Generators.Tests project file -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+
+    <!-- Disable code analysis for tests -->
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <WarningsAsErrors />
+    <WarningsNotAsErrors />
+    <NoWarn>$(NoWarn);CS5001;SA1200;SA1101;SA1633;SA1636;SA1609;SA1518;SA1210;SA0001</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyTitle>Dx.Domain.Generators.Tests</AssemblyTitle>
+    <Description>Test suite for Dx.Domain.Generators.</Description>
+    <Company>Dx.Domain Team</Company>
+    <Authors>Dx.Domain Team</Authors>
+    <Copyright>Copyright © 2025 Dx.Domain Team. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/ulfbou/Dx.Domain.git</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <!-- Test Framework Dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="FluentAssertions" Version="8.8.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Dx.Domain.Generators\Dx.Domain.Generators.csproj" />
+    <ProjectReference Include="..\..\src\Dx.Domain\Dx.Domain.csproj" />
+  </ItemGroup>
+
+  <!-- xUnit Global Usings -->
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
+  </ItemGroup>
+
+</Project>
