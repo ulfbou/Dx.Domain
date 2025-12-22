@@ -108,23 +108,12 @@ namespace Dx.Domain.Analyzers.Analyzers
             // Facade method doesn't return Result - should it enforce invariants?
             // This is a potential issue if creating domain types
             if (!services.Semantic.IsKernelResultType(method.ReturnType)
-                && IsDomainType(method.ReturnType)
+                && services.Semantic.IsDomainType(method.ReturnType)
                 && method.Locations.Any())
             {
                 var location = method.Locations.First();
                 context.ReportDiagnostic(Diagnostic.Create(Rule, location));
             }
-        }
-
-        private static bool IsDomainType(ITypeSymbol type)
-        {
-            var ns = type.ContainingNamespace?.ToDisplayString();
-            if (ns == null)
-                return false;
-
-            return ns.Contains("Dx.Domain") ||
-                   ns.Contains(".Domain") ||
-                   ns.Contains(".Domains");
         }
     }
 }

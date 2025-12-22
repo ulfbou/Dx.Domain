@@ -96,19 +96,24 @@ namespace Dx.Domain.Analyzers.Analyzers
                 return;
 
             // Only analyze S0 and S1 scopes (kernel and domain)
+            // S0 (kernel) is WHERE factories are typically defined and should be checked
+            // S1 (domain) also needs to be checked for domain types
             var scope = services.Scope.ResolveSymbol(type);
             if (scope != Scope.S0 && scope != Scope.S1)
                 return;
 
-            // Skip if not a domain type (basic heuristic: in Dx.Domain namespace or similar)
-            if (!IsDomainType(type))
+            // Use centralized semantic classifier for domain type detection
+            if (!services.Semantic.IsDomainType(type))
                 return;
 
             // Check public constructors
             foreach (var constructor in type.Constructors)
             {
+                // Skip static constructors (.cctor)
+                if (constructor.IsStatic)
+                    continue;
+
                 if (constructor.DeclaredAccessibility == Accessibility.Public &&
-                    !constructor.IsStatic &&
                     constructor.Locations.Any())
                 {
                     var location = constructor.Locations.First();
@@ -131,30 +136,29 @@ namespace Dx.Domain.Analyzers.Analyzers
             }
         }
 
-        private static bool IsDomainType(INamedTypeSymbol type)
-        {
-            // Heuristic: check if type is in a domain namespace
-            var ns = type.ContainingNamespace?.ToDisplayString();
-            if (ns == null)
-                return false;
-
-            return ns.Contains("Dx.Domain") || 
-                   ns.Contains(".Domain") ||
-                   ns.Contains(".Domains");
-        }
-
         private static bool IsFactoryMethod(IMethodSymbol method, INamedTypeSymbol containingType)
         {
             // Factory method returns the containing type or related type
             if (SymbolEqualityComparer.Default.Equals(method.ReturnType, containingType))
                 return true;
 
-            // Check if it returns a constructed version of the type
+            // Check if it returns a constructed version of the type (e.g., generic type)
             if (method.ReturnType is INamedTypeSymbol returnType &&
                 SymbolEqualityComparer.Default.Equals(returnType.ConstructedFrom, containingType))
                 return true;
 
-            // Common factory method names
+            // Check if it returns Result<T> where T is the containing type
+            // This catches factories that return Result-wrapped domain objects
+            if (method.ReturnType is INamedTypeSymbol namedReturn &&
+                namedReturn.IsGenericType &&
+                namedReturn.TypeArguments.Length > 0)
+            {
+                var firstArg = namedReturn.TypeArguments[0];
+                if (SymbolEqualityComparer.Default.Equals(firstArg, containingType))
+                    return true;
+            }
+
+            // Common factory method names - these are strong indicators
             var methodName = method.Name;
             return methodName.StartsWith("Create", System.StringComparison.Ordinal) ||
                    methodName.StartsWith("From", System.StringComparison.Ordinal) ||
