@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Diagnostics;
+using System.IO;
 
 namespace Dx.Domain
 {
@@ -91,9 +92,9 @@ namespace Dx.Domain
         internal static InvariantError Create(
             DomainError domainError,
             string? messageOverride = null,
-            CorrelationId correlationId = default,
-            TraceId traceId = default,
-            SpanId spanId = default,
+            CorrelationId? correlationId = default,
+            TraceId? traceId = default,
+            SpanId? spanId = default,
             [CallerMemberName] string member = "",
             [CallerFilePath] string file = "",
             [CallerLineNumber] int line = 0)
@@ -106,9 +107,9 @@ namespace Dx.Domain
                 member,
                 fileName,
                 line,
-                correlationId,
-                traceId,
-                spanId);
+                correlationId ?? CorrelationId.Empty,
+                traceId ?? TraceId.Empty,
+                spanId ?? SpanId.Empty);
         }
 
         /// <summary>
@@ -119,6 +120,6 @@ namespace Dx.Domain
 
         /// <inheritdoc />
         public override string ToString()
-            => $"{DomainError.Code}: {EffectiveMessage} @ {Member}:{Line}";
+            => $"InvariantError={DomainError.Code}: {EffectiveMessage} @ {Member}:{Line}";
     }
 }

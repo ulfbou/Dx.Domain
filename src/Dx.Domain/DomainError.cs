@@ -10,36 +10,34 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx;
+using System.Diagnostics;
 
 using static Dx.Dx;
-
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace Dx.Domain
 {
     /// <summary>
-    /// Represents a domain-specific error with a code and descriptive message.
+    /// Represents a domain-specific error with a unique code and a descriptive message.
     /// </summary>
     /// <remarks>
     /// This struct is used to standardize error reporting across the domain layer. It avoids the overhead
-    /// of exceptions for control flow and provides a serializable error format.
+    /// of exceptions for control flow and provides a serializable error format. Equality is based solely
+    /// on the <see cref="Code"/>.
     /// </remarks>
     [DebuggerDisplay("{Code,nq} @ {Message,nq}")]
     public readonly struct DomainError : IEquatable<DomainError>
     {
-        /// <summary>Gets the error code.</summary>
+        /// <summary>Gets the unique error code identifying the type of failure.</summary>
         public string Code { get; }
 
-        /// <summary>Gets the error message.</summary>
+        /// <summary>Gets the descriptive message explaining the reason for the failure.</summary>
         public string Message { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DomainError"/> struct with the specified error code and message.
+        /// Initializes a new instance of the <see cref="DomainError"/> struct.
         /// </summary>
-        /// <param name="code">The unique code that identifies the domain error. Cannot be <see langword="null"/> or empty.</param>
-        /// <param name="message">The descriptive message that explains the domain error. Cannot be <see langword="null"/> or empty.</param>
+        /// <param name="code">The unique code that identifies the domain error.</param>
+        /// <param name="message">The descriptive message that explains the domain error.</param>
         private DomainError(string code, string message)
         {
             Code = code;
@@ -51,33 +49,49 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="code">The unique code that identifies the domain error. Cannot be null or whitespace.</param>
         /// <param name="message">The descriptive message that explains the domain error. Cannot be null or whitespace.</param>
+        /// <param name="validate">If set to <see langword="true"/>, performs invariant validation on the input parameters.</param>
         /// <returns>A <see cref="DomainError"/> instance initialized with the specified code and message.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static DomainError Create(string code, string message)
+        internal static DomainError InternalCreate(string code, string message, bool validate = true)
         {
-            Invariant.That(!string.IsNullOrWhiteSpace(code), DomainError.Create(DomainErrors.Code.NullOrWhitespace, DomainErrors.Message.NullOrWhitespace));
-            Invariant.That(!string.IsNullOrWhiteSpace(message), DomainError.Create(DomainErrors.Message.NullOrWhitespace, DomainErrors.Code.NullOrWhitespace));
+            if (validate)
+            {
+                // Note: We use a bypass/raw fault here to prevent infinite recursion in the invariant system 
+                // if the validation itself fails.
+                Invariant.That(!string.IsNullOrWhiteSpace(code), () => DomainError.InternalCreate("DomainError.NullCode", "The error code cannot be null or whitespace.", false));
+                Invariant.That(!string.IsNullOrWhiteSpace(message), () => DomainError.InternalCreate("DomainError.NullMessage", "The error message cannot be null or whitespace.", false));
+            }
 
             return new DomainError(code, message);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type based on the <see cref="Code"/>.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns><see langword="true"/> if the current object is equal to the other parameter; otherwise, <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(DomainError other) => Code == other.Code;
+        public bool Equals(DomainError other) => string.Equals(Code, other.Code, StringComparison.Ordinal);
 
         /// <inheritdoc />
         public override bool Equals(object? obj) => obj is DomainError other && Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode() => Code.GetHashCode(StringComparison.Ordinal);
+        public override int GetHashCode() => Code?.GetHashCode(StringComparison.Ordinal) ?? 0;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Compares two <see cref="DomainError"/> instances for equality.
+        /// </summary>
         public static bool operator ==(DomainError left, DomainError right) => left.Equals(right);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Compares two <see cref="DomainError"/> instances for inequality.
+        /// </summary>
         public static bool operator !=(DomainError left, DomainError right) => !left.Equals(right);
 
-        /// <inheritdoc />
-        public override string ToString() => Code;
+        /// <summary>
+        /// Returns the <see cref="Code"/> as the string representation of the error.
+        /// </summary>
+        public override string ToString() => Code ?? string.Empty;
     }
 }

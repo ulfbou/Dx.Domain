@@ -1,0 +1,222 @@
+name: Workflow Validation
+
+# Validates GitHub Actions workflow syntax and best practices
+# Runs on changes to workflow files
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+  workflow_dispatch:
+
+concurrency:
+  group: workflow-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-syntax:
+    name: Validate Workflow Syntax
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install action-validator
+        run: npm install -g action-validator
+      
+      - name: Validate workflow files
+        run: |
+          echo "# Workflow Validation Report" > validation-report.md
+          echo "" >> validation-report.md
+          
+          FAILED=0
+          
+          for workflow in .github/workflows/*.yml; do
+            echo "Validating: $workflow"
+            if action-validator "$workflow"; then
+              echo "✅ $workflow" >> validation-report.md
+            else
+              echo "❌ $workflow" >> validation-report.md
+              FAILED=$((FAILED + 1))
+            fi
+          done
+          
+          echo "" >> validation-report.md
+          echo "**Total Files**: $(ls .github/workflows/*.yml | wc -l)" >> validation-report.md
+          echo "**Failed**: $FAILED" >> validation-report.md
+          
+          cat validation-report.md >> $GITHUB_STEP_SUMMARY
+          
+          if [ $FAILED -gt 0 ]; then
+            echo "::error::$FAILED workflow file(s) failed validation"
+            exit 1
+          fi
+        continue-on-error: true
+      
+      - name: Check YAML syntax
+        run: |
+          pip install yamllint
+          yamllint .github/workflows/ || echo "::warning::YAML linting issues found"
+        continue-on-error: true
+
+  check-best-practices:
+    name: Check Best Practices
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Check for required fields
+        run: |
+          echo "# Workflow Best Practices Report" > best-practices.md
+          echo "" >> best-practices.md
+          
+          for workflow in .github/workflows/*.yml; do
+            echo "## $(basename $workflow)" >> best-practices.md
+            echo "" >> best-practices.md
+            
+            # Check for timeout-minutes
+            if ! grep -q "timeout-minutes:" "$workflow"; then
+              echo "⚠️  Missing timeout-minutes" >> best-practices.md
+            else
+              echo "✅ Has timeout-minutes" >> best-practices.md
+            fi
+            
+            # Check for permissions
+            if ! grep -q "permissions:" "$workflow"; then
+              echo "⚠️  Missing explicit permissions" >> best-practices.md
+            else
+              echo "✅ Has explicit permissions" >> best-practices.md
+            fi
+            
+            # Check for concurrency
+            if ! grep -q "concurrency:" "$workflow"; then
+              echo "ℹ️  No concurrency control" >> best-practices.md
+            else
+              echo "✅ Has concurrency control" >> best-practices.md
+            fi
+            
+            # Check for checkout version
+            if grep -q "actions/checkout@v[0-3]" "$workflow"; then
+              echo "⚠️  Using old checkout action version" >> best-practices.md
+            fi
+            
+            echo "" >> best-practices.md
+          done
+          
+          cat best-practices.md >> $GITHUB_STEP_SUMMARY
+      
+      - name: Upload best practices report
+        uses: actions/upload-artifact@v4
+        with:
+          name: best-practices-report
+          path: best-practices.md
+
+  check-security:
+    name: Security Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Check for security issues
+        run: |
+          echo "# Workflow Security Report" > security-report.md
+          echo "" >> security-report.md
+          
+          ISSUES=0
+          
+          for workflow in .github/workflows/*.yml; do
+            echo "## $(basename $workflow)" >> security-report.md
+            echo "" >> security-report.md
+            
+            # Check for hardcoded secrets
+            if grep -i "password\|token\|secret" "$workflow" | grep -v "\${{" | grep -v "#"; then
+              echo "⚠️  Potential hardcoded secrets detected" >> security-report.md
+              ISSUES=$((ISSUES + 1))
+            fi
+            
+            # Check for pull_request_target with checkout
+            if grep -q "pull_request_target:" "$workflow" && grep -q "actions/checkout@" "$workflow"; then
+              echo "⚠️  Using checkout with pull_request_target (potential security risk)" >> security-report.md
+              ISSUES=$((ISSUES + 1))
+            fi
+            
+            # Check for unsafe script execution
+            if grep -q "run.*\${{.*}}" "$workflow"; then
+              echo "ℹ️  Direct variable interpolation in scripts (review carefully)" >> security-report.md
+            fi
+            
+            echo "" >> security-report.md
+          done
+          
+          echo "**Total Issues**: $ISSUES" >> security-report.md
+          
+          cat security-report.md >> $GITHUB_STEP_SUMMARY
+          
+          if [ $ISSUES -gt 0 ]; then
+            echo "::warning::$ISSUES potential security issues found"
+          fi
+      
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-report.md
+
+  test-reusable-workflows:
+    name: Test Reusable Workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: false  # Enable when we have reusable workflows to test
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Test sign-packages workflow
+        uses: ./.github/workflows/sign-packages.yml
+        with:
+          artifacts-path: ./test-artifacts
+        continue-on-error: true
+
+  summary:
+    name: Validation Summary
+    needs: [validate-syntax, check-best-practices, check-security]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Generate summary
+        run: |
+          echo "# 🔍 Workflow Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Syntax Validation | ${{ needs.validate-syntax.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Best Practices | ${{ needs.check-best-practices.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Check | ${{ needs.check-security.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.validate-syntax.result }}" != "success" ]; then
+            echo "::error::Workflow validation failed. Review the reports for details."
+            exit 1
+          fi

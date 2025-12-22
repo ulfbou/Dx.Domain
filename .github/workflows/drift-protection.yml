@@ -1,0 +1,310 @@
+name: Drift Protection
+
+# Infrastructure drift detection and remediation
+# Runs scheduled scans and pre-deploy checks
+
+on:
+  schedule:
+    # Run drift detection daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      auto-remediate:
+        description: 'Automatically create remediation PR'
+        required: false
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/drift-protection.yml'
+
+concurrency:
+  group: drift-protection-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DRIFT_REPORT_PATH: ./drift-reports
+
+jobs:
+  detect-config-drift:
+    name: Detect Configuration Drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    
+    outputs:
+      drift-detected: ${{ steps.detect.outputs.drift-detected }}
+      drift-severity: ${{ steps.detect.outputs.severity }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup reporting directory
+        run: mkdir -p ${{ env.DRIFT_REPORT_PATH }}
+      
+      - name: Check GitHub Actions workflow drift
+        id: workflow-drift
+        run: |
+          echo "🔍 Checking for workflow configuration drift"
+          
+          # Check if workflows have been modified outside of PR process
+          DRIFT_COUNT=0
+          
+          # Compare workflows with expected patterns
+          for workflow in .github/workflows/*.yml; do
+            # Check for required security settings
+            if ! grep -q "permissions:" "$workflow"; then
+              echo "⚠️  Missing permissions in: $workflow"
+              DRIFT_COUNT=$((DRIFT_COUNT + 1))
+            fi
+            
+            # Check for timeout settings
+            if grep -q "jobs:" "$workflow" && ! grep -q "timeout-minutes:" "$workflow"; then
+              echo "⚠️  Missing timeout in: $workflow"
+              DRIFT_COUNT=$((DRIFT_COUNT + 1))
+            fi
+          done
+          
+          echo "drift-count=${DRIFT_COUNT}" >> $GITHUB_OUTPUT
+          echo "Found ${DRIFT_COUNT} potential drift issues in workflows"
+      
+      - name: Check dependency drift
+        id: dependency-drift
+        run: |
+          echo "🔍 Checking for dependency drift"
+          
+          cd Dx.Domain.2
+          
+          # Check for outdated packages
+          dotnet list package --outdated --format json > ${{ env.DRIFT_REPORT_PATH }}/outdated-packages.json || true
+          
+          # Check for vulnerable packages
+          dotnet list package --vulnerable --format json > ${{ env.DRIFT_REPORT_PATH }}/vulnerable-packages.json || true
+          
+          # Count issues
+          OUTDATED_COUNT=$(jq -r '[.projects[].frameworks[].topLevelPackages[]? | select(.resolvedVersion != .latestVersion)] | length' ${{ env.DRIFT_REPORT_PATH }}/outdated-packages.json 2>/dev/null || echo "0")
+          VULNERABLE_COUNT=$(jq -r '[.projects[].frameworks[].topLevelPackages[]? | select(.vulnerabilities)] | length' ${{ env.DRIFT_REPORT_PATH }}/vulnerable-packages.json 2>/dev/null || echo "0")
+          
+          echo "outdated-count=${OUTDATED_COUNT}" >> $GITHUB_OUTPUT
+          echo "vulnerable-count=${VULNERABLE_COUNT}" >> $GITHUB_OUTPUT
+          echo "Found ${OUTDATED_COUNT} outdated packages, ${VULNERABLE_COUNT} vulnerable packages"
+      
+      - name: Check documentation drift
+        id: doc-drift
+        run: |
+          echo "🔍 Checking for documentation drift"
+          
+          DRIFT_COUNT=0
+          
+          # Check if API docs are out of sync with code
+          cd Dx.Domain.2
+          
+          # Count public APIs in code
+          API_COUNT=$(find src -name "*.cs" -exec grep -h "public " {} \; | wc -l)
+          
+          # Check if docs directory exists and has content
+          if [ -d "docs" ]; then
+            DOC_COUNT=$(find docs -name "*.md" | wc -l)
+            if [ $DOC_COUNT -lt 5 ]; then
+              echo "⚠️  Documentation appears sparse (${DOC_COUNT} files for ${API_COUNT} public APIs)"
+              DRIFT_COUNT=$((DRIFT_COUNT + 1))
+            fi
+          else
+            echo "⚠️  No docs directory found"
+            DRIFT_COUNT=$((DRIFT_COUNT + 1))
+          fi
+          
+          echo "drift-count=${DRIFT_COUNT}" >> $GITHUB_OUTPUT
+      
+      - name: Aggregate drift detection
+        id: detect
+        run: |
+          WORKFLOW_DRIFT=${{ steps.workflow-drift.outputs.drift-count || 0 }}
+          DEP_OUTDATED=${{ steps.dependency-drift.outputs.outdated-count || 0 }}
+          DEP_VULNERABLE=${{ steps.dependency-drift.outputs.vulnerable-count || 0 }}
+          DOC_DRIFT=${{ steps.doc-drift.outputs.drift-count || 0 }}
+          
+          TOTAL_DRIFT=$((WORKFLOW_DRIFT + DEP_OUTDATED + DEP_VULNERABLE + DOC_DRIFT))
+          
+          echo "total-drift=${TOTAL_DRIFT}" >> $GITHUB_OUTPUT
+          
+          if [ $TOTAL_DRIFT -gt 0 ]; then
+            echo "drift-detected=true" >> $GITHUB_OUTPUT
+            
+            # Determine severity
+            if [ $DEP_VULNERABLE -gt 0 ]; then
+              echo "severity=critical" >> $GITHUB_OUTPUT
+              echo "🔴 CRITICAL: Vulnerable dependencies detected"
+            elif [ $TOTAL_DRIFT -gt 10 ]; then
+              echo "severity=high" >> $GITHUB_OUTPUT
+              echo "🟠 HIGH: Significant drift detected"
+            elif [ $TOTAL_DRIFT -gt 5 ]; then
+              echo "severity=medium" >> $GITHUB_OUTPUT
+              echo "🟡 MEDIUM: Moderate drift detected"
+            else
+              echo "severity=low" >> $GITHUB_OUTPUT
+              echo "🟢 LOW: Minor drift detected"
+            fi
+          else
+            echo "drift-detected=false" >> $GITHUB_OUTPUT
+            echo "severity=none" >> $GITHUB_OUTPUT
+            echo "✅ No drift detected"
+          fi
+          
+          # Create summary report
+          cat > ${{ env.DRIFT_REPORT_PATH }}/summary.md << EOF
+          # Drift Detection Report
+          
+          **Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Commit**: ${{ github.sha }}
+          **Branch**: ${{ github.ref_name }}
+          
+          ## Summary
+          
+          - **Total Drift Issues**: ${TOTAL_DRIFT}
+          - **Severity**: $(echo "${{ steps.detect.outputs.severity }}" | tr '[:lower:]' '[:upper:]')
+          
+          ## Details
+          
+          - **Workflow Configuration Drift**: ${WORKFLOW_DRIFT} issues
+          - **Outdated Dependencies**: ${DEP_OUTDATED} packages
+          - **Vulnerable Dependencies**: ${DEP_VULNERABLE} packages
+          - **Documentation Drift**: ${DOC_DRIFT} issues
+          
+          ## Recommendations
+          
+          $(if [ $DEP_VULNERABLE -gt 0 ]; then echo "- 🔴 **URGENT**: Update vulnerable dependencies immediately"; fi)
+          $(if [ $DEP_OUTDATED -gt 5 ]; then echo "- 🟠 Update outdated dependencies to stay current"; fi)
+          $(if [ $WORKFLOW_DRIFT -gt 0 ]; then echo "- 🟡 Review and update workflow configurations"; fi)
+          $(if [ $DOC_DRIFT -gt 0 ]; then echo "- 📚 Update documentation to match current code"; fi)
+          EOF
+          
+          cat ${{ env.DRIFT_REPORT_PATH }}/summary.md
+      
+      - name: Upload drift report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-report-${{ github.run_id }}
+          path: ${{ env.DRIFT_REPORT_PATH }}/
+          retention-days: 90
+      
+      - name: Post drift summary
+        if: always()
+        run: |
+          cat ${{ env.DRIFT_REPORT_PATH }}/summary.md >> $GITHUB_STEP_SUMMARY
+
+  create-remediation-issue:
+    name: Create Remediation Issue
+    needs: detect-config-drift
+    if: needs.detect-config-drift.outputs.drift-detected == 'true' && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    
+    steps:
+      - name: Download drift report
+        uses: actions/download-artifact@v4
+        with:
+          name: drift-report-${{ github.run_id }}
+          path: ./drift-reports
+      
+      - name: Create or update issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('./drift-reports/summary.md', 'utf8');
+            
+            const title = `🔍 Configuration Drift Detected - ${{ needs.detect-config-drift.outputs.drift-severity }} Severity`;
+            const body = `${summary}
+            
+            ---
+            
+            This issue was automatically created by the drift detection workflow.
+            
+            **Run**: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            **Detected**: ${new Date().toISOString()}
+            
+            ### Next Steps
+            
+            ${{ needs.detect-config-drift.outputs.drift-severity == 'critical' ? '🔴 **CRITICAL**: This requires immediate attention. Vulnerable dependencies detected.' : '' }}
+            
+            1. Review the drift report artifact from the workflow run
+            2. Create a remediation PR to address the issues
+            3. Close this issue when drift is resolved
+            `;
+            
+            // Check for existing open drift issues
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'drift-detection',
+              per_page: 100
+            });
+            
+            const existingIssue = issues.find(issue => 
+              issue.title.includes('Configuration Drift Detected')
+            );
+            
+            if (existingIssue) {
+              // Update existing issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: body
+              });
+              
+              // Add comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `🔄 Drift detection re-run at ${new Date().toISOString()}\n\nSeverity: **${{ needs.detect-config-drift.outputs.drift-severity }}**`
+              });
+            } else {
+              // Create new issue
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['drift-detection', 'automated', 'infrastructure']
+              });
+              
+              // Add priority label based on severity
+              if ('${{ needs.detect-config-drift.outputs.drift-severity }}' === 'critical') {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.data.number,
+                  labels: ['priority-critical']
+                });
+              }
+            }
+
+  block-deployment-on-critical-drift:
+    name: Check Drift Before Deploy
+    needs: detect-config-drift
+    if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deployment')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Block on critical drift
+        run: |
+          if [ "${{ needs.detect-config-drift.outputs.drift-severity }}" == "critical" ]; then
+            echo "::error::🔴 CRITICAL drift detected. Deployment blocked."
+            echo "::error::Resolve critical drift issues before deploying."
+            exit 1
+          else
+            echo "✅ No critical drift detected. Deployment can proceed."
+          fi

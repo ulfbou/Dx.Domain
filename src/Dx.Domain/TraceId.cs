@@ -10,10 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-
     /// <summary>
     /// Represents a 128-bit unique identifier for distributed tracing scenarios.
     /// </summary>
@@ -43,7 +43,7 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new <see cref="TraceId"/> with a uniformly random 128-bit value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TraceId New()
+        internal static TraceId InternalNew()
         {
             Span<byte> buffer = stackalloc byte[16];
             Random.Shared.NextBytes(buffer);

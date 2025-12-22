@@ -1,0 +1,380 @@
+name: Release CD
+
+# Staged release pipeline: staging → canary → production
+# Creates signed releases with changelog and SBOM
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - canary
+          - production
+      skip-tests:
+        description: 'Skip tests (not recommended)'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    outputs:
+      can-release: ${{ steps.check.outputs.can-release }}
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check branch
+        id: check
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "::error::Releases can only be created from the main branch"
+            echo "can-release=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "can-release=true" >> $GITHUB_OUTPUT
+      
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1.1.1
+        with:
+          versionSpec: '5.x'
+      
+      - name: Calculate version
+        id: version
+        uses: gittools/actions/gitversion/execute@v1.1.1
+        with:
+          useConfigFile: true
+          configFilePath: .github/GitVersion.yml
+      
+      - name: Validate version
+        run: |
+          echo "📋 Current version: ${{ steps.version.outputs.semVer }}"
+          echo "📋 Release type: ${{ github.event.inputs.release-type }}"
+          
+          # Verify version follows semver
+          if ! [[ "${{ steps.version.outputs.semVer }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "::error::Invalid semantic version"
+            exit 1
+          fi
+
+  build-release:
+    name: Build Release
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      packages: write
+    
+    outputs:
+      version: ${{ steps.gitversion.outputs.nuGetVersionV2 }}
+      release-tag: ${{ steps.tag.outputs.tag }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+      
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1.1.1
+        with:
+          versionSpec: '5.x'
+      
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1.1.1
+        with:
+          useConfigFile: true
+          configFilePath: .github/GitVersion.yml
+      
+      - name: Create release tag
+        id: tag
+        run: |
+          TAG="v${{ steps.gitversion.outputs.semVer }}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "📌 Release tag: ${TAG}"
+      
+      - name: Restore dependencies
+        run: dotnet restore Dx.Domain.sln
+        working-directory: ./Dx.Domain.2
+      
+      - name: Build for release
+        run: |
+          dotnet build Dx.Domain.sln \
+            --configuration Release \
+            --no-restore \
+            -p:ContinuousIntegrationBuild=true \
+            -p:Deterministic=true \
+            -p:Version="${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+        working-directory: ./Dx.Domain.2
+      
+      - name: Run tests
+        if: ${{ !github.event.inputs.skip-tests }}
+        run: |
+          dotnet test Dx.Domain.sln \
+            --no-build \
+            --configuration Release \
+            --logger "trx" \
+            --results-directory ./TestResults
+        working-directory: ./Dx.Domain.2
+      
+      - name: Create packages
+        run: |
+          mkdir -p ./artifacts
+          
+          for project in $(find ./Dx.Domain.2/src -name "*.csproj" -exec grep -l "<IsPackable>true</IsPackable>" {} +); do
+            dotnet pack "$project" \
+              --no-build \
+              --configuration Release \
+              --output ./artifacts \
+              -p:PackageVersion="${{ steps.gitversion.outputs.nuGetVersionV2 }}" \
+              -p:RepositoryCommit="${{ github.sha }}" \
+              --include-symbols \
+              -p:SymbolPackageFormat=snupkg
+          done
+      
+      - name: Sign packages
+        run: |
+          # TODO: Implement package signing with certificate
+          # For now, create checksums
+          cd ./artifacts
+          for file in *.nupkg; do
+            sha256sum "$file" > "$file.sha256"
+          done
+      
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages
+          path: ./artifacts/
+          retention-days: 90
+
+  generate-changelog:
+    name: Generate Changelog
+    needs: [validate, build-release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No previous tag found, generating full changelog"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            echo "Previous tag: $LATEST_TAG"
+            COMMITS=$(git log ${LATEST_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Create changelog
+          CHANGELOG="## What's Changed\n\n${COMMITS}\n\n**Full Changelog**: https://github.com/${{ github.repository }}/compare/${LATEST_TAG}...${{ needs.build-release.outputs.release-tag }}"
+          
+          # Save to file
+          echo -e "${CHANGELOG}" > changelog.md
+          cat changelog.md
+      
+      - name: Upload changelog
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: changelog.md
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [build-release, generate-changelog]
+    if: github.event.inputs.environment == 'staging' || github.event.inputs.environment == 'canary' || github.event.inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.example.com
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: ./packages
+      
+      - name: Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment"
+          echo "📦 Packages:"
+          ls -lh ./packages/
+          # Add actual deployment commands here
+      
+      - name: Smoke tests
+        run: |
+          echo "🧪 Running smoke tests on staging"
+          # Add smoke test commands here
+
+  deploy-canary:
+    name: Deploy to Canary
+    needs: [build-release, generate-changelog, deploy-staging]
+    if: (github.event.inputs.environment == 'canary' || github.event.inputs.environment == 'production') && needs.deploy-staging.result == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: canary
+      url: https://canary.example.com
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: ./packages
+      
+      - name: Deploy to canary
+        run: |
+          echo "🐤 Deploying to canary environment (10% traffic)"
+          # Add canary deployment commands here
+      
+      - name: Monitor canary
+        run: |
+          echo "👀 Monitoring canary deployment"
+          # Add monitoring/health check commands here
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [build-release, generate-changelog, deploy-canary]
+    if: github.event.inputs.environment == 'production' && needs.deploy-canary.result == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://production.example.com
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: ./packages
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      
+      - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if [ -n "$NUGET_API_KEY" ]; then
+            for package in ./packages/*.nupkg; do
+              if [[ ! "$package" =~ \.symbols\.nupkg$ ]]; then
+                echo "📤 Publishing: $package"
+                dotnet nuget push "$package" \
+                  --source https://api.nuget.org/v3/index.json \
+                  --api-key "$NUGET_API_KEY" \
+                  --skip-duplicate
+              fi
+            done
+          else
+            echo "⚠️  NUGET_API_KEY not set, skipping NuGet publish"
+          fi
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-release, generate-changelog, deploy-production]
+    if: always() && needs.build-release.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: ./release-assets
+      
+      - name: Download changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+          path: ./
+      
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ needs.build-release.outputs.release-tag }}" -m "Release ${{ needs.build-release.outputs.version }}"
+          git push origin "${{ needs.build-release.outputs.release-tag }}"
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build-release.outputs.release-tag }}
+          name: Release ${{ needs.build-release.outputs.version }}
+          body_path: ./changelog.md
+          draft: false
+          prerelease: false
+          files: |
+            ./release-assets/*.nupkg
+            ./release-assets/*.snupkg
+            ./release-assets/*.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Release summary
+        run: |
+          echo "# 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ needs.build-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: ${{ needs.build-release.outputs.release-tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment**: ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          ls -lh ./release-assets/ >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

@@ -1,76 +1,309 @@
-# DocFX Documentation Build Workflow
-# Triggers: manual (workflow_dispatch), push to docs/*, docfx.json, assets/*, and when docfx.yml changes
+name: DocFX Documentation
 
-name: Build & Publish DocFX Documentation
+# Automated documentation generation and publishing
+# Triggered on doc/API changes, creates versioned docs site
 
 on:
-  workflow_dispatch: {}
   push:
-    branches: [main]
+    branches:
+      - main
+      - develop
     paths:
-      - 'docs/**'
-      - 'docfx.json'
-      - 'assets/**'
+      - 'Dx.Domain.2/docs/**'
+      - 'Dx.Domain.2/src/**/*.cs'
+      - 'Dx.Domain.2/docfx.json'
+      - 'Dx.Domain.2/**/*.md'
       - '.github/workflows/docfx.yml'
-  release:
-    types: [published]
+  pull_request:
+    paths:
+      - 'Dx.Domain.2/docs/**'
+      - 'Dx.Domain.2/src/**/*.cs'
+      - 'Dx.Domain.2/docfx.json'
+      - 'Dx.Domain.2/**/*.md'
+  workflow_dispatch:
+
+concurrency:
+  group: docfx-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
 
 jobs:
-  build-docfx:
-    name: Build DocFX Documentation
+  build-docs:
+    name: Build Documentation
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup .NET SDK (install 9.0.100 to match global.json)
+        with:
+          fetch-depth: 0
+      
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.100'
-
-      - name: Dotnet info (diagnostic)
-        run: dotnet --info
-
-      - name: Install DocFX (pinned version)
-        run: dotnet tool install -g docfx --version 2.77.0
-
-      - name: Add .dotnet/tools to PATH
-        run: echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
-
-      - name: Build documentation
-        run: docfx docfx.json --output _site
-
-      - name: Copy additional documentation (Markdown, YAML, images)
+          dotnet-version: 9.0.x
+      
+      - name: Install DocFX
+        run: dotnet tool update -g docfx
+      
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1.1.1
+        with:
+          versionSpec: '5.x'
+      
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1.1.1
+        with:
+          useConfigFile: true
+          configFilePath: .github/GitVersion.yml
+        continue-on-error: true
+      
+      - name: Update docfx.json with version
         run: |
-          set -euo pipefail
-          mkdir -p _site/docs
-          cp -r docs/* _site/docs/ || true
-          find . -maxdepth 1 -type f \( -name '*.md' -o -name '*.yml' \) -exec cp {} _site/ \;
-          # Copy common static assets if present
-          for ext in png jpg jpeg gif svg pdf; do
-            find docs/ -type f -name "*.$ext" -exec cp --parents {} _site/ \; || true
-          done
-          # Copy all assets (images, diagrams, etc.) from assets/ to _site/assets
-          if [ -d assets ]; then
-            mkdir -p _site/assets
-            cp -r assets/* _site/assets/ || true
-          fi
-
-      - name: Upload generated site as artifact
+          VERSION="${{ steps.gitversion.outputs.semVer || '1.0.0' }}"
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          
+          # Update version in docfx.json
+          jq --arg version "$VERSION" \
+             --arg commit "$COMMIT_SHA" \
+             '.build.globalMetadata._customMetadata.version = $version | 
+              .build.globalMetadata._customMetadata.commit = $commit' \
+             docfx.json > docfx.json.tmp
+          mv docfx.json.tmp docfx.json
+          
+          echo "📚 Building docs for version: $VERSION (commit: $COMMIT_SHA)"
+        working-directory: ./Dx.Domain.2
+      
+      - name: Restore dependencies
+        run: dotnet restore Dx.Domain.sln
+        working-directory: ./Dx.Domain.2
+      
+      - name: Build solution for API metadata
+        run: |
+          dotnet build Dx.Domain.sln \
+            --configuration Release \
+            --no-restore \
+            -p:GenerateDocumentationFile=true
+        working-directory: ./Dx.Domain.2
+      
+      - name: Build DocFX metadata
+        run: docfx metadata docfx.json
+        working-directory: ./Dx.Domain.2
+        continue-on-error: true
+      
+      - name: Build DocFX site
+        run: docfx build docfx.json
+        working-directory: ./Dx.Domain.2
+      
+      - name: Check for broken links
+        run: |
+          # Install link checker
+          npm install -g linkinator
+          
+          # Check for broken links in generated site
+          linkinator ./_site --recurse --skip "^(?!http://localhost|file://)" || true
+        working-directory: ./Dx.Domain.2
+        continue-on-error: true
+      
+      - name: Upload documentation artifact
         uses: actions/upload-artifact@v4
         with:
-          name: docfx-site
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+          name: documentation
+          path: ./Dx.Domain.2/_site/
+          retention-days: 30
+      
+      - name: Create version snapshot
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          VERSION="${{ steps.gitversion.outputs.semVer || '1.0.0' }}"
+          mkdir -p docs-versions
+          cp -r _site "docs-versions/${VERSION}"
+        working-directory: ./Dx.Domain.2
+      
+      - name: Upload version snapshot
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _site
-          publish_branch: gh-pages
-          force_orphan: true
+          name: docs-version-${{ steps.gitversion.outputs.semVer || '1.0.0' }}
+          path: ./Dx.Domain.2/docs-versions/
+          retention-days: 365
 
-# Notes:
-# - This workflow only triggers on manual runs, pushes to docs/*, docfx.json, assets/*, .github/workflows/docfx.yml, or new releases.
-# - All docs, markdown, yaml, and static assets are included in the published site.
-# - Documentation is published to the gh-pages branch for GitHub Pages hosting.
+  publish-docs:
+    name: Publish Documentation
+    needs: build-docs
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+        continue-on-error: true
+      
+      - name: Create gh-pages branch if it doesn't exist
+        if: failure()
+        run: |
+          git checkout --orphan gh-pages
+          git reset --hard
+          git commit --allow-empty -m "Initialize gh-pages branch"
+          git push origin gh-pages
+      
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      
+      - name: Download documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: ./docs-temp
+      
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1.1.1
+        with:
+          versionSpec: '5.x'
+      
+      - name: Checkout main for version
+        run: |
+          git fetch origin main
+          git checkout origin/main
+      
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1.1.1
+        with:
+          useConfigFile: true
+          configFilePath: .github/GitVersion.yml
+        continue-on-error: true
+      
+      - name: Update documentation
+        run: |
+          VERSION="${{ steps.gitversion.outputs.semVer || 'latest' }}"
+          
+          # Switch back to gh-pages
+          git checkout gh-pages
+          
+          # Create version directory
+          mkdir -p "versions/${VERSION}"
+          
+          # Copy new docs
+          cp -r docs-temp/* "versions/${VERSION}/"
+          
+          # Update latest symlink
+          rm -rf latest
+          cp -r docs-temp latest
+          
+          # Create index if it doesn't exist
+          if [ ! -f index.html ]; then
+            cat > index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta http-equiv="refresh" content="0;url=latest/index.html">
+            <title>Dx.Domain Documentation</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="latest/index.html">latest documentation</a>...</p>
+          </body>
+          </html>
+          EOF
+          fi
+          
+          echo "📚 Published documentation for version: ${VERSION}"
+      
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update documentation for ${{ steps.gitversion.outputs.semVer || 'latest' }}" || true
+          git push origin gh-pages
+
+  comment-pr:
+    name: Comment on PR
+    needs: build-docs
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    
+    steps:
+      - name: Download documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: ./docs
+      
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.runId;
+            const prNumber = context.issue.number;
+            
+            const body = `## 📚 Documentation Preview
+            
+            Documentation has been built for this PR.
+            
+            ### Preview Options:
+            
+            1. **Download Artifact**: Get the \`documentation\` artifact from [this workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})
+            2. **Local Preview**: Extract the artifact and open \`index.html\` in your browser
+            
+            ### What's Included:
+            
+            - ✅ API Reference
+            - ✅ Conceptual Documentation  
+            - ✅ Code Examples
+            - ✅ Changelog
+            
+            ---
+            
+            💡 **Tip**: Documentation will be automatically published to GitHub Pages when this PR is merged to main.
+            `;
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('📚 Documentation Preview')
+            );
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body
+              });
+            }
