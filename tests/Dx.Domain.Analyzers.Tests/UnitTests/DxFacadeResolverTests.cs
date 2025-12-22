@@ -4,9 +4,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-using Moq;
-
 using System.Linq;
+
+using Moq;
 
 using Xunit;
 
@@ -40,8 +40,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
 
             Assert.Single(resolver.FacadeFactories);
             Assert.Equal("Ok", resolver.FacadeFactories.First().Name);
@@ -65,8 +64,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
 
             Assert.Empty(resolver.FacadeFactories);
         }
@@ -89,8 +87,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
 
             Assert.Empty(resolver.FacadeFactories);
         }
@@ -113,8 +110,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
 
             Assert.Empty(resolver.FacadeFactories);
         }
@@ -144,8 +140,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
 
             Assert.Equal(4, resolver.FacadeFactories.Count);
             Assert.Contains(resolver.FacadeFactories, m => m.Name == "Ok");
@@ -172,8 +167,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
             var okMethod = resolver.FacadeFactories.First();
 
             Assert.True(resolver.IsDxFacadeFactory(okMethod));
@@ -202,8 +196,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
 
             var otherType = compilation.GetTypeByMetadataName("Other");
             var notFacadeMethod = otherType!.GetMembers("NotAFacade").First() as IMethodSymbol;
@@ -231,8 +224,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
             var myType = compilation.GetTypeByMetadataName("MyType");
 
             var factory = resolver.FindFacadeFactoryForType(myType!);
@@ -261,8 +253,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
             var otherType = compilation.GetTypeByMetadataName("OtherType");
 
             var factory = resolver.FindFacadeFactoryForType(otherType!);
@@ -285,11 +276,18 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
 
-            // Should not throw when Dx type is not present
-            var config = Mock.Of<AnalyzerConfigOptionsProvider>();
-            var resolver = new DxFacadeResolver(compilation, config);
+            var resolver = CreateResolver(compilation);
 
             Assert.Empty(resolver.FacadeFactories);
+        }
+
+        private static DxFacadeResolver CreateResolver(Compilation compilation)
+        {
+            var mockConfig = new Mock<AnalyzerConfigOptionsProvider>();
+            var mockOptions = new Mock<AnalyzerConfigOptions>();
+            mockConfig.Setup(c => c.GlobalOptions).Returns(mockOptions.Object);
+
+            return new DxFacadeResolver(compilation, mockConfig.Object);
         }
     }
 }

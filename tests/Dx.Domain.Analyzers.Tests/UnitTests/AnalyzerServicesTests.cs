@@ -45,13 +45,11 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
         {
             var services = CreateTestServices();
 
-            // Simulate multiple rule invocations
             var scope1 = services.Scope;
             var scope2 = services.Scope;
             var dx1 = services.Dx;
             var dx2 = services.Dx;
 
-            // Same instance should be returned (immutable)
             Assert.Same(scope1, scope2);
             Assert.Same(dx1, dx2);
         }
@@ -61,13 +59,10 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
         {
             var services = CreateTestServices();
 
-            // Verify that properties are init-only (cannot be set after construction)
             var type = typeof(AnalyzerServices);
             foreach (var property in type.GetProperties())
             {
                 var setMethod = property.GetSetMethod();
-                // In C# records with init accessors, SetMethod will be non-null but special
-                // We verify immutability by ensuring we can't reassign after construction
                 Assert.True(setMethod == null || setMethod.ReturnParameter.GetRequiredCustomModifiers()
                     .Any(m => m.Name == "IsExternalInit"));
             }
@@ -76,10 +71,17 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
         private static AnalyzerServices CreateTestServices()
         {
             var code = "namespace Test { public class Foo {} }";
+            var references = new[]
+            {
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(System.Runtime.AssemblyTargetedPatchBandAttribute).Assembly.Location)
+            };
+
             var compilation = CSharpCompilation.Create(
                 "Test",
                 new[] { CSharpSyntaxTree.ParseText(code) },
-                new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
+                references,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
             var mockConfig = new Mock<AnalyzerConfigOptionsProvider>();
             var mockOptions = new Mock<AnalyzerConfigOptions>();
