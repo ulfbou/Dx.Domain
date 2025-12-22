@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Result{TValue}.cs" company="Dx.Domain Team">
+// <copyright file="Result.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,11 +10,12 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
+using static Dx.Dx;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// Represents the common result of an operation that can succeed with a value of type <typeparamref name="TValue"/> or fail
     /// with a standard <see cref="DomainError"/>.
@@ -28,13 +29,6 @@ namespace Dx.Domain
     public readonly struct Result<TValue> where TValue : notnull
     {
         private readonly Result<TValue, DomainError> _inner;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Result{TValue}"/> struct that wraps an existing
-        /// <see cref="Result{TValue, TError}"/> with <see cref="DomainError"/> as the error type.
-        /// </summary>
-        /// <param name="inner">The inner result value that encapsulates either a successful value or a domain error.</param>
-        private Result(Result<TValue, DomainError> inner) => _inner = inner;
 
         /// <summary>
         /// Gets a value indicating whether the operation completed successfully.
@@ -59,13 +53,25 @@ namespace Dx.Domain
         internal DomainError Error => _inner.Error;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Result{TValue}"/> struct that wraps an existing
+        /// <see cref="Result{TValue, TError}"/> with <see cref="DomainError"/> as the error type.
+        /// </summary>
+        /// <param name="inner">The inner result value that encapsulates either a successful value or a domain error.</param>
+        private Result(Result<TValue, DomainError> inner) => _inner = inner;
+
+        // ------------------------------------------------------------
+        // PUBLIC FACTORIES REMOVED
+        // Consumers must use Dx.Result.Ok(...)
+        // ------------------------------------------------------------
+
+        /// <summary>
         /// Creates a successful result containing the specified value.
         /// </summary>
         /// <param name="value">The value to be wrapped in a successful result.</param>
         /// <returns>A <see cref="Result{TValue}"/> representing a successful operation with the provided value.</returns>
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Static factories on the generic result type are an intentional part of the API.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Result<TValue> Ok(TValue value) => new Result<TValue>(Result<TValue, DomainError>.Ok(value));
+        internal static Result<TValue> InternalOk(TValue value) => new(Result<TValue, DomainError>.InternalOk(value));
 
         /// <summary>
         /// Creates a failed result with the specified domain error.
@@ -74,31 +80,22 @@ namespace Dx.Domain
         /// <returns>A result representing a failure, containing the specified domain error.</returns>
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Static factories on the generic result type are an intentional part of the API.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Result<TValue> Failure(DomainError error) => new Result<TValue>(Result<TValue, DomainError>.Failure(error));
+        internal static Result<TValue> InternalFailure(DomainError error) => new(Result<TValue, DomainError>.InternalFailure(error));
 
         /// <summary>
-        /// Implicitly converts a value of type <typeparamref name="TValue"/> to a successful <see cref="Result{TValue}"/>
-        /// instance containing the specified value.
+        /// Converts a successful <see cref="Result{TValue}"/> to its underlying value of type <typeparamref name="TValue"/>.
         /// </summary>
-        /// <remarks>
-        /// This implicit conversion allows a <typeparamref name="TValue"/> to be used wherever a <see cref="Result{TValue}"/> is
-        /// expected, simplifying code that returns or assigns results.
-        /// </remarks>
-        /// <param name="value">The value to wrap in a successful result.</param>
+        /// <remarks>This operator throws an exception if the result represents a failure. Use only when it is guaranteed
+        /// that the result is successful.</remarks>
+        /// <param name="result">The <see cref="Result{TValue}"/> instance to convert. Must represent a successful result.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Result<TValue>(TValue value) => Ok(value);
+        public static explicit operator TValue(Result<TValue> result)
+        {
 
-        /// <summary>
-        /// Implicitly converts a <see cref="DomainError"/> to a failed <see cref="Result{TValue}"/> instance representing an
-        /// error result.
-        /// </summary>
-        /// <remarks>
-        /// This implicit conversion allows a <see cref="DomainError"/> to be returned or assigned where a
-        /// <see cref="Result{TValue}"/> is expected, simplifying error handling in method results.
-        /// </remarks>
-        /// <param name="error">The domain error to represent as a failed result. Cannot be null.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator Result<TValue>(DomainError error) => Failure(error);
+            Invariant.That(result.IsSuccess, () => Dx.Faults.Result.MissingValueOnFailure<TValue, DomainError>(result.Error));
+
+            return result.Value;
+        }
 
         /// <inheritdoc/>
         public override string ToString() => _inner.ToString();
@@ -150,12 +147,10 @@ namespace Dx.Domain
         /// <summary>
         /// Deconstructs the result into its value component.
         /// </summary>
-        /// <remarks>
-        /// This method enables deconstruction syntax, allowing the result to be unpacked into its value component using tuple
-        /// deconstruction.
-        /// </remarks>
-        /// <param name="value">When this method returns, contains the value if the operation was successful; otherwise, the default value for the
-        /// type.</param>
+        /// <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into
+        /// its value component using tuple deconstruction in assignment statements.</remarks>
+        /// <param name="value">When this method returns, contains the value if the result represents success; otherwise, the default value
+        /// for the type.</param>
         public void Deconstruct(out TValue? value)
         {
             value = IsSuccess ? Value : default;
@@ -170,6 +165,7 @@ namespace Dx.Domain
         {
             error = IsFailure ? Error : default;
         }
+
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay => $"Result<{typeof(TValue).Name}> IsSuccess = {IsSuccess}, HasError = {IsFailure}";

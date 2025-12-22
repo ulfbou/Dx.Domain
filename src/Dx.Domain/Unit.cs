@@ -10,10 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-
     /// <summary>
     /// Represents a single, unique instance with no value. Used as the type parameter for <see cref="Result{TValue, TError}"/>
     /// when an operation succeeds but returns no data (i.e., a functional equivalent of <c>void</c>).
