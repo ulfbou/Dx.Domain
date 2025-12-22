@@ -41,7 +41,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>zentient;metadata;core;builder;scanner;immutable;runtime;reflection;extensible</PackageTags>
-    <PackageAuthors>Ulf Bourelius;Zentient Framework Team</PackageAuthors>
+    <PackageAuthors>Ulf Bourelius;Dx Framework Team</PackageAuthors>
 
     <!-- Feature Flags -->
     <EnableSigning Condition="'$(EnableSigning)' == ''">true</EnableSigning>
