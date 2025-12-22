@@ -25,7 +25,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
     /// <remarks>
     /// This resolver is the single source of truth for DXA010/DXA011 and related rules.
     /// It discovers facade factory methods on the configured root facade type (defaults
-    /// to <c>Dx</c>) and exposes them for analyzers and code fixes.
+    /// to <c>Dx.Dx</c>) and exposes them for analyzers and code fixes.
     /// </remarks>
     public interface IDxFacadeResolver
     {
@@ -59,10 +59,17 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
         /// <param name="config">Analyzer configuration options used to locate the root facade.</param>
         public DxFacadeResolver(Compilation compilation, AnalyzerConfigOptionsProvider config)
         {
-            // Allow the root facade type to be overridden via EditorConfig, falling back to "Dx".
-            var rootTypeName = GetRootFacadeTypeName(config) ?? "Dx";
+            // Allow the root facade type to be overridden via EditorConfig, falling back to the
+            // fully qualified metadata name of the canonical root facade type "Dx.Dx".
+            var rootTypeName = GetRootFacadeTypeName(config) ?? "Dx.Dx";
 
+            // First, try to bind the configured or default root facade type directly.
             var dx = compilation.GetTypeByMetadataName(rootTypeName);
+
+            // As a resilience measure for older configurations that might still use the short
+            // type name "Dx", fall back to that if the fully qualified lookup fails.
+            dx ??= compilation.GetTypeByMetadataName("Dx");
+
             if (dx == null)
                 return;
 
@@ -104,7 +111,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
         private static string? GetRootFacadeTypeName(AnalyzerConfigOptionsProvider config)
         {
             // Config key aligned with docs: "dx_facade_root". When not present, callers fall
-            // back to the conventional root type name "Dx".
+            // back to the conventional root type name "Dx.Dx".
             var global = config.GlobalOptions;
             return global.TryGetValue("dx_facade_root", out var value) && !string.IsNullOrWhiteSpace(value)
                 ? value.Trim()
