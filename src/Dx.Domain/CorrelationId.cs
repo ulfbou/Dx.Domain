@@ -10,11 +10,12 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
+using static Dx.Dx;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// Represents a strongly-typed identifier used to correlate related operations or requests across system
     /// boundaries.
@@ -53,7 +54,14 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new unique <see cref="CorrelationId"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static CorrelationId New() => new CorrelationId(Guid.NewGuid());
+        internal static CorrelationId InternalNew() => new CorrelationId(Guid.NewGuid());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static CorrelationId InternalFrom(Guid value)
+        {
+            Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("CorrelationId cannot be default or empty. Use CorrelationId.New()"));
+            return new CorrelationId(value);
+        }
 
         /// <summary>
         /// Attempts to format the value as a 32-digit hexadecimal string without hyphens into the provided character
@@ -89,6 +97,6 @@ namespace Dx.Domain
         public static bool operator !=(CorrelationId left, CorrelationId right) => !left.Equals(right);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => Value.ToString("N");
+        private string DebuggerDisplay => $"CorrelationId={ToString()}";
     }
 }

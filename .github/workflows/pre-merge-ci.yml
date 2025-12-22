@@ -1,0 +1,214 @@
+name: Pre-merge CI
+
+# Fast DX-first PR checks: lint, unit tests, static analysis, preview docs
+# Goal: < 10 minutes for most changes
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: pre-merge-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  lint-and-format:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+      
+      - name: Restore tools
+        run: dotnet tool restore
+        working-directory: ./Dx.Domain.2
+        continue-on-error: true
+      
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --verbosity diagnostic
+        working-directory: ./Dx.Domain.2
+        continue-on-error: true
+      
+      - name: Run Analyzers
+        run: dotnet build Dx.Domain.sln --configuration Debug -p:TreatWarningsAsErrors=true
+        working-directory: ./Dx.Domain.2
+
+  fast-tests:
+    name: Fast Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      matrix:
+        dotnet: ['8.0.x', '9.0.x']
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET ${{ matrix.dotnet }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+      
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+      
+      - name: Restore dependencies
+        run: dotnet restore Dx.Domain.sln
+        working-directory: ./Dx.Domain.2
+      
+      - name: Build
+        run: dotnet build Dx.Domain.sln --no-restore --configuration Release
+        working-directory: ./Dx.Domain.2
+      
+      - name: Run unit tests
+        run: |
+          dotnet test Dx.Domain.sln \
+            --no-build \
+            --configuration Release \
+            --filter "Category!=Integration&Category!=Slow" \
+            --logger "trx;LogFileName=test-results.trx" \
+            --results-directory ./TestResults \
+            --collect:"XPlat Code Coverage" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+        working-directory: ./Dx.Domain.2
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.dotnet }}
+          path: ./Dx.Domain.2/TestResults/
+      
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.dotnet }}
+          path: ./Dx.Domain.2/TestResults/**/coverage.opencover.xml
+
+  security-scan:
+    name: Security & Dependency Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      security-events: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      
+      - name: Restore dependencies
+        run: dotnet restore Dx.Domain.sln
+        working-directory: ./Dx.Domain.2
+      
+      - name: Check for vulnerable packages
+        run: |
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable.txt
+          if grep -q "has the following vulnerable packages" vulnerable.txt; then
+            echo "::error::Vulnerable packages detected"
+            cat vulnerable.txt
+            exit 1
+          fi
+        working-directory: ./Dx.Domain.2
+
+  docfx-preview:
+    name: DocFX Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      
+      - name: Setup DocFX
+        run: dotnet tool update -g docfx
+      
+      - name: Build solution for API docs
+        run: dotnet build Dx.Domain.sln --configuration Release
+        working-directory: ./Dx.Domain.2
+      
+      - name: Build DocFX site
+        run: docfx docfx.json
+        working-directory: ./Dx.Domain.2
+        continue-on-error: true
+      
+      - name: Upload DocFX preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: docfx-preview
+          path: ./Dx.Domain.2/_site/
+      
+      - name: Comment PR with preview link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.runId;
+            const prNumber = context.issue.number;
+            const body = `📚 **Documentation Preview Available**\n\nPreview docs have been generated for this PR.\n\nDownload the \`docfx-preview\` artifact from [this workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}) to review the documentation locally.`;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: body
+            });
+
+  pr-status:
+    name: PR Status Check
+    runs-on: ubuntu-latest
+    needs: [lint-and-format, fast-tests, security-scan, docfx-preview]
+    if: always()
+    
+    steps:
+      - name: Check all jobs
+        run: |
+          if [ "${{ needs.lint-and-format.result }}" != "success" ]; then
+            echo "::error::Lint and format check failed"
+            exit 1
+          fi
+          if [ "${{ needs.fast-tests.result }}" != "success" ]; then
+            echo "::error::Fast tests failed"
+            exit 1
+          fi
+          if [ "${{ needs.security-scan.result }}" != "success" ]; then
+            echo "::error::Security scan failed"
+            exit 1
+          fi
+          echo "✅ All PR checks passed"

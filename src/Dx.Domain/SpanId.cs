@@ -10,10 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Dx.Domain
 {
-    using System.Diagnostics;
-
     /// <summary>
     /// Represents a unique identifier for a span within a distributed tracing system.
     /// </summary>
@@ -46,7 +46,7 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new <see cref="SpanId"/> whose <see cref="Value"/> is non-zero with high probability.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SpanId New()
+        internal static SpanId InternalNew()
         {
             Span<byte> buffer = stackalloc byte[8];
             Random.Shared.NextBytes(buffer);

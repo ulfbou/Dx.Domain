@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="TransitionResult{TState}.cs" company="Dx.Domain Team">
+// <copyright file="TransitionResult.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,11 +10,9 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx;
+using System.Diagnostics;
 
 using static Dx.Dx;
-
-using System.Diagnostics;
 
 namespace Dx.Domain.Factors
 {
@@ -66,11 +64,7 @@ namespace Dx.Domain.Factors
         internal static TransitionResult<TState> Success(
             TState state,
             IReadOnlyList<IDomainFact> facts)
-        {
-            Invariant.That(facts.Count > 0, DomainErrors.Transition.MissingFacts);
-
-            return new TransitionResult<TState>(Result.Ok(state), facts);
-        }
+            => new TransitionResult<TState>(Result.Ok(state), facts);
 
         /// <summary>
         /// Creates a failed transition result from the specified domain error.

@@ -1,0 +1,11 @@
+# Analyzer-specific rules
+[*.cs]
+
+# CA1707: Identifiers should not contain underscores - Allow for analyzer naming convention
+dotnet_diagnostic.CA1707.severity = none
+
+# RS2008: Enable analyzer release tracking - Not applicable for internal analyzers
+dotnet_diagnostic.RS2008.severity = none
+
+# RS1032: Diagnostic message format - Allow flexible message formats
+dotnet_diagnostic.RS1032.severity = none
