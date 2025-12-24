@@ -51,6 +51,8 @@ namespace Dx.Domain.Generators.Diagnostics
         /// <summary>
         /// DX8xxx: Trust boundary and supply chain violations (signature failure, derived artifact misuse).
         /// </summary>
-        TrustViolation
+        TrustViolation,
+        DependencyViolation,
+        InternalError
     }
 }

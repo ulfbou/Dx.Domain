@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Generators.Core;
+
 using System;
 using System.Collections.Generic;
 
@@ -57,7 +59,7 @@ namespace Dx.Domain.Generators.Abstractions
         /// Initializes a new instance of the <see cref="StageContext"/> class.
         /// </summary>
         public StageContext(
-            Core.InputFingerprint fingerprint,
+            InputFingerprint fingerprint,
             IReadOnlyDictionary<string, object> manifest,
             IReadOnlyPolicy policy,
             IReadOnlyFactSet priorFacts,

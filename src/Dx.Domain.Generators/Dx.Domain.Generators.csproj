@@ -16,6 +16,7 @@
     </Tags>
     <Copyright>Copyright © 2025 Dx.Domain Team. All rights reserved.</Copyright>
     <RepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</RepositoryUrl>
+    <RootNamespace>Dx</RootNamespace>
 
     <!-- Build Defaults -->
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
@@ -70,6 +71,10 @@
     <FileVersion>$(VersionPrefix).0</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="F:\repos\dx.domain\docs\#README.md#" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Dx.Domain.Abstractions" />

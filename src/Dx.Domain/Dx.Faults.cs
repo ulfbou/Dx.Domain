@@ -36,7 +36,7 @@ namespace Dx
                 public static DomainError NullOrWhitespaceMessage
                     => DomainError.InternalCreate("Faults.Message.Null", "Message cannot be null or whitespace.", false);
             }
-
+            
             /// <summary>
             /// General infrastructure and factory-related refusals.
             /// </summary>
@@ -195,6 +195,23 @@ namespace Dx
                         message: $"Required field '{fieldName}' is missing.",
                         false);
                 }
+            }
+
+            /// <summary>
+            /// Public factory helpers for creating <see cref="DomainError"/> instances.
+            /// These are intended for consumption by external components such as generators.
+            /// </summary>
+            public static class Factory
+            {
+                /// <summary>
+                /// Creates a simple, non-fatal <see cref="DomainError"/> with the specified code and message.
+                /// </summary>
+                /// <param name="code">The domain error code.</param>
+                /// <param name="message">The human-readable error message.</param>
+                /// <returns>A new <see cref="DomainError"/> instance.</returns>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public static DomainError Create(string code, string message)
+                    => DomainError.InternalCreate(code, message, false);
             }
         }
     }

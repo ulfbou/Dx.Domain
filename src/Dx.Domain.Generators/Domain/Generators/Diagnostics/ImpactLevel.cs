@@ -30,6 +30,7 @@ namespace Dx.Domain.Generators.Diagnostics
         /// <summary>
         /// Public API or semantic breaking change.
         /// </summary>
-        Breaking
+        Breaking,
+        Blocker
     }
 }
