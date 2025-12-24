@@ -188,7 +188,6 @@ namespace Dx
                 /// <returns>A <see cref="DomainError"/> representing the missing required field error.</returns>
                 public static DomainError MissingRequiredField(string fieldName)
                 {
-                    // Internal check to ensure the fault generator itself is used correctly.
                     Invariant.That(!string.IsNullOrEmpty(fieldName), DomainError.InternalCreate("Validation.InvalidFieldName", "Field name cannot be null or empty.", false));
 
                     return DomainError.InternalCreate(

@@ -1,0 +1,5 @@
+[assembly: InternalsVisibleTo("Dx.Domain.Analyzers")]
+[assembly: InternalsVisibleTo("Dx.Domain.Generators")]
+[assembly: InternalsVisibleTo("Dx.Domain.Tests")]
+[assembly: InternalsVisibleTo("Dx.Domain.Analyzers.Tests")]
+[assembly: InternalsVisibleTo("Dx.Domain.Generators.Tests")]
