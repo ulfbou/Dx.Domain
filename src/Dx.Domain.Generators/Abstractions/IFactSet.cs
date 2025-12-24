@@ -42,7 +42,7 @@ namespace Dx.Domain.Generators.Abstractions
         /// </summary>
         /// <param name="key">The fact key.</param>
         /// <param name="value">The fact value if found.</param>
-        /// <returns>True if the fact exists, false otherwise.</returns>
+        /// <returns><see langword="true"/> if if the fact exists; <see langword="false"/> otherwise.</returns>
         bool TryGetValue(string key, out object? value);
 
         /// <summary>
@@ -56,5 +56,32 @@ namespace Dx.Domain.Generators.Abstractions
         /// Gets all facts as a read-only dictionary.
         /// </summary>
         IReadOnlyDictionary<string, object> All { get; }
+    }
+
+    /// <summary>
+    /// Represents a strongly typed key for identifying a fact by name.
+    /// </summary>
+    /// <remarks>Use this type to associate a specific name with a value of type T in scenarios where facts
+    /// are stored or retrieved by key. FactKey{T} provides type safety when working with collections or registries of
+    /// named facts.</remarks>
+    /// <typeparam name="T">The type of the value associated with the fact. Must be a non-nullable type.</typeparam>
+    /// <param name="Name">The name that uniquely identifies the fact.</param>
+    public readonly record struct FactKey<T>(string Name)
+        where T : notnull
+    {
+        /// <inheritdoc/>
+        public override string ToString() => Name;
+    }
+    /// <summary>
+    /// Transactional fact access for a single generator stage.
+    /// All writes are isolated until commit.
+    /// </summary>
+    public interface IFactTransaction
+    {
+        Result<Unit, DomainError> Propose<T>(FactKey<T> key, T value)
+            where T : notnull;
+
+        Result<T, DomainError> GetCommitted<T>(FactKey<T> key)
+            where T : notnull;
     }
 }

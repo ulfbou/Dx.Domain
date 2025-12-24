@@ -83,8 +83,10 @@ namespace Dx.Domain.Generators.Core
         /// <inheritdoc/>
         public bool Equals(InputFingerprint? other)
         {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (other is null)
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
             return Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -99,7 +101,8 @@ namespace Dx.Domain.Generators.Core
 
         public static bool operator ==(InputFingerprint? left, InputFingerprint? right)
         {
-            if (left is null) return right is null;
+            if (left is null)
+                return right is null;
             return left.Equals(right);
         }
 
