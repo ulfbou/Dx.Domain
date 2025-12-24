@@ -10,6 +10,9 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain;
+using Dx.Domain.Generators.Abstractions;
+
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,7 +45,13 @@ namespace Dx.Domain.Generators.Abstractions
         /// </summary>
         /// <param name="context">The stage context containing input fingerprint, manifest, policy, and prior facts.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>A StageResult indicating success or failure.</returns>
-        Task<StageResult> ExecuteAsync(StageContext context, CancellationToken ct);
+        /// <returns>
+        /// A canonical <see cref="Result{TValue, TError}"/> carrying either a
+        /// <see cref="StageSuccessPayload"/> or a <see cref="StageFailurePayload"/>,
+        /// never throwing for domain or semantic failures.
+        /// </returns>
+        Task<Result<StageSuccessPayload, StageFailurePayload>> ExecuteAsync(
+            StageContext context,
+            CancellationToken ct);
     }
 }
