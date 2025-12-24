@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Generators.Abstractions;
+
 using System.Collections.Generic;
 
 namespace Dx.Domain.Generators.Abstractions
@@ -56,21 +58,6 @@ namespace Dx.Domain.Generators.Abstractions
         /// Gets all facts as a read-only dictionary.
         /// </summary>
         IReadOnlyDictionary<string, object> All { get; }
-    }
-
-    /// <summary>
-    /// Represents a strongly typed key for identifying a fact by name.
-    /// </summary>
-    /// <remarks>Use this type to associate a specific name with a value of type T in scenarios where facts
-    /// are stored or retrieved by key. FactKey{T} provides type safety when working with collections or registries of
-    /// named facts.</remarks>
-    /// <typeparam name="T">The type of the value associated with the fact. Must be a non-nullable type.</typeparam>
-    /// <param name="Name">The name that uniquely identifies the fact.</param>
-    public readonly record struct FactKey<T>(string Name)
-        where T : notnull
-    {
-        /// <inheritdoc/>
-        public override string ToString() => Name;
     }
     /// <summary>
     /// Transactional fact access for a single generator stage.

@@ -15,8 +15,6 @@ using Dx.Domain.Factors;
 using System.Collections.Concurrent;
 using System.Linq;
 
-using static Dx.Dx;
-
 namespace Dx.Domain.Generators.Core
 {
     public sealed class MonotonicFactStore
@@ -50,14 +48,14 @@ namespace Dx.Domain.Generators.Core
 
             var conflicts = Check(snapshot);
             if (conflicts.Count > 0)
-                return Result.Failure<Unit, CommitFailure>(new(conflicts));
+                return Dx.Result.Failure<Unit, CommitFailure>(new(conflicts));
 
             lock (_lock)
             {
                 conflicts = Check(snapshot);
                 if (conflicts.Count > 0)
                 {
-                    return Result.Failure<Unit, CommitFailure>(new(conflicts));
+                    return Dx.Result.Failure<Unit, CommitFailure>(new(conflicts));
                 }
 
                 foreach (var (key, value) in snapshot)
@@ -70,7 +68,7 @@ namespace Dx.Domain.Generators.Core
             }
 
             _telemetry.TrackCommitSuccess(stageName, snapshot.Length);
-            return Result.Ok<Unit, CommitFailure>(Unit.Value);
+            return Dx.Result.Ok<Unit, CommitFailure>(Unit.Value);
         }
 
         private List<CommitConflict> Check(

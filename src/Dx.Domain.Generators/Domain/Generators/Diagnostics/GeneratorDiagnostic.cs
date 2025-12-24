@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Generators.Core;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -87,7 +89,7 @@ namespace Dx.Domain.Generators.Diagnostics
             FailureClass @class,
             string title,
             string message,
-            Core.InputFingerprint inputFingerprint,
+            InputFingerprint inputFingerprint,
             string stage,
             DiagnosticLocation? location,
             IEnumerable<Remediation> remediationOptions,
@@ -111,7 +113,7 @@ namespace Dx.Domain.Generators.Diagnostics
     /// <summary>
     /// Represents the location information for a diagnostic.
     /// </summary>
-    public sealed class DiagnosticLocation
+    public readonly struct DiagnosticLocation
     {
         /// <summary>
         /// Gets the file path.

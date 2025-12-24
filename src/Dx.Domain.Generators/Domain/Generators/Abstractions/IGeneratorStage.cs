@@ -41,6 +41,11 @@ namespace Dx.Domain.Generators.Abstractions
         StageCapabilities Capabilities { get; }
 
         /// <summary>
+        /// Gets the collection of assertions associated with the current stage.
+        /// </summary>
+        StageAssertionSet Assertions { get; }
+
+        /// <summary>
         /// Executes the stage with the provided context.
         /// </summary>
         /// <param name="context">The stage context containing input fingerprint, manifest, policy, and prior facts.</param>
