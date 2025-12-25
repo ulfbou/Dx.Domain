@@ -95,14 +95,14 @@ var fingerprint = InputFingerprint.Compute(
 
 ```csharp
 // Canonicalize JSON, removing non-deterministic properties
-var canonical = Canonicalization.CanonicalizeJson(jsonInput);
+var canonical = Core.Canonicalization.CanonicalizeJson(jsonInput);
 
 // Canonicalize paths, removing machine-specific prefixes
-var canonical = Canonicalization.CanonicalizePath(filePath);
+var canonical = Core.Canonicalization.CanonicalizePath(filePath);
 
 // Remove timestamps and GUIDs
-var cleaned = Canonicalization.RemoveTimestamps(input);
-var cleaned = Canonicalization.RemoveGuids(input);
+var cleaned = Core.Canonicalization.RemoveTimestamps(input);
+var cleaned = Core.Canonicalization.RemoveGuids(input);
 ```
 
 ### StageDeclaration
