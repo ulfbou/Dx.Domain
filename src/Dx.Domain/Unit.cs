@@ -27,19 +27,6 @@ namespace Dx.Domain
         /// <summary>
         /// Gets the single, unique instance of the <see cref="Unit"/> struct.
         /// </summary>
-        public static Unit Value
-        {
-            get
-            {
-                if (_value == null)
-                {
-                    _value = new Unit();
-                }
-
-                return (Unit)_value.Value;
-            }
-        }
-
-        private static Unit? _value;
+        public static Unit Value => default(Unit);
     }
 }

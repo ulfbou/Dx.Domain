@@ -28,5 +28,8 @@ namespace Dx.Domain.Factors
 
         /// <summary>Gets the UTC timestamp when the fact occurred.</summary>
         DateTimeOffset UtcTimestamp { get; }
+
+        /// <summary>Gets the payload of the fact.</summary>
+        object GetPayload();
     }
 }

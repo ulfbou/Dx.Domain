@@ -42,6 +42,9 @@ namespace Dx.Domain.Factors
         /// <inheritdoc />
         public DateTimeOffset UtcTimestamp { get; }
 
+        /// <inheritdoc />
+        public object GetPayload() => Payload;
+
         /// <summary>
         /// Initializes a new instance of the Fact class with the specified identifier, fact type, payload, causation,
         /// and optional UTC timestamp.
