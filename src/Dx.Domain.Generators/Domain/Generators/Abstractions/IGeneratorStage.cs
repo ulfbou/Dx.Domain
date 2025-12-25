@@ -49,6 +49,7 @@ namespace Dx.Domain.Generators.Abstractions
         /// Executes the stage with the provided context.
         /// </summary>
         /// <param name="context">The stage context containing input fingerprint, manifest, policy, and prior facts.</param>
+        /// <param name="transaction">The fact transaction to record new facts.</param>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>
         /// A canonical <see cref="Result{TValue, TError}"/> carrying either a
@@ -57,6 +58,7 @@ namespace Dx.Domain.Generators.Abstractions
         /// </returns>
         Task<Result<StageSuccessPayload, StageFailurePayload>> ExecuteAsync(
             StageContext context,
+            IFactTransaction transaction,
             CancellationToken ct);
     }
 }
