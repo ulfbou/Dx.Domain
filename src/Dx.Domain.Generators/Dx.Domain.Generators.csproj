@@ -87,6 +87,10 @@
     <ProjectReference Include="..\Dx.Domain\Dx.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+  </ItemGroup>
+
   <!-- Imports -->
   <Import Project="Directory.Pack.props" Condition="Exists('Directory.Pack.props')" />
   <Import Project="Directory.Sign.props" Condition="Exists('Directory.Sign.props') AND '$(EnableSigning)' == 'true'" />

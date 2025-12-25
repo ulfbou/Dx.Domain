@@ -52,7 +52,7 @@ namespace Dx.Domain.Generators.Diagnostics
         /// <summary>
         /// Gets the stage name where this diagnostic was emitted.
         /// </summary>
-        public string Stage { get; }
+        public string StageName { get; }
 
         /// <summary>
         /// Gets the location information (file, line, column).
@@ -90,7 +90,7 @@ namespace Dx.Domain.Generators.Diagnostics
             string title,
             string message,
             InputFingerprint inputFingerprint,
-            string stage,
+            string stageName,
             DiagnosticLocation? location,
             IEnumerable<Remediation> remediationOptions,
             string? fixPreview,
@@ -101,7 +101,7 @@ namespace Dx.Domain.Generators.Diagnostics
             Title = title ?? throw new ArgumentNullException(nameof(title));
             Message = message ?? throw new ArgumentNullException(nameof(message));
             InputFingerprint = inputFingerprint ?? throw new ArgumentNullException(nameof(inputFingerprint));
-            Stage = stage ?? throw new ArgumentNullException(nameof(stage));
+            StageName = stageName ?? throw new ArgumentNullException(nameof(stageName));
             Location = location;
             RemediationOptions = remediationOptions?.ToImmutableList() ?? ImmutableList<Remediation>.Empty;
             FixPreview = fixPreview;

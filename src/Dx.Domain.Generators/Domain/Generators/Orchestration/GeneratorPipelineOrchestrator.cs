@@ -52,7 +52,7 @@ namespace Dx.Domain.Generators.Orchestration
                     title: "Orchestrator",
                     message: assertionResult.Error.Message,
                     inputFingerprint: _fingerprint,
-                    stage: stage.StageName,
+                    stageName: stage.StageName,
                     location: null,
                     remediationOptions: Enumerable.Empty<Remediation>(),
                     fixPreview: null,
@@ -80,7 +80,7 @@ namespace Dx.Domain.Generators.Orchestration
             try
             {
                 using var transaction = new StageTransaction(_store);
-                var result = await stage.ExecuteAsync(context, ct).ConfigureAwait(false);
+                var result = await stage.ExecuteAsync(context, transaction, ct).ConfigureAwait(false);
 
                 if (result.IsFailure)
                     return result;
