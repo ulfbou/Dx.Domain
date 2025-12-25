@@ -10,17 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-// <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="StageAssertionSet.cs" company="Dx.Domain Team">
-//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
-// </copyright>
-// ----------------------------------------------------------------------------------
-
-using System.Collections.Generic;
-using System.Collections.Immutable;
-
 using Dx.Domain.Generators.Core;
 using Dx.Domain.Generators.Internal;
+
+using System.Collections.Immutable;
 
 namespace Dx.Domain.Generators.Abstractions
 {
@@ -80,7 +73,6 @@ namespace Dx.Domain.Generators.Abstractions
 
             var details = $"Missing: [{string.Join(", ", missing)}], Forbidden: [{string.Join(", ", violations)}]";
 
-            // FIX: Correctly call the bridged factory with the single string parameter
             return Dx.Result.Failure<Unit>(GeneratorFaults.AssertionFailed(details));
         }
 
