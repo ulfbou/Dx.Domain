@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Dx.Result.cs" company="Dx.Domain Team">
+// <copyright file="DxDomain.Result.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -19,11 +19,11 @@ namespace Dx
     /// causation, and related primitives while keeping enforcement mechanics internal.
     /// </summary>
     /// <remarks>
-    /// All partial implementations of <see cref="Dx"/> contribute focused entry points (for example
+    /// All partial implementations of <see cref="DxDomain"/> contribute focused entry points (for example
     /// results, identities, causation, invariants, and preconditions) but present a single, cohesive
     /// surface to consumers of the domain kernel.
     /// </remarks>
-    public static partial class Dx
+    public static partial class DxDomain
     {
         // ---------------------------------------------------------
         // PUBLIC FACADE (The "Front Office")

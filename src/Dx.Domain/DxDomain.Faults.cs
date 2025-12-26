@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Dx.Faults.cs" company="Dx.Domain Team">
+// <copyright file="DxDomain.Faults.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -12,7 +12,7 @@
 
 namespace Dx
 {
-    public static partial class Dx
+    public static partial class DxDomain
     {
         // ---------------------------------------------------------
         // INTERNAL MECHANICS (The "Back Office")
@@ -36,7 +36,7 @@ namespace Dx
                 public static DomainError NullOrWhitespaceMessage
                     => DomainError.InternalCreate("Faults.Message.Null", "Message cannot be null or whitespace.", false);
             }
-            
+
             /// <summary>
             /// General infrastructure and factory-related refusals.
             /// </summary>

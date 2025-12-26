@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Dx.Require.cs" company="Dx.Domain Team">
+// <copyright file="DxDomain.Require.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 
 namespace Dx
 {
-    public static partial class Dx
+    public static partial class DxDomain
     {
         /// <summary>
         /// Provides functional-style precondition checks that return <see cref="Result{TValue}"/> instead of throwing
