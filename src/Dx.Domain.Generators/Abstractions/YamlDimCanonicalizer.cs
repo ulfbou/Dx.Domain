@@ -50,13 +50,13 @@ namespace Dx.Domain.Generators.Canonicalization
                 var raw = _deserializer.Deserialize<RawDomainModel>(rawYamlContent);
 
                 if (raw == null)
-                    return Dx.Result.Failure<(string, DomainIntentModel)>(
-                        Dx.Faults.Factory.Create("DX-DIM-001", $"Empty or invalid YAML in {filePath}"));
+                    return DxDomain.Result.Failure<(string, DomainIntentModel)>(
+                        DxDomain.Faults.Factory.Create("DX-DIM-001", $"Empty or invalid YAML in {filePath}"));
 
                 // 2. Validate Version (Phase 1 Gate)
                 if (!raw.ModelVersion.StartsWith("1.", StringComparison.Ordinal))
-                    return Dx.Result.Failure<(string, DomainIntentModel)>(
-                        Dx.Faults.Factory.Create("DX-DIM-002", $"Unsupported modelVersion '{raw.ModelVersion}' in {filePath}. Only 1.x is supported."));
+                    return DxDomain.Result.Failure<(string, DomainIntentModel)>(
+                        DxDomain.Faults.Factory.Create("DX-DIM-002", $"Unsupported modelVersion '{raw.ModelVersion}' in {filePath}. Only 1.x is supported."));
 
                 // 3. Map & Normalize (The Sort Law application)
                 // We order ALL collections by Name/Key using Ordinal comparison to ensure
@@ -93,13 +93,13 @@ namespace Dx.Domain.Generators.Canonicalization
                 // 4. Generate Canonical JSON (Input Fingerprint Source)
                 var canonicalJson = JsonSerializer.Serialize(model, JsonOptions);
 
-                return Dx.Result.Ok((canonicalJson, model));
+                return DxDomain.Result.Ok((canonicalJson, model));
             }
             catch (Exception ex)
             {
                 // We trap parser errors and convert them to proper Domain Errors
-                return Dx.Result.Failure<(string, DomainIntentModel)>(
-                    Dx.Faults.Factory.Create("DX-DIM-000", $"Canonicalization failed for {filePath}: {ex.Message}"));
+                return DxDomain.Result.Failure<(string, DomainIntentModel)>(
+                    DxDomain.Faults.Factory.Create("DX-DIM-000", $"Canonicalization failed for {filePath}: {ex.Message}"));
             }
         }
 

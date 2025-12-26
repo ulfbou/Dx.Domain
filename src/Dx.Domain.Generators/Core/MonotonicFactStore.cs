@@ -48,14 +48,14 @@ namespace Dx.Domain.Generators.Core
 
             var conflicts = Check(snapshot);
             if (conflicts.Count > 0)
-                return Dx.Result.Failure<Unit, CommitFailure>(new(conflicts));
+                return DxDomain.Result.Failure<Unit, CommitFailure>(new(conflicts));
 
             lock (_lock)
             {
                 conflicts = Check(snapshot);
                 if (conflicts.Count > 0)
                 {
-                    return Dx.Result.Failure<Unit, CommitFailure>(new(conflicts));
+                    return DxDomain.Result.Failure<Unit, CommitFailure>(new(conflicts));
                 }
 
                 foreach (var (key, value) in snapshot)
@@ -68,7 +68,7 @@ namespace Dx.Domain.Generators.Core
             }
 
             _telemetry.TrackCommitSuccess(stageName, snapshot.Length);
-            return Dx.Result.Ok<Unit, CommitFailure>(Unit.Value);
+            return DxDomain.Result.Ok<Unit, CommitFailure>(Unit.Value);
         }
 
         private List<CommitConflict> Check(

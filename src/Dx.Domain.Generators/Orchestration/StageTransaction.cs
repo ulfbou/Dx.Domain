@@ -19,7 +19,7 @@ using Dx.Domain; // Required for Unit and DomainError
 using Dx.Domain.Generators.Abstractions;
 using Dx.Domain.Generators.Core;
 
-using static Dx.Dx;
+using static Dx.DxDomain;
 
 namespace Dx.Domain.Generators.Orchestration
 {
@@ -47,7 +47,7 @@ namespace Dx.Domain.Generators.Orchestration
                 if (!StructuralComparer.StructurallyEqual(existing, value))
                 {
                     return Result.Failure<Unit, DomainError>(
-                        Dx.Faults.InvalidInput($"Conflicting proposal for '{key.Name}'.")); // Aligned with Faults.cs
+                        DxDomain.Faults.InvalidInput($"Conflicting proposal for '{key.Name}'.")); // Aligned with Faults.cs
                 }
                 return Result.Ok<Unit, DomainError>(Unit.Value); // Aligned with Unit.cs
             }
@@ -67,7 +67,7 @@ namespace Dx.Domain.Generators.Orchestration
             }
 
             return Result.Failure<T, DomainError>(
-                Dx.Faults.InvalidInput($"Missing required committed fact '{key.Name}'."));
+                DxDomain.Faults.InvalidInput($"Missing required committed fact '{key.Name}'."));
         }
 
         /// <summary>

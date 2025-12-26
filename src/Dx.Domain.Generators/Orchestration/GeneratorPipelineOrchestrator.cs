@@ -87,9 +87,9 @@ namespace Dx.Domain.Generators.Orchestration
 
                 // 3. Monotonic Commit
                 // Using the specific Dx identity factories provided in your prompt
-                var causation = Dx.CausationFactory.Create(
-                    correlationId: Dx.Correlation.New(),
-                    traceId: Dx.Trace.New(),
+                var causation = DxDomain.CausationFactory.Create(
+                    correlationId: DxDomain.Correlation.New(),
+                    traceId: DxDomain.Trace.New(),
                     actorId: ActorId.Empty);
 
                 var commit = _store.AtomicCommit(
