@@ -1,0 +1,96 @@
+<!-- Directory.Dx.props -->
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Build Kernel — Policy & Configuration Authority -->
+  <!-- ========================================================= -->
+
+
+  <!-- ========================================================= -->
+  <!-- 1. Kernel Identity & Versioning -->
+  <!-- ========================================================= -->
+  <PropertyGroup Label="Dx Kernel Identity">
+    <DxBuildKernel>true</DxBuildKernel>
+    <DxBuildKernelVersion>1.0.0</DxBuildKernelVersion>
+  </PropertyGroup>
+
+
+  <!-- ========================================================= -->
+  <!-- 2. Canonical Framework Policy -->
+  <!-- ========================================================= -->
+  <PropertyGroup Label="Dx Framework Policy">
+    <!-- Canonical TFMs -->
+    <DxMinimumTFM>net8.0</DxMinimumTFM>
+    <DxPrimaryTFM>net10.0</DxPrimaryTFM>
+    <DxAllowedTFMs>net8.0;net9.0;net10.0</DxAllowedTFMs>
+
+
+    <!-- Default targeting (single-TFM unless explicitly overridden) -->
+    <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''">$(DxMinimumTFM)</TargetFramework>
+
+
+    <!-- CI signal -->
+    <DxCI Condition="'$(CI)' != ''">true</DxCI>
+
+
+    <!-- Build determinism -->
+    <ContinuousIntegrationBuild Condition="'$(DxCI)' == 'true'">true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+
+  <!-- ========================================================= -->
+  <!-- 3. Feature Flags (Explicit, Opinionated Defaults) -->
+  <!-- ========================================================= -->
+  <PropertyGroup Label="Dx Feature Flags">
+    <EnableCore>true</EnableCore>
+    <EnablePack>true</EnablePack>
+    <EnableSigning>false</EnableSigning>
+    <EnableTesting>true</EnableTesting>
+    <EnableQuality>true</EnableQuality>
+    <EnableSecurity>true</EnableSecurity>
+    <EnableDocumentation>false</EnableDocumentation>
+    <EnablePerformance>false</EnablePerformance>
+  </PropertyGroup>
+
+
+  <!-- ========================================================= -->
+  <!-- 4. Compiler Feature Guards -->
+  <!-- ========================================================= -->
+  <PropertyGroup Label="TFM Compiler Guards">
+    <DefineConstants>$(DefineConstants);DX</DefineConstants>
+    <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">$(DefineConstants);DX_NET8</DefineConstants>
+    <DefineConstants Condition="'$(TargetFramework)' == 'net9.0'">$(DefineConstants);DX_NET9</DefineConstants>
+    <DefineConstants Condition="'$(TargetFramework)' == 'net10.0'">$(DefineConstants);DX_NET10</DefineConstants>
+  </PropertyGroup>
+
+
+  <!-- ========================================================= -->
+  <!-- 5. Analyzer / Generator Policy -->
+  <!-- ========================================================= -->
+  <PropertyGroup Label="Analyzer & Generator Policy">
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+    <TreatWarningsAsErrors Condition="'$(DxCI)' == 'true'">true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+
+  <!-- ========================================================= -->
+  <!-- 6. Import Topology Root -->
+  <!-- ========================================================= -->
+  <PropertyGroup Label="Dx Import Roots">
+    <DxBuildRoot>$(MSBuildThisFileDirectory)build\</DxBuildRoot>
+  </PropertyGroup>
+
+
+  <!-- ========================================================= -->
+  <!-- 7. Ordered Concern Imports (AUTHORITATIVE) -->
+  <!-- ========================================================= -->
+
+
+  <Import Project="$(DxBuildRoot)core/Core.props" Condition="'$(EnableCore)' == 'true' and Exists('$(DxBuildRoot)core/Core.props')" />
+  <Import Project="$(DxBuildRoot)pack/Pack.props" Condition="'$(EnablePack)' == 'true' and Exists('$(DxBuildRoot)pack/Pack.props')" />
+  <Import Project="$(DxBuildRoot)sign/Sign.props" Condition="'$(EnableSigning)' == 'true' and Exists('$(DxBuildRoot)sign/Sign.props')" />
+  <Import Project="$(DxBuildRoot)test/Test.props" Condition="'$(EnableTesting)' == 'true' and Exists('$(DxBuildRoot)test/Test.props')" />
+  <Import Project="$(DxBuildRoot)quality/Quality.props" Condition="'$(EnableQuality)' == 'true' and Exists('$(DxBuildRoot)quality/Quality.props')" />
+</Project>
