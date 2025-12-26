@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Dx.Identities.cs" company="Dx.Domain Team">
+// <copyright file="DxDomain.Identities.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -14,7 +14,7 @@ using Dx.Domain.Factors;
 
 namespace Dx
 {
-    public static partial class Dx
+    public static partial class DxDomain
     {
         /// <summary>
         /// Factories for creating <see cref="ActorId"/> values.

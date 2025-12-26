@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Dx.Invariant.cs" company="Dx.Domain Team">
+// <copyright file="DxDomain.Invariant.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -12,7 +12,7 @@
 
 namespace Dx
 {
-    public static partial class Dx
+    public static partial class DxDomain
     {
         /// <summary>
         /// Provides methods for enforcing invariants within the domain by validating conditions and throwing exceptions
