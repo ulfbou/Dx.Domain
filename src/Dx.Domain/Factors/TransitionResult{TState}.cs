@@ -12,7 +12,7 @@
 
 using System.Diagnostics;
 
-using static Dx.Dx;
+using static Dx.DxDomain;
 
 namespace Dx.Domain.Factors
 {

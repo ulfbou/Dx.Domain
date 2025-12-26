@@ -12,7 +12,7 @@
 
 using System.Diagnostics;
 
-using static Dx.Dx;
+using static Dx.DxDomain;
 
 namespace Dx.Domain.Factors
 {
@@ -74,8 +74,8 @@ namespace Dx.Domain.Factors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Causation InternalCreate(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
         {
-            Dx.Invariant.That(correlationId.Value != Guid.Empty, Faults.Causation.MissingCorrelation);
-            Dx.Invariant.That(!traceId.IsEmpty, Faults.Causation.MissingTrace);
+            DxDomain.Invariant.That(correlationId.Value != Guid.Empty, Faults.Causation.MissingCorrelation);
+            DxDomain.Invariant.That(!traceId.IsEmpty, Faults.Causation.MissingTrace);
             return new Causation(correlationId, traceId, actorId, DateTimeOffset.UtcNow);
         }
 

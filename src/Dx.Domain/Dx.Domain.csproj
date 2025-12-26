@@ -72,54 +72,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="F:\repos\dx-framework\CHANGELOG.md" />
-    <None Remove="F:\repos\dx-framework\docs\DPI.md" />
-    <None Remove="F:\repos\dx-framework\docs\DPI.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-acceptance-criteria.md~" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-contracts.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-contracts.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-contracts.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\analyzer-contracts.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\canonical-scope-model.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\canonical-scope-model.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\canonical-scope-model.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\canonical-scope-model.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\chat.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\chat.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\chat.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\chat.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\design-decisions.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\design-decisions.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\design-decisions.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\design-decisions.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\implementation-status.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\implementation-status.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\implementation-status.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\implementation-status.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\rules.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\rules.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\rules.md" />
-    <None Remove="F:\repos\dx-framework\docs\internal\rules.md" />
-    <None Remove="F:\repos\dx-framework\docs\MANIFESTO.md" />
-    <None Remove="F:\repos\dx-framework\docs\MANIFESTO.md" />
-    <None Remove="F:\repos\dx-framework\docs\NON_GOALS.md" />
-    <None Remove="F:\repos\dx-framework\docs\NON_GOALS.md" />
-    <None Remove="F:\repos\dx-framework\docs\revert-notes.md" />
-    <None Remove="F:\repos\dx-framework\docs\revert-notes.md" />
-    <None Remove="F:\repos\dx-framework\docs\ROADMAP.md" />
-    <None Remove="F:\repos\dx-framework\docs\ROADMAP.md" />
-    <None Remove="F:\repos\dx-framework\docs\todo.md" />
-    <None Remove="F:\repos\dx-framework\docs\todo.md" />
-    <None Remove="F:\repos\dx-framework\LICENSE" />
-    <None Remove="F:\repos\dx-framework\README.md" />
-    <None Remove="F:\repos\dx.domain\docs\#README.md#" />
-  </ItemGroup>
-
-  <ItemGroup>
     <InternalsVisibleTo Include="Dx.Domain.Values" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
     <InternalsVisibleTo Include="Dx.Domain.Generators" />
@@ -141,5 +93,8 @@
     <None Update="C:\repos\Dx.Domain\docs\NON_GOALS.md" Link="docs\NON_GOALS.md" />
     <None Update="C:\repos\Dx.Domain\LICENSE" Link="docs\LICENSE" />
     <None Update="C:\repos\Dx.Domain\README.md" Link="docs\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Factors\" />
   </ItemGroup>
 </Project>

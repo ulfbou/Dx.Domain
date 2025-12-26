@@ -12,7 +12,7 @@
 
 using System.Diagnostics;
 
-using static Dx.Dx;
+using static Dx.DxDomain;
 
 namespace Dx.Domain
 {
@@ -50,7 +50,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsSuccess, Dx.Faults.Result.MissingValueOnFailure<TValue, TError>(_error!));
+                Invariant.That(IsSuccess, DxDomain.Faults.Result.MissingValueOnFailure<TValue, TError>(_error!));
                 return _value!;
             }
         }
@@ -63,7 +63,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsFailure, Dx.Faults.Result.MissingErrorOnSuccess<TValue, TError>(_value!));
+                Invariant.That(IsFailure, DxDomain.Faults.Result.MissingErrorOnSuccess<TValue, TError>(_value!));
                 return _error!;
             }
         }

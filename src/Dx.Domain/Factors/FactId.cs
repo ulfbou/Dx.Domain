@@ -12,7 +12,7 @@
 
 using System.Diagnostics;
 
-using static Dx.Dx;
+using static Dx.DxDomain;
 
 namespace Dx.Domain.Factors
 {
@@ -50,7 +50,7 @@ namespace Dx.Domain.Factors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static FactId InternalFrom(Guid value)
         {
-            Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("FactId cannot be default or empty. Use FactId.New()"));
+            Invariant.That(value != Guid.Empty, DxDomain.Faults.FactoryBypass("FactId cannot be default or empty. Use FactId.New()"));
             return new(value);
         }
 

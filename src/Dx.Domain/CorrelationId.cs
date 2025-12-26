@@ -12,7 +12,7 @@
 
 using System.Diagnostics;
 
-using static Dx.Dx;
+using static Dx.DxDomain;
 
 namespace Dx.Domain
 {
@@ -59,7 +59,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static CorrelationId InternalFrom(Guid value)
         {
-            Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("CorrelationId cannot be default or empty. Use CorrelationId.New()"));
+            Invariant.That(value != Guid.Empty, DxDomain.Faults.FactoryBypass("CorrelationId cannot be default or empty. Use CorrelationId.New()"));
             return new CorrelationId(value);
         }
 
