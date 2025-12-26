@@ -13,7 +13,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-using static Dx.Dx;
+using static Dx.DxDomain;
 
 namespace Dx.Domain
 {
@@ -63,7 +63,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static ActorId InternalFrom(Guid value)
         {
-            Invariant.That(value != Guid.Empty, Dx.Faults.FactoryBypass("ActorId cannot be default or empty. Use ActorId.New()"));
+            Invariant.That(value != Guid.Empty, DxDomain.Faults.FactoryBypass("ActorId cannot be default or empty. Use ActorId.New()"));
 
             return new ActorId(value);
         }

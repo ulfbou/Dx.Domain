@@ -12,7 +12,7 @@
 
 using System.Diagnostics;
 
-using static Dx.Dx;
+using static Dx.DxDomain;
 
 namespace Dx.Domain
 {
@@ -92,7 +92,7 @@ namespace Dx.Domain
         public static explicit operator TValue(Result<TValue> result)
         {
 
-            Invariant.That(result.IsSuccess, () => Dx.Faults.Result.MissingValueOnFailure<TValue, DomainError>(result.Error));
+            Invariant.That(result.IsSuccess, () => DxDomain.Faults.Result.MissingValueOnFailure<TValue, DomainError>(result.Error));
 
             return result.Value;
         }
