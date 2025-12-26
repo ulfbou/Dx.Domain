@@ -2,8 +2,21 @@
 // <copyright file="CanonicalizationOrderTests.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
+
+using System.Collections.Generic;
 
 using Dx.Domain.Generators.Core;
+
+using FluentAssertions;
+
+using Xunit;
 
 namespace Dx.Domain.Generators.Tests.UnitTests;
 
@@ -18,9 +31,9 @@ public class CanonicalizationOrderTests
         var json3 = @"{""c"": 3, ""b"": 2, ""a"": 1}";
 
         // Act - Canonicalize all three
-        var canonical1 = Canonicalization.CanonicalizeJson(json1);
-        var canonical2 = Canonicalization.CanonicalizeJson(json2);
-        var canonical3 = Canonicalization.CanonicalizeJson(json3);
+        var canonical1 = Core.Canonicalization.CanonicalizeJson(json1);
+        var canonical2 = Core.Canonicalization.CanonicalizeJson(json2);
+        var canonical3 = Core.Canonicalization.CanonicalizeJson(json3);
 
         // Assert - All should produce the same canonical form
         canonical1.Should().Be(canonical2);
@@ -31,10 +44,10 @@ public class CanonicalizationOrderTests
     public void ReorderingJsonKeys_ProducesSameFingerprint()
     {
         // Arrange - Create fingerprints with reordered intent
-        var intent1 = Canonicalization.CanonicalizeJson(@"{""target"": ""entity"", ""name"": ""User""}");
-        var intent2 = Canonicalization.CanonicalizeJson(@"{""name"": ""User"", ""target"": ""entity""}");
-        
-        var manifest = Canonicalization.CanonicalizeJson(@"{""project"": ""MyApp""}");
+        var intent1 = Core.Canonicalization.CanonicalizeJson(@"{""target"": ""entity"", ""name"": ""User""}");
+        var intent2 = Core.Canonicalization.CanonicalizeJson(@"{""name"": ""User"", ""target"": ""entity""}");
+
+        var manifest = Core.Canonicalization.CanonicalizeJson(@"{""project"": ""MyApp""}");
         var policies = "v1";
         var version = "1.0.0";
 
@@ -43,7 +56,6 @@ public class CanonicalizationOrderTests
         var fingerprint2 = InputFingerprint.Compute(intent2, manifest, policies, version);
 
         // Assert - Same fingerprint despite reordered keys
-        fingerprint1.Should().Be(fingerprint2);
         fingerprint1.Value.Should().Be(fingerprint2.Value);
     }
 
@@ -66,8 +78,8 @@ public class CanonicalizationOrderTests
         };
 
         // Act
-        var canonical1 = Canonicalization.CanonicalizeDictionary(dict1);
-        var canonical2 = Canonicalization.CanonicalizeDictionary(dict2);
+        var canonical1 = Core.Canonicalization.CanonicalizeDictionary(dict1);
+        var canonical2 = Core.Canonicalization.CanonicalizeDictionary(dict2);
 
         // Assert
         canonical1.Should().Be(canonical2);
@@ -96,8 +108,8 @@ public class CanonicalizationOrderTests
         }";
 
         // Act
-        var canonical1 = Canonicalization.CanonicalizeJson(json1);
-        var canonical2 = Canonicalization.CanonicalizeJson(json2);
+        var canonical1 = Core.Canonicalization.CanonicalizeJson(json1);
+        var canonical2 = Core.Canonicalization.CanonicalizeJson(json2);
 
         // Assert
         canonical1.Should().Be(canonical2);

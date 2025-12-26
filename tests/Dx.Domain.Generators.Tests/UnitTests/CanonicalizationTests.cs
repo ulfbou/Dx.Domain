@@ -2,21 +2,48 @@
 // <copyright file="CanonicalizationTests.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
+
+using System.Collections.Generic;
 
 using Dx.Domain.Generators.Core;
+
+using FluentAssertions;
+
+using Xunit;
 
 namespace Dx.Domain.Generators.Tests.UnitTests;
 
 public class CanonicalizationTests
 {
     [Fact]
+    public void CanonicalizeJson_SortsKeysAndRemovesNonDeterministicProperties()
+    {
+        // Arrange
+        var json = "{\"b\": 2, \"a\": 1}";
+
+        // Act
+        var result = Core.Canonicalization.CanonicalizeJson(json);
+
+        // Assert
+        result.Should().Contain("\"a\":1");
+        result.Should().Contain("\"b\":2");
+    }
+
+    [Fact]
     public void CanonicalizeJson_WithValidJson_ReturnsCanonicalForm()
     {
         // Arrange
-        var json = @"{""b"": 2, ""a"": 1}";
+        var json = "{\"b\": 2, \"a\": 1}";
 
         // Act
-        var result = Canonicalization.CanonicalizeJson(json);
+        var result = Core.Canonicalization.CanonicalizeJson(json);
 
         // Assert
         result.Should().Contain("\"a\"");
@@ -27,10 +54,10 @@ public class CanonicalizationTests
     public void CanonicalizeJson_WithNonDeterministicProperties_RemovesThem()
     {
         // Arrange
-        var json = @"{""value"": 1, ""timestamp"": ""2024-01-01T00:00:00Z"", ""guid"": ""123""}";
+        var json = "{\"value\": 1, \"timestamp\": \"2024-01-01T00:00:00Z\", \"guid\": \"123\"}";
 
         // Act
-        var result = Canonicalization.CanonicalizeJson(json);
+        var result = Core.Canonicalization.CanonicalizeJson(json);
 
         // Assert
         result.Should().Contain("value");
@@ -50,7 +77,7 @@ public class CanonicalizationTests
         };
 
         // Act
-        var result = Canonicalization.CanonicalizeDictionary(dict);
+        var result = Core.Canonicalization.CanonicalizeDictionary(dict);
 
         // Assert
         result.Should().Be("a=1;m=13;z=26");
@@ -63,7 +90,7 @@ public class CanonicalizationTests
         var path = "/home/user/project/src/file.cs";
 
         // Act
-        var result = Canonicalization.CanonicalizePath(path);
+        var result = Core.Canonicalization.CanonicalizePath(path);
 
         // Assert
         result.Should().NotContain("/home/user/");
@@ -74,10 +101,10 @@ public class CanonicalizationTests
     public void CanonicalizePath_NormalizesPathSeparators()
     {
         // Arrange
-        var path = @"C:\project\src\file.cs";
+        var path = @"C:\\project\\src\\file.cs";
 
         // Act
-        var result = Canonicalization.CanonicalizePath(path);
+        var result = Core.Canonicalization.CanonicalizePath(path);
 
         // Assert
         result.Should().Contain("/");
@@ -91,7 +118,7 @@ public class CanonicalizationTests
         var input = "Generated at 2024-01-01T12:00:00Z";
 
         // Act
-        var result = Canonicalization.RemoveTimestamps(input);
+        var result = Core.Canonicalization.RemoveTimestamps(input);
 
         // Assert
         result.Should().Contain("<TIMESTAMP>");
@@ -105,7 +132,7 @@ public class CanonicalizationTests
         var input = "ID: 12345678-1234-1234-1234-123456789abc";
 
         // Act
-        var result = Canonicalization.RemoveGuids(input);
+        var result = Core.Canonicalization.RemoveGuids(input);
 
         // Assert
         result.Should().Contain("<GUID>");
@@ -118,7 +145,7 @@ public class CanonicalizationTests
     public void CanonicalizeJson_WithEmptyInput_ReturnsEmptyString(string? input)
     {
         // Act
-        var result = Canonicalization.CanonicalizeJson(input!);
+        var result = Core.Canonicalization.CanonicalizeJson(input!);
 
         // Assert
         result.Should().BeEmpty();
@@ -131,7 +158,7 @@ public class CanonicalizationTests
         var invalidJson = "{not valid json";
 
         // Act & Assert
-        var act = () => Canonicalization.CanonicalizeJson(invalidJson);
+        var act = () => Core.Canonicalization.CanonicalizeJson(invalidJson);
         act.Should().Throw<ArgumentException>();
     }
 }

@@ -41,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" />
     <ProjectReference Include="..\..\src\Dx.Domain.Generators\Dx.Domain.Generators.csproj" />
     <ProjectReference Include="..\..\src\Dx.Domain\Dx.Domain.csproj" />
   </ItemGroup>
