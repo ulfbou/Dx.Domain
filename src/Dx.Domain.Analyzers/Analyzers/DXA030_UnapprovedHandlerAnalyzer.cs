@@ -18,7 +18,6 @@ using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
-using Dx.Domain.Analyzers.Infrastructure.Semantics;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -115,7 +114,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             // Only analyze S0, S1, S2 scopes
             if (invocation.TargetMethod == null)
                 return;
-            
+
             var scope = services.Scope.ResolveSymbol(invocation.TargetMethod);
             if (scope == Scope.S3)
                 return;
@@ -127,7 +126,7 @@ namespace Dx.Domain.Analyzers.Analyzers
                 {
                     // Check if the target method is approved
                     var methodName = invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                    
+
                     if (!IsApprovedHandler(methodName, approvedHandlers, invocation.TargetMethod))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));
@@ -148,7 +147,7 @@ namespace Dx.Domain.Analyzers.Analyzers
 
             // Check for common Result extension methods
             var name = method.Name;
-            if (name == "Match" || name == "Map" || name == "Bind" || 
+            if (name == "Match" || name == "Map" || name == "Bind" ||
                 name == "OnSuccess" || name == "OnFailure" || name == "Tap" ||
                 name == "Ensure" || name == "ThenAsync" || name == "Finally")
                 return true;
