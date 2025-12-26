@@ -15,7 +15,7 @@ using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Dx.Domain.Analyzers.Infrastructure.Semantics
+namespace Dx.Domain.Analyzers.Infrastructure.Facades
 {
     public interface ISemanticClassifier
     {

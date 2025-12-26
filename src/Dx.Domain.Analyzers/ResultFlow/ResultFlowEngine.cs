@@ -422,11 +422,11 @@ namespace Dx.Domain.Analyzers.ResultFlow
     {
         public static ResultFlowEngineOptions Default { get; } = new();
         public ImmutableHashSet<string> ResultTypeMetadataNames { get; init; } =
-        ImmutableHashSet.Create(
-        "Dx.Domain.Result",
-        "Dx.Domain.Result`1");
+            ImmutableHashSet.Create(
+            "Dx.Domain.Result",
+            "Dx.Domain.Result`1");
         public ImmutableHashSet<string> InspectionMemberNames { get; init; } =
-        ImmutableHashSet.Create("IsSuccess", "IsFailure", "Match", "Map", "Bind");
+            ImmutableHashSet.Create("IsSuccess", "IsFailure", "Match", "Map", "Bind");
         public string HandlerConfigKey { get; init; } = "dx.result.handlers";
         public string TerminalizerConfigKey { get; init; } = "dx.result.terminalizers";
     }
