@@ -1,0 +1,63 @@
+{
+  "suite": "Dx.Kernel.Analyzers",
+  "version": "1.0.0",
+  "supported_contract_versions": [ "1.0" ],
+  "rules": [
+    {
+      "id": "DXKC001",
+      "title": "Missing Dx Build Contract",
+      "class": "critical",
+      "minScope": "Adjacency",
+      "maxScope": "Ecosystem",
+      "requiredLayers": [],
+      "forbiddenLayers": [],
+      "draftSeverity": "Error",
+      "productionSeverity": "Error"
+    },
+    {
+      "id": "DXKC002",
+      "title": "Invalid Dx Build Contract Version",
+      "class": "critical",
+      "minScope": "Adjacency",
+      "maxScope": "Ecosystem",
+      "draftSeverity": "Error",
+      "productionSeverity": "Error"
+    },
+    {
+      "id": "DXKT001",
+      "title": "Illegal Import Order",
+      "class": "critical",
+      "minScope": "Kernel",
+      "maxScope": "Kernel",
+      "draftSeverity": "Warning",
+      "productionSeverity": "Error"
+    },
+    {
+      "id": "DXKT002",
+      "title": "Kernel Imported Multiple Times",
+      "class": "critical",
+      "minScope": "Kernel",
+      "maxScope": "Kernel",
+      "draftSeverity": "Warning",
+      "productionSeverity": "Error"
+    },
+    {
+      "id": "DXKL001",
+      "title": "Illegal Layer Override",
+      "class": "critical",
+      "minScope": "Kernel",
+      "maxScope": "Kernel",
+      "draftSeverity": "Warning",
+      "productionSeverity": "Error"
+    },
+    {
+      "id": "DXKM001",
+      "title": "CI Invariants Violated",
+      "class": "critical",
+      "minScope": "Adjacency",
+      "maxScope": "Ecosystem",
+      "draftSeverity": "Error",
+      "productionSeverity": "Error"
+    }
+  ]
+}
