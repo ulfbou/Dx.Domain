@@ -25,19 +25,31 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
         Scope ResolveSymbol(ISymbol symbol);
     }
 
-    public sealed class ScopeResolver : IScopeResolver
+    /// <summary>
+    /// Resolves the scope for assemblies and symbols based on analyzer configuration options.
+    /// </summary>
+    /// <remarks>ScopeResolver provides mapping between assemblies or symbols and their associated scopes, as
+    /// defined by configuration options. This is typically used in code analysis scenarios to determine how different
+    /// assemblies or symbols should be treated according to their configured scope.</remarks>
+    internal sealed class ScopeResolver : IScopeResolver
     {
         private static readonly char[] ScopeSeparator = { ';' };
 
         private readonly ImmutableDictionary<string, Scope> _assemblyMap;
         private readonly ImmutableArray<string> _rootNamespaces;
 
+        /// <summary>
+        /// Initializes a new instance of the ScopeResolver class using the specified analyzer configuration options.
+        /// </summary>
+        /// <param name="config">An AnalyzerConfigOptionsProvider that supplies configuration options for resolving assemblies and root
+        /// namespaces. Cannot be null.</param>
         public ScopeResolver(AnalyzerConfigOptionsProvider config)
         {
             _assemblyMap = ParseAssemblyMap(config);
             _rootNamespaces = ParseRootNamespaces(config);
         }
 
+        /// <inheritdoc/>
         public Scope ResolveAssembly(IAssemblySymbol assembly)
         {
             if (_assemblyMap.TryGetValue(assembly.Name, out var scope))
@@ -52,6 +64,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
             return Scope.S3;
         }
 
+        /// <inheritdoc/>
         public Scope ResolveSymbol(ISymbol symbol) =>
             ResolveAssembly(symbol.ContainingAssembly);
 

@@ -72,10 +72,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="F:\repos\dx.domain\docs\#README.md#" />
-  </ItemGroup>
-
-  <ItemGroup>
     <InternalsVisibleTo Include="Dx.Domain.Abstractions" />
     <InternalsVisibleTo Include="Dx.Domain.Attributes" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
