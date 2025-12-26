@@ -67,7 +67,7 @@ namespace Dx.Domain.Generators.Stages
                 modelObj is not DomainIntentModel dim)
             {
                 // We can't return Failure(...) directly here because the method signature requires Result<StageSuccessPayload, StageFailurePayload>
-                return Dx.Result.Failure<StageSuccessPayload, StageFailurePayload>(
+                return DxDomain.Result.Failure<StageSuccessPayload, StageFailurePayload>(
                     Failure("DX4001",
                     FailureClass.InferenceFailure,
                     "DomainIntentModel is missing from prior facts. Pipeline sequence violation."));
@@ -106,13 +106,13 @@ namespace Dx.Domain.Generators.Stages
                 }
 
                 // 4. Success: Return artifacts and the (potentially expanded) fact transaction
-                return Dx.Result.Ok<StageSuccessPayload, StageFailurePayload>(
+                return DxDomain.Result.Ok<StageSuccessPayload, StageFailurePayload>(
                     new StageSuccessPayload(transaction, artifacts.ToImmutableList())
                 );
             }
             catch (Exception ex)
             {
-                return Dx.Result.Failure<StageSuccessPayload, StageFailurePayload>(
+                return DxDomain.Result.Failure<StageSuccessPayload, StageFailurePayload>(
                     Failure("DX5001", FailureClass.InternalError,
                     $"Unexpected failure during Identity generation: {ex.Message}"));
             }

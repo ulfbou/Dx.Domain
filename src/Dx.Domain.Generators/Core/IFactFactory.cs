@@ -46,8 +46,8 @@ namespace Dx.Domain.Generators.Core
                 return factory(key, value, causation);
 
             // Controlled reflection fallback (cold path only)
-            var method = typeof(Dx.Fact)
-                .GetMethod(nameof(Dx.Fact.Create))!
+            var method = typeof(DxDomain.Fact)
+                .GetMethod(nameof(DxDomain.Fact.Create))!
                 .MakeGenericMethod(type);
 
             return (IDomainFact)method.Invoke(null, new[] { key, value, causation })!;

@@ -27,7 +27,7 @@ namespace Dx.Domain.Generators.Internal
         public static DomainError AssertionFailed(string details)
         {
             // We use the public Factory helper provided in Dx.Faults.cs
-            return Dx.Faults.Factory.Create(
+            return DxDomain.Faults.Factory.Create(
                 $"{GenNamespace}.AssertionFailed",
                 $"Stage execution blocked: {details}");
         }
@@ -37,7 +37,7 @@ namespace Dx.Domain.Generators.Internal
         /// </summary>
         public static DomainError MonotonicityViolation(string key)
         {
-            return Dx.Faults.Factory.Create(
+            return DxDomain.Faults.Factory.Create(
                 $"{GenNamespace}.MonotonicityConflict",
                 $"Monotonicity violation: Fact '{key}' has already been committed.");
         }
