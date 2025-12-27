@@ -1,101 +1,65 @@
 <Project>
 
+  <!-- ========================================================= -->
+  <!-- Dx Build Kernel — Execution Authority                      -->
+  <!-- ========================================================= -->
 
-  <!-- ========================================================= -->
-  <!-- Dx Build Kernel — Execution & Enforcement Authority -->
-  <!-- ========================================================= -->
-
-
-  <!-- ========================================================= -->
-  <!-- 1. Kernel Import Guard (Idempotency) -->
-  <!-- ========================================================= -->
+  <!-- Import Guard -->
   <PropertyGroup>
     <_DxTargetsImported>true</_DxTargetsImported>
   </PropertyGroup>
 
+  <!-- ========================================================= -->
+  <!-- Target Framework Validation (Hard Law)                     -->
+  <!-- ========================================================= -->
 
-  <!-- ========================================================= -->
-  <!-- 2. Target Framework Validation -->
-  <!-- ========================================================= -->
   <Target Name="DxValidateTargetFramework"
-  BeforeTargets="PrepareForBuild">
+          BeforeTargets="PrepareForBuild">
 
+    <!-- Single TFM -->
+    <Error
+      Condition="'$(TargetFramework)' != '' AND
+                 !$([System.String]::Copy('$(DxAllowedTFMs)')
+                   .Contains('$(TargetFramework)'))"
+      Text="Dx build error: TargetFramework '$(TargetFramework)' is not allowed. Allowed: $(DxAllowedTFMs)." />
 
-    <Error Text="Dx Framework error: TargetFramework '$(TargetFramework)' is not permitted. Allowed TFMs: $(DxAllowedTFMs)."
-    Condition="'$(TargetFramework)' != '' and !$([System.String]::Copy('$(DxAllowedTFMs)').Contains('$(TargetFramework)'))" />
+    <!-- Multi TFM -->
+    <Error
+      Condition="'$(TargetFrameworks)' != '' AND
+                 $([System.Linq.Enumerable]::Any(
+                   $([System.String]::Copy('$(TargetFrameworks)').Split(';')),
+                   t => !$([System.String]::Copy('$(DxAllowedTFMs)').Contains(t))
+                 ))"
+      Text="Dx build error: One or more TargetFrameworks are not allowed. Allowed: $(DxAllowedTFMs)." />
 
-
-    <Error Text="Dx Framework error: One or more TargetFrameworks are not permitted. Allowed TFMs: $(DxAllowedTFMs)."
-    Condition="'$(TargetFrameworks)' != '' and
-$([System.Linq.Enumerable]::Any(
-$([System.String]::Copy('$(TargetFrameworks)').Split(';')),
-t => !$([System.String]::Copy('$(DxAllowedTFMs)').Contains(t))
-))" />
   </Target>
 
-
   <!-- ========================================================= -->
-  <!-- 3. Analyzer / Generator Containment -->
+  <!-- CI Enforcement (Non-Negotiable)                            -->
   <!-- ========================================================= -->
-  <Target Name="DxValidateAnalyzerTargets"
-  BeforeTargets="Compile"
-  Condition="'$(IsAnalyzer)' == 'true' or '$(IsSourceGenerator)' == 'true'">
 
-
-    <Error Text="Dx Framework error: Analyzers and generators must target $(DxPrimaryTFM)."
-    Condition="'$(TargetFramework)' != '$(DxPrimaryTFM)'" />
-  </Target>
-
-
-  <!-- ========================================================= -->
-  <!-- 4. net10 API Containment (Lower-TFM Builds) -->
-  <!-- ========================================================= -->
-  <Target Name="DxPreventPrimaryTFMLeakage"
-  BeforeTargets="Compile"
-  Condition="'$(TargetFramework)' != '$(DxPrimaryTFM)'">
-
-
-    <PropertyGroup>
-      <LangVersion>latest</LangVersion>
-    </PropertyGroup>
-
-
-    <Message Text="Ensuring no $(DxPrimaryTFM)-only APIs leak into $(TargetFramework) build." Importance="high" />
-  </Target>
-
-
-  <!-- ========================================================= -->
-  <!-- 5. CI Hard-Fail Enforcement -->
-  <!-- ========================================================= -->
   <Target Name="DxCIEnforcement"
-  BeforeTargets="Build"
-  Condition="'$(DxCI)' == 'true'">
+          BeforeTargets="Build"
+          Condition="'$(DxCI)' == 'true'">
 
+    <Error
+      Condition="'$(TreatWarningsAsErrors)' != 'true'"
+      Text="Dx CI error: TreatWarningsAsErrors must be enabled." />
 
-    <Error Text="Dx CI error: TreatWarningsAsErrors must be enabled in CI."
-    Condition="'$(TreatWarningsAsErrors)' != 'true'" />
+    <Error
+      Condition="'$(Deterministic)' != 'true'"
+      Text="Dx CI error: Deterministic builds are mandatory." />
 
-
-    <Error Text="Dx CI error: Deterministic builds are mandatory."
-    Condition="'$(Deterministic)' != 'true'" />
   </Target>
 
-
   <!-- ========================================================= -->
-  <!-- 6. Ordered Concern Execution -->
+  <!-- Ordered Execution Imports                                  -->
   <!-- ========================================================= -->
 
+  <Import Project="$(DxBuildRoot)core/Core.targets"
+          Condition="'$(EnableCore)' == 'true'" />
 
-  <Import Project="$(DxBuildRoot)core/Core.targets" Condition="'$(EnableCore)' == 'true' and Exists('$(DxBuildRoot)core/Core.targets')" />
-  <Import Project="$(DxBuildRoot)pack/Pack.targets" Condition="'$(EnablePack)' == 'true' and Exists('$(DxBuildRoot)pack/Pack.targets')" />
-  <Import Project="$(DxBuildRoot)sign/Sign.targets" Condition="'$(EnableSigning)' == 'true' and Exists('$(DxBuildRoot)sign/Sign.targets')" />
-  <Import Project="$(DxBuildRoot)test/Test.targets" Condition="'$(EnableTesting)' == 'true' and Exists('$(DxBuildRoot)test/Test.targets')" />
-  <Import Project="$(DxBuildRoot)quality/Quality.targets" Condition="'$(EnableQuality)' == 'true' and Exists('$(DxBuildRoot)quality/Quality.targets')" />
-  <Import Project="$(DxBuildRoot)security/Security.targets" Condition="'$(EnableSecurity)' == 'true' and Exists('$(DxBuildRoot)security/Security.targets')" />
-  <Import Project="$(DxBuildRoot)documentation/Documentation.targets" Condition="'$(EnableDocumentation)' == 'true' and Exists('$(DxBuildRoot)documentation/Documentation.targets')" />
-  <Import Project="$(DxBuildRoot)performance/Performance.targets" Condition="'$(EnablePerformance)' == 'true' and Exists('$(DxBuildRoot)performance/Performance.targets')" />
+  <Import Project="$(DxBuildRoot)scope/Scope.targets"
+          Condition="'$(EnableScope)' == 'true'" />
 
-
-  <!-- ========================================================= -->
-  <!-- 7. Kernel Double-Import Guard -->
 </Project>
