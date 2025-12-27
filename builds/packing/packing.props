@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup Label="Dx.Pack.Identity">
+    <IsPackable Condition="'$(IsPackable)' == '' AND ('$(IsAbstractionsProject)' == 'true' OR '$(IsDomainProject)' == 'true')">true</IsPackable>
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+
+    <GeneratePackageOnBuild Condition="'$(IsPackable)' == 'true'">true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Pack.Metadata" Condition="'$(IsPackable)' == 'true'">
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <Version Condition="'$(Version)' == ''">0.0.0-local</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Pack.Assets" Condition="'$(IsPackable)' == 'true'">
+    <IncludeContentInPack>false</IncludeContentInPack>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking Condition="'$(IsToolingProject)' == 'true'">true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+</Project>

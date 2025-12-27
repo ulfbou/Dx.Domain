@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup Label="Dx.CI.Identity" Condition="'$(DxCI)' == 'true'">
+    <IsContinuousIntegration>true</IsContinuousIntegration>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.CI.Tightening" Condition="'$(DxCI)' == 'true'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableAnalyzers Condition="'$(EnableAnalyzers)' == ''">true</EnableAnalyzers>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.CI.Discipline" Condition="'$(DxCI)' == 'true'">
+    <DisableBuildServers>true</DisableBuildServers>
+    <UseSharedCompilation>false</UseSharedCompilation>
+
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="Exists('$(MSBuildProjectDirectory)\packages.lock.json')">true</RestoreLockedMode>
+  </PropertyGroup>
+</Project>

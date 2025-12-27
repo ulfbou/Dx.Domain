@@ -1,0 +1,35 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Signing — Key Availability Enforcement                  -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxSigningKeyRequired"
+          BeforeTargets="Compile"
+          Condition="'$(EnableSigning)' == 'true'">
+
+    <Error
+      Condition="'$(AssemblyOriginatorKeyFile)' == ''"
+      Text="Dx Signing error: Signing is enabled but no signing key file was provided." />
+
+    <Error
+      Condition="'$(DxCI)' != 'true'"
+      Text="Dx Signing error: Signing is only permitted in CI." />
+
+  </Target>
+
+  <!-- ========================================================= -->
+  <!-- Public Signing Prohibition                                 -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxSigningPublicSignForbidden"
+          BeforeTargets="Compile"
+          Condition="'$(EnableSigning)' == 'true'">
+
+    <Error
+      Condition="'$(PublicSign)' == 'true'"
+      Text="Dx Signing error: Public signing is forbidden for Dx artifacts." />
+
+  </Target>
+
+</Project>

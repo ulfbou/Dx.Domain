@@ -1,0 +1,40 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Performance — Enablement                                -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Perf.Enablement">
+
+    <!-- Performance tuning is explicit -->
+    <EnablePerformance>false</EnablePerformance>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Runtime Optimization Policy                               -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Perf.Runtime"
+                 Condition="'$(EnablePerformance)' == 'true'">
+
+    <!-- Compiler optimizations -->
+    <Optimize>true</Optimize>
+
+    <!-- JIT behavior -->
+    <TieredCompilation>true</TieredCompilation>
+    <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Scope-Derived Defaults                                     -->
+  <!-- ========================================================= -->
+
+  <!-- Kernel and Domain must be optimized -->
+  <PropertyGroup Condition="'$(IsKernelProject)' == 'true'
+                         OR '$(IsDomainProject)' == 'true'">
+    <EnablePerformance>true</EnablePerformance>
+  </PropertyGroup>
+
+</Project>

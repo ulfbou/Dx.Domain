@@ -1,0 +1,27 @@
+<Project>
+
+  <Import Project="Directory.Core.props" Condition="Exists('Directory.Core.props')" />
+
+  <Import Project="Directory.Pack.props" Condition="Exists('Directory.Pack.props')" />
+
+  <Import Project="Directory.Sign.props"
+          Condition="Exists('Directory.Sign.props') AND '$(EnableSigning)' == 'true'" />
+
+  <Import Project="Directory.Test.props"
+          Condition="Exists('Directory.Test.props') AND '$(EnableTesting)' == 'true'" />
+
+  <Import Project="Directory.Quality.props"
+          Condition="Exists('Directory.Quality.props') AND '$(EnableQuality)' == 'true'" />
+
+  <Import Project="Directory.Security.props"
+          Condition="Exists('Directory.Security.props') AND '$(EnableSecurity)' == 'true'" />
+
+  <Import Project="Directory.Documentation.props"
+          Condition="Exists('Directory.Documentation.props') AND '$(EnableDocumentation)' == 'true'" />
+
+  <Import Project="Directory.Performance.props"
+          Condition="Exists('Directory.Performance.props') AND '$(EnablePerformance)' == 'true'" />
+
+  <Import Project="src/Dx.Domain/build/Dx.Domain.props" Condition="Exists('src/Dx.Domain/build/Dx.Domain.props') AND '$(DxDomainSingleSource)' == 'true'" />
+
+</Project>

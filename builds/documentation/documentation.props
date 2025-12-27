@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup Label="Dx.Docs.Enablement">
+    <EnableDocumentation Condition="'$(EnableDocumentation)' == '' AND ('$(IsKernelProject)' == 'true' OR '$(IsDomainProject)' == 'true')">true</EnableDocumentation>
+    <EnableDocumentation Condition="'$(EnableDocumentation)' == ''">false</EnableDocumentation>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Docs.Semantics" Condition="'$(EnableDocumentation)' == 'true'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+</Project>

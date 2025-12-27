@@ -1,0 +1,67 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Testing — Test Execution Enforcement                   -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxTestingRequired"
+          BeforeTargets="Build"
+          Condition="'$(DxCI)' == 'true'
+                  AND '$(EnableTesting)' == 'true'">
+
+    <!-- CI must run tests -->
+    <Error
+      Condition="'$(IsTestProject)' == 'false'"
+      Text="Dx Testing error: EnableTesting is true but project is not marked as a test project." />
+
+  </Target>
+
+  <!-- ========================================================= -->
+  <!-- Dx Testing — Pack Safety                                  -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxTestingPackSafety"
+          BeforeTargets="Pack"
+          Condition="'$(IsTestProject)' == 'true'">
+
+    <Error
+      Condition="'$(IsPackable)' == 'true'"
+      Text="Dx Testing error: Test projects must never be packable." />
+
+  </Target>
+
+  <!-- ========================================================= -->
+  <!-- Dx Testing — CI Skip Prohibition                          -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxTestingCINoSkip"
+          BeforeTargets="Test"
+          Condition="'$(DxCI)' == 'true'
+                  AND '$(EnableTesting)' == 'true'">
+
+    <Error
+      Condition="'$(SkipTests)' == 'true'"
+      Text="Dx Testing error: Tests may not be skipped in CI." />
+
+  </Target>
+
+  <!-- ========================================================= -->
+  <!-- Dx Testing — Coverage Configuration                       -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+  </PropertyGroup>
+
+  <Target Name="DxRunTests" AfterTargets="Build" Condition="'$(IsTestProject)' == 'true' AND '$(SkipTests)' != 'true'">
+    <Message Text="Running Tests for $(MSBuildProjectName)..." Importance="high" />
+    <CallTarget Targets="VSTest" />
+  </Target>
+
+  <Target Name="DxValidateCoverage" AfterTargets="DxRunTests" Condition="'$(CollectCoverage)' == 'true'">
+    <Error Condition="!Exists('$(CoverletOutput)coverage.cobertura.xml')"
+           Text="Dx Test Error: Coverage report was not generated." />
+  </Target>
+
+</Project>

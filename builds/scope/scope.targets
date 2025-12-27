@@ -1,0 +1,98 @@
+<Project>
+  <Target Name="DxTraceProjectIdentity"
+          BeforeTargets="PrepareForBuild"
+          DependsOnTargets="DxIdentifyProject"
+          Condition="'$(DxBuildTrace)' == 'true'">
+    <Message Importance="high" Text=" " />
+    <Message Importance="high" Text="==== DX BUILD TRACE: $(MSBuildProjectName) ====" />
+    <Message Importance="high" Text="  Identity: Kernel=$(IsKernelProject), Domain=$(IsDomainProject), Abstractions=$(IsAbstractionsProject)" />
+    <Message Importance="high" Text="  Purity:   AllowReflection=$(AllowReflection), AllowIO=$(AllowIO), AllowUnsafe=$(AllowUnsafe)" />
+    <Message Importance="high" Text="====================================================" />
+    <Message Importance="high" Text=" " />
+  </Target>
+
+  <Target Name="DxScopeIdentityValidation"
+          BeforeTargets="PrepareForBuild"
+          DependsOnTargets="DxIdentifyProject">
+
+    <Error Condition="'$(IsKernelProject)' != 'true' AND 
+                      '$(IsDomainProject)' != 'true' AND 
+                      '$(IsInfrastructureProject)' != 'true' AND 
+                      '$(IsApplicationProject)' != 'true' AND 
+                      '$(IsToolingProject)' != 'true'"
+           Text="DX-SCOPE-ERR: No project scope declared for '$(MSBuildProjectName)'. Please ensure naming conventions match (e.g., .Abstractions, .Persistence)." />
+
+    <Error Condition="'$(IsKernelProject)' == 'true' AND '$(IsInfrastructureProject)' == 'true'"
+           Text="DX-SCOPE-ERR: Identity Crisis. Project cannot be both Kernel and Infrastructure." />
+  </Target>
+
+  <Target Name="DxKernelPurityValidation" BeforeTargets="CoreCompile">
+    <Error Condition="('$(IsKernelProject)' == 'true' OR '$(IsAbstractionsProject)' == 'true') AND '$(AllowIO)' == 'true'"
+           Text="DX-PURITY-ERR: Pure projects (Kernel/Abstractions) are strictly forbidden from performing IO." />
+
+    <Error Condition="('$(IsKernelProject)' == 'true' OR '$(IsAbstractionsProject)' == 'true') AND '$(AllowReflection)' == 'true'"
+           Text="DX-PURITY-ERR: Pure projects (Kernel/Abstractions) are strictly forbidden from using Reflection." />
+  </Target>
+</Project>
+<!--<Project>
+  <Target Name="DxTraceProjectIdentity" BeforeTargets="PrepareForBuild" Condition="'$(DxBuildTrace)' == 'true'">
+    <Message Importance="high" Text=" " />
+    <Message Importance="high" Text="==== DX BUILD TRACE: $(MSBuildProjectName) ====" />
+    <Message Importance="high" Text="  Identity: Kernel=$(IsKernelProject), Domain=$(IsDomainProject), Abstractions=$(IsAbstractionsProject)" />
+    <Message Importance="high" Text="  Identity: Tooling=$(IsToolingProject) (Analyzer=$(IsAnalyzerProject), Generator=$(IsGeneratorProject))" />
+    <Message Importance="high" Text="  Policy:   AnalysisLevel=$(AnalysisLevel), Quality=$(EnableQuality), Docs=$(GenerateDocumentationFile)" />
+    <Message Importance="high" Text="  Purity:   AllowReflection=$(AllowReflection), AllowIO=$(AllowIO), AllowUnsafe=$(AllowUnsafe)" />
+    <Message Importance="high" Text="====================================================" />
+    <Message Importance="high" Text=" " />
+  </Target>
+
+  <Target Name="DxCorePurityCheck" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(AnalysisLevel)' == ''"
+           Text="DX-CORE-001: AnalysisLevel is missing. The Dx Kernel requires this property to be set." />
+
+    <Error Condition="'$(AnalysisLevel)' != 'latest' AND '$(AnalysisLevel)' != 'preview'"
+           Text="DX-CORE-001: AnalysisLevel is set to '$(AnalysisLevel)'. Architecture mandates 'latest'." />
+  </Target>
+
+  <Target Name="DxScopeIdentityValidation" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <_IdCount>0</_IdCount>
+
+      <_IdCount Condition="'$(IsKernelProject)' == 'true'">$([MSBuild]::Add($(_IdCount), 1))</_IdCount>
+      <_IdCount Condition="'$(IsDomainProject)' == 'true'">$([MSBuild]::Add($(_IdCount), 1))</_IdCount>
+      <_IdCount Condition="'$(IsInfrastructureProject)' == 'true'">$([MSBuild]::Add($(_IdCount), 1))</_IdCount>
+      <_IdCount Condition="'$(IsApplicationProject)' == 'true'">$([MSBuild]::Add($(_IdCount), 1))</_IdCount>
+
+      <_IdCount Condition="'$(IsToolingProject)' == 'true' AND '$(IsKernelProject)' != 'true'">$([MSBuild]::Add($(_IdCount), 1))</_IdCount>
+
+      <_IdCount Condition="'$(IsAbstractionsProject)' == 'true' AND '$(IsDomainProject)' == 'true'">$([MSBuild]::Subtract($(_IdCount), 1))</_IdCount>
+
+      <_IdCount Condition="'$(IsTestProject)' == 'true' AND $(_IdCount) == 0">1</_IdCount>
+    </PropertyGroup>
+
+    <Error Condition="'$(_IdCount)' == '0'"
+           Text="DX-SCOPE-ERR: No project scope declared for '$(MSBuildProjectName)'. A project must belong to exactly one role (Kernel, Domain, Infrastructure, Application, or Tooling)." />
+
+    <Error Condition="'$(_IdCount)' > '1'"
+           Text="DX-SCOPE-ERR: Identity Crisis in '$(MSBuildProjectName)'. Multiple primary scopes detected ($(_IdCount)). A project cannot be both Kernel and Infrastructure, etc." />
+  </Target>
+
+  <Target Name="DxScopeToolingValidation" BeforeTargets="PrepareForBuild"
+          Condition="'$(IsAnalyzerProject)' == 'true' OR '$(IsGeneratorProject)' == 'true'">
+    <Error Condition="'$(IsToolingProject)' != 'true'"
+           Text="DX-SCOPE-ERR: Roslyn components (Analyzers/Generators) must declare IsToolingProject=true." />
+  </Target>
+
+  <Target Name="DxKernelPurityValidation" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <_MustBePure>false</_MustBePure>
+      <_MustBePure Condition="'$(IsKernelProject)' == 'true' OR '$(IsAbstractionsProject)' == 'true'">true</_MustBePure>
+    </PropertyGroup>
+
+    <Error Condition="'$(_MustBePure)' == 'true' AND '$(AllowIO)' == 'true'"
+           Text="DX-PURITY-ERR: Pure projects (Kernel/Abstractions) are strictly forbidden from performing IO." />
+
+    <Error Condition="'$(_MustBePure)' == 'true' AND '$(AllowReflection)' == 'true'"
+           Text="DX-PURITY-ERR: Pure projects (Kernel/Abstractions) are strictly forbidden from using Reflection." />
+  </Target>
+</Project>-->

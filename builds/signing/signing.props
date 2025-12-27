@@ -1,0 +1,56 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Signing — Enablement                                   -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Signing.Enablement">
+
+    <!-- Signing is explicit -->
+    <EnableSigning>false</EnableSigning>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Strong-Name Policy                                        -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Signing.StrongName"
+                 Condition="'$(EnableSigning)' == 'true'">
+
+    <!-- Strong-name signing -->
+    <SignAssembly>true</SignAssembly>
+
+    <!-- Key file must be supplied externally -->
+    <AssemblyOriginatorKeyFile>$(DxSigningKeyFile)</AssemblyOriginatorKeyFile>
+
+    <!-- Public signing is forbidden for trusted artifacts -->
+    <PublicSign>false</PublicSign>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- CI-Only Authority                                         -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Signing.CI"
+                 Condition="'$(DxCI)' == 'true'">
+
+    <!-- CI is allowed to sign -->
+    <EnableSigning>true</EnableSigning>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Scope-Derived Defaults                                     -->
+  <!-- ========================================================= -->
+
+  <!-- Kernel, Domain, Tooling, and Packable artifacts must be signed -->
+  <PropertyGroup Condition="'$(IsKernelProject)' == 'true'
+                         OR '$(IsDomainProject)' == 'true'
+                         OR '$(IsToolingProject)' == 'true'
+                         OR '$(IsPackable)' == 'true'">
+    <EnableSigning>true</EnableSigning>
+  </PropertyGroup>
+
+</Project>

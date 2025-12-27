@@ -1,0 +1,44 @@
+<Project>
+
+  <PropertyGroup Label="Dx.Generators.Identity"
+                 Condition="'$(IsGeneratorProject)' == 'true'">
+
+    <IsGeneratorProject>true</IsGeneratorProject>
+    <IsToolingProject>true</IsToolingProject>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Generators.Execution">
+
+    <RunSourceGenerators Condition="'$(EnableGenerators)' == 'true'">true</RunSourceGenerators>
+    <RunSourceGenerators Condition="'$(EnableGenerators)' != 'true'">false</RunSourceGenerators>
+    <EnableAnalyzers>true</EnableAnalyzers>
+
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Generators.Determinism">
+
+    <DefineConstants>
+      $(DefineConstants);
+      DX_GENERATOR;
+      DX_NO_CLOCK;
+      DX_NO_GUID;
+      DX_NO_RANDOM
+    </DefineConstants>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+
+    <CompilerGeneratedFilesOutputPath>
+      $(BaseIntermediateOutputPath)dx\generated\
+    </CompilerGeneratedFilesOutputPath>
+
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(EnableGenerators)' == 'true'">
+    <Analyzer Include="@(ProjectReference)"
+              Condition="'%(ProjectReference.IsGeneratorProject)' == 'true'" />
+  </ItemGroup>
+
+</Project>

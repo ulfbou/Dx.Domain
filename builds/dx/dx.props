@@ -1,0 +1,73 @@
+<Project>
+  <PropertyGroup Label="Dx.Constants">
+    <DxBuild>true</DxBuild>
+    <DxAllowedTFMs>net8.0;net9.0;net10.0;netstandard2.0</DxAllowedTFMs>
+    <DxMinimumTFM>net8.0</DxMinimumTFM>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Identity">
+    <DxBuildVersion Condition="'$(DxBuildVersion)' == ''">1.0.0</DxBuildVersion>
+    <DxBuildName>Dx.Domain</DxBuildName>
+    <DxBuildOwner>Dx Architecture Team</DxBuildOwner>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.FrameworkPolicy">
+    <TargetFramework Condition="'$(TargetFramework)' == '' AND '$(TargetFrameworks)' == ''">$(DxMinimumTFM)</TargetFramework>
+
+    <DxCI Condition="'$(CI)' != '' OR '$(TF_BUILD)' != ''">true</DxCI>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(DxCI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.FeatureFlags">
+    <EnableCore Condition="'$(EnableCore)' == ''">true</EnableCore>
+    <EnableScope Condition="'$(EnableScope)' == ''">true</EnableScope>
+    <EnableAnalyzers Condition="'$(EnableAnalyzers)' == ''">false</EnableAnalyzers>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DxInternalRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</DxInternalRoot>
+  </PropertyGroup>
+
+  <Import Project="$(DxInternalRoot)core/core.props" Condition="'$(EnableCore)' == 'true'" />
+  <Import Project="$(DxInternalRoot)scope/scope.props" Condition="'$(EnableScope)' == 'true'" />
+</Project>
+<!--<Project>
+  <PropertyGroup Label="Dx.Identity">
+    <DxBuild>true</DxBuild>
+    <DxBuildVersion>1.0.0</DxBuildVersion>
+    <DxBuildName>Dx.Domain</DxBuildName>
+    <DxBuildOwner>Dx Architecture Team</DxBuildOwner>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.FrameworkPolicy">
+    <DxMinimumTFM>net8.0</DxMinimumTFM>
+    <DxPrimaryTFM>net10.0</DxPrimaryTFM>
+    <DxAllowedTFMs>net8.0;net9.0;net10.0;netstandard2.0</DxAllowedTFMs>
+    <TargetFramework Condition="'$(TargetFramework)' == '' AND '$(TargetFrameworks)' == ''">$(DxMinimumTFM)</TargetFramework>
+    <DxCI Condition="'$(CI)' != '' OR '$(TF_BUILD)' != ''">true</DxCI>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(DxCI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.FeatureFlags">
+    <EnableCore Condition="'$(EnableCore)' == ''">true</EnableCore>
+    <EnableScope Condition="'$(EnableScope)' == ''">true</EnableScope>
+    <EnableAnalyzers Condition="'$(EnableAnalyzers)' == ''">false</EnableAnalyzers>
+    <EnableSecurity Condition="'$(EnableSecurity)' == ''">false</EnableSecurity>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DxInternalRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</DxInternalRoot>
+  </PropertyGroup>
+
+  <Import Project="$(DxInternalRoot)core/core.props" Condition="'$(EnableCore)' == 'true'" />
+  <Import Project="$(DxInternalRoot)scope/scope.props" Condition="'$(EnableScope)' == 'true'" />
+  <Import Project="$(DxInternalRoot)ci/ci.props" Condition="'$(DxCI)' == 'true' AND Exists('$(DxInternalRoot)ci/ci.props')" />
+  <Import Project="$(DxInternalRoot)analyzer/analyzer.props" Condition="'$(EnableAnalyzers)' == 'true' AND Exists('$(DxInternalRoot)analyzer/analyzer.props')" />
+  <Import Project="$(DxInternalRoot)quality/quality.props" Condition="'$(EnableQuality)' == 'true' AND Exists('$(DxInternalRoot)quality/quality.props')" />
+  <Import Project="$(DxInternalRoot)security/security.props" Condition="'$(EnableSecurity)' == 'true' AND Exists('$(DxInternalRoot)security/security.props')" />
+  <Import Project="$(DxInternalRoot)documentation/documentation.props" Condition="'$(EnableDocumentation)' == 'true' AND Exists('$(DxInternalRoot)documentation/documentation.props')" />
+  <Import Project="$(DxInternalRoot)packing/packing.props" Condition="'$(IsPackable)' == 'true' AND Exists('$(DxInternalRoot)packing/packing.props')" />
+
+</Project>-->

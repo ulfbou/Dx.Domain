@@ -3,23 +3,19 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 
-    <!-- Identity -->
     <AssemblyName>Dx.Domain.Abstractions</AssemblyName>
     <RootNamespace>Dx.Domain</RootNamespace>
 
-    <!-- Quality -->
+    <IsAbstractionsProject>true</IsAbstractionsProject>
+
+    <IsDomainProject>false</IsDomainProject>
+    <IsToolingProject>false</IsToolingProject>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Abstractions.Quality">
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
-    <!-- Packaging -->
-    <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-
-    <!-- Governance -->
-    <IsDomainProject>false</IsDomainProject>
-    <IsToolingProject>false</IsToolingProject>
-    <IsAbstractionsProject>true</IsAbstractionsProject>
   </PropertyGroup>
 
 </Project>

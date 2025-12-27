@@ -1,0 +1,33 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Performance — Optimization Enforcement                  -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxPerformanceOptimizationRequired"
+          BeforeTargets="Compile"
+          Condition="'$(EnablePerformance)' == 'true'">
+
+    <Error
+      Condition="'$(Optimize)' != 'true'"
+      Text="Dx Performance error: Performance is enabled but compiler optimization is disabled." />
+
+  </Target>
+
+  <!-- ========================================================= -->
+  <!-- CI Enforcement                                             -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxPerformanceCIParity"
+          BeforeTargets="Compile"
+          Condition="'$(DxCI)' == 'true'
+                  AND ('$(IsKernelProject)' == 'true'
+                    OR '$(IsDomainProject)' == 'true')">
+
+    <Error
+      Condition="'$(TieredCompilation)' != 'true'"
+      Text="Dx Performance error: CI requires tiered compilation for Kernel and Domain projects." />
+
+  </Target>
+
+</Project>

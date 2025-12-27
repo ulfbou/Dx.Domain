@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup Label="Dx.Analyzers.Identity" Condition="'$(IsAnalyzerProject)' == 'true' OR '$(IsGeneratorProject)' == 'true'">
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <IsToolingProject>true</IsToolingProject>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Analyzers.Execution">
+    <RunAnalyzers Condition="'$(EnableAnalyzers)' == 'true'">true</RunAnalyzers>
+    <RunAnalyzers Condition="'$(RunAnalyzers)' == ''">false</RunAnalyzers>
+
+    <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
+    <AnalysisMode Condition="'$(AnalysisMode)' == ''">All</AnalysisMode>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Analyzers.Severity">
+    <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+
+    <TreatWarningsAsErrors Condition="'$(IsAnalyzerProject)' == 'true' OR '$(IsGeneratorProject)' == 'true'">false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
+    <Analyzer Include="@(ProjectReference)"
+              Condition="'%(ProjectReference.IsAnalyzerProject)' == 'true' OR '%(ProjectReference.IsGeneratorProject)' == 'true'" />
+  </ItemGroup>
+</Project>

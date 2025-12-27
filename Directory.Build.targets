@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup Label="Dx.IdentityPersistence">
+    <DxBuildRoot>$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
+
+    <IsAbstractionsProject Condition="'$(IsAbstractionsProject)' == '' AND $(MSBuildProjectName.EndsWith('.Abstractions'))">true</IsAbstractionsProject>
+    <IsDomainProject Condition="'$(IsDomainProject)' == '' AND '$(IsAbstractionsProject)' == 'true'">true</IsDomainProject>
+  </PropertyGroup>
+
+  <Import Project="$(DxBuildRoot)dx\dx.targets" Condition="Exists('$(DxBuildRoot)dx\dx.targets')" />
+</Project>

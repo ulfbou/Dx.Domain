@@ -19,10 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Persistence", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain", "src\Dx.Domain\Dx.Domain.csproj", "{181926AB-5A78-4487-82F1-E93D8C2896CA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{23C415C5-9A2F-4DAB-91F7-96C480B17B11}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{23C415C5-9A2F-4DAB-91F7-96C480B17B11}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Dx.props = Directory.Dx.props
-		Directory.Dx.targets = Directory.Dx.targets
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D829B9CA-75B7-4129-962A-2E31338C4A20}"
@@ -32,7 +32,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D8
 		.gitignore = .gitignore
 		docfx.json = docfx.json
 		Dockerfile = Dockerfile
-		Dx.Domain.snk = Dx.Domain.snk
 		favicon.png = favicon.png
 		filterConfig.yml = filterConfig.yml
 		test.runsettings = test.runsettings
@@ -60,69 +59,109 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Ac
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dx.Domain", "Dx.Domain", "{61BE2535-9F7C-4B8F-96F2-EB1A190DC0A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Analyzers.Tests", "tests\Dx.Domain.Analyzers.Tests\Dx.Domain.Analyzers.Tests.csproj", "{8E313E44-DEF8-FBE9-D72F-52DE56205732}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.analyzers.Tests", "tests\Dx.Domain.analyzers.Tests\Dx.Domain.analyzers.Tests.csproj", "{8E313E44-DEF8-FBE9-D72F-52DE56205732}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Generators.Tests", "tests\Dx.Domain.Generators.Tests\Dx.Domain.Generators.Tests.csproj", "{53704AB1-7E21-0CE3-54E9-1847EB572476}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzer", "Analyzer", "{93A06F62-3201-49B9-AA69-179DF003004A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzer", "analyzer", "{93A06F62-3201-49B9-AA69-179DF003004A}"
 	ProjectSection(SolutionItems) = preProject
-		builds\analyzer\Directory.Analyzer.props = builds\analyzer\Directory.Analyzer.props
-		builds\analyzer\Directory.Analyzer.targets = builds\analyzer\Directory.Analyzer.targets
+		builds\analyzer\analyzer.props = builds\analyzer\analyzer.props
+		builds\analyzer\analyzer.targets = builds\analyzer\analyzer.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{4CCC1888-C906-49E7-AA1C-1C3B567BFF44}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{A8043194-EAC4-4C62-8E23-346745B52F90}"
 	ProjectSection(SolutionItems) = preProject
-		builds\build\Directory.Build.props = builds\build\Directory.Build.props
-		builds\build\Directory.Build.targets = builds\build\Directory.Build.targets
+		builds\analyzer\analyzer.props = builds\analyzer\analyzer.props
+		builds\analyzer\analyzer.targets = builds\analyzer\analyzer.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{3BFCBE84-535F-46DA-ADC6-5ADC43696D84}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{4CCC1888-C906-49E7-AA1C-1C3B567BFF44}"
 	ProjectSection(SolutionItems) = preProject
-		builds\core\Directory.Core.props = builds\core\Directory.Core.props
-		builds\core\Directory.Core.targets = builds\core\Directory.Core.targets
+		builds\build\build.props = builds\build\build.props
+		builds\build\build.targets = builds\build\build.targets
+		builds\build\repo.targets = builds\build\repo.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{62B8DD8E-0514-4669-A0CB-D7A9710C044E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "ci", "{66AFF239-021D-4AA0-929C-DB637325C640}"
 	ProjectSection(SolutionItems) = preProject
-		builds\documentation\Directory.Documentation.props = builds\documentation\Directory.Documentation.props
-		builds\documentation\Directory.Documentation.targets = builds\documentation\Directory.Documentation.targets
+		builds\ci\ci.props = builds\ci\ci.props
+		builds\ci\ci.targets = builds\ci\ci.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{DA47A977-A7BD-427B-9DFA-999D7FB037FF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{3BFCBE84-535F-46DA-ADC6-5ADC43696D84}"
 	ProjectSection(SolutionItems) = preProject
-		builds\test\Directory.Test.props = builds\test\Directory.Test.props
-		builds\test\Directory.Test.targets = builds\test\Directory.Test.targets
+		builds\core\core.props = builds\core\core.props
+		builds\core\core.targets = builds\core\core.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sign", "Sign", "{E5A6CB85-1048-42C8-BB10-C94A8DACAF86}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documentation", "documentation", "{62B8DD8E-0514-4669-A0CB-D7A9710C044E}"
 	ProjectSection(SolutionItems) = preProject
-		builds\sign\Directory.Sign.props = builds\sign\Directory.Sign.props
-		builds\sign\Directory.Sign.targets = builds\sign\Directory.Sign.targets
+		builds\documentation\documentation.props = builds\documentation\documentation.props
+		builds\documentation\documentation.targets = builds\documentation\documentation.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{55779022-EAA2-49F3-A93B-C6CAE452FFC9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "generators", "generators", "{83DEE2E6-EB4A-4001-8CBA-DD2E68D791BA}"
 	ProjectSection(SolutionItems) = preProject
-		builds\security\Directory.Security.props = builds\security\Directory.Security.props
-		builds\security\Directory.Security.targets = builds\security\Directory.Security.targets
+		builds\generators\generators.props = builds\generators\generators.props
+		builds\generators\generators.targets = builds\generators\generators.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance", "Performance", "{2635FCDD-45BD-43C9-90E1-A6CA17B4B7A9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "help", "help", "{CE431F83-5A33-4FEE-9629-86E77E86C587}"
 	ProjectSection(SolutionItems) = preProject
-		builds\performance\Directory.Performance.props = builds\performance\Directory.Performance.props
-		builds\performance\Directory.Performance.targets = builds\performance\Directory.Performance.targets
+		builds\help\help.targets = builds\help\help.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pack", "Pack", "{93C0DA18-89B9-42E3-9057-11EA8920E4CE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packing", "packing", "{93C0DA18-89B9-42E3-9057-11EA8920E4CE}"
 	ProjectSection(SolutionItems) = preProject
-		builds\pack\Directory.Pack.props = builds\pack\Directory.Pack.props
-		builds\pack\Directory.Pack.targets = builds\pack\Directory.Pack.targets
+		builds\packing\packing.props = builds\packing\packing.props
+		builds\packing\packing.targets = builds\packing\packing.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Quality", "Quality", "{DC4BF4DC-FB0F-49D6-9A8C-6A04750C8F0E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance", "performance", "{2635FCDD-45BD-43C9-90E1-A6CA17B4B7A9}"
 	ProjectSection(SolutionItems) = preProject
-		builds\quality\Directory.Quality.props = builds\quality\Directory.Quality.props
-		builds\quality\Directory.Quality.targets = builds\quality\Directory.Quality.targets
+		builds\performance\performance.props = builds\performance\performance.props
+		builds\performance\performance.targets = builds\performance\performance.targets
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "quality", "quality", "{DC4BF4DC-FB0F-49D6-9A8C-6A04750C8F0E}"
+	ProjectSection(SolutionItems) = preProject
+		builds\quality\quality.props = builds\quality\quality.props
+		builds\quality\quality.targets = builds\quality\quality.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scope", "scope", "{6E1CDFA4-9DAF-49EB-96D4-F4FFD850A222}"
+	ProjectSection(SolutionItems) = preProject
+		builds\scope\scope.props = builds\scope\scope.props
+		builds\scope\scope.targets = builds\scope\scope.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "security", "security", "{55779022-EAA2-49F3-A93B-C6CAE452FFC9}"
+	ProjectSection(SolutionItems) = preProject
+		builds\security\security.props = builds\security\security.props
+		builds\security\security.targets = builds\security\security.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "signing", "signing", "{E5A6CB85-1048-42C8-BB10-C94A8DACAF86}"
+	ProjectSection(SolutionItems) = preProject
+		builds\signing\signing.props = builds\signing\signing.props
+		builds\signing\signing.targets = builds\signing\signing.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testing", "testing", "{DA47A977-A7BD-427B-9DFA-999D7FB037FF}"
+	ProjectSection(SolutionItems) = preProject
+		builds\testing\testing.props = builds\testing\testing.props
+		builds\testing\testing.targets = builds\testing\testing.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dx", "dx", "{C021B5E4-9C7E-45C8-95A9-709AD29C76B7}"
+	ProjectSection(SolutionItems) = preProject
+		builds\dx\dx.props = builds\dx\dx.props
+		builds\dx\dx.targets = builds\dx\dx.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Abstractions", "src\Dx.Domain.Abstractions\Dx.Domain.Abstractions.csproj", "{D7B88843-105E-46C6-8CEB-DC015D6416AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dx.Domain.Abstractions", "Dx.Domain.Abstractions", "{FE3B7BFA-C9C7-4401-A9DE-6A77AAC078C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -206,6 +245,18 @@ Global
 		{53704AB1-7E21-0CE3-54E9-1847EB572476}.Release|x64.Build.0 = Release|Any CPU
 		{53704AB1-7E21-0CE3-54E9-1847EB572476}.Release|x86.ActiveCfg = Release|Any CPU
 		{53704AB1-7E21-0CE3-54E9-1847EB572476}.Release|x86.Build.0 = Release|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Debug|x64.Build.0 = Debug|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Debug|x86.Build.0 = Debug|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Release|x64.ActiveCfg = Release|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Release|x64.Build.0 = Release|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -219,15 +270,23 @@ Global
 		{8C7D95F1-42CF-4211-8E85-A407E46F497E} = {B57FF503-E11C-A8CB-2BF8-31E7221C9645}
 		{181926AB-5A78-4487-82F1-E93D8C2896CA} = {61BE2535-9F7C-4B8F-96F2-EB1A190DC0A8}
 		{61BE2535-9F7C-4B8F-96F2-EB1A190DC0A8} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{A8043194-EAC4-4C62-8E23-346745B52F90} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
 		{4CCC1888-C906-49E7-AA1C-1C3B567BFF44} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{66AFF239-021D-4AA0-929C-DB637325C640} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
 		{3BFCBE84-535F-46DA-ADC6-5ADC43696D84} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
 		{62B8DD8E-0514-4669-A0CB-D7A9710C044E} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
-		{DA47A977-A7BD-427B-9DFA-999D7FB037FF} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
-		{E5A6CB85-1048-42C8-BB10-C94A8DACAF86} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
-		{55779022-EAA2-49F3-A93B-C6CAE452FFC9} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
-		{2635FCDD-45BD-43C9-90E1-A6CA17B4B7A9} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{83DEE2E6-EB4A-4001-8CBA-DD2E68D791BA} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{CE431F83-5A33-4FEE-9629-86E77E86C587} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
 		{93C0DA18-89B9-42E3-9057-11EA8920E4CE} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{2635FCDD-45BD-43C9-90E1-A6CA17B4B7A9} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
 		{DC4BF4DC-FB0F-49D6-9A8C-6A04750C8F0E} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{6E1CDFA4-9DAF-49EB-96D4-F4FFD850A222} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{55779022-EAA2-49F3-A93B-C6CAE452FFC9} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{E5A6CB85-1048-42C8-BB10-C94A8DACAF86} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{DA47A977-A7BD-427B-9DFA-999D7FB037FF} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{C021B5E4-9C7E-45C8-95A9-709AD29C76B7} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
+		{D7B88843-105E-46C6-8CEB-DC015D6416AA} = {FE3B7BFA-C9C7-4401-A9DE-6A77AAC078C6}
+		{FE3B7BFA-C9C7-4401-A9DE-6A77AAC078C6} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A326CE0-DFBE-435C-AD8C-3CA905A96D98}

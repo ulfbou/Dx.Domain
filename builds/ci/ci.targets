@@ -1,0 +1,41 @@
+<Project>
+
+  <Target Name="DxCIAnalyzerAndGeneratorRequired"
+          BeforeTargets="Compile"
+          Condition="'$(DxCI)' == 'true'">
+
+    <Error
+      Condition="'$(EnableAnalyzers)' != 'true'"
+      Text="Dx CI error: CI builds must have analyzers enabled." />
+
+    <Error
+      Condition="'$(EnableGenerators)' != 'true'"
+      Text="Dx CI error: CI builds must have generators enabled." />
+
+  </Target>
+
+  <Target Name="DxCIDeterminismRequired"
+          BeforeTargets="Compile"
+          Condition="'$(DxCI)' == 'true'">
+
+    <Error
+      Condition="'$(Deterministic)' != 'true'"
+      Text="Dx CI error: CI builds must be deterministic." />
+
+    <Error
+      Condition="'$(ContinuousIntegrationBuild)' != 'true'"
+      Text="Dx CI error: ContinuousIntegrationBuild must be enabled in CI." />
+
+  </Target>
+
+  <Target Name="DxCIPartialBuildForbidden"
+          BeforeTargets="Build"
+          Condition="'$(DxCI)' == 'true'">
+
+    <Error
+      Condition="'$(BuildProjectReferences)' == 'false'"
+      Text="Dx CI error: CI builds may not disable project reference builds." />
+
+  </Target>
+
+</Project>
