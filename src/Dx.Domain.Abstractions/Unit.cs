@@ -10,8 +10,6 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using System.Diagnostics;
-
 namespace Dx.Domain
 {
     /// <summary>

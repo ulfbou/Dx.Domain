@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <!-- Identity -->
+    <AssemblyName>Dx.Domain.Abstractions</AssemblyName>
+    <RootNamespace>Dx.Domain</RootNamespace>
+
+    <!-- Quality -->
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Packaging -->
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Governance -->
+    <IsDomainProject>false</IsDomainProject>
+    <IsToolingProject>false</IsToolingProject>
+    <IsAbstractionsProject>true</IsAbstractionsProject>
+  </PropertyGroup>
+
+</Project>
