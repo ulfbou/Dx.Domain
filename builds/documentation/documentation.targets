@@ -1,0 +1,21 @@
+<Project>
+
+  <Target Name="DxDocumentationRequired"
+          BeforeTargets="Compile"
+          Condition="'$(EnableDocumentation)' == 'true'">
+
+    <Error Condition="'$(GenerateDocumentationFile)' != 'true'"
+           Text="Dx Docs error: Documentation is enabled but XML documentation is not generated." />
+
+  </Target>
+
+  <Target Name="DxDocumentationCIParity"
+          BeforeTargets="Compile"
+          Condition="'$(DxCI)' == 'true' AND ('$(IsKernelProject)' == 'true' OR '$(IsDomainProject)' == 'true')">
+
+    <Error Condition="$([System.IO.File]::Exists('$(DocumentationFile)')) != 'True'"
+           Text="Dx Docs error: Required documentation file was not produced in CI." />
+
+  </Target>
+
+</Project>

@@ -1,0 +1,30 @@
+<Project>
+  <PropertyGroup Label="Dx.Core.Mandatory">
+    <AnalysisLevel Condition="'$(AnalysisLevel)' == ''">latest</AnalysisLevel>
+    <AnalysisMode Condition="'$(AnalysisMode)' == ''">All</AnalysisMode>
+    <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild Condition="'$(EnforceCodeStyleInBuild)' == ''">true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Core.Language">
+    <LangVersion Condition="'$(LangVersion)' == ''">latest</LangVersion>
+    <Nullable Condition="'$(Nullable)' == ''">enable</Nullable>
+    <ImplicitUsings Condition="'$(ImplicitUsings)' == ''">enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Core.Determinism">
+    <Deterministic Condition="'$(Deterministic)' == ''">true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(DxCI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(ImplicitUsings)' == 'enable'">
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Collections.Immutable" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Runtime.CompilerServices" />
+    <Using Include="System.Threading.Tasks" />
+  </ItemGroup>
+</Project>

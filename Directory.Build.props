@@ -1,0 +1,31 @@
+<Project>
+  <PropertyGroup Label="Dx.PathConfiguration">
+    <DxBuildRoot>$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
+  </PropertyGroup>
+
+  <Target Name="DxIdentifyProject" BeforeTargets="Restore;CollectPackageReferences;PrepareForBuild">
+    <PropertyGroup>
+      <IsAbstractionsProject Condition="$(MSBuildProjectName.EndsWith('.Abstractions'))">true</IsAbstractionsProject>
+      <IsInfrastructureProject Condition="$(MSBuildProjectName.EndsWith('.Persistence'))">true</IsInfrastructureProject>
+      <IsDomainProject Condition="'$(IsAbstractionsProject)' == 'true' OR '$(MSBuildProjectName)' == 'Dx.Domain'">true</IsDomainProject>
+    </PropertyGroup>
+  </Target>
+
+  <Import Project="$(DxBuildRoot)dx\dx.props" Condition="Exists('$(DxBuildRoot)dx\dx.props')" />
+</Project>
+<!--<Project>
+  <PropertyGroup Label="Dx.PathConfiguration">
+    <DxBuildRoot>$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.IdentityDetection">
+    <IsAbstractionsProject Condition="$(MSBuildProjectName.EndsWith('.Abstractions'))">true</IsAbstractionsProject>
+    <IsDomainProject Condition="'$(IsAbstractionsProject)' == 'true'">true</IsDomainProject>
+  </PropertyGroup>
+
+  <Target Name="DxDiscoveryMessage" BeforeTargets="Restore;PrepareForBuild" Condition="'$(DxBuildTrace)' == 'true'">
+    <Message Importance="high" Text="DX-DEBUG: Root Identity for $(MSBuildProjectName) is Abstractions=$(IsAbstractionsProject), Domain=$(IsDomainProject)" />
+  </Target>
+
+  <Import Project="$(DxBuildRoot)dx\dx.props" Condition="Exists('$(DxBuildRoot)dx\dx.props')" />
+</Project>-->

@@ -1,0 +1,32 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Security — Lock File Enforcement                        -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxSecurityLockFileRequired"
+          BeforeTargets="Restore"
+          Condition="'$(DxCI)' == 'true'
+                  AND '$(EnableSecurity)' == 'true'">
+
+    <Error
+      Condition="'$(RestoreLockedMode)' != 'true'"
+      Text="Dx Security error: CI builds must restore using locked mode." />
+
+  </Target>
+
+  <!-- ========================================================= -->
+  <!-- Vulnerability Audit Enforcement                            -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxSecurityAuditRequired"
+          BeforeTargets="Build"
+          Condition="'$(EnableSecurity)' == 'true'">
+
+    <Error
+      Condition="'$(EnablePackageVulnerabilityAudit)' != 'true'"
+      Text="Dx Security error: Vulnerability audit must be enabled." />
+
+  </Target>
+
+</Project>

@@ -1,0 +1,48 @@
+<Project>
+  <PropertyGroup>
+    <_DxTargetsImported>true</_DxTargetsImported>
+    <DxInternalTargetsRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</DxInternalTargetsRoot>
+  </PropertyGroup>
+
+  <Target Name="DxValidateTargetFramework" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(DxAllowedTFMs)' == ''"
+           Text="Dx critical error: Global framework policy (DxAllowedTFMs) is missing." />
+
+    <Error Condition="'$(TargetFramework)' != '' AND !$(DxAllowedTFMs.Contains('$(TargetFramework)'))"
+           Text="Dx build error: TargetFramework '$(TargetFramework)' is not allowed for project '$(MSBuildProjectName)'. Allowed: $(DxAllowedTFMs)." />
+  </Target>
+
+  <Target Name="DxCIEnforcement" BeforeTargets="Build" Condition="'$(DxCI)' == 'true'">
+    <Error Condition="'$(TreatWarningsAsErrors)' != 'true'" Text="Dx CI error: TreatWarningsAsErrors must be enabled." />
+    <Error Condition="'$(Deterministic)' != 'true'" Text="Dx CI error: Deterministic builds are mandatory." />
+  </Target>
+
+  <Import Project="$(DxInternalTargetsRoot)core/core.targets" />
+  <Import Project="$(DxInternalTargetsRoot)scope/scope.targets" />
+</Project>
+<!--<Project>
+  <PropertyGroup>
+    <_DxTargetsImported>true</_DxTargetsImported>
+    <DxInternalTargetsRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</DxInternalTargetsRoot>
+  </PropertyGroup>
+
+  <Target Name="DxValidateTargetFramework" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(TargetFramework)' != '' AND !$([System.String]::Copy('$(DxAllowedTFMs)').Contains('$(TargetFramework)'))"
+           Text="Dx build error: TargetFramework '$(TargetFramework)' is not allowed. Allowed: $(DxAllowedTFMs)." />
+  </Target>
+
+  <Target Name="DxCIEnforcement" BeforeTargets="Build" Condition="'$(DxCI)' == 'true'">
+    <Error Condition="'$(TreatWarningsAsErrors)' != 'true'" Text="Dx CI error: TreatWarningsAsErrors must be enabled." />
+    <Error Condition="'$(Deterministic)' != 'true'" Text="Dx CI error: Deterministic builds are mandatory." />
+  </Target>
+
+  <Import Project="$(DxInternalTargetsRoot)core/core.targets" Condition="Exists('$(DxInternalTargetsRoot)core/core.targets')" />
+  <Import Project="$(DxInternalTargetsRoot)scope/scope.targets" Condition="Exists('$(DxInternalTargetsRoot)scope/scope.targets')" />
+
+  <Import Project="$(DxInternalTargetsRoot)ci/ci.targets" Condition="'$(DxCI)' == 'true' AND Exists('$(DxInternalTargetsRoot)ci/ci.targets')" />
+  <Import Project="$(DxInternalTargetsRoot)quality/quality.targets" Condition="'$(EnableQuality)' == 'true' AND Exists('$(DxInternalTargetsRoot)quality/quality.targets')" />
+  <Import Project="$(DxInternalTargetsRoot)packing/packing.targets" Condition="'$(IsPackable)' == 'true' AND Exists('$(DxInternalTargetsRoot)packing/packing.targets')" />
+  <Import Project="$(DxInternalTargetsRoot)documentation/documentation.targets" Condition="'$(EnableDocumentation)' == 'true' AND Exists('$(DxInternalTargetsRoot)documentation/documentation.targets')" />
+
+  <Import Project="$(DxInternalTargetsRoot)help/help.targets" Condition="Exists('$(DxInternalTargetsRoot)help/help.targets')" />
+</Project>-->

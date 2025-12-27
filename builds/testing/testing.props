@@ -1,0 +1,53 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Testing — Identity                                     -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Testing.Identity">
+
+    <!-- Explicit test project declaration -->
+    <IsTestProject>false</IsTestProject>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Dx Testing — Enablement                                   -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Testing.Enablement">
+
+    <!-- Test execution is explicit -->
+    <EnableTesting>false</EnableTesting>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Dx Testing — Execution Policy                              -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Testing.Execution"
+                 Condition="'$(EnableTesting)' == 'true'">
+
+    <!-- Tests are not packable -->
+    <IsPackable>false</IsPackable>
+
+    <!-- Tests are never optimized for shipping -->
+    <Optimize>false</Optimize>
+
+    <!-- Tests may use reflection and threading -->
+    <AllowReflection>true</AllowReflection>
+    <AllowThreading>true</AllowThreading>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Scope-Derived Defaults                                     -->
+  <!-- ========================================================= -->
+
+  <!-- Test projects always enable testing -->
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <EnableTesting>true</EnableTesting>
+  </PropertyGroup>
+
+</Project>

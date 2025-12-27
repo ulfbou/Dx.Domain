@@ -1,0 +1,30 @@
+<Project>
+
+  <Import Project="Directory.Core.targets" Condition="Exists('Directory.Core.targets')" />
+
+  <Import Project="Directory.Pack.targets" Condition="Exists('Directory.Pack.targets')" />
+
+  <Import Project="Directory.Sign.targets"
+          Condition="Exists('Directory.Sign.targets') AND '$(EnableSigning)' == 'true'" />
+
+  <Import Project="Directory.Test.targets"
+          Condition="Exists('Directory.Test.targets') AND '$(EnableTesting)' == 'true'" />
+
+  <Import Project="Directory.Quality.targets"
+          Condition="Exists('Directory.Quality.targets') AND '$(EnableQuality)' == 'true'" />
+
+  <Import Project="Directory.Security.targets"
+          Condition="Exists('Directory.Security.targets') AND '$(EnableSecurity)' == 'true'" />
+
+  <Import Project="Directory.Documentation.targets"
+          Condition="Exists('Directory.Documentation.targets') AND '$(EnableDocumentation)' == 'true'" />
+
+  <Import Project="Directory.Performance.targets"
+          Condition="Exists('Directory.Performance.targets') AND '$(EnablePerformance)' == 'true'" />
+
+  <PropertyGroup Condition="'$(EnableDocumentation)' == 'true'">
+    <WarningsAsErrors>$(WarningsAsErrors);$(DocumentationWarningsAsErrors)</WarningsAsErrors>
+    <TreatWarningsAsErrors Condition="'$(DocumentationWarningsAsErrors)' != ''">true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

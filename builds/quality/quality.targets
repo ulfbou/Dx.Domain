@@ -1,0 +1,22 @@
+<Project>
+  <Target Name="DxQualityDiagnostics"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(EnableQuality)' == 'true'">
+    <Error Condition="'$(TreatWarningsAsErrors)' != 'true'"
+           Text="Dx Quality error: Quality-enabled project [$(MSBuildProjectName)] must treat warnings as errors." />
+  </Target>
+
+  <Target Name="DxQualityTestProjectValidation"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(IsTestProject)' == 'true'">
+    <Error Condition="'$(IsPackable)' == 'true'"
+           Text="Dx Quality error: Test project [$(MSBuildProjectName)] must not be packable." />
+  </Target>
+
+  <Target Name="DxQualityCIParity"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(DxCI)' == 'true' AND '$(EnableQuality)' == 'true'">
+    <Error Condition="'$(EnableAnalyzers)' != 'true'"
+           Text="Dx Quality error: CI quality builds for [$(MSBuildProjectName)] require analyzers to be enabled." />
+  </Target>
+</Project>

@@ -1,0 +1,17 @@
+<Project>
+
+  <Target Name="CleanArtifacts">
+
+    <ItemGroup>
+      <DirsToClean Include="**/bin" />
+      <DirsToClean Include="**/obj" />
+      <DirsToClean Include="**/TestResults" />
+      <DirsToClean Include="**/artifacts" />
+    </ItemGroup>
+
+    <Message Text="Nuking build artifacts..." Importance="high" />
+    <RemoveDir Directories="@(DirsToClean)" />
+
+  </Target>
+
+</Project>

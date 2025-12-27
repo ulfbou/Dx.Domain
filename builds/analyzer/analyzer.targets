@@ -1,0 +1,33 @@
+<Project>
+
+  <Target Name="DxAnalyzerPresence"
+          BeforeTargets="Compile"
+          Condition="'$(EnableAnalyzers)' == 'true'">
+
+    <Error
+      Condition="'$(RunAnalyzers)' != 'true'"
+      Text="Dx Analyzer error: Analyzers are enabled but not executing." />
+
+  </Target>
+
+  <Target Name="DxAnalyzerBeforeGenerators"
+          BeforeTargets="Compile"
+          Condition="'$(IsGeneratorProject)' == 'true'">
+
+    <Error
+      Condition="'$(EnableAnalyzers)' != 'true'"
+      Text="Dx Generator error: Generators may not run without analyzers enabled." />
+
+  </Target>
+
+  <Target Name="DxAnalyzerCIParity"
+          BeforeTargets="Compile"
+          Condition="'$(DxCI)' == 'true'">
+
+    <Error
+      Condition="'$(AnalysisMode)' != 'AllEnabledByDefault'"
+      Text="Dx Analyzer error: CI requires AnalysisMode=AllEnabledByDefault." />
+
+  </Target>
+
+</Project>

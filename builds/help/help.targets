@@ -1,0 +1,29 @@
+<Project>
+  <Target Name="DxPrintBuildInfo" BeforeTargets="BeforeBuild" Condition="'$(DxPrintInfo)' != 'false'">
+    <Message Text=" " Importance="high" />
+    <Message Text="================================================================" Importance="high" />
+    <Message Text="  Dx Build Kernel | $(MSBuildProjectName)" Importance="high" />
+    <Message Text="================================================================" Importance="high" />
+    <Message Text="  Identity      : Kernel=$(IsKernelProject) Domain=$(IsDomainProject) Abs=$(IsAbstractionsProject)" Importance="high" />
+    <Message Text="  Policy        : Quality=$(EnableQuality) Docs=$(EnableDocumentation) Analysis=$(AnalysisLevel)" Importance="high" />
+    <Message Text="  Environment   : CI=$(DxCI) TFM=$(TargetFramework) Config=$(Configuration)" Importance="high" />
+    <Message Text="================================================================" Importance="high" />
+    <Message Text=" " Importance="high" />
+  </Target>
+
+  <Target Name="Help">
+    <Message Text=" " Importance="high" />
+    <Message Text="Dx Build System - Developer Guide" Importance="high" />
+    <Message Text="---------------------------------" Importance="high" />
+    <Message Text="Usage: dotnet build /p:EnableQuality=true" Importance="high" />
+    <Message Text=" " Importance="high" />
+    <Message Text="Primary Feature Flags:" Importance="high" />
+    <Message Text="  EnableQuality        : Enforce strict warnings as errors" Importance="high" />
+    <Message Text="  EnableDocumentation  : Generate XML documentation" Importance="high" />
+    <Message Text="  DxBuildTrace=true    : Show detailed property evaluation trace" Importance="high" />
+    <Message Text=" " Importance="high" />
+    <Message Text="Common Targets:" Importance="high" />
+    <Message Text="  /t:Help              : Show this message" Importance="high" />
+    <Message Text=" " Importance="high" />
+  </Target>
+</Project>

@@ -1,0 +1,42 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Security — Enablement                                   -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Security.Enablement">
+
+    <!-- Security checks are explicit -->
+    <EnableSecurity>false</EnableSecurity>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Dependency & Vulnerability Policy                          -->
+  <!-- ========================================================= -->
+
+  <PropertyGroup Label="Dx.Security.Dependencies"
+                 Condition="'$(EnableSecurity)' == 'true'">
+
+    <!-- NuGet audit -->
+    <EnablePackageVulnerabilityAudit>true</EnablePackageVulnerabilityAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+
+    <!-- Lock files are mandatory for reproducibility -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(DxCI)' == 'true'">true</RestoreLockedMode>
+
+  </PropertyGroup>
+
+  <!-- ========================================================= -->
+  <!-- Scope-Derived Defaults                                     -->
+  <!-- ========================================================= -->
+
+  <!-- Kernel, Domain, and Tooling must always be secure -->
+  <PropertyGroup Condition="'$(IsKernelProject)' == 'true'
+                         OR '$(IsDomainProject)' == 'true'
+                         OR '$(IsToolingProject)' == 'true'">
+    <EnableSecurity>true</EnableSecurity>
+  </PropertyGroup>
+
+</Project>

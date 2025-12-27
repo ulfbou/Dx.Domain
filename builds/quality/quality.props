@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup Label="Dx.Quality.Enablement">
+    <EnableQuality Condition="'$(EnableQuality)' == '' AND ('$(IsDomainProject)' == 'true' OR '$(IsApplicationProject)' == 'true')">true</EnableQuality>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">false</EnableQuality>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Quality.Diagnostics" Condition="'$(EnableQuality)' == 'true'">
+    <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
+    <AnalysisLevel Condition="'$(AnalysisLevel)' == ''">latest</AnalysisLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Quality.Testing" Condition="'$(EnableQuality)' == 'true'">
+    <IsTestProject Condition="'$(IsTestProject)' == ''">false</IsTestProject>
+    <EnableCoverage Condition="'$(EnableCoverage)' == ''">false</EnableCoverage>
+  </PropertyGroup>
+</Project>

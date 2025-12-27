@@ -1,0 +1,56 @@
+<Project>
+
+  <!-- ========================================================= -->
+  <!-- Dx Packaging — Sanity Enforcement                         -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxPackSanity"
+          BeforeTargets="Pack"
+          Condition="'$(IsPackable)' == 'true'">
+
+    <!-- Version must be explicitly set for non-local builds -->
+    <Error
+      Condition="'$(DxCI)' == 'true' AND '$(Version)' == '0.0.0-local'"
+      Text="Dx Pack error: CI builds must specify an explicit package Version." />
+
+    <!-- Tooling packages must not leak runtime output -->
+    <Error
+      Condition="('$(IsAnalyzerProject)' == 'true' OR
+                  '$(IsGeneratorProject)' == 'true')
+                 AND '$(IncludeBuildOutput)' == 'true'"
+      Text="Dx Pack error: Analyzer and generator packages may not include build output." />
+
+  </Target>
+
+  <!-- ========================================================= -->
+  <!-- Analyzer Presence Enforcement                             -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxPackRequiresAnalyzers"
+          BeforeTargets="Pack"
+          Condition="'$(IsPackable)' == 'true'">
+
+    <Error
+      Condition="'$(EnableAnalyzers)' != 'true'"
+      Text="Dx Pack error: Packable projects must have analyzers enabled." />
+
+  </Target>
+
+  <!-- ========================================================= -->
+  <!-- Dx Pack — Metadata Validation                             -->
+  <!-- ========================================================= -->
+
+  <Target Name="DxPackMetadataValidation" BeforeTargets="Pack" Condition="'$(IsPackable)' == 'true'">
+    <Error Condition="'$(Authors)' == ''" Text="Dx Pack error: Package 'Authors' must be specified." />
+    <Error Condition="'$(Description)' == ''" Text="Dx Pack error: Package 'Description' must be specified." />
+    <Error Condition="'$(PackageLicenseExpression)' == ''" Text="Dx Pack error: Package License must be specified." />
+
+    <Error Condition="'$(PackageReadmeFile)' == ''" Text="Dx Pack error: PackageReadmeFile property is missing." />
+    <Error Condition="!Exists('$(PackageReadmeFile)')" Text="Dx Pack error: The README file '$(PackageReadmeFile)' does not exist." />
+  </Target>
+
+  <Target Name="DxPackValidation" BeforeTargets="GenerateNuspec">
+    <Error Condition="'$(Description)' == ''" Text="Dx Pack Error: Description is mandatory." />
+  </Target>
+
+</Project>

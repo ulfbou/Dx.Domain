@@ -1,0 +1,82 @@
+<Project>
+  <PropertyGroup Label="Dx.Scope.Purity"
+                 Condition="'$(IsAbstractionsProject)' == 'true' OR '$(IsKernelProject)' == 'true'">
+    <AllowReflection Condition="'$(AllowReflection)' == ''">false</AllowReflection>
+    <AllowIO Condition="'$(AllowIO)' == ''">false</AllowIO>
+    <AllowThreading Condition="'$(AllowThreading)' == ''">false</AllowThreading>
+    <AllowUnsafe Condition="'$(AllowUnsafe)' == ''">false</AllowUnsafe>
+    <EnableDocumentation Condition="'$(EnableDocumentation)' == ''">true</EnableDocumentation>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Scope.Domain"
+                 Condition="'$(IsDomainProject)' == 'true' AND '$(IsAbstractionsProject)' != 'true'">
+    <AllowReflection Condition="'$(AllowReflection)' == ''">false</AllowReflection>
+    <AllowIO Condition="'$(AllowIO)' == ''">false</AllowIO>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Scope.GlobalSafetyFallback">
+    <AllowReflection Condition="'$(AllowReflection)' == ''">false</AllowReflection>
+    <AllowIO Condition="'$(AllowIO)' == ''">false</AllowIO>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
+  </PropertyGroup>
+</Project>
+<!--<Project>
+  <PropertyGroup Label="Dx.Scope.IdentityDefaults">
+    <IsDomainProject Condition="'$(IsAbstractionsProject)' == 'true'">true</IsDomainProject>
+
+    <IsKernelProject Condition="'$(IsKernelProject)' == ''">false</IsKernelProject>
+    <IsDomainProject Condition="'$(IsDomainProject)' == ''">false</IsDomainProject>
+    <IsApplicationProject Condition="'$(IsApplicationProject)' == ''">false</IsApplicationProject>
+    <IsInfrastructureProject Condition="'$(IsInfrastructureProject)' == ''">false</IsInfrastructureProject>
+    <IsToolingProject Condition="'$(IsToolingProject)' == ''">false</IsToolingProject>
+    <IsAbstractionsProject Condition="'$(IsAbstractionsProject)' == ''">false</IsAbstractionsProject>
+    <IsAnalyzerProject Condition="'$(IsAnalyzerProject)' == ''">false</IsAnalyzerProject>
+    <IsGeneratorProject Condition="'$(IsGeneratorProject)' == ''">false</IsGeneratorProject>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Scope.Purity"
+                 Condition="'$(IsAbstractionsProject)' == 'true' OR '$(IsKernelProject)' == 'true'">
+    <AllowReflection Condition="'$(AllowReflection)' == ''">false</AllowReflection>
+    <AllowIO Condition="'$(AllowIO)' == ''">false</AllowIO>
+    <AllowThreading Condition="'$(AllowThreading)' == ''">false</AllowThreading>
+    <AllowUnsafe Condition="'$(AllowUnsafe)' == ''">false</AllowUnsafe>
+
+    <EnableDocumentation Condition="'$(EnableDocumentation)' == ''">true</EnableDocumentation>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Scope.Domain"
+                 Condition="'$(IsDomainProject)' == 'true' AND '$(IsAbstractionsProject)' != 'true'">
+    <AllowReflection Condition="'$(AllowReflection)' == ''">false</AllowReflection>
+    <AllowIO Condition="'$(AllowIO)' == ''">false</AllowIO>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Scope.Infrastructure"
+                 Condition="'$(IsInfrastructureProject)' == 'true'">
+    <AllowReflection Condition="'$(AllowReflection)' == ''">true</AllowReflection>
+    <AllowIO Condition="'$(AllowIO)' == ''">true</AllowIO>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Scope.Tooling"
+                 Condition="'$(IsToolingProject)' == 'true'">
+    <AllowReflection Condition="'$(AllowReflection)' == ''">true</AllowReflection>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Scope.References">
+    <DisableTransitiveProjectReferences Condition="'$(DisableTransitiveProjectReferences)' == ''">true</DisableTransitiveProjectReferences>
+    <DxAllowKernelReference Condition="'$(DxAllowKernelReference)' == ''">false</DxAllowKernelReference>
+    <DxAllowDomainReference Condition="'$(DxAllowDomainReference)' == ''">false</DxAllowDomainReference>
+    <DxAllowInfrastructureReference Condition="'$(DxAllowInfrastructureReference)' == ''">false</DxAllowInfrastructureReference>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.Scope.GlobalSafetyFallback">
+    <AllowReflection Condition="'$(AllowReflection)' == ''">false</AllowReflection>
+    <AllowIO Condition="'$(AllowIO)' == ''">false</AllowIO>
+    <AllowThreading Condition="'$(AllowThreading)' == ''">false</AllowThreading>
+    <AllowUnsafe Condition="'$(AllowUnsafe)' == ''">false</AllowUnsafe>
+    <EnableQuality Condition="'$(EnableQuality)' == ''">true</EnableQuality>
+  </PropertyGroup>
+</Project>-->

@@ -1,0 +1,15 @@
+<Project>
+  <Target Name="DxCoreSanity" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(LangVersion)' == ''"
+           Text="Dx Core error: LangVersion must be explicitly set." />
+
+    <Error Condition="'$(Nullable)' != 'enable'"
+           Text="Dx Core error: Nullable must be enabled." />
+
+    <Error Condition="'$(EnableNETAnalyzers)' != 'true'"
+           Text="Dx Core error: EnableNETAnalyzers must be true." />
+
+    <Error Condition="'$(AnalysisLevel)' == '' OR '$(AnalysisLevel)' == 'none'"
+           Text="Dx Core error: AnalysisLevel must be set to 'latest'." />
+  </Target>
+</Project>

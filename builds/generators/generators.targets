@@ -1,0 +1,37 @@
+<Project>
+
+  <Target Name="DxGeneratorAnalyzerGate"
+          BeforeTargets="Compile"
+          Condition="'$(EnableGenerators)' == 'true'">
+
+    <Error
+      Condition="'$(EnableAnalyzers)' != 'true'"
+      Text="Dx Generator error: Source generators require analyzers to be enabled." />
+
+    <Error
+      Condition="'$(RunSourceGenerators)' != 'true'"
+      Text="Dx Generator error: Generators are enabled but not executing." />
+
+  </Target>
+
+  <Target Name="DxGeneratorDeterminism"
+          BeforeTargets="Compile"
+          Condition="'$(IsGeneratorProject)' == 'true'">
+
+    <Error
+      Condition="'$(Deterministic)' != 'true'"
+      Text="Dx Generator error: Generator projects must be deterministic." />
+
+  </Target>
+
+  <Target Name="DxGeneratorCIParity"
+          BeforeTargets="Compile"
+          Condition="'$(DxCI)' == 'true' AND '$(EnableGenerators)' == 'true'">
+
+    <Error
+      Condition="'$(EmitCompilerGeneratedFiles)' != 'true'"
+      Text="Dx Generator error: CI requires generated files to be emitted." />
+
+  </Target>
+
+</Project>
