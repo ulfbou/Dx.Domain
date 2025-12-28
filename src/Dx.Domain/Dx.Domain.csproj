@@ -97,4 +97,7 @@
   <ItemGroup>
     <Folder Include="Factors\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dx.Domain.Abstractions\Dx.Domain.Abstractions.csproj" />
+  </ItemGroup>
 </Project>

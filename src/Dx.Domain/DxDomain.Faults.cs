@@ -10,6 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain;
+
+using System.Runtime.CompilerServices;
+
 namespace Dx
 {
     public static partial class DxDomain

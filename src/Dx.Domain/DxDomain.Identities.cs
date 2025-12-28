@@ -10,7 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain;
 using Dx.Domain.Factors;
+
+using System;
 
 namespace Dx
 {
