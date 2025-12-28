@@ -2,6 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <DxIsAnalyzer>true</DxIsAnalyzer>
+
     <!-- Template Symbols -->
     <ProjectName>Dx.Domain.Analyzers</ProjectName>
     <Authors>Ulf Bourelius;Dx.Domain Team</Authors>
@@ -22,7 +24,7 @@
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
@@ -85,19 +87,5 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
-  <!-- NOTE: The analyzers project must remain independent of the concrete Dx.Domain
-       target framework. It consumes domain concepts only via metadata conventions
-       (type names, result shape, etc.), so we deliberately avoid a project reference
-       to the net10.0 Dx.Domain assembly to keep this package usable on netstandard2.0. -->
-
-  <!-- Imports -->
-  <Import Project="Directory.Pack.props" Condition="Exists('Directory.Pack.props')" />
-  <Import Project="Directory.Sign.props" Condition="Exists('Directory.Sign.props') AND '$(EnableSigning)' == 'true'" />
-  <Import Project="Directory.Test.props" Condition="Exists('Directory.Test.props') AND '$(EnableTesting)' == 'true'" />
-  <Import Project="Directory.Quality.props" Condition="Exists('Directory.Quality.props') AND '$(EnableQuality)' == 'true'" />
-  <Import Project="Directory.Security.props" Condition="Exists('Directory.Security.props') AND '$(EnableSecurity)' == 'true'" />
-  <Import Project="Directory.Documentation.props" Condition="Exists('Directory.Documentation.props') AND '$(EnableDocumentation)' == 'true'" />
-  <Import Project="Directory.Performance.props" Condition="Exists('Directory.Performance.props') AND '$(EnablePerformance)' == 'true'" />
 
 </Project>

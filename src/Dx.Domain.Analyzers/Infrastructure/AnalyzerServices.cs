@@ -15,7 +15,7 @@ using Dx.Domain.Analyzers.Infrastructure.Flow;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
-namespace Dx.Domain.Analyzers.Infrastructure
+namespace System.Runtime.CompilerServices
 {
     // Support for C# 9 record types when targeting netstandard2.0
     internal static class IsExternalInit { }

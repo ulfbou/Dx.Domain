@@ -17,7 +17,6 @@ using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
-using Dx.Domain.Analyzers.Infrastructure.Semantics;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -132,7 +131,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             // Heuristic: consider symbols from core types as legacy
             // In production, this would check against a baseline API surface snapshot
             var containingType = symbol.ContainingType?.Name;
-            
+
             // Common kernel types that are grandfathered in
             if (containingType == "Result" || containingType == "DomainError" ||
                 containingType == "InvariantViolationException" || containingType == "Dx" ||

@@ -1,8 +1,9 @@
-<!-- Dx.Domain.Abstractions Project File -->
+﻿<!-- Dx.Domain.Abstractions Project File -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>10</LangVersion>
 
     <AssemblyName>Dx.Domain.Abstractions</AssemblyName>
     <RootNamespace>Dx.Domain</RootNamespace>
@@ -18,5 +19,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="10.0.1" />
+  </ItemGroup>
 
 </Project>

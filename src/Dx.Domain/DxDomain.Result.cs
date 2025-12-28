@@ -10,10 +10,12 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain;
+
+using System.Runtime.CompilerServices;
+
 namespace Dx
 {
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// Root facade into the Dx Domain Kernel, exposing public factories for results, identities,
     /// causation, and related primitives while keeping enforcement mechanics internal.
