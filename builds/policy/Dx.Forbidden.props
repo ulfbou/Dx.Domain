@@ -1,0 +1,9 @@
+<Project Label="Dx.Policy.Forbidden">
+
+  <ItemGroup>
+    <DxForbiddenProperty Include="Version" />
+    <DxForbiddenProperty Include="PackageVersion" />
+    <DxForbiddenProperty Include="SignAssembly" />
+  </ItemGroup>
+
+</Project>

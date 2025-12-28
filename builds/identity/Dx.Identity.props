@@ -1,0 +1,16 @@
+<Project Label="Dx.Identity.Hints">
+
+  <PropertyGroup>
+    <DxProjectRoleExplicit>$(DxProjectRole)</DxProjectRoleExplicit>
+
+    <DxSdkHint Condition="'$(DxProjectRoleExplicit)' == ''">
+      $(MSBuildProjectSdk)
+    </DxSdkHint>
+
+    <DxOutputTypeHint
+      Condition="'$(DxProjectRoleExplicit)' == '' AND '$(DxSdkHint)' == ''">
+      $(OutputType)
+    </DxOutputTypeHint>
+  </PropertyGroup>
+
+</Project>

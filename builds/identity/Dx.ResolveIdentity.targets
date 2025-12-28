@@ -1,0 +1,39 @@
+<Project Label="Dx.Identity.Resolve">
+
+  <Target Name="DxResolveIdentity"
+          BeforeTargets="PrepareForBuild">
+
+    <PropertyGroup>
+      <DxResolvedRole Condition="'$(DxProjectRoleExplicit)' != ''">
+        $(DxProjectRoleExplicit)
+      </DxResolvedRole>
+
+      <DxResolvedRole Condition="'$(DxResolvedRole)' == '' AND '$(DxSdkHint)' != ''">
+        $([System.String]::Copy($(DxSdkHint)))
+      </DxResolvedRole>
+
+      <DxResolvedRole Condition="'$(DxResolvedRole)' == '' AND '$(DxOutputTypeHint)' != ''">
+        $(DxOutputTypeHint)
+      </DxResolvedRole>
+    </PropertyGroup>
+
+    <Warning Condition="'$(DxResolvedRole)' == ''"
+             Code="DX002"
+             Text="[Dx Identity] Heuristic role resolution failed." />
+
+    <Error Condition="'$(DxResolvedRole)' == ''"
+           Code="DX003"
+           Text="[Dx Identity] Missing project identity. Define DxProjectRole." />
+
+    <PropertyGroup>
+      <DxIdentityFrozen>true</DxIdentityFrozen>
+    </PropertyGroup>
+
+    <WriteLinesToFile
+      File="$(BaseIntermediateOutputPath)DxResolved.props"
+      Lines="DxResolvedRole=$(DxResolvedRole);DxIdentityFrozen=true"
+      Overwrite="true" />
+
+  </Target>
+
+</Project>

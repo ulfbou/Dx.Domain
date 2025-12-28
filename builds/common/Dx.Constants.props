@@ -1,0 +1,8 @@
+<Project Label="Dx.Common.Constants">
+
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <DxIdentityFrozen>false</DxIdentityFrozen>
+  </PropertyGroup>
+
+</Project>

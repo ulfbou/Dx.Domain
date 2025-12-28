@@ -1,0 +1,15 @@
+<Project Label="Dx.Common.Versions">
+
+  <PropertyGroup>
+    <DxBuildVersion>1.0.0-prototype</DxBuildVersion>
+
+    <Version Condition="'$(Version)' == ''">
+      $(DxBuildVersion)
+    </Version>
+
+    <PackageVersion Condition="'$(PackageVersion)' == ''">
+      $(DxBuildVersion)
+    </PackageVersion>
+  </PropertyGroup>
+
+</Project>

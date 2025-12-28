@@ -1,0 +1,18 @@
+<Project Label="Dx.Policy.Enforcement">
+
+  <Target Name="DxEnforceForbiddenPolicies"
+          BeforeTargets="PrepareForBuild">
+
+    <ItemGroup>
+      <_DxViolation Include="@(DxForbiddenProperty)"
+                    Condition="'$($(DxForbiddenProperty.Identity))' != ''" />
+    </ItemGroup>
+
+    <Error Condition="'@(_DxViolation)' != ''"
+           Code="DX001"
+           File="$(MSBuildProjectFullPath)"
+           Text="[Dx Architecture] Policy Violation: Property '%(_DxViolation.Identity)' is forbidden. Move configuration to the Build Kernel or request a waiver." />
+
+  </Target>
+
+</Project>

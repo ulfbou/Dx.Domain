@@ -1,0 +1,10 @@
+<Project Label="Dx.CI.Policy">
+
+  <PropertyGroup>
+    <DxCI>true</DxCI>
+    <Deterministic>true</Deterministic>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DisableBuildServer>true</DisableBuildServer>
+  </PropertyGroup>
+
+</Project>

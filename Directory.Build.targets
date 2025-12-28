@@ -1,10 +1,9 @@
-<Project>
-  <PropertyGroup Label="Dx.IdentityPersistence">
-    <DxBuildRoot>$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
+<Project Label="Dx.Root.Egress">
 
-    <IsAbstractionsProject Condition="'$(IsAbstractionsProject)' == '' AND $(MSBuildProjectName.EndsWith('.Abstractions'))">true</IsAbstractionsProject>
-    <IsDomainProject Condition="'$(IsDomainProject)' == '' AND '$(IsAbstractionsProject)' == 'true'">true</IsDomainProject>
-  </PropertyGroup>
+  <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets"
+          Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
 
-  <Import Project="$(DxBuildRoot)dx\dx.targets" Condition="Exists('$(DxBuildRoot)dx\dx.targets')" />
+  <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets"
+          Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
+
 </Project>
