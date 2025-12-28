@@ -1,15 +1,15 @@
 <Project Label="Dx.Identity.Resolve">
-  <Target Name="DxResolveIdentity" BeforeTargets="PrepareForBuild">
+  <Target Name="DxResolveIdentity" BeforeTargets="DxEnforceIntentValidation">
     <PropertyGroup>
-      <DxResolvedRole Condition="'$(DxProjectRoleExplicit)' != ''">$(DxProjectRoleExplicit)</DxResolvedRole>
-      <DxResolvedRole Condition="'$(DxResolvedRole)' == '' AND '$(DxSdkHint)' != ''">$(DxSdkHint)</DxResolvedRole>
-      <DxResolvedRole Condition="'$(DxResolvedRole)' == '' AND '$(DxOutputTypeHint)' != ''">$(DxOutputTypeHint)</DxResolvedRole>
+      <DxResolvedRole Condition="'$(DxIsLibrary)' == 'true'">Library</DxResolvedRole>
+      <DxResolvedRole Condition="'$(DxIsAbstractions)' == 'true'">Abstractions</DxResolvedRole>
+      <DxResolvedRole Condition="'$(DxIsAnalyzer)' == 'true'">Analyzer</DxResolvedRole>
+      <DxResolvedRole Condition="'$(DxIsTest)' == 'true'">Test</DxResolvedRole>
+      <DxResolvedRole Condition="'$(DxIsTool)' == 'true'">Tool</DxResolvedRole>
+
+      <DxIdentityFrozen>true</DxIdentityFrozen>
     </PropertyGroup>
 
-    <Error Condition="'$(DxResolvedRole)' == ''"
-           Code="DXB003"
-           Text="[Dx Identity] Missing project identity. Define DxProjectRole in $(MSBuildProjectFile)." />
-
-    <Message Importance="High" Text="[Dx Identity] Resolved role: $(DxResolvedRole)" />
+    <Message Importance="High" Text="[Dx Identity] Project Intent Verified: $(DxResolvedRole)" Condition="'$(DxResolvedRole)' != ''" />
   </Target>
 </Project>

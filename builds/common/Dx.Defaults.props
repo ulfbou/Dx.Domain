@@ -1,0 +1,24 @@
+<Project Label="Dx.Common.Defaults">
+  <PropertyGroup>
+    <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == ''">true</GenerateDocumentationFile>
+    <ProduceReferenceAssembly Condition="'$(ProduceReferenceAssembly)' == ''">true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DxIsAbstractions)' == 'true'">
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <IsPackable Condition="'$(IsPackable)' == ''">true</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DxIsAnalyzer)' == 'true'">
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DxIsTest)' == 'true'">
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);CA1707;CS1591</NoWarn>
+  </PropertyGroup>
+</Project>

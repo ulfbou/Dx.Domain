@@ -1,0 +1,9 @@
+<Project Label="Dx.Common.ProjectKinds">
+  <ItemGroup Label="Dx.Vocabulary.ProjectKinds">
+    <DxValidProjectKind Include="DxIsLibrary" Description="Standard class library" />
+    <DxValidProjectKind Include="DxIsAbstractions" Description="Contract-only library" />
+    <DxValidProjectKind Include="DxIsAnalyzer" Description="Roslyn analyzer or source generator" />
+    <DxValidProjectKind Include="DxIsTest" Description="Unit or integration test project" />
+    <DxValidProjectKind Include="DxIsTool" Description="CLI tool or utility" />
+  </ItemGroup>
+</Project>

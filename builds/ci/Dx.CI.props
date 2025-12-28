@@ -1,10 +1,10 @@
-<Project Label="Dx.CI.Policy">
+<Project Label="Dx.CI.Discipline">
 
   <PropertyGroup>
     <DxCI>true</DxCI>
-    <Deterministic>true</Deterministic>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <DisableBuildServer>true</DisableBuildServer>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
 </Project>

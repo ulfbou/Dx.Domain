@@ -1,4 +1,22 @@
 <Project Label="Dx.Policy.Enforcement">
+
+  <Target Name="DxEnforceIntentValidation" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <_DxActiveKind Include="@(DxValidProjectKind)"
+                    Condition="'$([System.String]::Copy($%(Identity)).ToLower())' == 'true'" />
+    </ItemGroup>
+
+    <Error Condition="@(_DxActiveKind->Count()) &gt; 1"
+           Code="DXB011"
+           File="$(MSBuildProjectFullPath)"
+           Text="[Dx Architecture] Ambiguous Identity. Multiple roles detected: (@(_DxActiveKind)). A project must declare exactly one role (e.g. &lt;DxIsLibrary&gt;true&lt;/DxIsLibrary&gt;)." />
+
+    <Error Condition="@(_DxActiveKind->Count()) == 0 AND '$(DxIdentityFrozen)' != 'true'"
+           Code="DXB012"
+           File="$(MSBuildProjectFullPath)"
+           Text="[Dx Architecture] Undeclared Intent. Every project must declare a role from the closed vocabulary: (@(DxValidProjectKind))." />
+  </Target>
+
   <Target Name="DxEnforceForbiddenPolicies" BeforeTargets="PrepareForBuild">
     <ItemGroup>
       <_DxViolation Include="@(DxForbiddenProperty)"
@@ -8,6 +26,6 @@
     <Error Condition="'@(_DxViolation)' != ''"
            Code="DXB001"
            File="$(MSBuildProjectFullPath)"
-           Text="[Dx Architecture] Policy Violation: Property '%(_DxViolation.Identity)' is managed by the Kernel. Local project overrides are forbidden." />
+           Text="[Dx Architecture] Forbidden override: '%(_DxViolation.Identity)'. This property is managed by the Kernel. Remove it from the project file to comply with repo policy." />
   </Target>
 </Project>

@@ -7,12 +7,12 @@
   <ItemGroup Label="Dx.Internal.Discovery">
     <DxImport Include="common/Dx.Constants.props" />
     <DxImport Include="common/Dx.Versions.props" />
-    <DxImport Include="identity/Dx.Identity.props" />
     <DxImport Include="policy/Dx.Forbidden.props" />
-    <DxImport Include="ci/Dx.CI.props" Condition="'$(CI)' != '' OR '$(TF_BUILD)' != ''" />
+    <DxImport Include="ci/Dx.CI.props"
+              Condition="'$(CI)' != '' OR '$(TF_BUILD)' != ''" />
   </ItemGroup>
 
-  <Import Project="$(DxBuildRoot)%(DxImport.Identity)"
-          Condition="Exists('$(DxBuildRoot)%(DxImport.Identity)')" />
+  <Import Project="%(DxImport.Identity)"
+          Condition="Exists('%(DxImport.Identity)')" />
 
 </Project>
