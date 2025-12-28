@@ -12,7 +12,7 @@
     <DxImport Include="ci/Dx.CI.props" Condition="'$(CI)' != '' OR '$(TF_BUILD)' != ''" />
   </ItemGroup>
 
-  <Import Project="%(DxImport.Identity)"
-          Condition="Exists('%(DxImport.Identity)')" />
+  <Import Project="$(DxBuildRoot)%(DxImport.Identity)"
+          Condition="Exists('$(DxBuildRoot)%(DxImport.Identity)')" />
 
 </Project>

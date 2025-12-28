@@ -1,8 +1,16 @@
+<!-- Dx Constants -->
 <Project Label="Dx.Common.Constants">
 
-  <PropertyGroup>
-    <Deterministic>true</Deterministic>
-    <DxIdentityFrozen>false</DxIdentityFrozen>
+  <PropertyGroup Label="Dx.Common.Constants.Metadata">
+    <DxCompany>Dx.Domain Team</DxCompany>
+    <DxCopyright>Copyright © $([System.DateTime]::Now.ToString("yyyy")) $(DxCompany). All rights reserved.</DxCopyright>
+    <DxRepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</DxRepositoryUrl>
   </PropertyGroup>
 
+  <PropertyGroup Label="Dx.Common.Constants.GlobalSettings">
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
 </Project>
