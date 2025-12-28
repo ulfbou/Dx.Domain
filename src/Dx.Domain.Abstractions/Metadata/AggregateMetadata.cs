@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System;
+
 namespace Dx.Domain.Metadata
 {
     public sealed record AggregateMetadata(
@@ -28,3 +30,55 @@ namespace Dx.Domain.Metadata
         string Name,
         ImmutableArray<string> PayloadProperties);
 }
+#if NETSTANDARD2_0
+namespace System.Runtime.CompilerServices
+{
+    // Required so "init" compiles under netstandard2.0
+    public sealed class IsExternalInit { }
+}
+#endif
+#if NETSTANDARD2_0
+public abstract class Record
+{
+    public override bool Equals(object obj)
+    {
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+
+        var fields = GetType().GetProperties();
+        foreach (var f in fields)
+        {
+            var thisValue = f.GetValue(this);
+            var otherValue = f.GetValue(obj);
+            if (!Equals(thisValue, otherValue))
+                return false;
+        }
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 17;
+            foreach (var f in GetType().GetProperties())
+            {
+                var value = f.GetValue(this);
+                hash = hash * 23 + (value?.GetHashCode() ?? 0);
+            }
+            return hash;
+        }
+    }
+
+    public T With<T>(Action<T> mutator) where T : Record, new()
+    {
+        var clone = new T();
+        foreach (var f in GetType().GetProperties())
+            f.SetValue(clone, f.GetValue(this));
+
+        mutator(clone);
+        return clone;
+    }
+}
+#endif

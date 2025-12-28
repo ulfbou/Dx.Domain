@@ -10,7 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain
+namespace Dx.Domain.Diagnostics
 {
     // -------------------------------------------------------------------------
     // Shared Diagnostic Constants & Enums
