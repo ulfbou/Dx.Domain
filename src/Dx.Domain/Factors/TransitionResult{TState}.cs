@@ -10,7 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 using static Dx.DxDomain;
 
