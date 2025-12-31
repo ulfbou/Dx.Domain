@@ -1,31 +1,34 @@
-<Project Label="Dx.Policy.Enforcement">
+<!-- builds/policy/Dx.Governance.targets -->
+<Project Label="Dx.Policy.IntentValidation">
 
-  <Target Name="DxEnforceIntentValidation" BeforeTargets="PrepareForBuild">
+  <Target Name="DxValidateProjectIntent" BeforeTargets="PrepareForBuild">
+
     <ItemGroup>
-      <_DxActiveKind Include="@(DxValidProjectKind)"
-                    Condition="'$([System.String]::Copy($%(Identity)).ToLower())' == 'true'" />
+      <_DxDeclaredKind Include="@(DxProjectKind)"
+                       Condition="'$([System.String]::Copy($(%(Identity))).ToLower())' == 'true'" />
     </ItemGroup>
 
-    <Error Condition="@(_DxActiveKind->Count()) &gt; 1"
-           Code="DXB011"
+    <Error Condition="'@(_DxDeclaredKind->Count())' &gt; '1'"
+           Code="DX011"
            File="$(MSBuildProjectFullPath)"
-           Text="[Dx Architecture] Ambiguous Identity. Multiple roles detected: (@(_DxActiveKind)). A project must declare exactly one role (e.g. &lt;DxIsLibrary&gt;true&lt;/DxIsLibrary&gt;)." />
+           Text="[Dx Intent] Multiple DxIs flags detected: (@(_DxDeclaredKind)). Exactly one project role must be declared." />
 
-    <Error Condition="@(_DxActiveKind->Count()) == 0 AND '$(DxIdentityFrozen)' != 'true'"
-           Code="DXB012"
+    <Error Condition="'@(_DxDeclaredKind->Count())' == '0' AND '$(IsPackable)' == 'true'"
+           Code="DX012"
            File="$(MSBuildProjectFullPath)"
-           Text="[Dx Architecture] Undeclared Intent. Every project must declare a role from the closed vocabulary: (@(DxValidProjectKind))." />
+           Text="[Dx Intent] Packable projects must declare exactly one DxIs* role from the kernel vocabulary." />
+
   </Target>
 
-  <Target Name="DxEnforceForbiddenPolicies" BeforeTargets="PrepareForBuild">
+  <Target Name="DxValidateConstantsPurity" BeforeTargets="PrepareForBuild">
     <ItemGroup>
-      <_DxViolation Include="@(DxForbiddenProperty)"
-                    Condition="'$($(DxForbiddenProperty.Identity))' != ''" />
+      <_DxConstantsCondition Include="$(DxBuildRoot)common/Dx.Constants.props"
+                             Condition="$([System.IO.File]::ReadAllText('%(Identity)').Contains('Condition='))" />
     </ItemGroup>
 
-    <Error Condition="'@(_DxViolation)' != ''"
-           Code="DXB001"
-           File="$(MSBuildProjectFullPath)"
-           Text="[Dx Architecture] Forbidden override: '%(_DxViolation.Identity)'. This property is managed by the Kernel. Remove it from the project file to comply with repo policy." />
+    <Error Condition="'@(_DxConstantsCondition)' != ''"
+           Code="DX020"
+           Text="[Dx Architecture] Dx.Constants.props contains conditional logic. Constants must be unconditional facts only." />
   </Target>
+
 </Project>

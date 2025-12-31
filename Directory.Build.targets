@@ -1,14 +1,13 @@
+<!-- Directory.Build.targets -->
 <Project Label="Dx.Root.Egress">
-  <PropertyGroup>
-    <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
-    <DxTargetsImported Condition="'$(DxTargetsImported)' == ''">false</DxTargetsImported>
-  </PropertyGroup>
+
+  <Import Project="$(DxBuildRoot)common/Dx.Defaults.props"
+          Condition="Exists('$(DxBuildRoot)common/Dx.Defaults.props')" />
 
   <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets"
-          Condition="'$(DxTargetsImported)' != 'true'
-                     AND Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
+          Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
 
   <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets"
-          Condition="'$(DxTargetsImported)' != 'true'
-                     AND Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
+          Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
+
 </Project>

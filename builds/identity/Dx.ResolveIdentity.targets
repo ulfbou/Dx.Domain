@@ -1,5 +1,10 @@
+<!-- builds/identity/Dx.ResolveIdentity.targets -->
 <Project Label="Dx.Identity.Resolve">
-  <Target Name="DxResolveIdentity" BeforeTargets="DxEnforceIntentValidation">
+
+  <Target Name="DxResolveIdentity"
+          BeforeTargets="DxValidateProjectIntent"
+          Condition="'$(DxIdentityFrozen)' != 'true'">
+
     <PropertyGroup>
       <DxResolvedRole Condition="'$(DxIsLibrary)' == 'true'">Library</DxResolvedRole>
       <DxResolvedRole Condition="'$(DxIsAbstractions)' == 'true'">Abstractions</DxResolvedRole>
@@ -10,6 +15,10 @@
       <DxIdentityFrozen>true</DxIdentityFrozen>
     </PropertyGroup>
 
-    <Message Importance="High" Text="[Dx Identity] Project Intent Verified: $(DxResolvedRole)" Condition="'$(DxResolvedRole)' != ''" />
+    <Message Importance="High"
+             Text="[Dx Identity] Resolved project role: $(DxResolvedRole)"
+             Condition="'$(DxResolvedRole)' != ''" />
+
   </Target>
+
 </Project>

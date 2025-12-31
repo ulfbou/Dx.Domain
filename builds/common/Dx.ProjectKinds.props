@@ -1,9 +1,14 @@
-<Project Label="Dx.Common.ProjectKinds">
-  <ItemGroup Label="Dx.Vocabulary.ProjectKinds">
-    <DxValidProjectKind Include="DxIsLibrary" Description="Standard class library" />
-    <DxValidProjectKind Include="DxIsAbstractions" Description="Contract-only library" />
-    <DxValidProjectKind Include="DxIsAnalyzer" Description="Roslyn analyzer or source generator" />
-    <DxValidProjectKind Include="DxIsTest" Description="Unit or integration test project" />
-    <DxValidProjectKind Include="DxIsTool" Description="CLI tool or utility" />
+<!-- builds/common/Dx.ProjectKinds.props -->
+<Project Label="Dx.Data.ProjectKinds">
+  <PropertyGroup>
+    <DxProjectKindVocabularyVersion>1.0</DxProjectKindVocabularyVersion>
+  </PropertyGroup>
+
+  <ItemGroup Label="Dx.ProjectKind.Vocabulary">
+    <DxProjectKind Include="DxIsLibrary"      Description="Standard class library" />
+    <DxProjectKind Include="DxIsAbstractions" Description="Contract-only library" />
+    <DxProjectKind Include="DxIsAnalyzer"     Description="Roslyn analyzer or generator" />
+    <DxProjectKind Include="DxIsTest"         Description="Unit or integration test project" />
+    <DxProjectKind Include="DxIsTool"         Description="CLI tool or internal utility" />
   </ItemGroup>
 </Project>
