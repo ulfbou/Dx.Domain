@@ -13,11 +13,13 @@
 using Dx.Domain.Generators.Model;
 using Dx.Domain.Generators.Preview;
 
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Text.Json;
 
 using YamlDotNet.Serialization;
-
 using YamlDotNet.Serialization.NamingConventions;
 namespace Dx.Domain.Generators.Canonicalization
 {

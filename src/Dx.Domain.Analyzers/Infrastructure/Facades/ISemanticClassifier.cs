@@ -72,7 +72,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
 
             // Check for Dx.Domain namespace or domain-related namespaces
             return ns.StartsWith("Dx.Domain", System.StringComparison.Ordinal) ||
-                   ns.Contains(".Domain.", System.StringComparison.Ordinal) ||
+                   ns.Contains(".Domain.")
                    ns.EndsWith(".Domain", System.StringComparison.Ordinal);
         }
 

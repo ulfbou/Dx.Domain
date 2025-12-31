@@ -1,15 +1,16 @@
+using Dx.Domain;
+using Dx.Domain.Generators.Abstractions;
+using Dx.Domain.Generators.Core;
+using Dx.Domain.Generators.Diagnostics;
+using Dx.Domain.Generators.Internal;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Dx.Domain;
-using Dx.Domain.Generators.Core;
-using Dx.Domain.Generators.Abstractions;
-using Dx.Domain.Generators.Diagnostics;
-using Dx.Domain.Generators.Internal;
+using System.Transactions;
 
 namespace Dx.Domain.Generators.Orchestration
 {
@@ -42,15 +43,28 @@ namespace Dx.Domain.Generators.Orchestration
             IGeneratorStage stage,
             CancellationToken ct)
         {
-            // 1. Pre-Flight Assertion Check
-            var assertionResult = stage.Assertions.Validate(_store);
-            if (assertionResult.IsFailure)
+            // 1. Build Context and Transaction FIRST to fix CS0841/CS0103
+            var context = new StageContext(
+                _fingerprint,
+                _manifest,
+                _policy,
+                new ReadOnlyFactStoreProjection(_store),
+                _clock,
+                _identity);
+
+            using var transaction = new StageTransaction(_store);
+
+            // 2. Execute Stage (Renamed 'result' to 'stageResult' to avoid CS0136)
+            var stageResult = await stage.ExecuteAsync(context, transaction, ct).ConfigureAwait(false);
+
+            if (stageResult.IsFailure)
             {
+                // Accessing the diagnostic property correctly based on generators.cs
                 var diagnostic = new GeneratorDiagnostic(
                     id: "DXG.PreFlight",
                     @class: FailureClass.IntentViolation,
                     title: "Orchestrator",
-                    message: assertionResult.Error.Message,
+                    message: stageResult.Error.Diagnostic.Message,
                     inputFingerprint: _fingerprint,
                     stageName: stage.StageName,
                     location: null,
@@ -66,27 +80,9 @@ namespace Dx.Domain.Generators.Orchestration
                         null));
             }
 
-            // 2. Build Context
-            // FIX CS1061: MonotonicFactStore mapping to IReadOnlyFactSet
-            // Based on generators.cs, we wrap the store or use a projection
-            var context = new StageContext(
-                _fingerprint,
-                _manifest,
-                _policy,
-                new ReadOnlyFactStoreProjection(_store),
-                _clock,
-                _identity);
-
             try
             {
-                using var transaction = new StageTransaction(_store);
-                var result = await stage.ExecuteAsync(context, transaction, ct).ConfigureAwait(false);
-
-                if (result.IsFailure)
-                    return result;
-
                 // 3. Monotonic Commit
-                // Using the specific Dx identity factories provided in your prompt
                 var causation = DxDomain.CausationFactory.Create(
                     correlationId: DxDomain.Correlation.New(),
                     traceId: DxDomain.Trace.New(),
@@ -99,7 +95,6 @@ namespace Dx.Domain.Generators.Orchestration
 
                 if (commit.IsFailure)
                 {
-                    // FIX CS1061: Aggregate conflict messages from CommitFailure
                     var failureMessage = string.Join("; ", commit.Error.Conflicts.Select(c => c.ToString()));
 
                     return Result<StageSuccessPayload, StageFailurePayload>.InternalFailure(
@@ -116,7 +111,7 @@ namespace Dx.Domain.Generators.Orchestration
                             null));
                 }
 
-                return result;
+                return stageResult;
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {

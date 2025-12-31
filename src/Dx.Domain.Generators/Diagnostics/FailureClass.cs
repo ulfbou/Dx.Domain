@@ -53,6 +53,7 @@ namespace Dx.Domain.Generators.Diagnostics
         /// </summary>
         TrustViolation,
         DependencyViolation,
-        InternalError
+        InternalError,
+        InfrastructureError
     }
 }

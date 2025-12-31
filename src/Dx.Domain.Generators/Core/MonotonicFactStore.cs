@@ -12,7 +12,9 @@
 
 using Dx.Domain.Factors;
 
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Dx.Domain.Generators.Core
@@ -90,6 +92,13 @@ namespace Dx.Domain.Generators.Core
             }
 
             return conflicts;
+        }
+        /// <summary>
+        /// Returns a read-only snapshot of all currently stored facts.
+        /// </summary>
+        public IReadOnlyDictionary<string, object> Snapshot()
+        {
+            return _store.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetPayload());
         }
     }
 }

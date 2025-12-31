@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using Dx;
-using Dx.Domain; // Required for Unit and DomainError
+using Dx.Domain;
 using Dx.Domain.Generators.Abstractions;
 using Dx.Domain.Generators.Core;
 
@@ -41,33 +41,44 @@ namespace Dx.Domain.Generators.Orchestration
         public Result<Unit, DomainError> Propose<T>(FactKey<T> key, T value)
             where T : notnull
         {
-            if (_local.TryGetValue(key.Name, out var existing))
+            // Use Namespace:Name for unique key identification in the global store
+            var compositeKey = $"{key.Namespace}:{key.Name}";
+
+            if (_local.TryGetValue(compositeKey, out var existing))
             {
-                // Ensure the new proposal matches the existing one (monotonicity)
+                // Monotonic Invariant: Once proposed, a fact cannot change within a transaction
                 if (!StructuralComparer.StructurallyEqual(existing, value))
                 {
                     return Result.Failure<Unit, DomainError>(
-                        DxDomain.Faults.InvalidInput($"Conflicting proposal for '{key.Name}'.")); // Aligned with Faults.cs
+                        DxDomain.Faults.InvalidInput($"Conflicting proposal for '{compositeKey}'."));
                 }
-                return Result.Ok<Unit, DomainError>(Unit.Value); // Aligned with Unit.cs
+                return Result.Ok<Unit, DomainError>(Unit.Value);
             }
 
-            _local.Add(key.Name, value);
+            _local.Add(compositeKey, value);
             return Result.Ok<Unit, DomainError>(Unit.Value);
         }
 
         public Result<T, DomainError> GetCommitted<T>(FactKey<T> key)
             where T : notnull
         {
+            var compositeKey = $"{key.Namespace}:{key.Name}";
+
             // Attempts to retrieve a fact already committed to the store
-            if (_store.TryGet(key.Name, out var fact))
+            if (_store.TryGet(compositeKey, out var fact))
             {
-                // Note: MonotonicFactStore should return a type that allows payload extraction
-                return Result.Ok<T, DomainError>((T)fact!.GetPayload());
+                var payload = fact!.GetPayload();
+                if (payload is T typedValue)
+                {
+                    return Result.Ok<T, DomainError>(typedValue);
+                }
+
+                return Result.Failure<T, DomainError>(
+                    DxDomain.Faults.InvalidInput($"Type mismatch for committed fact '{compositeKey}'. Expected {typeof(T).Name}."));
             }
 
             return Result.Failure<T, DomainError>(
-                DxDomain.Faults.InvalidInput($"Missing required committed fact '{key.Name}'."));
+                DxDomain.Faults.InvalidInput($"Missing required committed fact '{compositeKey}'."));
         }
 
         /// <summary>

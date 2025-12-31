@@ -12,6 +12,7 @@
 
 using Dx.Domain;
 using Dx.Domain.Generators.Abstractions;
+using Dx.Domain.Generators.Core;
 
 using System.Threading;
 using System.Threading.Tasks;
