@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 
 using static Dx.DxDomain;
 
-namespace Dx.Domain
+namespace Dx.Domain.Errors
 {
     /// <summary>
     /// Represents a domain-specific error with a unique code and a descriptive message.

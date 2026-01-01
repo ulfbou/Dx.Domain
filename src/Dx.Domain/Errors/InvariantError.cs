@@ -17,7 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace Dx.Domain
+namespace Dx.Domain.Errors
 {
     /// <summary>
     /// Represents detailed diagnostic information for a violated invariant.

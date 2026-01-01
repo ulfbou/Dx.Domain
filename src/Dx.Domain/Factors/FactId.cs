@@ -12,6 +12,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 using static Dx.DxDomain;
@@ -25,15 +26,30 @@ namespace Dx.Domain.Factors
     /// Uniquely identifies a fact within the event stream or persistence store.
     /// </remarks>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly struct FactId : IEquatable<FactId>
+    public readonly struct FactId : IEquatable<FactId>, IComparable<FactId>, IComparable, ISpanFormattable
     {
+        /// <summary>
+        /// Represents an uninitialized or default value of the <see cref="FactId"/> type.
+        /// </summary>
+        public static readonly FactId Empty = new(Guid.Empty);
+
         /// <summary>Gets the underlying <see cref="Guid"/> value.</summary>
         public Guid Value { get; }
 
         /// <summary>
-        /// Initializes a new instance of the FactId struct with the specified <see cref="Guid"/> value.
+        /// Gets a value indicating whether the current value is empty.
         /// </summary>
-        /// <param name="value">The <see cref="Guid"/> value to assign to the FactId.</param>
+        public bool IsEmpty
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => Value == Guid.Empty;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FactId"/> struct with the specified <see cref="Guid"/> value.
+        /// </summary>
+        /// <param name="value">The <see cref="Guid"/> value to assign to the <see cref="FactId"/>.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private FactId(Guid value) => Value = value;
 
         /// <summary>
@@ -44,15 +60,15 @@ namespace Dx.Domain.Factors
         internal static FactId InternalNew() => new(Guid.NewGuid());
 
         /// <summary>
-        /// Creates a new FactId instance from the specified Guid value.
+        /// Creates a new <see cref="FactId"/> instance from the specified <see cref="Guid"/> value.
         /// </summary>
-        /// <param name="value">The Guid value to use for the FactId. Must not be <see cref="Guid.Empty"/>.</param>
-        /// <returns>A FactId that represents the specified <see cref="Guid"/> value.</returns>
+        /// <param name="value">The <see cref="Guid"/> value to use for the <see cref="FactId"/>. Must not be <see cref="Guid.Empty"/>.</param>
+        /// <returns>A <see cref="FactId"/> that represents the specified <see cref="Guid"/> value.</returns>
         /// <exception cref="InvariantViolationException">Thrown if the provided <see cref="Guid"/> value is <see cref="Guid.Empty"/>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static FactId InternalFrom(Guid value)
         {
-            Invariant.That(value != Guid.Empty, DxDomain.Faults.FactoryBypass("FactId cannot be default or empty. Use FactId.New()"));
+            Invariant.That(value != Guid.Empty, Faults.FactoryBypass("FactId cannot be default or empty. Use FactId.New()."));
             return new(value);
         }
 
@@ -66,12 +82,51 @@ namespace Dx.Domain.Factors
         public bool TryFormat(Span<char> destination, out int charsWritten)
             => Value.TryFormat(destination, out charsWritten, "N");
 
+        /// <summary>
+        /// General-purpose span formatting implementation used by composite formatting APIs.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="Guid"/>'s span-based formatting does not accept an <see cref="IFormatProvider"/>, so the provider parameter is ignored.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+            => Value.TryFormat(destination, out charsWritten, format.IsEmpty ? "N" : format);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => Value.ToString("N", CultureInfo.InvariantCulture);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(string? format, IFormatProvider? formatProvider)
+            => Value.ToString(format ?? "N", formatProvider ?? CultureInfo.InvariantCulture);
+
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(FactId other) => Value.Equals(other.Value);
 
         /// <inheritdoc />
         public override bool Equals(object? obj) => obj is FactId other && Equals(other);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => Value.GetHashCode();
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(FactId other) => Value.CompareTo(other.Value);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(object? obj)
+        {
+            if (obj is null || obj is not FactId other)
+            {
+                return 1;
+            }
+
+            return CompareTo(other);
+        }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -82,12 +137,26 @@ namespace Dx.Domain.Factors
         public static bool operator !=(FactId left, FactId right) => !left.Equals(right);
 
         /// <inheritdoc />
-        public override int GetHashCode() => Value.GetHashCode();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <(FactId left, FactId right) => left.CompareTo(right) < 0;
 
         /// <inheritdoc />
-        public override string ToString() => Value.ToString("N");
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <=(FactId left, FactId right) => left.CompareTo(right) <= 0;
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >(FactId left, FactId right) => left.CompareTo(right) > 0;
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >=(FactId left, FactId right) => left.CompareTo(right) >= 0;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => $"FactId={ToString()}";
+        private string DebuggerDisplay
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => $"FactId={Value.ToString("N", CultureInfo.InvariantCulture)}";
+        }
     }
 }
