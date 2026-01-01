@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Errors;
+
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;

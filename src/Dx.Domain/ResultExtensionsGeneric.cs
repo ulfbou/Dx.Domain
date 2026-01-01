@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Errors;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

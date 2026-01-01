@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using Dx.Domain;
+using Dx.Domain.Errors;
 using Dx.Domain.Primitives;
 
 using System;

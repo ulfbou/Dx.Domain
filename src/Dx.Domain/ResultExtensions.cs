@@ -11,6 +11,8 @@
 // ----------------------------------------------------------------------------------
 
 // src/Dx.Domain/Results/ResultExtensions.cs
+using Dx.Domain.Errors;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="IDomainSymbol.cs" company="Dx.Domain Team">
+// <copyright file="IDomainMetadataProvider.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,14 +10,17 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain
+namespace Dx.Domain.Contracts
 {
-    public interface IDomainSymbol
+    /// <summary>
+    /// Defines a provider that supplies domain-specific metadata of a specified type.
+    /// </summary>
+    /// <typeparam name="TMetadata">The type of metadata provided by the implementation.</typeparam>
+    public interface IDomainMetadataProvider<out TMetadata>
     {
-        string Name { get; }
-    }
-    public interface IDomainMetadataProvider<TMetadata>
-    {
+        /// <summary>
+        /// Gets the metadata associated with the current instance.
+        /// </summary>
         TMetadata Metadata { get; }
     }
 }
