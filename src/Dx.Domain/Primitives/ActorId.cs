@@ -10,13 +10,17 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Contracts;
+
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 using static Dx.DxDomain;
 
-namespace Dx.Domain
+namespace Dx.Domain.Primitives
 {
     /// <summary>
     /// Represents a strongly typed identifier for an actor, backed by a <see cref="Guid"/> value.
@@ -26,7 +30,7 @@ namespace Dx.Domain
     /// <see cref="ActorId"/> provides value-based equality and can be compared, serialized, or used as a key in collections.
     /// </remarks>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly struct ActorId : IEquatable<ActorId>
+    public readonly struct ActorId : IIdentity, IParsable<ActorId>, ISpanFormattable, IComparable<ActorId>, IEquatable<ActorId>
     {
         /// <summary>
         /// Represents an uninitialized or default value of the ActorId type.
@@ -41,9 +45,19 @@ namespace Dx.Domain
         public Guid Value { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the current value is empty.
+        /// </summary>
+        public bool IsEmpty
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => Value == Guid.Empty;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the ActorId struct using the specified <see cref="Guid"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Guid"/> value that uniquely identifies the actor.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ActorId(Guid value) => Value = value;
 
         /// <summary>
@@ -51,7 +65,7 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new unique <see cref="ActorId"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ActorId InternalNew() => new ActorId(Guid.NewGuid());
+        internal static ActorId InternalNew() => new(Guid.NewGuid());
 
         /// <summary>
         /// Creates a new ActorId instance from the specified GUID value.
@@ -64,8 +78,8 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static ActorId InternalFrom(Guid value)
         {
-            Invariant.That(value != Guid.Empty, DxDomain.Faults.FactoryBypass("ActorId cannot be default or empty. Use ActorId.New()"));
-
+            // Validates "Monotonic Knowledge" and "Invariant Enforcement"
+            Invariant.That(value != Guid.Empty, Faults.FactoryBypass("ActorId cannot be default."));
             return new ActorId(value);
         }
 
@@ -98,7 +112,75 @@ namespace Dx.Domain
         public static bool operator !=(ActorId left, ActorId right) => !left.Equals(right);
 
         /// <inheritdoc />
-        public override string ToString() => Value.ToString("N");
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => Value.ToString("N", CultureInfo.InvariantCulture);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(string? format, IFormatProvider? formatProvider)
+            => Value.ToString(format ?? "N", formatProvider ?? CultureInfo.InvariantCulture);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(ActorId other) => Value.CompareTo(other.Value);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(object? obj)
+        {
+            if (obj is null || obj is not ActorId other)
+            {
+                return 1;
+            }
+
+            return Value.CompareTo(other.Value);
+        }
+
+        /// <summary>
+        /// General-purpose span formatting implementation used by composite formatting APIs.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="Guid"/>'s span-based formatting does not accept an <see cref="IFormatProvider"/>, so the provider parameter is ignored.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+            => Value.TryFormat(destination, out charsWritten, format.IsEmpty ? "N" : format);
+
+        /// <inheritdoc />
+        public static ActorId Parse(string s, IFormatProvider? provider)
+        {
+            Invariant.That(s is not null, Faults.FactoryBypass("Null parse input."));
+            return InternalFrom(Guid.Parse(s, provider ?? CultureInfo.InvariantCulture));
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out ActorId result)
+        {
+            if (s is not null && Guid.TryParse(s, provider ?? CultureInfo.InvariantCulture, out var guid) && guid != Guid.Empty)
+            {
+                result = new ActorId(guid);
+                return true;
+            }
+            result = default;
+            return false;
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <(ActorId left, ActorId right) => left.CompareTo(right) < 0;
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <=(ActorId left, ActorId right) => left.CompareTo(right) <= 0;
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >(ActorId left, ActorId right) => left.CompareTo(right) > 0;
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >=(ActorId left, ActorId right) => left.CompareTo(right) >= 0;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay => $"ActorId={Value.ToString("N")}";

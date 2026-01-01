@@ -12,9 +12,10 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace Dx.Domain
+namespace Dx.Domain.Primitives
 {
     /// <summary>
     /// Represents a unique identifier for a span within a distributed tracing system.
@@ -22,25 +23,26 @@ namespace Dx.Domain
     /// <remarks>A SpanId is typically used to correlate and track individual operations or requests across
     /// system boundaries. The value is a 64-bit unsigned integer, and a SpanId with a value of 0 is considered empty.
     /// SpanId is immutable and supports value equality comparison.</remarks>
-    [DebuggerDisplay("SpanId = {Value}")]
-    public readonly struct SpanId : IEquatable<SpanId>
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    public readonly struct SpanId : IEquatable<SpanId>, IComparable<SpanId>, IComparable, ISpanFormattable
     {
         /// <summary>
         /// Gets an empty <see cref="SpanId"/> with a value of <c>0</c>.
         /// </summary>
         public static readonly SpanId Empty = new(0UL);
 
+        private readonly ulong _value;
+
         /// <summary>
         /// Gets the underlying numeric span value.
         /// </summary>
         public ulong Value => _value;
 
-        private readonly ulong _value;
-
         /// <summary>
         /// Initializes a new <see cref="SpanId"/> with the provided numeric value.
         /// </summary>
         /// <param name="value">The underlying span value.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private SpanId(ulong value) => _value = value;
 
         /// <summary>
@@ -61,6 +63,7 @@ namespace Dx.Domain
         public bool IsEmpty => _value == 0UL;
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(SpanId other) => _value == other._value;
 
         /// <inheritdoc />
@@ -69,12 +72,60 @@ namespace Dx.Domain
         /// <inheritdoc />
         public override int GetHashCode() => _value.GetHashCode();
 
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(SpanId other) => _value.CompareTo(other._value);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(object? obj)
+        {
+            if (obj is null || obj is not SpanId other)
+            {
+                return 1;
+            }
+
+            return CompareTo(other);
+        }
+
+        /// <summary>
+        /// Attempts to format the value as a hexadecimal string into the provided span.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten)
+            => _value.TryFormat(destination, out charsWritten, "x16", CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// General-purpose span formatting implementation used by composite formatting APIs.
+        /// </summary>
+        /// <remarks>
+        /// The <paramref name="format"/> is optional; when omitted, the value is rendered as 16 lowercase hexadecimal
+        /// characters.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+        {
+            var effectiveFormat = format.IsEmpty ? "x16" : new string(format);
+            return _value.TryFormat(destination, out charsWritten, effectiveFormat, provider ?? CultureInfo.InvariantCulture);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString()
+            => IsEmpty ? "SpanId.Empty" : _value.ToString("x16", CultureInfo.InvariantCulture);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(string? format, IFormatProvider? formatProvider)
+            => _value.ToString(format ?? "x16", formatProvider ?? CultureInfo.InvariantCulture);
+
         /// <summary>
         /// Determines whether two <see cref="SpanId"/> values are equal.
         /// </summary>
         /// <param name="a">The first identifier to compare.</param>
         /// <param name="b">The second identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(SpanId a, SpanId b) => a.Equals(b);
 
         /// <summary>
@@ -83,10 +134,10 @@ namespace Dx.Domain
         /// <param name="a">The first identifier to compare.</param>
         /// <param name="b">The second identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(SpanId a, SpanId b) => !a.Equals(b);
 
-        /// <inheritdoc />
-        public override string ToString()
-            => IsEmpty ? "SpanId.Empty" : $"SpanId(v={_value})";
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => IsEmpty ? "SpanId.Empty" : _value.ToString("x16", CultureInfo.InvariantCulture);
     }
 }

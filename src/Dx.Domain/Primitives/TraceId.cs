@@ -12,9 +12,10 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace Dx.Domain
+namespace Dx.Domain.Primitives
 {
     /// <summary>
     /// Represents a 128-bit unique identifier for distributed tracing scenarios.
@@ -23,8 +24,8 @@ namespace Dx.Domain
     /// boundaries in distributed systems. It provides equality comparison, string representation, and supports
     /// generation of random identifiers suitable for tracing use cases. The struct is immutable and
     /// thread-safe.</remarks>
-    [DebuggerDisplay("TraceId = hi={_hi}, lo={_lo}")]
-    public readonly struct TraceId : IEquatable<TraceId>
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    public readonly struct TraceId : IEquatable<TraceId>, IComparable<TraceId>, IComparable, ISpanFormattable
     {
         /// <summary>
         /// Gets an empty <see cref="TraceId"/> with all bits set to zero.
@@ -60,6 +61,7 @@ namespace Dx.Domain
         public bool IsEmpty => _hi == 0UL && _lo == 0UL;
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(TraceId other) => _hi == other._hi && _lo == other._lo;
 
         /// <inheritdoc />
@@ -74,6 +76,7 @@ namespace Dx.Domain
         /// <param name="a">The first identifier to compare.</param>
         /// <param name="b">The second identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(TraceId a, TraceId b) => a.Equals(b);
 
         /// <summary>
@@ -82,10 +85,91 @@ namespace Dx.Domain
         /// <param name="a">The first identifier to compare.</param>
         /// <param name="b">The second identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(TraceId a, TraceId b) => !a.Equals(b);
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(TraceId other)
+        {
+            int hiComparison = _hi.CompareTo(other._hi);
+            if (hiComparison != 0)
+            {
+                return hiComparison;
+            }
+
+            return _lo.CompareTo(other._lo);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(object? obj)
+        {
+            if (obj is null || obj is not TraceId other)
+            {
+                return 1;
+            }
+
+            return CompareTo(other);
+        }
+
+        /// <summary>
+        /// Attempts to format the identifier as a canonical 32-character hexadecimal string without separators.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten)
+        {
+            // 32 hex characters are required for the combined 128-bit value.
+            if (destination.Length < 32)
+            {
+                charsWritten = 0;
+                return false;
+            }
+
+            // Format as hi then lo in big-endian style for readability and determinism.
+            if (!_hi.TryFormat(destination.Slice(0, 16), out var hiChars, "x16"))
+            {
+                charsWritten = 0;
+                return false;
+            }
+
+            if (!_lo.TryFormat(destination.Slice(16, 16), out var loChars, "x16"))
+            {
+                charsWritten = 0;
+                return false;
+            }
+
+            charsWritten = hiChars + loChars;
+            return true;
+        }
+
+        /// <summary>
+        /// General-purpose span formatting implementation used by composite formatting APIs.
+        /// </summary>
+        /// <remarks>
+        /// The <paramref name="format"/> is currently ignored and the identifier is always rendered as 32 hex characters
+        /// using invariant culture.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+            => TryFormat(destination, out charsWritten);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
-            => IsEmpty ? "TraceId.Empty" : $"TraceId(hi={_hi},lo={_lo})";
+        {
+            Span<char> buffer = stackalloc char[32];
+
+            return TryFormat(buffer, out var charsWritten)
+                ? new string(buffer.Slice(0, charsWritten))
+                : string.Empty;
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(string? format, IFormatProvider? formatProvider) => ToString();
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => IsEmpty ? "TraceId.Empty" : ToString();
     }
 }

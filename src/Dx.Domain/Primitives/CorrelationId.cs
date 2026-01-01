@@ -12,11 +12,13 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 using static Dx.DxDomain;
 
-namespace Dx.Domain
+namespace Dx.Domain.Primitives
 {
     /// <summary>
     /// Represents a strongly-typed identifier used to correlate related operations or requests across system
@@ -28,7 +30,7 @@ namespace Dx.Domain
     /// A <see cref="CorrelationId"/> with a value of <see cref="Guid.Empty"/> is considered to be a context with no correlation.
     /// </remarks>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly struct CorrelationId : IEquatable<CorrelationId>
+    public readonly struct CorrelationId : IEquatable<CorrelationId>, ISpanFormattable, IComparable<CorrelationId>, IComparable
     {
         /// <summary>
         /// Gets an empty correlation identifier whose underlying value is all zeros.
@@ -40,7 +42,11 @@ namespace Dx.Domain
         /// <summary>
         /// Gets a value indicating whether this identifier is empty.
         /// </summary>
-        public bool IsEmpty => Value == Guid.Empty;
+        public bool IsEmpty
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => Value == Guid.Empty;
+        }
 
         /// <summary>Gets the underlying <see cref="Guid"/> value.</summary>
         public Guid Value { get; }
@@ -49,6 +55,7 @@ namespace Dx.Domain
         /// Initializes a new instance of the CorrelationId struct with the specified <see cref="Guid"/> value.
         /// </summary>
         /// <param name="value">The <see cref="Guid"/> value to assign to the correlation identifier.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private CorrelationId(Guid value) => Value = value;
 
         /// <summary>
@@ -56,12 +63,12 @@ namespace Dx.Domain
         /// </summary>
         /// <returns>A new unique <see cref="CorrelationId"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static CorrelationId InternalNew() => new CorrelationId(Guid.NewGuid());
+        internal static CorrelationId InternalNew() => new(Guid.NewGuid());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static CorrelationId InternalFrom(Guid value)
         {
-            Invariant.That(value != Guid.Empty, DxDomain.Faults.FactoryBypass("CorrelationId cannot be default or empty. Use CorrelationId.New()"));
+            Invariant.That(value != Guid.Empty, Faults.FactoryBypass("CorrelationId cannot be default or empty. Use CorrelationId.New()."));
             return new CorrelationId(value);
         }
 
@@ -80,10 +87,27 @@ namespace Dx.Domain
         public bool TryFormat(Span<char> destination, out int charsWritten)
             => Value.TryFormat(destination, out charsWritten, "N");
 
-        /// <inheritdoc />
-        public override string ToString() => Value.ToString("N");
+        /// <summary>
+        /// General-purpose span formatting implementation used by composite formatting APIs.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="Guid"/>'s span-based formatting does not accept an <see cref="IFormatProvider"/>, so the provider parameter is ignored.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+            => Value.TryFormat(destination, out charsWritten, format.IsEmpty ? "N" : format);
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => Value.ToString("N", CultureInfo.InvariantCulture);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string ToString(string? format, IFormatProvider? formatProvider)
+            => Value.ToString(format ?? "N", formatProvider ?? CultureInfo.InvariantCulture);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(CorrelationId other) => Value.Equals(other.Value);
 
         /// <inheritdoc />
@@ -93,12 +117,30 @@ namespace Dx.Domain
         public override int GetHashCode() => Value.GetHashCode();
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(CorrelationId other) => Value.CompareTo(other.Value);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(object? obj)
+        {
+            if (obj is null || obj is not CorrelationId other)
+            {
+                return 1;
+            }
+
+            return Value.CompareTo(other.Value);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(CorrelationId left, CorrelationId right) => left.Equals(right);
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(CorrelationId left, CorrelationId right) => !left.Equals(right);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => $"CorrelationId={ToString()}";
+        private string DebuggerDisplay => $"CorrelationId={Value.ToString("N", CultureInfo.InvariantCulture)}";
     }
 }
