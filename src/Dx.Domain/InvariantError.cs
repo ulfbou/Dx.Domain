@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Primitives;
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -48,7 +50,7 @@ namespace Dx.Domain
         public SpanId SpanId { get; }
 
         /// <summary>Gets the UTC timestamp when the invariant violation was recorded.</summary>
-        public DateTime UtcTimestamp { get; }
+        public DateTimeOffset UtcTimestamp { get; }
 
         private InvariantError(
             DomainError domainError,
@@ -68,7 +70,7 @@ namespace Dx.Domain
             CorrelationId = correlationId;
             TraceId = traceId;
             SpanId = spanId;
-            UtcTimestamp = DateTime.UtcNow;
+            UtcTimestamp = DateTimeOffset.UtcNow;
         }
 
         /// <summary>
@@ -91,7 +93,7 @@ namespace Dx.Domain
         /// <param name="line">The line number in the source file at which this method is called. This value is automatically provided by
         /// the compiler.</param>
         /// <returns>An InvariantError instance containing the specified domain error and contextual information.</returns>
-        internal static InvariantError Create(
+        internal static InvariantError InternalCreate(
             DomainError domainError,
             string? messageOverride = null,
             CorrelationId? correlationId = default,

@@ -12,6 +12,7 @@
 
 using Dx.Domain;
 
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Dx
@@ -54,6 +55,12 @@ namespace Dx
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static DomainError InvalidInput(string detail)
                 => DomainError.InternalCreate("Faults.InvalidInput", detail, false);
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static DomainError UnhandledException(Exception ex)
+                => DomainError.InternalCreate("Faults.UnhandledException", ex.Message, false);
+
+
 
             /// <summary>
             /// Provides predefined domain errors related to causation validation.

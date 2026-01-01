@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using Dx.Domain;
+using Dx.Domain.Primitives;
 
 using System;
 using System.Runtime.CompilerServices;
@@ -67,7 +68,7 @@ namespace Dx
                 if (condition)
                     return;
 
-                var diagnostic = InvariantError.Create(
+                var diagnostic = InvariantError.InternalCreate(
                     error,
                     message ?? error.Message,
                     correlationId ?? CorrelationId.Empty,
@@ -124,7 +125,7 @@ namespace Dx
                     return;
 
                 var error = errorFactory!();
-                var diagnostic = InvariantError.Create(
+                var diagnostic = InvariantError.InternalCreate(
                     error,
                     message ?? error.Message,
                     correlationId ?? CorrelationId.Empty,
@@ -135,6 +136,28 @@ namespace Dx
                     line);
 
                 throw InvariantViolationException.Create(diagnostic);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static InvariantError CreateInvariantError(
+                DomainError domainError,
+                string? messageOverride = null,
+                CorrelationId? correlationId = null,
+                TraceId? traceId = null,
+                SpanId? spanId = null,
+                [CallerMemberName] string member = "",
+                [CallerFilePath] string file = "",
+                [CallerLineNumber] int line = 0)
+            {
+                return InvariantError.InternalCreate(
+                    domainError,
+                    messageOverride,
+                    correlationId ?? CorrelationId.Empty,
+                    traceId ?? TraceId.Empty,
+                    spanId ?? SpanId.Empty,
+                    member,
+                    file,
+                    line);
             }
         }
     }

@@ -10,8 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain;
 using Dx.Domain.Factors;
+using Dx.Domain.Primitives;
 
 using System;
 
