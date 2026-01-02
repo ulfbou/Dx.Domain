@@ -10,12 +10,11 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain;
 using Dx.Domain.Errors;
 
 using System.Runtime.CompilerServices;
 
-namespace Dx
+namespace Dx.Domain
 {
     /// <summary>
     /// Root facade into the Dx Domain Kernel, exposing public factories for results, identities,
@@ -51,7 +50,7 @@ namespace Dx
             /// <returns>A <see cref="Result{TValue}"/> representing a successful operation with the provided value.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<TValue> Ok<TValue>(TValue value) where TValue : notnull
-                => Result<TValue>.InternalOk(value);
+                => Result<TValue>.Success(value);
 
             /// <summary>
             /// Creates a failed result containing the specified domain error.
@@ -63,7 +62,7 @@ namespace Dx
             /// <returns>A failed <see cref="Result{TValue}"/> instance containing the provided domain error.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<TValue> Failure<TValue>(DomainError error) where TValue : notnull
-                => Result<TValue>.InternalFailure(error);
+                => Result<TValue>.Failure(error);
 
             /// <summary>
             /// Creates a failed result with the specified error code and message.
@@ -74,7 +73,7 @@ namespace Dx
             /// <returns>A failed result containing the specified error information.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<TValue> Failure<TValue>(string code, string message) where TValue : notnull
-                => Result<TValue>.InternalFailure(DomainError.InternalCreate(code, message));
+                => Result<TValue>.Failure(DomainError.Create(code, message));
 
             /// <summary>
             /// Creates a successful result containing the specified value.
@@ -85,7 +84,7 @@ namespace Dx
             /// <returns>A Result object representing a successful outcome that contains the specified value.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<TValue, TError> Ok<TValue, TError>(TValue value) where TValue : notnull where TError : notnull
-                => Result<TValue, TError>.InternalOk(value);
+                => Result<TValue, TError>.Success(value);
 
             /// <summary>
             /// Creates a failed result containing the specified error value.
@@ -106,7 +105,7 @@ namespace Dx
             /// </summary>
             /// <returns>A <see cref="Result{Unit}"/> representing a successful operation with no value.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Result<Unit> Ok() => Result<Unit>.InternalOk(Unit.Value);
+            public static Result<Unit> Ok() => Result<Unit>.Success(Unit.Value);
 
             /// <summary>
             /// Creates a failed result of type <see cref="Unit"/> with the specified domain error.
@@ -114,7 +113,7 @@ namespace Dx
             /// <param name="error">The <see cref="DomainError"/> that describes the reason for the failure. Cannot be null.</param>
             /// <returns>A <see cref="Result{Unit}"/> representing a failed operation with the provided error.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Result<Unit> Failure(DomainError error) => Result<Unit>.InternalFailure(error);
+            public static Result<Unit> Failure(DomainError error) => Result<Unit>.Failure(error);
 
             /// <summary>
             /// Creates a failed result containing the specified error value.
@@ -136,50 +135,7 @@ namespace Dx
             /// <returns>A successful <see cref="Result{Unit, TError}"/> instance containing no value.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<Unit, TError> Ok<TError>() where TError : notnull
-                => Result<Unit, TError>.InternalOk(Unit.Value);
-
-            /// <summary>
-            /// Creates a new result instance from an existing <see cref="Result{TValue, TError}"/> object.
-            /// </summary>
-            /// <typeparam name="TValue">The type of the value contained in the result.</typeparam>
-            /// <typeparam name="TError">The type of the error contained in the result.</typeparam>
-            /// <param name="result">The result object to be returned.</param>
-            /// <returns>The same <see cref="Result{TValue, TError}"/> instance provided in <paramref name="result"/>.</returns>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Result<TValue, TError> From<TValue, TError>(Result<TValue, TError> result) where TValue : notnull where TError : notnull
-                => result;
-
-            /// <summary>
-            /// Returns the specified result instance without modification.
-            /// </summary>
-            /// <remarks>This method can be used to improve code readability or to enable method chaining in
-            /// generic scenarios. It does not create a new instance or alter the input result.</remarks>
-            /// <typeparam name="TValue">The type of the value contained in the result.</typeparam>
-            /// <param name="result">The result instance to return. Cannot be <see langword="null"/>.</param>
-            /// <returns>The same <see cref="Result{TValue}"/> instance provided in <paramref name="result"/>.</returns>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Result<TValue> From<TValue>(Result<TValue> result) where TValue : notnull
-                => result;
-
-            /// <summary>
-            /// Returns the specified <see cref="Result{Unit}"/> instance without modification.
-            /// </summary>
-            /// <param name="result">The <see cref="Result{Unit}"/> instance to return.</param>
-            /// <returns>The same <see cref="Result{Unit}"/> instance provided in <paramref name="result"/>.</returns>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Result<Unit> From(Result<Unit> result)
-                => result;
-
-            /// <summary>
-            /// Returns the specified result without modification.
-            /// </summary>
-            /// <typeparam name="TError">The type of the error value contained in the result.</typeparam>
-            /// <param name="result">The result to return. Represents either a successful outcome with no value, or an error of type
-            /// <typeparamref name="TError"/>.</param>
-            /// <returns>The same <see cref="Result{Unit, TError}"/> instance provided in <paramref name="result"/>.</returns>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Result<Unit, TError> From<TError>(Result<Unit, TError> result) where TError : notnull
-                => result;
+                => Result<Unit, TError>.Success(Unit.Value);
 
             /// <summary>
             /// Creates a new result object by converting a non-error result to a result type that includes an explicit
@@ -200,7 +156,7 @@ namespace Dx
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Result<TValue, TError> From<TValue, TError>(Result<TValue> result) where TValue : notnull where TError : notnull
                 => result.IsSuccess
-                    ? Result<TValue, TError>.InternalOk(result.Value)
+                    ? Result<TValue, TError>.Success(result.Value)
                     : Result<TValue, TError>.InternalFailure((TError)(object)result.Error!);
         }
     }

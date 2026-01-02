@@ -15,125 +15,51 @@ using Dx.Domain.Primitives;
 
 using System;
 
-namespace Dx
+namespace Dx.Domain
 {
     public static partial class DxDomain
     {
-        /// <summary>
-        /// Factories for creating <see cref="ActorId"/> values.
-        /// </summary>
+        /// <summary>Factories for creating <see cref="ActorId"/> values.</summary>
         public static partial class Actor
         {
-            /// <summary>
-            /// Creates a new <see cref="ActorId"/> with a freshly generated <see cref="Guid"/> value.
-            /// </summary>
-            /// <returns>A non-empty <see cref="ActorId"/>.</returns>
             public static ActorId New() => ActorId.InternalNew();
 
-            /// <summary>
-            /// Creates an <see cref="ActorId"/> from an existing <see cref="Guid"/> value.
-            /// </summary>
-            /// <param name="value">The GUID to wrap.</param>
-            /// <returns>An <see cref="ActorId"/> whose underlying value is <paramref name="value"/>.</returns>
             public static ActorId From(Guid value) => ActorId.InternalFrom(value);
         }
 
-        /// <summary>
-        /// Factories for creating <see cref="CorrelationId"/> values.
-        /// </summary>
         public static partial class Correlation
         {
-            /// <summary>
-            /// Creates a new <see cref="CorrelationId"/> with a freshly generated <see cref="Guid"/> value.
-            /// </summary>
-            /// <returns>A non-empty <see cref="CorrelationId"/>.</returns>
-            public static CorrelationId New() => CorrelationId.InternalNew();
+            public static CorrelationId New() => CorrelationId.New();
 
-            /// <summary>
-            /// Creates a <see cref="CorrelationId"/> from an existing <see cref="Guid"/> value.
-            /// </summary>
-            /// <param name="value">The GUID to wrap.</param>
-            /// <returns>A <see cref="CorrelationId"/> whose underlying value is <paramref name="value"/>.</returns>
-            public static CorrelationId From(Guid value) => CorrelationId.InternalFrom(value);
+            public static CorrelationId From(Guid value) => CorrelationId.From(value);
         }
 
-        /// <summary>
-        /// Factory for creating <see cref="TraceId"/> values used in distributed tracing.
-        /// </summary>
         public static partial class Trace
         {
-            /// <summary>
-            /// Creates a new random <see cref="TraceId"/> instance.
-            /// </summary>
-            /// <returns>A <see cref="TraceId"/> with a uniformly random 128-bit value.</returns>
-            public static TraceId New() => TraceId.InternalNew();
+            public static TraceId New() => TraceId.New();
         }
 
-        /// <summary>
-        /// Factory for creating <see cref="SpanId"/> values used within a single trace.
-        /// </summary>
         public static partial class Span
         {
-            /// <summary>
-            /// Creates a new random <see cref="SpanId"/> instance.
-            /// </summary>
-            /// <returns>A <see cref="SpanId"/> whose underlying value is non-zero with high probability.</returns>
-            public static SpanId New() => SpanId.InternalNew();
+            public static SpanId New() => SpanId.New();
         }
 
-        /// <summary>
-        /// Factories for creating fact identifiers and fact instances.
-        /// </summary>
         public static partial class Fact
         {
-            /// <summary>
-            /// Factories for creating <see cref="FactId"/> values.
-            /// </summary>
             public static partial class Id
             {
-                /// <summary>
-                /// Creates a new <see cref="FactId"/> with a freshly generated <see cref="Guid"/> value.
-                /// </summary>
-                /// <returns>A non-empty <see cref="FactId"/>.</returns>
-                public static FactId New() => FactId.InternalNew();
+                public static FactId New() => FactId.New();
 
-                /// <summary>
-                /// Creates a <see cref="FactId"/> from an existing <see cref="Guid"/> value.
-                /// </summary>
-                /// <param name="value">The GUID to wrap.</param>
-                /// <returns>A <see cref="FactId"/> whose underlying value is <paramref name="value"/>.</returns>
-                public static FactId From(Guid value) => FactId.InternalFrom(value);
+                public static FactId From(Guid value) => FactId.From(value);
             }
 
-            /// <summary>
-            /// Creates a new domain fact with the specified type, payload, and causation metadata.
-            /// </summary>
-            /// <typeparam name="TPayload">The type of the payload carried by the fact.</typeparam>
-            /// <param name="factType">The logical type or category of the fact. Must not be null or whitespace.</param>
-            /// <param name="payload">The fact payload.</param>
-            /// <param name="causation">The causation metadata describing why this fact occurred.</param>
-            /// <returns>A new <see cref="Fact{TPayload}"/> instance.</returns>
             public static Fact<TPayload> Create<TPayload>(string factType, TPayload payload, Causation causation)
                 where TPayload : notnull
                 => Fact<TPayload>.InternalCreate(factType, payload, causation);
         }
 
-        /// <summary>
-        /// Provides factory methods for creating instances of the Causation class with specified correlation and trace
-        /// information.
-        /// </summary>
-        /// <remarks>This static class is intended to simplify the creation of Causation objects by
-        /// encapsulating the required identifiers. All members are thread safe.</remarks>
         public static partial class CausationFactory
         {
-            /// <summary>
-            /// Creates a new Causation instance with the specified correlation and trace identifiers, and an optional
-            /// actor identifier.
-            /// </summary>
-            /// <param name="correlationId">The correlation identifier that links related operations for tracing and diagnostic purposes.</param>
-            /// <param name="traceId">The trace identifier that represents the distributed trace context for the operation.</param>
-            /// <param name="actorId">The optional identifier of the actor responsible for the causation. If null, no actor is associated.</param>
-            /// <returns>A new Causation instance initialized with the provided identifiers.</returns>
             public static Causation Create(
                 CorrelationId correlationId,
                 TraceId traceId,
