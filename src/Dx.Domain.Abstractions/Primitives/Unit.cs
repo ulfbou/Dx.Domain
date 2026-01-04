@@ -15,18 +15,14 @@ using System.Diagnostics;
 namespace Dx.Domain
 {
     /// <summary>
-    /// Represents a single, unique instance with no value. Used as the type parameter for <see cref="Result{TValue, TError}"/>
-    /// when an operation succeeds but returns no data (i.e., a functional equivalent of <c>void</c>).
+    /// Represents the absence of a value.
+    /// Used to unify generic and non-generic results.
     /// </summary>
-    /// <remarks>
-    /// This is a lightweight, stack-allocated record struct.
-    /// </remarks>
-    [DebuggerDisplay("Unit")]
-    public readonly record struct Unit
+    public readonly struct Unit
     {
         /// <summary>
-        /// Gets the single, unique instance of the <see cref="Unit"/> struct.
+        /// The single valid value of <see cref="Unit"/>.
         /// </summary>
-        public static Unit Value => default(Unit);
+        public static readonly Unit Value = default;
     }
 }

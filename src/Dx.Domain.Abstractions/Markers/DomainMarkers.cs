@@ -15,34 +15,33 @@ namespace Dx.Domain
     /// <summary>
     /// Represents the root entity of an aggregate in a domain-driven design context.
     /// </summary>
-    /// <remarks>Aggregate roots are entry points for modifying and retrieving aggregate data. Only aggregate
-    /// roots should be referenced from outside the aggregate to ensure consistency and encapsulation. This interface is
-    /// typically used as a marker for generic constraints and domain modeling.</remarks>
-    public interface IAggregateRoot : IEntity { }
+    /// <remarks>
+    /// Aggregate roots are entry points for modifying and retrieving aggregate data.
+    /// This interface is a pure semantic marker and defines no members.
+    /// </remarks>
+    public interface IAggregateRoot { }
 
     /// <summary>
-    /// Defines a contract for an entity type that can be used as a base for domain or data model objects.
+    /// Defines a contract for an entity type that participates in the domain model.
     /// </summary>
-    /// <remarks>Implement this interface to indicate that a class represents an entity within a domain model or
-    /// persistence layer. This interface is commonly used as a marker to enable generic handling of entities in
-    /// repositories, services, or frameworks.</remarks>
+    /// <remarks>
+    /// This interface is a pure semantic marker and defines no members.
+    /// </remarks>
     public interface IEntity { }
 
     /// <summary>
-    /// Represents a domain event that signals a significant change or occurrence within the domain model.
+    /// Represents a domain event that signals a significant change in the domain model.
     /// </summary>
-    /// <remarks>Domain events are used to capture and communicate important business events that have occurred within
-    /// the system. Implement this interface to define custom events that can be handled by other components, such as event
-    /// handlers or message dispatchers. Domain events are typically used in domain-driven design (DDD) to decouple event
-    /// producers from consumers and to enable eventual consistency across bounded contexts.</remarks>
+    /// <remarks>
+    /// This interface is a pure semantic marker and defines no members.
+    /// </remarks>
     public interface IDomainEvent { }
 
     /// <summary>
-    /// Defines a marker interface for value objects, which are compared based on their values rather than their
-    /// identities.
+    /// Defines a marker interface for value objects, which are compared by value.
     /// </summary>
-    /// <remarks>Implement this interface to indicate that an object represents a value in the domain model
-    /// and should be considered equal to other instances with the same value. Value objects are typically immutable and
-    /// do not have a distinct identity.</remarks>
+    /// <remarks>
+    /// This interface is a pure semantic marker and defines no members.
+    /// </remarks>
     public interface IValueObject { }
 }
