@@ -52,7 +52,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsSuccess, DxDomain.Faults.Result.MissingValueOnFailure<TValue, TError>(_error!));
+                Invariant.That(IsSuccess, DxDomain.Faults.Result.ValueAccessOnFailure<TValue, TError>(_error!));
                 return _value!;
             }
         }
@@ -65,7 +65,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsFailure, DxDomain.Faults.Result.MissingErrorOnSuccess<TValue, TError>(_value!));
+                Invariant.That(IsFailure, DxDomain.Faults.Result.ErrorAccessOnSuccess<TValue, TError>(_value!));
                 return _error!;
             }
         }
@@ -88,7 +88,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DebuggerStepThrough]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        internal static Result<TValue, TError> InternalOk(TValue value) => new(value);
+        internal static Result<TValue, TError> Success(TValue value) => new(value);
 
         /// <summary>
         /// Creates a failed result containing the specified error value.

@@ -50,7 +50,7 @@ namespace Dx.Domain.Primitives
         /// </summary>
         /// <returns>A new <see cref="SpanId"/> whose <see cref="Value"/> is non-zero with high probability.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static SpanId InternalNew()
+        internal static SpanId New()
         {
             Span<byte> buffer = stackalloc byte[8];
             Random.Shared.NextBytes(buffer);
@@ -119,23 +119,29 @@ namespace Dx.Domain.Primitives
         public string ToString(string? format, IFormatProvider? formatProvider)
             => _value.ToString(format ?? "x16", formatProvider ?? CultureInfo.InvariantCulture);
 
-        /// <summary>
-        /// Determines whether two <see cref="SpanId"/> values are equal.
-        /// </summary>
-        /// <param name="a">The first identifier to compare.</param>
-        /// <param name="b">The second identifier to compare.</param>
-        /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(SpanId a, SpanId b) => a.Equals(b);
+        public static bool operator ==(SpanId left, SpanId right) => left.Equals(right);
 
-        /// <summary>
-        /// Determines whether two <see cref="SpanId"/> values are not equal.
-        /// </summary>
-        /// <param name="a">The first identifier to compare.</param>
-        /// <param name="b">The second identifier to compare.</param>
-        /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(SpanId a, SpanId b) => !a.Equals(b);
+        public static bool operator !=(SpanId left, SpanId right) => !left.Equals(right);
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <(SpanId left, SpanId right) => left.CompareTo(right) < 0;
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator <=(SpanId left, SpanId right) => left.CompareTo(right) <= 0;
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >(SpanId left, SpanId right) => left.CompareTo(right) > 0;
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator >=(SpanId left, SpanId right) => left.CompareTo(right) >= 0;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay => IsEmpty ? "SpanId.Empty" : _value.ToString("x16", CultureInfo.InvariantCulture);

@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using static Dx.Domain.DxDomain.Kernel;
+
 namespace Dx.Domain
 {
     /// <summary>
@@ -55,7 +57,7 @@ namespace Dx.Domain
             where TOut : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(map is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(map)}' cannot be null."));
+            Invariant.That(map is not null, Faults.Guard.ParameterCannotBeNull(nameof(map)));
 
             return result.IsFailure
                 ? DxDomain.Result.Failure<TOut, TError>(result.Error)
@@ -78,7 +80,7 @@ namespace Dx.Domain
             where TOut : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(map is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(map)}' cannot be null."));
+            Invariant.That(map is not null, Faults.Guard.ParameterCannotBeNull(nameof(map)));
 
             if (result.IsFailure)
                 return Result<TOut, TError>.InternalFailure(result.Error);
@@ -107,7 +109,7 @@ namespace Dx.Domain
             where TOut : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(bind is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(bind)}' cannot be null."));
+            Invariant.That(bind is not null, Faults.Guard.ParameterCannotBeNull(nameof(bind)));
 
             return result.IsFailure ? DxDomain.Result.Failure<TOut, TError>(result.Error) : bind(result.Value);
         }
@@ -129,7 +131,7 @@ namespace Dx.Domain
             where TOut : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(bind is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(bind)}' cannot be null."));
+            Invariant.That(bind is not null, Faults.Guard.ParameterCannotBeNull(nameof(bind)));
 
             if (result.IsFailure)
                 return DxDomain.Result.Failure<TOut, TError>(result.Error);
@@ -153,7 +155,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(action is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(action)}' cannot be null."));
+            Invariant.That(action is not null, Faults.Guard.ParameterCannotBeNull(nameof(action)));
 
             if (!result.IsFailure)
                 action(result.Value);
@@ -174,7 +176,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(action is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(action)}' cannot be null."));
+            Invariant.That(action is not null, Faults.Guard.ParameterCannotBeNull(nameof(action)));
 
             if (!result.IsFailure)
                 await action(result.Value).ConfigureAwait(false);
@@ -201,7 +203,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(predicate is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(predicate)}' cannot be null."));
+            Invariant.That(predicate is not null, Faults.Guard.ParameterCannotBeNull(nameof(predicate)));
 
             if (result.IsFailure)
                 return result;
@@ -224,8 +226,8 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(predicate is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(predicate)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(errorFactory is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(predicate is not null, Faults.Guard.ParameterCannotBeNull(nameof(predicate)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             if (result.IsFailure)
                 return result;
@@ -248,7 +250,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(predicate is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(predicate)}' cannot be null."));
+            Invariant.That(predicate is not null, Faults.Guard.ParameterCannotBeNull(nameof(predicate)));
 
             if (result.IsFailure)
                 return result;
@@ -275,8 +277,8 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(predicate is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(predicate)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(errorFactory is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(predicate is not null, Faults.Guard.ParameterCannotBeNull(nameof(predicate)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             if (result.IsFailure)
                 return result;
@@ -304,7 +306,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(recovery is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(recovery)}' cannot be null."));
+            Invariant.That(recovery is not null, Faults.Guard.ParameterCannotBeNull(nameof(recovery)));
 
             return result.IsFailure ? DxDomain.Result.Ok<T, TError>(recovery(result.Error)) : result;
         }
@@ -323,7 +325,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(recovery is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(recovery)}' cannot be null."));
+            Invariant.That(recovery is not null, Faults.Guard.ParameterCannotBeNull(nameof(recovery)));
 
             return result.IsFailure ? recovery(result.Error) : result;
         }
@@ -342,7 +344,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(recovery is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(recovery)}' cannot be null."));
+            Invariant.That(recovery is not null, Faults.Guard.ParameterCannotBeNull(nameof(recovery)));
 
             return result.IsFailure
                 ? DxDomain.Result.Ok<T, TError>(await recovery(result.Error).ConfigureAwait(false))
@@ -363,7 +365,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(recovery is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(recovery)}' cannot be null."));
+            Invariant.That(recovery is not null, Faults.Guard.ParameterCannotBeNull(nameof(recovery)));
 
             return result.IsFailure
                 ? await recovery(result.Error).ConfigureAwait(false)
@@ -391,8 +393,8 @@ namespace Dx.Domain
             where TError : notnull
             where TOut : notnull
         {
-            Dx.DxDomain.Invariant.That(onSuccess is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(onSuccess)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(onFailure is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(onFailure)}' cannot be null."));
+            Invariant.That(onSuccess is not null, Faults.Guard.ParameterCannotBeNull(nameof(onSuccess)));
+            Invariant.That(onFailure is not null, Faults.Guard.ParameterCannotBeNull(nameof(onFailure)));
 
             return result.IsSuccess ? onSuccess(result.Value) : onFailure(result.Error);
         }
@@ -409,8 +411,8 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(onSuccess is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(onSuccess)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(onFailure is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(onFailure)}' cannot be null."));
+            Invariant.That(onSuccess is not null, Faults.Guard.ParameterCannotBeNull(nameof(onSuccess)));
+            Invariant.That(onFailure is not null, Faults.Guard.ParameterCannotBeNull(nameof(onFailure)));
 
             if (result.IsSuccess)
                 onSuccess(result.Value);
@@ -435,8 +437,8 @@ namespace Dx.Domain
             where TError : notnull
             where TOut : notnull
         {
-            Dx.DxDomain.Invariant.That(onSuccess is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(onSuccess)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(onFailure is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(onFailure)}' cannot be null."));
+            Invariant.That(onSuccess is not null, Faults.Guard.ParameterCannotBeNull(nameof(onSuccess)));
+            Invariant.That(onFailure is not null, Faults.Guard.ParameterCannotBeNull(nameof(onFailure)));
 
             return result.IsSuccess
                 ? await onSuccess(result.Value).ConfigureAwait(false)
@@ -457,8 +459,8 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(onSuccess is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(onSuccess)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(onFailure is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(onFailure)}' cannot be null."));
+            Invariant.That(onSuccess is not null, Faults.Guard.ParameterCannotBeNull(nameof(onSuccess)));
+            Invariant.That(onFailure is not null, Faults.Guard.ParameterCannotBeNull(nameof(onFailure)));
 
             if (result.IsSuccess)
                 await onSuccess(result.Value).ConfigureAwait(false);
@@ -497,7 +499,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(results is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(results)}' cannot be null."));
+            Invariant.That(results is not null, Faults.Guard.ParameterCannotBeNull(nameof(results)));
 
             var list = new List<T>();
             foreach (var r in results)
@@ -527,8 +529,8 @@ namespace Dx.Domain
             where TOut : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(source is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(source)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(selector is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(selector)}' cannot be null."));
+            Invariant.That(source is not null, Faults.Guard.ParameterCannotBeNull(nameof(source)));
+            Invariant.That(selector is not null, Faults.Guard.ParameterCannotBeNull(nameof(selector)));
 
             var list = new List<TOut>();
             foreach (var item in source)
@@ -561,8 +563,8 @@ namespace Dx.Domain
             where TOut : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(source is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(source)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(selector is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(selector)}' cannot be null."));
+            Invariant.That(source is not null, Faults.Guard.ParameterCannotBeNull(nameof(source)));
+            Invariant.That(selector is not null, Faults.Guard.ParameterCannotBeNull(nameof(selector)));
 
             var list = new List<TOut>();
             foreach (var item in source)
@@ -595,8 +597,8 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(func is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(func)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(errorFactory is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(func is not null, Faults.Guard.ParameterCannotBeNull(nameof(func)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             try
             {
@@ -620,8 +622,8 @@ namespace Dx.Domain
         public static Result<Unit, TError> TryCatch<TError>(Action action, Func<Exception, TError> errorFactory)
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(action is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(action)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(errorFactory is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(action is not null, Faults.Guard.ParameterCannotBeNull(nameof(action)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             try
             {
@@ -649,8 +651,8 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(func is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(func)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(errorFactory is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(func is not null, Faults.Guard.ParameterCannotBeNull(nameof(func)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             try
             {
@@ -675,8 +677,8 @@ namespace Dx.Domain
         public static async Task<Result<Unit, TError>> TryCatchAsync<TError>(Func<Task> action, Func<Exception, TError> errorFactory)
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(action is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(action)}' cannot be null."));
-            Dx.DxDomain.Invariant.That(errorFactory is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(action is not null, Faults.Guard.ParameterCannotBeNull(nameof(action)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             try
             {
@@ -730,7 +732,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            Dx.DxDomain.Invariant.That(mapError is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(mapError)}' cannot be null."));
+            Invariant.That(mapError is not null, Faults.Guard.ParameterCannotBeNull(nameof(mapError)));
 
             return result.IsFailure
                 ? DxDomain.Result.Failure<T, DomainError>(mapError(result.Error))
@@ -751,11 +753,11 @@ namespace Dx.Domain
             where TErrorIn : notnull
             where TErrorOut : notnull
         {
-            Dx.DxDomain.Invariant.That(mapError is not null, Dx.DxDomain.Faults.InvalidInput($"Parameter '{nameof(mapError)}' cannot be null."));
+            Invariant.That(mapError is not null, Faults.Guard.ParameterCannotBeNull(nameof(mapError)));
 
             return result.IsFailure
                 ? DxDomain.Result.Failure<T, TErrorOut>(mapError(result.Error))
-                : Result<T, TErrorOut>.InternalOk(result.Value);
+                : Result<T, TErrorOut>.Success(result.Value);
         }
 
         /// <summary>
@@ -774,8 +776,8 @@ namespace Dx.Domain
         {
             if (result.IsFailure)
             {
-                var invariantError = Dx.DxDomain.Invariant.CreateInvariantError(
-                    Dx.DxDomain.Faults.Result.MissingValueOnFailure<T, TError>(result.Error),
+                var invariantError = Invariant.CreateInvariantError(
+                    Faults.Result.ValueAccessOnFailure<T, TError>(result.Error),
                     "Attempted to unwrap a Result that is in a failure state.");
 
                 throw InvariantViolationException.Create(invariantError);

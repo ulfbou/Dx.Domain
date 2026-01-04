@@ -10,6 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Contracts;
 using Dx.Domain.Primitives;
 
 using System;
@@ -17,7 +18,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-using static Dx.DxDomain;
+using static Dx.Domain.DxDomain;
+using static Dx.Domain.DxDomain.Kernel;
 
 namespace Dx.Domain.Factors
 {
@@ -80,9 +82,9 @@ namespace Dx.Domain.Factors
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
         internal static Fact<TPayload> InternalCreate(string factType, TPayload payload, Causation causation, DateTimeOffset? utcTimestamp = null)
         {
-            Invariant.That(!string.IsNullOrWhiteSpace(factType), DxDomain.Faults.Fact.MissingFactType);
-            Invariant.That(causation.TraceId != TraceId.Empty, DxDomain.Faults.Fact.MissingTrace);
-            return new(FactId.InternalNew(), factType, payload!, causation, DateTimeOffset.UtcNow);
+            Invariant.That(!string.IsNullOrWhiteSpace(factType), Faults.Guard.StringParameterCannotBeNullOrWhitespace(nameof(factType)));
+            Invariant.That(causation.TraceId != TraceId.Empty, Faults.Guard.StringParameterCannotBeNullOrWhitespace(nameof(causation.TraceId)));
+            return new(FactId.New(), factType, payload!, causation, DateTimeOffset.UtcNow);
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

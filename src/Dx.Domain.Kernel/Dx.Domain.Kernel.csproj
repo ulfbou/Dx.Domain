@@ -1,15 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
 
     <RootNamespace>Dx.Domain</RootNamespace>
+    <AssemblyName>Dx.Domain.Kernel</AssemblyName>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>
-      The Dx.Domain package provides a powerful, attribute-based system for declaring and discovering metadata.
-      The core kernel focuses on strictly typed results, errors, and invariants.
+      The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.
+      It exists to make incorrect domain modeling impossible to ignore, not to act as a convenience library.
     </Description>
-    <PackageTags>dx;ddd;functional;result-pattern;metadata</PackageTags>
+    <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

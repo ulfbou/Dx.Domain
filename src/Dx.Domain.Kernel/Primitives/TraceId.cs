@@ -46,7 +46,7 @@ namespace Dx.Domain.Primitives
         /// </summary>
         /// <returns>A new <see cref="TraceId"/> with a uniformly random 128-bit value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static TraceId InternalNew()
+        internal static TraceId New()
         {
             Span<byte> buffer = stackalloc byte[16];
             Random.Shared.NextBytes(buffer);

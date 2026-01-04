@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using static Dx.Domain.DxDomain.Kernel;
+
 namespace Dx.Domain
 {
     /// <summary>
@@ -51,7 +53,7 @@ namespace Dx.Domain
         /// the original error.</returns>
         public static Result<TOut> Map<TIn, TOut>(this Result<TIn> result, Func<TIn, TOut> mapFunc)
         {
-            DxDomain.Invariant.That(mapFunc is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(mapFunc)}' cannot be null."));
+            Invariant.That(mapFunc is not null, Faults.Guard.ParameterCannotBeNull(nameof(mapFunc)));
             return result.IsFailure
                 ? DxDomain.Result.Failure<TOut>(result.Error)
                 : DxDomain.Result.Ok(mapFunc(result.Value));
@@ -72,7 +74,7 @@ namespace Dx.Domain
             where TIn : notnull
             where TOut : notnull
         {
-            DxDomain.Invariant.That(map is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(map)}' cannot be null."));
+            Invariant.That(map is not null, Faults.Guard.ParameterCannotBeNull(nameof(map)));
 
             if (result.IsFailure)
             {
@@ -101,7 +103,7 @@ namespace Dx.Domain
         /// a failure result containing the original error.</returns>
         public static Result<TOut> Bind<TIn, TOut>(this Result<TIn> result, Func<TIn, Result<TOut>> bindFunc)
         {
-            DxDomain.Invariant.That(bindFunc is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(bindFunc)}' cannot be null."));
+            Invariant.That(bindFunc is not null, Faults.Guard.ParameterCannotBeNull(nameof(bindFunc)));
 
             return result.IsFailure
                 ? DxDomain.Result.Failure<TOut>(result.Error)
@@ -126,7 +128,7 @@ namespace Dx.Domain
             where TIn : notnull
             where TOut : notnull
         {
-            DxDomain.Invariant.That(bindFunc is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(bindFunc)}' cannot be null."));
+            Invariant.That(bindFunc is not null, Faults.Guard.ParameterCannotBeNull(nameof(bindFunc)));
 
             if (result.IsFailure)
             {
@@ -163,7 +165,7 @@ namespace Dx.Domain
         public static async ValueTask<Result<T>> TapAsync<T>(this Result<T> result, Func<T, Task> action)
             where T : notnull
         {
-            DxDomain.Invariant.That(action is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(action)}' cannot be null."));
+            Invariant.That(action is not null, Faults.Guard.ParameterCannotBeNull(nameof(action)));
 
             if (result.IsSuccess)
             {
@@ -193,7 +195,7 @@ namespace Dx.Domain
         /// returned unchanged.</returns>
         public static Result<T> Ensure<T>(this Result<T> result, Func<T, bool> predicate, DomainError error) where T : notnull
         {
-            DxDomain.Invariant.That(predicate is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(predicate)}' cannot be null."));
+            Invariant.That(predicate is not null, Faults.Guard.ParameterCannotBeNull(nameof(predicate)));
 
             return result.IsFailure
                 ? result
@@ -216,8 +218,8 @@ namespace Dx.Domain
         /// containing the error produced by the error factory.</returns>
         public static Result<T> Ensure<T>(this Result<T> result, Func<T, bool> predicate, Func<DomainError> errorFactory) where T : notnull
         {
-            DxDomain.Invariant.That(predicate is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(predicate)}' cannot be null."));
-            DxDomain.Invariant.That(errorFactory is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(predicate is not null, Faults.Guard.ParameterCannotBeNull(nameof(predicate)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             return result.IsFailure
                 ? result
@@ -240,7 +242,7 @@ namespace Dx.Domain
         /// otherwise, a failure result containing the specified error.</returns>
         public static async ValueTask<Result<T>> EnsureAsync<T>(this Result<T> result, Func<T, Task<bool>> predicate, DomainError error) where T : notnull
         {
-            DxDomain.Invariant.That(predicate is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(predicate)}' cannot be null."));
+            Invariant.That(predicate is not null, Faults.Guard.ParameterCannotBeNull(nameof(predicate)));
 
             return result.IsFailure
                 ? result
@@ -265,8 +267,8 @@ namespace Dx.Domain
         /// is a failure; otherwise, a failure result with the error provided by <paramref name="errorFactory"/>.</returns>
         public static async ValueTask<Result<T>> EnsureAsync<T>(this Result<T> result, Func<T, Task<bool>> predicate, Func<Task<DomainError>> errorFactory) where T : notnull
         {
-            DxDomain.Invariant.That(predicate is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(predicate)}' cannot be null."));
-            DxDomain.Invariant.That(errorFactory is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(predicate is not null, Faults.Guard.ParameterCannotBeNull(nameof(predicate)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             return result.IsFailure
                 ? result
@@ -292,7 +294,7 @@ namespace Dx.Domain
         /// a failure; otherwise, the original result.</returns>
         public static Result<T> Recover<T>(this Result<T> result, Func<DomainError, T> recoveryFunc) where T : notnull
         {
-            DxDomain.Invariant.That(recoveryFunc is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(recoveryFunc)}' cannot be null."));
+            Invariant.That(recoveryFunc is not null, Faults.Guard.ParameterCannotBeNull(nameof(recoveryFunc)));
             return result.IsFailure
                 ? DxDomain.Result.Ok(recoveryFunc(result.Error))
                 : result;
@@ -312,7 +314,7 @@ namespace Dx.Domain
         /// original result if it is successful.</returns>
         public static Result<T> Recover<T>(this Result<T> result, Func<DomainError, Result<T>> recoveryFunc) where T : notnull
         {
-            DxDomain.Invariant.That(recoveryFunc is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(recoveryFunc)}' cannot be null."));
+            Invariant.That(recoveryFunc is not null, Faults.Guard.ParameterCannotBeNull(nameof(recoveryFunc)));
             return result.IsFailure ? recoveryFunc(result.Error) : result;
         }
 
@@ -330,7 +332,7 @@ namespace Dx.Domain
         /// result containing the value returned by the recovery function.</returns>
         public static async ValueTask<Result<T>> RecoverAsync<T>(this Result<T> result, Func<DomainError, Task<T>> recoveryFunc) where T : notnull
         {
-            DxDomain.Invariant.That(recoveryFunc is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(recoveryFunc)}' cannot be null."));
+            Invariant.That(recoveryFunc is not null, Faults.Guard.ParameterCannotBeNull(nameof(recoveryFunc)));
             return result.IsFailure ? DxDomain.Result.Ok(await recoveryFunc(result.Error).ConfigureAwait(false)) : result;
         }
 
@@ -346,7 +348,7 @@ namespace Dx.Domain
         /// the recovery function; otherwise, returns the original result.</returns>
         public static async ValueTask<Result<T>> RecoverAsync<T>(this Result<T> result, Func<DomainError, Task<Result<T>>> recovery) where T : notnull
         {
-            DxDomain.Invariant.That(recovery is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(recovery)}' cannot be null."));
+            Invariant.That(recovery is not null, Faults.Guard.ParameterCannotBeNull(nameof(recovery)));
             return result.IsFailure ? await recovery(result.Error).ConfigureAwait(false) : result;
         }
 
@@ -371,8 +373,8 @@ namespace Dx.Domain
         /// if the result is a failure.</returns>
         public static TOut Match<TOut, T>(this Result<T> result, Func<T, TOut> onSuccess, Func<DomainError, TOut> onFailure)
         {
-            DxDomain.Invariant.That(onSuccess is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(onSuccess)}' cannot be null."));
-            DxDomain.Invariant.That(onFailure is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(onFailure)}' cannot be null."));
+            Invariant.That(onSuccess is not null, Faults.Guard.ParameterCannotBeNull(nameof(onSuccess)));
+            Invariant.That(onFailure is not null, Faults.Guard.ParameterCannotBeNull(nameof(onFailure)));
 
             return result.IsSuccess
                 ? onSuccess(result.Value)
@@ -393,8 +395,8 @@ namespace Dx.Domain
         /// null.</param>
         public static void Match<T>(this Result<T> result, Action<T> onSuccess, Action<DomainError> onFailure) where T : notnull
         {
-            DxDomain.Invariant.That(onSuccess is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(onSuccess)}' cannot be null."));
-            DxDomain.Invariant.That(onFailure is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(onFailure)}' cannot be null."));
+            Invariant.That(onSuccess is not null, Faults.Guard.ParameterCannotBeNull(nameof(onSuccess)));
+            Invariant.That(onFailure is not null, Faults.Guard.ParameterCannotBeNull(nameof(onFailure)));
 
             if (result.IsSuccess)
             {
@@ -424,8 +426,8 @@ namespace Dx.Domain
         /// success or failure function, depending on the state of the result.</returns>
         public static async ValueTask<TOut> MatchAsync<T, TOut>(this Result<T> result, Func<T, Task<TOut>> onSuccess, Func<DomainError, Task<TOut>> onFailure) where T : notnull
         {
-            DxDomain.Invariant.That(onSuccess is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(onSuccess)}' cannot be null."));
-            DxDomain.Invariant.That(onFailure is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(onFailure)}' cannot be null."));
+            Invariant.That(onSuccess is not null, Faults.Guard.ParameterCannotBeNull(nameof(onSuccess)));
+            Invariant.That(onFailure is not null, Faults.Guard.ParameterCannotBeNull(nameof(onFailure)));
 
             return result.IsSuccess
                 ? await onSuccess(result.Value).ConfigureAwait(false)
@@ -447,8 +449,8 @@ namespace Dx.Domain
         /// <returns>A ValueTask that represents the asynchronous operation of invoking the appropriate delegate.</returns>
         public static async ValueTask MatchAsync<T>(this Result<T> result, Func<T, Task> onSuccess, Func<DomainError, Task> onFailure) where T : notnull
         {
-            DxDomain.Invariant.That(onSuccess is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(onSuccess)}' cannot be null."));
-            DxDomain.Invariant.That(onFailure is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(onFailure)}' cannot be null."));
+            Invariant.That(onSuccess is not null, Faults.Guard.ParameterCannotBeNull(nameof(onSuccess)));
+            Invariant.That(onFailure is not null, Faults.Guard.ParameterCannotBeNull(nameof(onFailure)));
 
             if (result.IsSuccess)
                 await onSuccess(result.Value).ConfigureAwait(false);
@@ -508,7 +510,7 @@ namespace Dx.Domain
         /// failure result containing the error from the first failed result.</returns>
         public static Result<IReadOnlyList<T>> Sequence<T>(this IEnumerable<Result<T>> results) where T : notnull
         {
-            DxDomain.Invariant.That(results is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(results)}' cannot be null."));
+            Invariant.That(results is not null, Faults.Guard.ParameterCannotBeNull(nameof(results)));
 
             if (results.Any(result => result.IsFailure))
                 return DxDomain.Result.Failure<IReadOnlyList<T>>(results.First(result => result.IsFailure).Error);
@@ -535,7 +537,7 @@ namespace Dx.Domain
         /// failure result containing the error from the first failed task.</returns>
         public static async ValueTask<Result<IReadOnlyList<T>>> SequenceAsync<T>(this IEnumerable<Task<Result<T>>> resultTasks) where T : notnull
         {
-            DxDomain.Invariant.That(resultTasks is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(resultTasks)}' cannot be null."));
+            Invariant.That(resultTasks is not null, Faults.Guard.ParameterCannotBeNull(nameof(resultTasks)));
 
             var list = new List<T>();
 
@@ -565,8 +567,8 @@ namespace Dx.Domain
             where TIn : notnull
             where TOut : notnull
         {
-            DxDomain.Invariant.That(selector is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(selector)}' cannot be null."));
-            DxDomain.Invariant.That(source is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(source)}' cannot be null."));
+            Invariant.That(selector is not null, Faults.Guard.ParameterCannotBeNull(nameof(selector)));
+            Invariant.That(source is not null, Faults.Guard.ParameterCannotBeNull(nameof(source)));
 
             var list = new List<TOut>();
 
@@ -631,8 +633,8 @@ namespace Dx.Domain
         /// the domain error produced by the error factory.</returns>
         public static Result<T> TryCatch<T>(Func<T> func, Func<Exception, DomainError> errorFactory) where T : notnull
         {
-            DxDomain.Invariant.That(func is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(func)}' cannot be null."));
-            DxDomain.Invariant.That(errorFactory is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(func is not null, Faults.Guard.ParameterCannotBeNull(nameof(func)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             try
             {
@@ -657,8 +659,8 @@ namespace Dx.Domain
         /// containing the domain error returned by <paramref name="errorFactory"/>.</returns>
         public static Result<Unit> TryCatch(Action action, Func<Exception, DomainError> errorFactory)
         {
-            DxDomain.Invariant.That(action is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(action)}' cannot be null."));
-            DxDomain.Invariant.That(errorFactory is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(action is not null, Faults.Guard.ParameterCannotBeNull(nameof(action)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             try
             {
@@ -685,8 +687,8 @@ namespace Dx.Domain
         /// containing the domain error generated from the exception.</returns>
         public static async ValueTask<Result<T>> TryCatchAsync<T>(Func<Task<T>> func, Func<Exception, DomainError> errorFactory) where T : notnull
         {
-            DxDomain.Invariant.That(func is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(func)}' cannot be null."));
-            DxDomain.Invariant.That(errorFactory is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(func is not null, Faults.Guard.ParameterCannotBeNull(nameof(func)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             try
             {
@@ -711,8 +713,8 @@ namespace Dx.Domain
         /// containing the domain error produced by <paramref name="errorFactory"/>.</returns>
         public static async ValueTask<Result<Unit>> TryCatchAsync(Func<Task> action, Func<Exception, DomainError> errorFactory)
         {
-            DxDomain.Invariant.That(action is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(action)}' cannot be null."));
-            DxDomain.Invariant.That(errorFactory is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(errorFactory)}' cannot be null."));
+            Invariant.That(action is not null, Faults.Guard.ParameterCannotBeNull(nameof(action)));
+            Invariant.That(errorFactory is not null, Faults.Guard.ParameterCannotBeNull(nameof(errorFactory)));
 
             try
             {
@@ -739,7 +741,7 @@ namespace Dx.Domain
             where T : notnull
             where TError : notnull
         {
-            DxDomain.Invariant.That(mapError is not null, DxDomain.Faults.InvalidInput($"Parameter '{nameof(mapError)}' cannot be null."));
+            Invariant.That(mapError is not null, Faults.Guard.ParameterCannotBeNull(nameof(mapError)));
             return result.IsFailure
                 ? DxDomain.Result.Failure<T, TError>(mapError(result.Error))
                 : DxDomain.Result.Ok<T, TError>(result.Value);
@@ -749,7 +751,7 @@ namespace Dx.Domain
         {
             if (result.IsFailure)
                 throw InvariantViolationException.Create(
-                    DxDomain.Invariant.CreateInvariantError(
+                    Invariant.CreateInvariantError(
                         result.Error,
                         "Attempted to unwrap a Result that is in a failure state."));
             return result.Value;
