@@ -10,7 +10,11 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Internal.Invariants;
+
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -27,21 +31,25 @@ namespace Dx.Domain.Errors
     public readonly struct DomainError : IEquatable<DomainError>
     {
         /// <summary>
-        /// A stable, machine-readable error code.
+        /// Gets a stable, machine-readable error code.
         /// </summary>
         public string Code { get; }
 
         /// <summary>
-        /// A human-readable description of the error.
+        /// Gets a human-readable description of the error.
         /// </summary>
         public string Message { get; }
 
-        private DomainError(string code, string message)
+        /// <summary>
+        /// Gets a collection of metadata associated with the current instance.
+        /// </summary>
+        public ImmutableDictionary<string, object> Meta { get; }
+
+        private DomainError(string code, string message, ImmutableArray<KeyValuePair<string, object>> meta)
         {
-            Invariant.That(!string.IsNullOrWhiteSpace(code), Faults.Guard.StringParameterCannotBeNullOrWhitespace(nameof(code)));
-            Invariant.That(!string.IsNullOrWhiteSpace(message), Faults.Guard.StringParameterCannotBeNullOrWhitespace(nameof(message)));
             Code = code;
             Message = message;
+            Meta = ImmutableDictionary.CreateRange(meta);
         }
 
         /// <summary>
@@ -50,8 +58,8 @@ namespace Dx.Domain.Errors
         /// <param name="code">The unique code that identifies the type of domain error. Cannot be null or empty.</param>
         /// <param name="message">The descriptive message that explains the error. Cannot be null.</param>
         /// <returns>A new DomainError instance initialized with the specified code and message.</returns>
-        internal static DomainError Create(string code, string message)
-            => new(code, message);
+        internal static DomainError Create(string code, string message, ImmutableArray<KeyValuePair<string, object>> meta)
+            => new(code, message, meta: meta);
 
         /// <inheritdoc />
         public bool Equals(DomainError other)
