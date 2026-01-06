@@ -93,7 +93,7 @@ namespace Dx.Domain.Errors
         /// <param name="line">The line number in the source file at which this method is called. This value is automatically provided by
         /// the compiler.</param>
         /// <returns>An InvariantError instance containing the specified domain error and contextual information.</returns>
-        internal static InvariantError InternalCreate(
+        internal static InvariantError Create(
             DomainError domainError,
             string? messageOverride = null,
             CorrelationId? correlationId = default,

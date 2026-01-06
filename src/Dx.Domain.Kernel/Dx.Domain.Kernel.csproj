@@ -13,6 +13,7 @@
     <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

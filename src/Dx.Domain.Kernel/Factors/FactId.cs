@@ -15,9 +15,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-using static Dx.Domain.DxDomain;
-using static Dx.Domain.DxDomain.Kernel;
-
 namespace Dx.Domain.Factors
 {
     /// <summary>

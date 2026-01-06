@@ -12,34 +12,10 @@
 //   - encode policy, logging, or integration behavior
 // ============================================================================
 
-using Dx.Domain.Diagnostics;
-using Dx.Domain.Errors;
-
 using System;
-using System.Collections.Immutable;
 
 namespace Dx.Domain.Internal.Diagnostics
 {
-    // DPI: Transforms InvariantError into InvariantDiagnostic; data-only, no behavior.
-    internal static class DiagnosticFactory
-    {
-        public static InvariantDiagnostic FromInvariantError(
-            InvariantError error,
-            DiagnosticCategory category)
-        {
-            var timestamp = error.Timestamp ?? error.Error.Timestamp ?? KernelClock.UtcNow();
-
-            return new InvariantDiagnostic
-            {
-                RuleId = error.RuleId,
-                Message = error.Error.Message,
-                ErrorCode = error.Error.Code,
-                Hints = error.Hints ?? ImmutableDictionary<string, object>.Empty,
-                Timestamp = timestamp,
-                Category = category
-            };
-        }
-    }
     // DPI: Ensures diagnostic hint values are serializable and permitted.
     //      This is a mechanical guard, analyzers enforce the broader contract.
     internal static class DiagnosticHintValidator
@@ -86,11 +62,5 @@ namespace Dx.Domain.Internal.Diagnostics
                     $"Diagnostic hint value for key '{key}' is not a permitted type.",
                     nameof(value));
         }
-    }
-    internal sealed class InvariantDiagnostic
-    {
-        public string RuleId { get; }
-        public string Message { get; }
-        public InvariantDiagnostic(string ruleId, string message) { RuleId = ruleId; Message = message; }
     }
 }

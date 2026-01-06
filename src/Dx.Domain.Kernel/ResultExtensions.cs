@@ -12,13 +12,12 @@
 
 // src/Dx.Domain/Results/ResultExtensions.cs
 using Dx.Domain.Errors;
+using Dx.Domain.Internal.Invariants;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using static Dx.Domain.DxDomain.Kernel;
 
 namespace Dx.Domain
 {
@@ -52,6 +51,8 @@ namespace Dx.Domain
         /// <returns>A new result containing the mapped value if the input result is successful; otherwise, a failure result with
         /// the original error.</returns>
         public static Result<TOut> Map<TIn, TOut>(this Result<TIn> result, Func<TIn, TOut> mapFunc)
+            where TIn : notnull
+            where TOut : notnull
         {
             Invariant.That(mapFunc is not null, Faults.Guard.ParameterCannotBeNull(nameof(mapFunc)));
             return result.IsFailure

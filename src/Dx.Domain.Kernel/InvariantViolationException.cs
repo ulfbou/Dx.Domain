@@ -48,6 +48,14 @@ namespace Dx.Domain
         internal static InvariantViolationException Create(InvariantError diagnostic)
             => new InvariantViolationException(diagnostic);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static InvariantViolationException Create(InvariantError diagnostic, string paramName)
+            => InvariantViolationException.Create(diagnostic, paramName);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static InvariantViolationException Create(string code, string message, string paramName)
+            => new(InvariantError.Create(DomainError.Create(code, message), paramName));
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay => $"InvariantViolationException: {Message}";
     }

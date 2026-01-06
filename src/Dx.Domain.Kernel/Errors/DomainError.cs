@@ -18,9 +18,6 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-using static Dx.Domain.DxDomain;
-using static Dx.Domain.DxDomain.Kernel;
-
 namespace Dx.Domain.Errors
 {
     /// <summary>
@@ -43,7 +40,7 @@ namespace Dx.Domain.Errors
         /// <summary>
         /// Gets a collection of metadata associated with the current instance.
         /// </summary>
-        public ImmutableDictionary<string, object> Meta { get; }
+        public ImmutableDictionary<string, object> Meta { get; init; }
 
         private DomainError(string code, string message, ImmutableArray<KeyValuePair<string, object>> meta)
         {
@@ -57,9 +54,19 @@ namespace Dx.Domain.Errors
         /// </summary>
         /// <param name="code">The unique code that identifies the type of domain error. Cannot be null or empty.</param>
         /// <param name="message">The descriptive message that explains the error. Cannot be null.</param>
+        /// <param name="meta">Metadata associated with the error. Cannot be null.</param>
         /// <returns>A new DomainError instance initialized with the specified code and message.</returns>
-        internal static DomainError Create(string code, string message, ImmutableArray<KeyValuePair<string, object>> meta)
-            => new(code, message, meta: meta);
+        internal static DomainError Create(string code, string message, ImmutableArray<KeyValuePair<string, object>>? meta = null)
+            => new(code, message, meta: meta ?? ImmutableArray<KeyValuePair<string, object>>.Empty);
+
+        /// <summary>
+        /// Returns a new instance of the current error with the specified metadata key and value added or updated.
+        /// </summary>
+        /// <param name="key">The metadata key to add or update. Cannot be null.</param>
+        /// <param name="value">The value to associate with the specified metadata key. Cannot be null.</param>
+        /// <returns>A new <see cref="DomainError"/> instance that includes the specified metadata key and value.</returns>
+        public DomainError Enrich(string key, string value)
+            => this with { Meta = Meta.SetItem(key, value) };
 
         /// <inheritdoc />
         public bool Equals(DomainError other)

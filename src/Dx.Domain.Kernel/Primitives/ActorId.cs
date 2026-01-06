@@ -10,15 +10,15 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Contracts;
+using Dx.Domain.Attributes;
+using Dx.Domain.Errors;
+using Dx.Domain.Internal.Invariants;
 
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-
-using static Dx.DxDomain;
 
 namespace Dx.Domain.Primitives
 {
@@ -30,7 +30,7 @@ namespace Dx.Domain.Primitives
     /// <see cref="ActorId"/> provides value-based equality and can be compared, serialized, or used as a key in collections.
     /// </remarks>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly struct ActorId : IIdentity, IParsable<ActorId>, ISpanFormattable, IComparable<ActorId>, IEquatable<ActorId>
+    public readonly struct ActorId : IParsable<ActorId>, ISpanFormattable, IComparable<ActorId>, IEquatable<ActorId>
     {
         /// <summary>
         /// Represents an uninitialized or default value of the ActorId type.
@@ -76,10 +76,17 @@ namespace Dx.Domain.Primitives
         /// <remarks>The method enforces the invariant that the provided <see cref="Guid"/> value is not
         /// <see cref="Guid.Empty"/>. If the value is <see cref="Guid.Empty"/>, an invariant violation is raised.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ActorId InternalFrom(Guid value)
+        internal static ActorId From(Guid value)
         {
             // Validates "Monotonic Knowledge" and "Invariant Enforcement"
-            Invariant.That(value != Guid.Empty, Faults.FactoryBypass("ActorId cannot be default."));
+            Invariant.That(
+                value != Guid.Empty,
+                ruleId: "ActorId.From:EmptyGuid",
+                code: new ErrorCode(
+                    ErrorCode.InvalidActorId,
+                    "Input string cannot be null.",
+                    "An ActorId must be created from a valid non-null string representation of a GUID.")
+            );
             return new ActorId(value);
         }
 
@@ -149,8 +156,15 @@ namespace Dx.Domain.Primitives
         /// <inheritdoc />
         public static ActorId Parse(string s, IFormatProvider? provider)
         {
-            Invariant.That(s is not null, Faults.FactoryBypass("Null parse input."));
-            return InternalFrom(Guid.Parse(s, provider ?? CultureInfo.InvariantCulture));
+            Invariant.That(
+                s is not null,
+                ruleId: "ActorId.Parse:NullInput",
+                code: new ErrorCode(
+                    ErrorCode.InvalidActorId,
+                    "Input string cannot be null.",
+                    "An ActorId must be created from a valid non-null string representation of a GUID.")
+            );
+            return From(Guid.Parse(s, provider ?? CultureInfo.InvariantCulture));
         }
 
         /// <inheritdoc />

@@ -14,8 +14,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-using static Dx.DxDomain;
-
 namespace Dx.Domain
 {
     /// <summary>
@@ -52,7 +50,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsSuccess, DxDomain.Faults.Result.ValueAccessOnFailure<TValue, TError>(_error!));
+                Invariant.That(IsSuccess, Faults.Result.ValueAccessOnFailure<TValue, TError>(_error!));
                 return _value!;
             }
         }
@@ -65,7 +63,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsFailure, DxDomain.Faults.Result.ErrorAccessOnSuccess<TValue, TError>(_value!));
+                Invariant.That(IsFailure, Faults.Result.ErrorAccessOnSuccess<TValue, TError>(_value!));
                 return _error!;
             }
         }

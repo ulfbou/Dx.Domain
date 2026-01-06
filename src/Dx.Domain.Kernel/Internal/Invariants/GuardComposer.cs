@@ -12,46 +12,15 @@
 //   - encode policy, logging, or integration behavior
 // ============================================================================
 
+using Dx.Domain.Diagnostics;
 using Dx.Domain.Errors;
+using Dx.Domain.Internal.Errors;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace Dx.Domain.Internal.Invariants
 {
-    // DPI: Centralizes invariant evaluation; builds InvariantError for failed conditions.
-    internal static class InvariantBuilder
-    {
-        public static InvariantError? Require(
-            bool condition,
-            string ruleId,
-            ErrorCode code)
-        {
-            if (condition)
-                return null;
-
-            return InvariantErrorBuilder.Create(
-                ruleId,
-                code,
-                hints: ImmutableDictionary<string, object>.Empty);
-        }
-
-        public static InvariantError? Require(
-            bool condition,
-            string ruleId,
-            ErrorCode code,
-            IReadOnlyDictionary<string, object> hints)
-        {
-            if (condition)
-                return null;
-
-            return InvariantErrorBuilder.Create(
-                ruleId,
-                code,
-                hints);
-        }
-    }
     // DPI: Composes invariant checks without adding semantics; pure logical composition.
     internal static class GuardComposer
     {
@@ -64,9 +33,23 @@ namespace Dx.Domain.Internal.Invariants
                 if (guard is null)
                     continue;
 
-                var result = guard();
-                if (result is not null)
-                    return result;
+                try
+                {
+                    var result = guard();
+                    if (result is not null)
+                        return result;
+                }
+                catch (Exception ex)
+                {
+                    return InvariantErrorBuilder.Create(
+                        ruleId: DxRuleIds.GuardComposerAndException,
+                        code: new ErrorCode("DX.INVARIANT.GUARD_COMPOSITION.EXCEPTION"),
+                        hints: new Dictionary<string, object>
+                        {
+                            { "ExceptionType", ex.GetType().FullName ?? "Unknown" },
+                            { "ExceptionMessage", ex.Message }
+                        });
+                }
             }
 
             return null;
@@ -83,14 +66,19 @@ namespace Dx.Domain.Internal.Invariants
                 if (guard is null)
                     continue;
 
-                var result = guard();
-                if (result is null)
-                    return null; // At least one guard passed.
-
-                lastError = result;
+                try
+                {
+                    var result = guard();
+                    if (result is null)
+                        return null;
+                    lastError = result;
+                }
+                catch
+                {
+                    // Swallow exceptions in Or composition
+                }
             }
 
-            // All failed; report the last error (or null if nothing ran).
             return lastError;
         }
     }

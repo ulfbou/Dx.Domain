@@ -1,20 +1,6 @@
-// ============================================================================
-// Dx.Domain.Internal — Kernel Internal Helpers
-// DPI: These helpers are mechanical Kernel implementation details only.
-// They:
-//   - enforce invariants
-//   - construct immutable values
-//   - normalize results
-//   - check time/diagnostics constraints
-// They do NOT:
-//   - expose public APIs
-//   - provide convenience to consumers
-//   - encode policy, logging, or integration behavior
-// ============================================================================
-
 using Dx.Domain.Errors;
+using Dx.Domain.Internal.Invariants;
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -25,80 +11,104 @@ namespace Dx.Domain.Internal.Errors
     {
         public static DomainError Wrap(DomainError outer, DomainError inner)
         {
-            // Outer error remains the primary semantic identity.
-            // Inner error is preserved as meta for post-mortem inspection.
-            var metaBuilder = ImmutableDictionary.CreateBuilder<string, object>();
-
-            if (outer.Meta is not null)
+            // If neither error has meta, avoid allocations and return a simple cloned error
+            if (outer.Meta is null && inner.Meta is null)
             {
-                foreach (var kvp in outer.Meta)
-                    metaBuilder[kvp.Key] = kvp.Value!;
+                return DomainError.Create(outer.Code, outer.Message);
             }
 
-            // Store inner error under a stable key.
-            metaBuilder["inner"] = inner;
-
-            return new DomainError
-            {
-                Code = outer.Code,
-                Message = outer.Message,
-                Meta = metaBuilder.ToImmutable(),
-                Timestamp = outer.Timestamp ?? inner.Timestamp
-            };
+            var mergedMeta = MergeMeta(outer.Meta, inner.Meta);
+            return DomainError.Create(outer.Code, outer.Message, mergedMeta);
         }
 
         public static DomainError Enrich(DomainError error, string key, object value)
         {
-            ArgumentNullException.ThrowIfNull(key);
+            Invariant.That(!string.IsNullOrWhiteSpace(key),
+                "Dx.Domain.Internal.Errors.ErrorComposer.Enrich",
+                _ =>
+                    (new ErrorCode(ErrorCode.InvalidArgument, "Meta key must be a non-empty string.", DpiRationale: "Meta keys are used to identify metadata entries."),
+                    new Dictionary<string, object>
+                    {
+                        { "ParameterName", nameof(key) },
+                        { "ParameterValue", key ?? "null" }
+                    }));
 
             if (value is not null &&
                 !Dx.Domain.Internal.Diagnostics.DiagnosticHintValidator.IsValidValue(value))
             {
-                throw new ArgumentException(
-                    $"Meta value for key '{key}' is not a permitted type.",
-                    nameof(value));
+                throw InvariantViolationException.Create(
+                    "Dx.Domain.Internal.Errors.ErrorComposer.InvalidMetaValue",
+                    "Meta value is not a permitted type.",
+                    nameof(Enrich));
+            }
+
+            // Fast path: no existing meta, create a single-entry array
+            if (error.Meta is null || error.Meta.Count == 0)
+            {
+                return DomainError.Create(
+                    error.Code,
+                    error.Message,
+                    ImmutableArray.Create(new KeyValuePair<string, object>(key, value!)));
             }
 
             var metaBuilder = ImmutableDictionary.CreateBuilder<string, object>();
 
-            if (error.Meta is not null)
+            foreach (var kvp in error.Meta)
             {
-                foreach (var kvp in error.Meta)
-                    metaBuilder[kvp.Key] = kvp.Value!;
+                metaBuilder[kvp.Key] = kvp.Value!;
             }
 
             metaBuilder[key] = value!;
-            return new DomainError
-            {
-                Code = error.Code,
-                Message = error.Message,
-                Meta = metaBuilder.ToImmutable(),
-                Timestamp = error.Timestamp
-            };
+            return DomainError.Create(error.Code, error.Message, metaBuilder.ToImmutableArray());
         }
 
-        public static IReadOnlyDictionary<string, object> MergeMeta(
-            IReadOnlyDictionary<string, object> a,
-            IReadOnlyDictionary<string, object> b)
+        private static ImmutableArray<KeyValuePair<string, object>> MergeMeta(
+            IReadOnlyDictionary<string, object>? a,
+            IReadOnlyDictionary<string, object>? b)
         {
-            if ((a is null || a.Count == 0) && (b is null || b.Count == 0))
-                return ImmutableDictionary<string, object>.Empty;
+            var hasA = a is not null && a.Count > 0;
+            var hasB = b is not null && b.Count > 0;
 
-            var builder = ImmutableDictionary.CreateBuilder<string, object>();
+            if (!hasA && !hasB)
+                return ImmutableArray<KeyValuePair<string, object>>.Empty;
 
-            if (a is not null)
+            if (hasA && !hasB)
             {
+                // Clone into an immutable array with a single pass
+                var builder = ImmutableArray.CreateBuilder<KeyValuePair<string, object>>(a.Count);
                 foreach (var kvp in a)
-                    builder[kvp.Key] = kvp.Value!;
+                {
+                    builder.Add(new KeyValuePair<string, object>(kvp.Key, kvp.Value!));
+                }
+
+                return builder.MoveToImmutable();
             }
 
-            if (b is not null)
+            if (!hasA && hasB)
             {
+                var builder = ImmutableArray.CreateBuilder<KeyValuePair<string, object>>(b.Count);
                 foreach (var kvp in b)
-                    builder[kvp.Key] = kvp.Value!;
+                {
+                    builder.Add(new KeyValuePair<string, object>(kvp.Key, kvp.Value!));
+                }
+
+                return builder.MoveToImmutable();
             }
 
-            return builder.ToImmutable();
+            // Both have values – merge with B overriding A on key collisions
+            var merged = ImmutableDictionary.CreateBuilder<string, object>();
+
+            foreach (var kvp in a!)
+            {
+                merged[kvp.Key] = kvp.Value!;
+            }
+
+            foreach (var kvp in b!)
+            {
+                merged[kvp.Key] = kvp.Value!;
+            }
+
+            return merged.ToImmutableArray();
         }
     }
-
+}

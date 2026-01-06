@@ -16,8 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using static Dx.Domain.DxDomain.Kernel;
-
 namespace Dx.Domain
 {
     /// <summary>

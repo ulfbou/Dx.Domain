@@ -11,14 +11,13 @@
 // ----------------------------------------------------------------------------------
 
 using Dx.Domain.Factors;
+using Dx.Domain.Internal.Invariants;
 
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-
-using static Dx.Domain.DxDomain.Kernel;
 
 namespace Dx.Domain.Primitives
 {

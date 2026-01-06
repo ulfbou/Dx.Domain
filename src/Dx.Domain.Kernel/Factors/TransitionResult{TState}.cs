@@ -18,8 +18,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-using static Dx.DxDomain;
-
 namespace Dx.Domain.Factors
 {
     /// <summary>

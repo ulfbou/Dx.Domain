@@ -18,9 +18,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-using static Dx.Domain.DxDomain;
-using static Dx.Domain.DxDomain.Kernel;
-
 namespace Dx.Domain
 {
     /// <summary>
