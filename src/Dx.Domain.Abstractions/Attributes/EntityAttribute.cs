@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="IIdentity.cs" company="Dx.Domain Team">
+// <copyright file="EntityAttribute.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,13 +10,16 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain.Contracts
+using System;
+
+namespace Dx.Domain.Attributes
 {
     /// <summary>
-    /// Marks a type as a deterministic identity primitive.
+    /// Specifies that a class represents a data entity for use with an object-relational mapping framework or data
+    /// access layer.
     /// </summary>
-    /// <remarks>
-    /// Must be immutable, parsable, and contain no generation logic.
-    /// </remarks>
-    public interface IIdentity { }
+    /// <remarks>Apply this attribute to a class to indicate that it should be treated as a persistent entity.
+    /// This attribute is not inherited by derived classes.</remarks>
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public sealed class EntityAttribute : Attribute { }
 }

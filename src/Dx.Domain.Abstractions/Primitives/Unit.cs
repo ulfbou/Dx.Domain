@@ -15,14 +15,12 @@ using System.Diagnostics;
 namespace Dx.Domain
 {
     /// <summary>
-    /// Represents the absence of a value.
-    /// Used to unify generic and non-generic results.
+    /// Unit type used for Result operations that return no value.
     /// </summary>
-    public readonly struct Unit
+    [DebuggerDisplay("Unit")]
+    public readonly record struct Unit
     {
-        /// <summary>
-        /// The single valid value of <see cref="Unit"/>.
-        /// </summary>
-        public static readonly Unit Value = default;
+        /// <summary>Gets the singleton value of the Unit type.</summary>
+        public static Unit Value => default;
     }
 }

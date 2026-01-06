@@ -12,6 +12,9 @@
 
 namespace Dx.Domain.Diagnostics
 {
+    /// <summary>
+    /// Specifies the category of a diagnostic message for tooling and analysis purposes.
+    /// </summary>
     // DPI: Passive category markers for tooling; no behavior.
     public enum DiagnosticCategory
     {

@@ -12,6 +12,7 @@
 
     <IsDomainProject>false</IsDomainProject>
     <IsToolingProject>false</IsToolingProject>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Label="Dx.Abstractions.Quality">

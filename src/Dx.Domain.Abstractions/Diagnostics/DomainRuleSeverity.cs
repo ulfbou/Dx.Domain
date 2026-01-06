@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="IDomainMetadataProvider.cs" company="Dx.Domain Team">
+// <copyright file="DomainRuleSeverity.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,17 +10,16 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain.Contracts
+namespace Dx.Domain.Diagnostics
 {
     /// <summary>
-    /// Defines a provider that supplies domain-specific metadata of a specified type.
+    /// Specifies the severity level of a domain rule for tooling and analysis purposes.
     /// </summary>
-    /// <typeparam name="TMetadata">The type of metadata provided by the implementation.</typeparam>
-    public interface IDomainMetadataProvider<out TMetadata>
+    // DPI: Passive severity markers for tooling; no behavior.
+    public enum DomainRuleSeverity
     {
-        /// <summary>
-        /// Gets the metadata associated with the current instance.
-        /// </summary>
-        TMetadata Metadata { get; }
+        Info = 0,
+        Warning = 1,
+        Error = 2
     }
 }
