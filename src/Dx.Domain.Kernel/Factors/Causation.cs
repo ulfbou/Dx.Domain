@@ -10,7 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Internal.Invariants;
+using Dx.Domain.Kernel;
 using Dx.Domain.Primitives;
 
 using System;
@@ -77,8 +77,8 @@ namespace Dx.Domain.Factors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
         {
-            Invariant.That(correlationId.Value != Guid.Empty, Kernel.Causation.MissingCorrelation);
-            Invariant.That(!traceId.IsEmpty, Kernel.Causation.MissingTrace);
+            Invariant.That(correlationId.Value != Guid.Empty, "Kernel.Causation.MissingCorrelation", "CorrelationId must not be empty.");
+            Invariant.That(!traceId.IsEmpty, "Kernel.Causation.MissingTrace", "TraceId must not be empty.");
             return new Causation(correlationId, traceId, actorId, DateTimeOffset.UtcNow);
         }
 

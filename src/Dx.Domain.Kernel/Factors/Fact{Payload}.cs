@@ -79,8 +79,8 @@ namespace Dx.Domain.Factors
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
         internal static Fact<TPayload> Create(string factType, TPayload payload, Causation causation, DateTimeOffset? utcTimestamp = null)
         {
-            Invariant.That(!string.IsNullOrWhiteSpace(factType), Faults.Guard.StringParameterCannotBeNullOrWhitespace(nameof(factType)));
-            Invariant.That(causation.TraceId != TraceId.Empty, Faults.Guard.StringParameterCannotBeNullOrWhitespace(nameof(causation.TraceId)));
+            Invariant.That(!string.IsNullOrWhiteSpace(factType), "Fact.Create.FactTypeMustNotBeNullOrWhitespace", "Fact type cannot be null or whitespace.");
+            Invariant.That(causation.TraceId != TraceId.Empty, "Fact.Create.FactTypeMustNotBeNullOrWhitespace", "Causation TraceId cannot be empty.");
             return new(FactId.New(), factType, payload!, causation, DateTimeOffset.UtcNow);
         }
 

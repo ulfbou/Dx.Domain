@@ -68,7 +68,7 @@ namespace Dx.Domain.Factors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static FactId From(Guid value)
         {
-            Invariant.That(value != Guid.Empty, Kernel.FactoryBypass("FactId cannot be default or empty. Use FactId.New()."));
+            Invariant.That(value != Guid.Empty, "FactId.From", "The provided Guid value must not be Guid.Empty.");
             return new(value);
         }
 

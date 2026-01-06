@@ -12,7 +12,7 @@
 
 using Dx.Domain.Contracts;
 
-namespace Dx.Domain.Internal.Errors
+namespace Dx.Domain.Kernel.Errors
 {
     /// <summary>
     /// Represents detailed diagnostic information for a violated invariant.

@@ -53,7 +53,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsSuccess, Faults.Result.ValueAccessOnFailure<TValue, TError>(_error!));
+                Invariant.That(IsSuccess, "Result.ValueAccessOnFailure", "Cannot access Value when the result is a failure.");
                 return _value!;
             }
         }
@@ -66,7 +66,7 @@ namespace Dx.Domain
             [DebuggerStepThrough]
             get
             {
-                Invariant.That(IsFailure, Faults.Result.ErrorAccessOnSuccess<TValue, TError>(_value!));
+                Invariant.That(IsFailure, "Result.ErrorAccessOnSuccess", "Cannot access Error when the result is a success.");
                 return _error!;
             }
         }
@@ -97,7 +97,7 @@ namespace Dx.Domain
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DebuggerStepThrough]
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By design")]
-        internal static Result<TValue, TError> InternalFailure(TError error) => new(error);
+        internal static Result<TValue, TError> Failure(TError error) => new(error);
 
         /// <inheritdoc />
         public override string ToString() => IsSuccess ? $"Ok({_value})" : $"Failure({_error})";

@@ -65,10 +65,8 @@ namespace Dx.Domain.Factors
         /// Thrown if <paramref name="facts"/> is empty.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static TransitionResult<TState> Success(
-            TState state,
-            IReadOnlyList<IDomainFact> facts)
-            => new TransitionResult<TState>(Result.Ok(state), facts);
+        internal static TransitionResult<TState> Success(TState state, IReadOnlyList<IDomainFact> facts)
+            => new TransitionResult<TState>(Result<TState>.Success(state), facts);
 
         /// <summary>
         /// Creates a failed transition result from the specified domain error.
@@ -80,7 +78,7 @@ namespace Dx.Domain.Factors
         /// </returns>
         internal static TransitionResult<TState> Failure(DomainError error)
             => new TransitionResult<TState>(
-                Result.Failure<TState>(error),
+                Result<TState>.Failure(error),
                 Array.Empty<IDomainFact>());
 
         private string DebuggerDisplay => IsSuccess

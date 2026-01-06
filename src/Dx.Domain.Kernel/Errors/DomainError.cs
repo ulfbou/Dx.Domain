@@ -10,13 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Internal.Invariants;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace Dx.Domain.Errors
 {

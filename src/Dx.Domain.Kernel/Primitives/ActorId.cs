@@ -10,9 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Attributes;
-using Dx.Domain.Errors;
-using Dx.Domain.Internal.Invariants;
+using Dx.Domain.Kernel;
 
 using System;
 using System.Diagnostics;
@@ -81,12 +79,8 @@ namespace Dx.Domain.Primitives
             // Validates "Monotonic Knowledge" and "Invariant Enforcement"
             Invariant.That(
                 value != Guid.Empty,
-                ruleId: "ActorId.From:EmptyGuid",
-                code: new ErrorCode(
-                    ErrorCode.InvalidActorId,
-                    "Input string cannot be null.",
-                    "An ActorId must be created from a valid non-null string representation of a GUID.")
-            );
+                "Input string cannot be null.",
+                "An ActorId must be created from a valid non-null string representation of a GUID.");
             return new ActorId(value);
         }
 
@@ -158,13 +152,9 @@ namespace Dx.Domain.Primitives
         {
             Invariant.That(
                 s is not null,
-                ruleId: "ActorId.Parse:NullInput",
-                code: new ErrorCode(
-                    ErrorCode.InvalidActorId,
-                    "Input string cannot be null.",
-                    "An ActorId must be created from a valid non-null string representation of a GUID.")
-            );
-            return From(Guid.Parse(s, provider ?? CultureInfo.InvariantCulture));
+                "ActorId.Parse:NullInput",
+                "Input string cannot be null.");
+            return From(Guid.Parse(s!, provider ?? CultureInfo.InvariantCulture));
         }
 
         /// <inheritdoc />

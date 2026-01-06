@@ -35,7 +35,7 @@ namespace Dx.Domain.Primitives
 
         private CorrelationId(Guid value)
         {
-            Invariant.That(value != Guid.Empty, Faults.Guard.GuidParameterCannotBeEmpty(nameof(value)));
+            Invariant.That(value != Guid.Empty, "Kernel.CorrelationId.EmptyNotAllowed", "CorrelationId cannot be empty.");
             Value = value;
         }
 

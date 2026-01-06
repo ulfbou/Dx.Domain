@@ -25,7 +25,7 @@ namespace Dx.Domain.Primitives
     /// generation of random identifiers suitable for tracing use cases. The struct is immutable and
     /// thread-safe.</remarks>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly struct TraceId : IEquatable<TraceId>, IComparable<TraceId>, IComparable, ISpanFormattable
+    public readonly struct TraceId : IEquatable<TraceId>, ISpanFormattable
     {
         /// <summary>
         /// Gets an empty <see cref="TraceId"/> with all bits set to zero.
@@ -87,31 +87,6 @@ namespace Dx.Domain.Primitives
         /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(TraceId a, TraceId b) => !a.Equals(b);
-
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int CompareTo(TraceId other)
-        {
-            int hiComparison = _hi.CompareTo(other._hi);
-            if (hiComparison != 0)
-            {
-                return hiComparison;
-            }
-
-            return _lo.CompareTo(other._lo);
-        }
-
-        /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int CompareTo(object? obj)
-        {
-            if (obj is null || obj is not TraceId other)
-            {
-                return 1;
-            }
-
-            return CompareTo(other);
-        }
 
         /// <summary>
         /// Attempts to format the identifier as a canonical 32-character hexadecimal string without separators.

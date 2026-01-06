@@ -37,20 +37,21 @@ namespace Dx.Domain
         /// Initializes a new instance of the <see cref="InvariantViolationException"/> class.
         /// </summary>
         /// <param name="diagnostic">The diagnostic information for the violated invariant.</param>
+        /// <param name="ex">The inner exception that caused this exception, if any.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal InvariantViolationException(InvariantError diagnostic)
-            : base(diagnostic.EffectiveMessage)
+        internal InvariantViolationException(InvariantError diagnostic, Exception? ex = null)
+            : base(diagnostic.EffectiveMessage, ex)
         {
             Diagnostic = diagnostic;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static InvariantViolationException Create(string code, string message)
-            => new(InvariantError.Create(DomainError.Create(code, message)));
+        internal static InvariantViolationException Create(string code, string message, Exception? ex = null)
+            => new(InvariantError.Create(DomainError.Create(code, message)), ex);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static InvariantViolationException Create(string code, string message, string paramName)
-            => new(InvariantError.Create(DomainError.Create(code, message), paramName));
+        internal static InvariantViolationException Create(string code, string message, string paramName, Exception? ex = null)
+            => new(InvariantError.Create(DomainError.Create(code, message), paramName), ex);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay => $"InvariantViolationException: {Message}";

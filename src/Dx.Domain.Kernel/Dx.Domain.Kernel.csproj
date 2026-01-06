@@ -33,8 +33,4 @@
     <ProjectReference Include="..\Dx.Domain.Abstractions\Dx.Domain.Abstractions.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Internal\Invariants\" />
-  </ItemGroup>
-
 </Project>

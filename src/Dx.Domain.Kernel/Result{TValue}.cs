@@ -34,12 +34,10 @@ namespace Dx.Domain
         private Result(TValue value)
         {
             _value = value;
-            _error = null;
         }
 
         private Result(DomainError error)
         {
-            _value = default;
             _error = error;
         }
 
@@ -68,9 +66,8 @@ namespace Dx.Domain
             {
                 Invariant.That(
                     IsSuccess,
-                    DomainError.Create(
-                        "Result.InvalidState",
-                        "Cannot access Value on a failed result."));
+                    "Result.InvalidState",
+                    "Cannot access Value on a failed result.");
                 return _value!;
             }
         }
@@ -84,9 +81,8 @@ namespace Dx.Domain
             {
                 Invariant.That(
                     IsFailure,
-                    DomainError.Create(
-                        "Result.InvalidState",
-                        "Cannot access Error on a successful result."));
+                    "Result.InvalidState",
+                    "Cannot access Error on a successful result.");
                 return _error!.Value;
             }
         }
