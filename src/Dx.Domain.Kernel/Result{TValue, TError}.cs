@@ -10,6 +10,9 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Errors;
+using Dx.Domain.Kernel;
+
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;

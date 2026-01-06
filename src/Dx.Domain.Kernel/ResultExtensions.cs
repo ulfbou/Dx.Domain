@@ -12,7 +12,7 @@
 
 // src/Dx.Domain/Results/ResultExtensions.cs
 using Dx.Domain.Errors;
-using Dx.Domain.Internal.Invariants;
+using Dx.Domain.Kernel;
 
 using System;
 using System.Collections.Generic;

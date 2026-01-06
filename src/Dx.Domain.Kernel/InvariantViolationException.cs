@@ -45,12 +45,8 @@ namespace Dx.Domain
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static InvariantViolationException Create(InvariantError diagnostic)
-            => new InvariantViolationException(diagnostic);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static InvariantViolationException Create(InvariantError diagnostic, string paramName)
-            => InvariantViolationException.Create(diagnostic, paramName);
+        internal static InvariantViolationException Create(string code, string message)
+            => new(InvariantError.Create(DomainError.Create(code, message)));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static InvariantViolationException Create(string code, string message, string paramName)

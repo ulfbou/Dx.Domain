@@ -10,7 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Internal.Invariants;
+using Dx.Domain.Kernel;
 using Dx.Domain.Primitives;
 
 using System;

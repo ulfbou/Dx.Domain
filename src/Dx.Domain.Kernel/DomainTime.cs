@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Kernel;
+
 using System;
 
 namespace Dx.Domain
@@ -18,8 +20,23 @@ namespace Dx.Domain
     /// Value object representing a UTC timestamp used by the kernel.
     /// Kernel policy: only monotonic checks; no clock correction.
     /// </summary>
-    public readonly record struct DomainTime(DateTimeOffset Utc)
+    public readonly record struct DomainTime
     {
-        public static DomainTime Now() => new DomainTime(DateTimeOffset.UtcNow);
+        public DateTimeOffset Utc { get; }
+
+        private DomainTime(DateTimeOffset utc) => Utc = utc;
+
+        public static DomainTime Now()
+            => new(DateTimeOffset.UtcNow);
+
+        internal static DomainTime From(DateTimeOffset utc)
+        {
+            Invariant.That(
+                utc.Offset == TimeSpan.Zero,
+                "DomainTime.Invariant.Utc",
+                "DomainTime must be UTC.");
+
+            return new DomainTime(utc);
+        }
     }
 }
