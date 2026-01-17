@@ -18,19 +18,21 @@ using System.Runtime.CompilerServices;
 namespace Dx.Domain.Primitives
 {
     /// <summary>
-    /// Represents a 128-bit unique identifier for distributed tracing scenarios.
+    /// Represents a 128-bit trace identifier.
     /// </summary>
-    /// <remarks>A TraceId is typically used to uniquely identify a trace across process and service
-    /// boundaries in distributed systems. It provides equality comparison, string representation, and supports
-    /// generation of random identifiers suitable for tracing use cases. The struct is immutable and
-    /// thread-safe.</remarks>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public readonly struct TraceId : IEquatable<TraceId>, ISpanFormattable
+    /// <remarks>
+    /// <para>
+    /// Canonical string format is <c>"hi:lo"</c>, both unsigned decimals.
+    /// </para>
+    /// </remarks>
+    [DebuggerDisplay("{ToString(),nq}")]
+    public readonly struct TraceId :
+        IEquatable<TraceId>,
+        IParsable<TraceId>,
+        ISpanFormattable
     {
-        /// <summary>
-        /// Gets an empty <see cref="TraceId"/> with all bits set to zero.
-        /// </summary>
-        public static readonly TraceId Empty = new(0UL, 0UL);
+        /// <summary>An empty trace identifier.</summary>
+        public static readonly TraceId Empty = new(0, 0);
 
         private readonly ulong _hi;
         private readonly ulong _lo;
@@ -45,14 +47,55 @@ namespace Dx.Domain.Primitives
         /// Creates a new random <see cref="TraceId"/> instance.
         /// </summary>
         /// <returns>A new <see cref="TraceId"/> with a uniformly random 128-bit value.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static TraceId New()
+        public static TraceId New()
         {
-            Span<byte> buffer = stackalloc byte[16];
-            Random.Shared.NextBytes(buffer);
-            ulong hi = BitConverter.ToUInt64(buffer.Slice(0, 8));
-            ulong lo = BitConverter.ToUInt64(buffer.Slice(8, 8));
-            return new TraceId(hi, lo);
+            var g = Guid.NewGuid().ToByteArray();
+            return new TraceId(
+                BitConverter.ToUInt64(g, 0),
+                BitConverter.ToUInt64(g, 8));
+        }
+
+        /// <summary>Creates a <see cref="TraceId"/> from its parts.</summary>
+        /// <param name="hi">The high 64 bits.</param>
+        /// <param name="lo">The low 64 bits.</param>
+        /// <returns>A new <see cref="TraceId"/> instance.</returns>
+        public static TraceId FromParts(ulong hi, ulong lo) => new(hi, lo);
+
+        /// <inheritdoc />
+        public static TraceId Parse(string s, IFormatProvider? provider)
+        {
+            ArgumentNullException.ThrowIfNull(s);
+
+            var parts = s.Split(':');
+
+            if (parts.Length != 2)
+                throw new FormatException("TraceId must be in 'hi:lo' format.");
+
+            return new TraceId(
+                ulong.Parse(parts[0], CultureInfo.InvariantCulture),
+                ulong.Parse(parts[1], CultureInfo.InvariantCulture));
+        }
+
+        /// <inheritdoc />
+        public static bool TryParse(string? s, IFormatProvider? provider, out TraceId result)
+        {
+            result = default;
+
+            if (s is null)
+                return false;
+
+            var parts = s.Split(':');
+
+            if (parts.Length != 2)
+                return false;
+
+            if (!ulong.TryParse(parts[0], out var hi))
+                return false;
+            if (!ulong.TryParse(parts[1], out var lo))
+                return false;
+
+            result = new TraceId(hi, lo);
+            return true;
         }
 
         /// <summary>
@@ -61,7 +104,6 @@ namespace Dx.Domain.Primitives
         public bool IsEmpty => _hi == 0UL && _lo == 0UL;
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(TraceId other) => _hi == other._hi && _lo == other._lo;
 
         /// <inheritdoc />
@@ -73,25 +115,22 @@ namespace Dx.Domain.Primitives
         /// <summary>
         /// Determines whether two <see cref="TraceId"/> values are equal.
         /// </summary>
-        /// <param name="a">The first identifier to compare.</param>
-        /// <param name="b">The second identifier to compare.</param>
+        /// <param name="left">The first identifier to compare.</param>
+        /// <param name="right">The second identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(TraceId a, TraceId b) => a.Equals(b);
+        public static bool operator ==(TraceId left, TraceId right) => left.Equals(right);
 
         /// <summary>
         /// Determines whether two <see cref="TraceId"/> values are not equal.
         /// </summary>
-        /// <param name="a">The first identifier to compare.</param>
-        /// <param name="b">The second identifier to compare.</param>
+        /// <param name="left">The first identifier to compare.</param>
+        /// <param name="right">The second identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(TraceId a, TraceId b) => !a.Equals(b);
+        public static bool operator !=(TraceId left, TraceId right) => !left.Equals(right);
 
         /// <summary>
         /// Attempts to format the identifier as a canonical 32-character hexadecimal string without separators.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryFormat(Span<char> destination, out int charsWritten)
         {
             // 32 hex characters are required for the combined 128-bit value.
@@ -102,13 +141,13 @@ namespace Dx.Domain.Primitives
             }
 
             // Format as hi then lo in big-endian style for readability and determinism.
-            if (!_hi.TryFormat(destination.Slice(0, 16), out var hiChars, "x16"))
+            if (!_hi.TryFormat(destination.Slice(0, 16), out var hiChars, "x16", CultureInfo.InvariantCulture))
             {
                 charsWritten = 0;
                 return false;
             }
 
-            if (!_lo.TryFormat(destination.Slice(16, 16), out var loChars, "x16"))
+            if (!_lo.TryFormat(destination.Slice(16, 16), out var loChars, "x16", CultureInfo.InvariantCulture))
             {
                 charsWritten = 0;
                 return false;
@@ -125,12 +164,10 @@ namespace Dx.Domain.Primitives
         /// The <paramref name="format"/> is currently ignored and the identifier is always rendered as 32 hex characters
         /// using invariant culture.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
             => TryFormat(destination, out charsWritten);
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString()
         {
             Span<char> buffer = stackalloc char[32];
@@ -141,7 +178,6 @@ namespace Dx.Domain.Primitives
         }
 
         /// <inheritdoc />
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ToString(string? format, IFormatProvider? formatProvider) => ToString();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <DxIsLibrary>true</DxIsLibrary>
+
+    <AssemblyName>Dx.Domain.Primitives</AssemblyName>
+    <RootNamespace>Dx.Domain</RootNamespace>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Description>
+      The Dx.Domain.Primitives package provides low-level, opinionated primitives for domain modeling and
+      observability, including strongly-typed identifiers (ActorId, FactId), correlation and trace identifiers
+      (CorrelationId, TraceId, SpanId), and related helpers. These types are designed to be immutable, value-based,
+      and suitable for use as keys, identifiers, and tracing anchors across services.
+    </Description>
+    <PackageTags>dx;ddd;primitives;actor-id;fact-id;correlation-id;trace-id;span-id;observability</PackageTags>
+    <Authors>Dx.Domain Team</Authors>
+    <Company>Dx.Domain Team</Company>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <Nullable>enable</Nullable>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ulfbou/dx.domain</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
+  </PropertyGroup>
+
+</Project>
