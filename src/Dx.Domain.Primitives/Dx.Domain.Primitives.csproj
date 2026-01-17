@@ -4,7 +4,7 @@
     <DxIsLibrary>true</DxIsLibrary>
 
     <AssemblyName>Dx.Domain.Primitives</AssemblyName>
-    <RootNamespace>Dx.Domain</RootNamespace>
+    <RootNamespace>Dx.Domain.Primitives</RootNamespace>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>
       The Dx.Domain.Primitives package provides low-level, opinionated primitives for domain modeling and
