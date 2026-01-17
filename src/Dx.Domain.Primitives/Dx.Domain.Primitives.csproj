@@ -24,4 +24,10 @@
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Update="CHANGELOG.md" Link="docs/CHANGELOG.md" />
+    <None Update="README.md" Link="docs/README.md" />
+    <None Update="../../LICENSE" Link="docs/LICENSE" />
+  </ItemGroup>
+
 </Project>
