@@ -10,14 +10,16 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Immutable;
 using System.Linq;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Dx.Domain.Analyzers.Analyzers.Generators
+namespace Dx.Domain.Analyzers.Generators
 {
     /// <summary>
     /// Analyzer for DX1001: Referential Transparency.
@@ -53,12 +55,25 @@ namespace Dx.Domain.Analyzers.Analyzers.Generators
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
 
-            context.RegisterSyntaxNodeAction(AnalyzeMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
-            context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+            context.RegisterCompilationStartAction(startContext =>
+            {
+                var assemblyName = startContext.Compilation.AssemblyName;
+                if (assemblyName == null ||
+                    assemblyName.IndexOf("Generators", StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    return;
+                }
+
+                startContext.RegisterSyntaxNodeAction(AnalyzeMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
+                startContext.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+            });
         }
 
         private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
         {
+            if (!IsGeneratorAssembly(context.SemanticModel.Compilation))
+                return;
+
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
             var symbolInfo = context.SemanticModel.GetSymbolInfo(memberAccess);
             
@@ -94,6 +109,9 @@ namespace Dx.Domain.Analyzers.Analyzers.Generators
 
         private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
         {
+            if (!IsGeneratorAssembly(context.SemanticModel.Compilation))
+                return;
+
             var invocation = (InvocationExpressionSyntax)context.Node;
             var symbolInfo = context.SemanticModel.GetSymbolInfo(invocation);
 
@@ -153,6 +171,13 @@ namespace Dx.Domain.Analyzers.Analyzers.Generators
                    (propertyName == "Now" || 
                     propertyName == "UtcNow" || 
                     propertyName == "Today");
+        }
+
+        private static bool IsGeneratorAssembly(Compilation compilation)
+        {
+            var assemblyName = compilation.AssemblyName;
+            return assemblyName != null &&
+                   assemblyName.IndexOf("Generators", StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

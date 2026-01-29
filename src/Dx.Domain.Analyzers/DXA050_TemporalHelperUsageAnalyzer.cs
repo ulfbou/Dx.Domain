@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="DXA022_DomainControlExceptionAnalyzer.cs" company="Dx.Domain Team">
+// <copyright file="DXA050_TemporalHelperUsageAnalyzer.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -14,7 +14,6 @@ using System.Collections.Immutable;
 
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
-using Dx.Domain.Analyzers.Infrastructure.Flow;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
@@ -23,24 +22,24 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Dx.Domain.Analyzers.Analyzers
+namespace Dx.Domain.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA022: Discouraged Domain Control Exception.
-    /// Detects methods that return Result&lt;T&gt; but throw domain control exceptions instead of returning Result.Failure.
+    /// Analyzer for DXA050: Temporal Helper Usage in Kernel.
+    /// Detects use of temporal/policy helpers in kernel code.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class DXA022_DomainControlExceptionAnalyzer : DiagnosticAnalyzer
+    public sealed class DXA050_TemporalHelperUsageAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA022";
-        private const string Category = "Domain.ExceptionHandling";
+        public const string DiagnosticId = "DXA050";
+        private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
-            "Discouraged Domain Control Exception";
+            "Temporal Helper Usage in Kernel";
         private static readonly LocalizableString MessageFormat =
-            "Use Result.Failure instead of throwing exception in Result-returning method.";
+            "Temporal or policy-sensitive helper used in kernel. Move to edge package or justify via DPI.";
         private static readonly LocalizableString Description =
-            "Methods that return Result should use Result.Failure instead of throwing exceptions for domain control flow.";
+            "Kernel code should remain mechanical, not prescriptive. Temporal helpers encode business time semantics and belong at the edges.";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
@@ -65,8 +64,8 @@ namespace Dx.Domain.Analyzers.Analyzers
 
                 startContext.RegisterOperationAction(operationContext =>
                 {
-                    AnalyzeThrow(operationContext, services);
-                }, OperationKind.Throw);
+                    AnalyzeInvocation(operationContext, services);
+                }, OperationKind.Invocation);
             });
         }
 
@@ -82,49 +81,51 @@ namespace Dx.Domain.Analyzers.Analyzers
                 new DxFacadeResolver(context.Compilation, config),
                 new SemanticClassifier(context.Compilation),
                 new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new ResultFlowEngineWrapper(),
+                new Infrastructure.Flow.ResultFlowEngineWrapper(),
                 new GeneratedCodeDetector(config));
         }
 
-        private static void AnalyzeThrow(OperationAnalysisContext context, AnalyzerServices services)
+        private static void AnalyzeInvocation(OperationAnalysisContext context, AnalyzerServices services)
         {
-            var throwOperation = (IThrowOperation)context.Operation;
+            var invocation = (IInvocationOperation)context.Operation;
 
             // Skip if generated code
-            if (throwOperation.Exception?.Type != null &&
-                services.Generated.IsGenerated(throwOperation.Exception.Type))
+            if (invocation.TargetMethod != null && services.Generated.IsGenerated(invocation.TargetMethod))
                 return;
 
-            // Get the scope - only enforce in S1, S2 (not S0 kernel)
+            // Only analyze S0 scope (kernel) - also flag in S1 when used in kernel contexts
             var scope = services.Scope.ResolveSymbol(context.ContainingSymbol);
-            if (scope == Scope.S0)
+            if (scope != Scope.S0 && scope != Scope.S1)
                 return;
 
-            // Check if we're in a method that returns Result
-            if (context.ContainingSymbol is not IMethodSymbol method)
+            // Check if it's a temporal helper method
+            if (invocation.TargetMethod == null || !IsTemporalHelper(invocation.TargetMethod))
                 return;
 
-            if (!services.Semantic.IsKernelResultType(method.ReturnType))
-                return;
+            context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));
+        }
 
-            // Classify the exception intent
-            var intent = services.Exceptions.Classify(throwOperation);
+        private static bool IsTemporalHelper(IMethodSymbol method)
+        {
+            var containingType = method.ContainingType?.ToDisplayString();
+            var methodName = method.Name;
 
-            // Allow argument validation and invariant violations
-            if (intent == ExceptionIntent.ArgumentValidation ||
-                intent == ExceptionIntent.InvariantViolation)
-                return;
-
-            // Allow rethrows (throw; with no expression)
-            if (throwOperation.Exception == null)
-                return;
-
-            // Report diagnostic for domain control or unknown exceptions in Result-returning methods
-            if (intent == ExceptionIntent.DomainControl || intent == ExceptionIntent.Unknown)
+            // Check for Require.Temporal helpers
+            if (containingType != null &&
+                containingType.Contains("Require") &&
+                (methodName == "NotInFuture" || methodName == "NotInPast" ||
+                 methodName == "InRange" || methodName == "BeforeNow" ||
+                 methodName == "AfterNow" || methodName == "Between"))
             {
-                var diagnostic = Diagnostic.Create(Rule, throwOperation.Syntax.GetLocation());
-                context.ReportDiagnostic(diagnostic);
+                return true;
             }
+
+            // Check for DateTime/DateTimeOffset policy methods
+            if (methodName.Contains("ValidateTime") || methodName.Contains("EnsureTime") ||
+                methodName.Contains("CheckTime") || methodName.Contains("AssertTime"))
+                return true;
+
+            return false;
         }
     }
 }

@@ -30,4 +30,8 @@
     <None Update="../../LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Dx.Domain.Analyzers" Version="1.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>

@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Primitives;
+
 using System;
 
 namespace Dx.Domain.Factors

@@ -22,7 +22,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Dx.Domain.Analyzers.Analyzers
+namespace Dx.Domain.Analyzers
 {
     /// <summary>
     /// Analyzer for DXA040: Kernel Public Surface Freeze.

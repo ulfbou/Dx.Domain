@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="DXA060_ForbiddenVocabularyAnalyzer.cs" company="Dx.Domain Team">
+// <copyright file="DXA020_ResultIgnoredAnalyzer.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,36 +10,37 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
+using Dx.Domain.Analyzers.Infrastructure.Flow;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Dx.Domain.Analyzers.Analyzers
+namespace Dx.Domain.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA060: Forbidden Vocabulary in Kernel.
-    /// Detects use of forbidden pattern vocabulary in kernel code.
+    /// Analyzer for DXA020: Result Ignored.
+    /// Detects when a Result&lt;T&gt; is created but not explicitly handled, returned, or checked.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class DXA060_ForbiddenVocabularyAnalyzer : DiagnosticAnalyzer
+    public sealed class DXA020_ResultIgnoredAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA060";
-        private const string Category = "Domain.Architecture";
+        public const string DiagnosticId = "DXA020";
+        private const string Category = "Domain.ResultHandling";
 
         private static readonly LocalizableString Title =
-            "Forbidden Vocabulary in Kernel";
+            "Result Ignored";
         private static readonly LocalizableString MessageFormat =
-            "Forbidden vocabulary '{0}' used in kernel. Move to adapter or rename to mechanical term.";
+            "Result value is produced and ignored. Either handle, return, or explicitly discard with intent.";
         private static readonly LocalizableString Description =
-            "Kernel code should use mechanical terminology. Pattern-based terms like 'Repository', 'Saga', 'Apply' belong in adapters.";
+            "Result instances must be explicitly handled to prevent silent failures and lost domain errors.";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
@@ -49,27 +50,6 @@ namespace Dx.Domain.Analyzers.Analyzers
             DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: Description);
-
-        // Forbidden vocabulary from the Dx.Domain manifesto
-        private static readonly ImmutableHashSet<string> ForbiddenTerms = ImmutableHashSet.Create(
-            "AggregateRoot",
-            "Repository",
-            "Saga",
-            "Apply",
-            "Handle",
-            "TransitionTo",
-            "Emit",
-            "Publish",
-            "Subscribe",
-            "Command",
-            "Query",
-            "Event",
-            "Projection",
-            "ReadModel",
-            "WriteModel",
-            "EventStore",
-            "Snapshot"
-        );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -81,12 +61,20 @@ namespace Dx.Domain.Analyzers.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
+                var assemblyName = startContext.Compilation.AssemblyName;
+                if (assemblyName != null &&
+                    (assemblyName.IndexOf("Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     assemblyName.IndexOf("Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    return;
+                }
+
                 var services = CreateServices(startContext);
 
                 startContext.RegisterSymbolAction(symbolContext =>
                 {
-                    AnalyzeSymbol(symbolContext, services);
-                }, SymbolKind.NamedType, SymbolKind.Method, SymbolKind.Property);
+                    AnalyzeMethod(symbolContext, services);
+                }, SymbolKind.Method);
             });
         }
 
@@ -102,34 +90,45 @@ namespace Dx.Domain.Analyzers.Analyzers
                 new DxFacadeResolver(context.Compilation, config),
                 new SemanticClassifier(context.Compilation),
                 new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new Infrastructure.Flow.ResultFlowEngineWrapper(),
+                new ResultFlowEngineWrapper(),
                 new GeneratedCodeDetector(config));
         }
 
-        private static void AnalyzeSymbol(SymbolAnalysisContext context, AnalyzerServices services)
+        private static void AnalyzeMethod(SymbolAnalysisContext context, AnalyzerServices services)
         {
-            var symbol = context.Symbol;
+            var method = (IMethodSymbol)context.Symbol;
 
-            // Skip if generated code
-            if (services.Generated.IsGenerated(symbol))
+            if (method.IsImplicitlyDeclared || method.DeclaringSyntaxReferences.Length == 0)
                 return;
 
-            // Only analyze S0 and S1 scopes (kernel and domain)
-            var scope = services.Scope.ResolveSymbol(symbol);
-            if (scope != Scope.S0 && scope != Scope.S1)
+            if (services.Generated.IsGenerated(method))
                 return;
 
-            // Check if symbol name contains forbidden vocabulary
-            var symbolName = symbol.Name;
-            var forbiddenTerm = ForbiddenTerms.FirstOrDefault(term => symbolName.Contains(term));
-            if (forbiddenTerm != null)
+            var scope = services.Scope.ResolveSymbol(method);
+            if (scope == Scope.S0)
+                return;
+
+            var optionsProvider = context.Options.AnalyzerConfigOptionsProvider;
+            var options = method.Locations.FirstOrDefault()?.SourceTree is { } tree
+                ? optionsProvider.GetOptions(tree)
+                : optionsProvider.GlobalOptions;
+
+            var graph = services.Flow.Analyze(method, context.Compilation, options, context.CancellationToken);
+            if (!graph.IsValid)
+                return;
+
+            foreach (var node in graph.ResultNodes)
             {
-                if (symbol.Locations.Any())
-                {
-                    var location = symbol.Locations.First();
-                    var diagnostic = Diagnostic.Create(Rule, location, forbiddenTerm);
-                    context.ReportDiagnostic(diagnostic);
-                }
+                if (!graph.NodeStates.TryGetValue(node, out var state))
+                    continue;
+
+                if (state != ResultFlow.ResultState.Ignored)
+                    continue;
+
+                if (node.Producer.Syntax == null)
+                    continue;
+
+                context.ReportDiagnostic(Diagnostic.Create(Rule, node.Producer.Syntax.GetLocation()));
             }
         }
     }

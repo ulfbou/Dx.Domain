@@ -18,7 +18,7 @@
     </Tags>
     <Copyright>Copyright © 2025 Dx.Domain Team. All rights reserved.</Copyright>
     <RepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</RepositoryUrl>
-    <RootNamespace>Dx</RootNamespace>
+    <RootNamespace>Dx.Domain.Analyzers</RootNamespace>
 
     <!-- Build Defaults -->
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
@@ -78,6 +78,7 @@
     <InternalsVisibleTo Include="Dx.Domain.Attributes" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
     <InternalsVisibleTo Include="Dx.Domain.Tests" />
+    <InternalsVisibleTo Include="Dx.Domain.Analyzers.Tests" />
   </ItemGroup>
 
   <ItemGroup>
