@@ -3,8 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Dx;
 using Dx.Domain;
+using Dx.Domain.Primitives;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 
 using FluentAssertions;
@@ -52,7 +52,7 @@ namespace Dx.Domain.Analyzers.Tests.IntegrationTests
 
             var resolver = new DxFacadeResolver(compilation, mockConfig.Object);
 
-            var actorIdMetadataName = typeof(Domain.ActorId).FullName!;
+            var actorIdMetadataName = typeof(ActorId).FullName!;
             var actorIdSymbol = compilation.GetTypeByMetadataName(actorIdMetadataName);
             if (actorIdSymbol is not null)
             {

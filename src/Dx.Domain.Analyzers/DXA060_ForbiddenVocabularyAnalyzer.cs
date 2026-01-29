@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="DXA080_FacadeInvariantEnforcementAnalyzer.cs" company="Dx.Domain Team">
+// <copyright file="DXA060_ForbiddenVocabularyAnalyzer.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -21,35 +21,55 @@ using Dx.Domain.Analyzers.Infrastructure.Scopes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Operations;
 
-namespace Dx.Domain.Analyzers.Analyzers
+namespace Dx.Domain.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA080: Facade Invariant Enforcement Missing.
-    /// Detects facade factory methods that don't enforce invariants.
+    /// Analyzer for DXA060: Forbidden Vocabulary in Kernel.
+    /// Detects use of forbidden pattern vocabulary in kernel code.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class DXA080_FacadeInvariantEnforcementAnalyzer : DiagnosticAnalyzer
+    public sealed class DXA060_ForbiddenVocabularyAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA080";
+        public const string DiagnosticId = "DXA060";
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
-            "Facade Invariant Enforcement Missing";
+            "Forbidden Vocabulary in Kernel";
         private static readonly LocalizableString MessageFormat =
-            "Facade factory does not enforce invariants. Ensure invariants are checked and failures return DomainError/Result.";
+            "Forbidden vocabulary '{0}' used in kernel. Move to adapter or rename to mechanical term.";
         private static readonly LocalizableString Description =
-            "Dx facade factory methods must enforce invariants to guarantee creation boundary correctness.";
+            "Kernel code should use mechanical terminology. Pattern-based terms like 'Repository', 'Saga', 'Apply' belong in adapters.";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
             MessageFormat,
             Category,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: Description);
+
+        // Forbidden vocabulary from the Dx.Domain manifesto
+        private static readonly ImmutableHashSet<string> ForbiddenTerms = ImmutableHashSet.Create(
+            "AggregateRoot",
+            "Repository",
+            "Saga",
+            "Apply",
+            "Handle",
+            "TransitionTo",
+            "Emit",
+            "Publish",
+            "Subscribe",
+            "Command",
+            "Query",
+            "Event",
+            "Projection",
+            "ReadModel",
+            "WriteModel",
+            "EventStore",
+            "Snapshot"
+        );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -65,8 +85,8 @@ namespace Dx.Domain.Analyzers.Analyzers
 
                 startContext.RegisterSymbolAction(symbolContext =>
                 {
-                    AnalyzeMethod(symbolContext, services);
-                }, SymbolKind.Method);
+                    AnalyzeSymbol(symbolContext, services);
+                }, SymbolKind.NamedType, SymbolKind.Method, SymbolKind.Property);
             });
         }
 
@@ -86,32 +106,30 @@ namespace Dx.Domain.Analyzers.Analyzers
                 new GeneratedCodeDetector(config));
         }
 
-        private static void AnalyzeMethod(SymbolAnalysisContext context, AnalyzerServices services)
+        private static void AnalyzeSymbol(SymbolAnalysisContext context, AnalyzerServices services)
         {
-            var method = (IMethodSymbol)context.Symbol;
+            var symbol = context.Symbol;
 
             // Skip if generated code
-            if (services.Generated.IsGenerated(method))
+            if (services.Generated.IsGenerated(symbol))
                 return;
 
-            // Only analyze S1 and S2 scopes (domain and application)
-            var scope = services.Scope.ResolveSymbol(method);
-            if (scope != Scope.S1 && scope != Scope.S2)
+            // Only analyze S0 and S1 scopes (kernel and domain)
+            var scope = services.Scope.ResolveSymbol(symbol);
+            if (scope != Scope.S0 && scope != Scope.S1)
                 return;
 
-            // Check if this is a Dx facade factory method
-            if (!services.Dx.IsDxFacadeFactory(method))
-                return;
-
-            // Check if method returns Result type (invariants should be enforced)
-            // Facade method doesn't return Result - should it enforce invariants?
-            // This is a potential issue if creating domain types
-            if (!services.Semantic.IsKernelResultType(method.ReturnType)
-                && services.Semantic.IsDomainType(method.ReturnType)
-                && method.Locations.Any())
+            // Check if symbol name contains forbidden vocabulary
+            var symbolName = symbol.Name;
+            var forbiddenTerm = ForbiddenTerms.FirstOrDefault(term => symbolName.Contains(term));
+            if (forbiddenTerm != null)
             {
-                var location = method.Locations.First();
-                context.ReportDiagnostic(Diagnostic.Create(Rule, location));
+                if (symbol.Locations.Any())
+                {
+                    var location = symbol.Locations.First();
+                    var diagnostic = Diagnostic.Create(Rule, location, forbiddenTerm);
+                    context.ReportDiagnostic(diagnostic);
+                }
             }
         }
     }

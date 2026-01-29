@@ -1,4 +1,4 @@
-using Dx.Domain.Analyzers.Infrastructure.Semantics;
+using Dx.Domain.Analyzers.Infrastructure.Facades;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;

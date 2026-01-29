@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="DX7002_NonDeterministicCacheableStageAnalyzer.cs" company="Dx.Domain Team">
+// <copyright file="DX1002_MonotonicKnowledgeAnalyzer.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -11,26 +11,27 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Immutable;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Dx.Domain.Analyzers.Analyzers.Generators
+namespace Dx.Domain.Analyzers.Generators
 {
     /// <summary>
-    /// Analyzer for DX7002: Non-Deterministic Cacheable Stage.
-    /// Detects cacheable stages that use non-deterministic operations.
+    /// Analyzer for DX1002: Monotonic Knowledge.
+    /// Detects contradictions between pipeline stage assertions.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class DX7002_NonDeterministicCacheableStageAnalyzer : DiagnosticAnalyzer
+    public sealed class DX1002_MonotonicKnowledgeAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DX7002";
-        private const string Category = "Domain.Generators.Cache";
+        public const string DiagnosticId = "DX1002";
+        private const string Category = "Domain.Generators.Invariants";
 
-        private static readonly LocalizableString Title = "Non-Deterministic Cacheable Stage";
+        private static readonly LocalizableString Title = "Monotonic Knowledge Violation";
         private static readonly LocalizableString MessageFormat =
-            "Cacheable stage uses non-deterministic operation: {0}. Mark stage as non-cacheable or remove non-deterministic behavior.";
+            "Stage assertion contradicts prior stage: {0}";
         private static readonly LocalizableString Description =
-            "Cacheable stages must be deterministic. They cannot use random numbers, timestamps, or other non-deterministic sources.";
+            "Pipeline stages may add derived facts but must not contradict facts emitted by earlier stages.";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
@@ -40,7 +41,7 @@ namespace Dx.Domain.Analyzers.Analyzers.Generators
             DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: Description,
-            helpLinkUri: "https://github.com/ulfbou/Dx-Framework/blob/main/docs/internal/dx.domain.generators.md#43-cache-rules");
+            helpLinkUri: "https://github.com/ulfbou/Dx-Framework/blob/main/docs/internal/dx.domain.generators.md#12-monotonic-knowledge");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
@@ -50,9 +51,9 @@ namespace Dx.Domain.Analyzers.Analyzers.Generators
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
 
-            // This analyzer would leverage DX1001 (Referential Transparency) detections
-            // in the context of cacheable stages
-            // The actual enforcement happens at the pipeline orchestrator level
+            // This analyzer would require runtime pipeline context
+            // Actual implementation would be in the generator runtime/orchestrator
+            // Here we provide the diagnostic descriptor for use by the runtime
         }
     }
 }

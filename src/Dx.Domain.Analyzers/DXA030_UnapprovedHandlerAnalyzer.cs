@@ -24,7 +24,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Dx.Domain.Analyzers.Analyzers
+namespace Dx.Domain.Analyzers
 {
     /// <summary>
     /// Analyzer for DXA030: Unapproved Handler Usage.

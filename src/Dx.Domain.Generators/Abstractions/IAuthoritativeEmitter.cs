@@ -10,10 +10,6 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Generators.Artifacts;
-
-using System.Text.Json.Serialization;
-
 namespace Dx.Domain.Generators.Abstractions
 {
     /// <summary>

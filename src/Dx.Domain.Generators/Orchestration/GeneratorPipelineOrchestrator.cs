@@ -1,4 +1,6 @@
 using Dx.Domain;
+using Dx.Domain.Factors;
+using Dx.Domain.Primitives;
 using Dx.Domain.Generators.Abstractions;
 using Dx.Domain.Generators.Core;
 using Dx.Domain.Generators.Diagnostics;
@@ -73,7 +75,7 @@ namespace Dx.Domain.Generators.Orchestration
                     impact: ImpactLevel.Breaking
                 );
 
-                return Result<StageSuccessPayload, StageFailurePayload>.InternalFailure(
+                return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                     new StageFailurePayload(
                         FailureClass.IntentViolation,
                         diagnostic,
@@ -83,10 +85,10 @@ namespace Dx.Domain.Generators.Orchestration
             try
             {
                 // 3. Monotonic Commit
-                var causation = DxDomain.CausationFactory.Create(
-                    correlationId: DxDomain.Correlation.New(),
-                    traceId: DxDomain.Trace.New(),
-                    actorId: ActorId.Empty);
+                var causation = Causation.Create(
+                    correlationId: CorrelationId.New(),
+                    traceId: TraceId.New(),
+                    actorId: null);
 
                 var commit = _store.AtomicCommit(
                     stage.StageName,
@@ -97,7 +99,7 @@ namespace Dx.Domain.Generators.Orchestration
                 {
                     var failureMessage = string.Join("; ", commit.Error.Conflicts.Select(c => c.ToString()));
 
-                    return Result<StageSuccessPayload, StageFailurePayload>.InternalFailure(
+                    return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                         new StageFailurePayload(
                             FailureClass.InternalError,
                             new GeneratorDiagnostic(
@@ -115,7 +117,7 @@ namespace Dx.Domain.Generators.Orchestration
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                return Result<StageSuccessPayload, StageFailurePayload>.InternalFailure(
+                return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                     new StageFailurePayload(
                         FailureClass.InternalError,
                         new GeneratorDiagnostic(

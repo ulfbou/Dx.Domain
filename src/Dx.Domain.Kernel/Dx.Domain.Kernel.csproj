@@ -24,13 +24,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="../../CHANGELOG.md" Link="docs/CHANGELOG.md" />
-    <None Update="../../README.md" Link="docs/README.md" />
-    <None Update="../../LICENSE" Link="docs/LICENSE" />
+    <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
+    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="../../CHANGELOG.md" Link="docs/CHANGELOG.md" />
+    <None Update="../../README.md" Link="docs/README.md" />
+    <None Update="../../LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
 
 </Project>

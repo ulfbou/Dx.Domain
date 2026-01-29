@@ -10,6 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Errors;
 using Dx.Domain.Generators.Abstractions;
 
 using System.Collections.Generic;

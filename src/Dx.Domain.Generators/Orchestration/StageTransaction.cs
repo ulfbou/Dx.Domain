@@ -14,12 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using Dx;
 using Dx.Domain;
+using Dx.Domain.Errors;
+using Dx.Domain.Generators.Internal;
 using Dx.Domain.Generators.Abstractions;
 using Dx.Domain.Generators.Core;
-
-using static Dx.DxDomain;
 
 namespace Dx.Domain.Generators.Orchestration
 {
@@ -49,14 +48,14 @@ namespace Dx.Domain.Generators.Orchestration
                 // Monotonic Invariant: Once proposed, a fact cannot change within a transaction
                 if (!StructuralComparer.StructurallyEqual(existing, value))
                 {
-                    return Result.Failure<Unit, DomainError>(
-                        DxDomain.Faults.InvalidInput($"Conflicting proposal for '{compositeKey}'."));
+                    return Result<Unit, DomainError>.Failure(
+                        GeneratorFaults.InvalidInput($"Conflicting proposal for '{compositeKey}'."));
                 }
-                return Result.Ok<Unit, DomainError>(Unit.Value);
+                return Result<Unit, DomainError>.Success(Unit.Value);
             }
 
             _local.Add(compositeKey, value);
-            return Result.Ok<Unit, DomainError>(Unit.Value);
+            return Result<Unit, DomainError>.Success(Unit.Value);
         }
 
         public Result<T, DomainError> GetCommitted<T>(FactKey<T> key)
@@ -70,15 +69,15 @@ namespace Dx.Domain.Generators.Orchestration
                 var payload = fact!.GetPayload();
                 if (payload is T typedValue)
                 {
-                    return Result.Ok<T, DomainError>(typedValue);
+                    return Result<T, DomainError>.Success(typedValue);
                 }
 
-                return Result.Failure<T, DomainError>(
-                    DxDomain.Faults.InvalidInput($"Type mismatch for committed fact '{compositeKey}'. Expected {typeof(T).Name}."));
+                return Result<T, DomainError>.Failure(
+                    GeneratorFaults.InvalidInput($"Type mismatch for committed fact '{compositeKey}'. Expected {typeof(T).Name}."));
             }
 
-            return Result.Failure<T, DomainError>(
-                DxDomain.Faults.InvalidInput($"Missing required committed fact '{compositeKey}'."));
+            return Result<T, DomainError>.Failure(
+                GeneratorFaults.InvalidInput($"Missing required committed fact '{compositeKey}'."));
         }
 
         /// <summary>

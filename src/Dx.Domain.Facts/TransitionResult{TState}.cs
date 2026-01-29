@@ -10,7 +10,6 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Contracts;
 using Dx.Domain.Errors;
 
 using System;
