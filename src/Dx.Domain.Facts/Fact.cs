@@ -93,7 +93,7 @@ public readonly struct Fact<TPayload> : IDomainFact
             throw new ArgumentException("Fact type must not be null or whitespace.", nameof(factType));
 
         return new Fact<TPayload>(
-            id: FactId.NewId(),
+            id: FactId.New(),
             factType: factType,
             payload: payload,
             causation: causation,

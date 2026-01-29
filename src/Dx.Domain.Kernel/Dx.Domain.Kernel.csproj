@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
     <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
   </ItemGroup>
 

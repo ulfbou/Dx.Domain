@@ -17,7 +17,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Dx.Domain.Factors
+namespace Dx.Domain.Facts
 {
     /// <summary>
     /// Captures correlation, trace, actor, and timestamp information that explains why a fact or operation occurred.
@@ -75,7 +75,7 @@ namespace Dx.Domain.Factors
         /// Thrown if <paramref name="correlationId"/> or <paramref name="traceId"/> is empty.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
+        public static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
         {
             Invariant.That(correlationId.Value != Guid.Empty, "Kernel.Causation.MissingCorrelation", "CorrelationId must not be empty.");
             Invariant.That(!traceId.IsEmpty, "Kernel.Causation.MissingTrace", "TraceId must not be empty.");

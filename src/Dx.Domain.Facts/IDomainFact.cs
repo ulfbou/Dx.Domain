@@ -14,7 +14,7 @@ using Dx.Domain.Primitives;
 
 using System;
 
-namespace Dx.Domain.Factors
+namespace Dx.Domain.Facts
 {
     /// <summary>
     /// Represents a domain fact with identity, type, causation, and timestamp metadata.
