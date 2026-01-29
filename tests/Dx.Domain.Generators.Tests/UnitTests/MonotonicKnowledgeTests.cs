@@ -13,7 +13,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Dx.Domain.Factors;
+using Dx.Domain.Facts;
 using Dx.Domain.Generators.Abstractions;
 using Dx.Domain.Generators.Core;
 using Dx.Domain.Generators.Model;
