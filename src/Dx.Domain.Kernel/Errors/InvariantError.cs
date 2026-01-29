@@ -1,129 +1,132 @@
-// <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="InvariantError.cs" company="Dx.Domain Team">
-//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
-// </copyright>
-// <license>
-//     This software is licensed under the MIT License.
-//     See the project's root <c>LICENSE</c> file for details.
-//     Contributions are welcome, subject to the terms of the project's license.
-//     See the repository root <c>CONTRIBUTING.md</c> file for details.
-// </license>
-// ----------------------------------------------------------------------------------
-
-using Dx.Domain.Primitives;
+// Copyright (c) Dx.Domain Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace Dx.Domain.Errors
+namespace Dx.Domain.Errors;
+
+/// <summary>
+/// Represents detailed diagnostic information for a violated invariant.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <see cref="InvariantError"/> captures structural diagnostic context for invariant violations
+/// (domain error, caller info, soft correlation, timestamp) without depending on typed identity primitives.
+/// </para>
+/// <para>
+/// This preserves Kernel Law 3 ("Diagnostics as Data") while avoiding Primitives dependencies.
+/// Correlation metadata is provided as strings or Guids by the caller, not typed identity structs.
+/// </para>
+/// <para>
+/// For domain failures crossing boundaries without diagnostic context, use <see cref="DomainError"/> instead.
+/// </para>
+/// </remarks>
+[DebuggerDisplay("InvariantError [{DomainError.Code}] @ {Member}:{Line}")]
+public sealed class InvariantError
 {
     /// <summary>
-    /// Represents detailed diagnostic information for a violated invariant.
+    /// Gets the domain error associated with the invariant violation.
     /// </summary>
-    [DebuggerDisplay("InvariantError {DomainError.Code} @ {Member}:{Line}")]
-    public sealed class InvariantError
+    public DomainError DomainError { get; }
+
+    /// <summary>
+    /// Gets an optional message override to use instead of <see cref="DomainError.Message"/>.
+    /// </summary>
+    public string? MessageOverride { get; }
+
+    /// <summary>
+    /// Gets the member name where the invariant was violated (via CallerMemberName).
+    /// </summary>
+    public string Member { get; }
+
+    /// <summary>
+    /// Gets the source file name where the invariant was violated (via CallerFilePath).
+    /// </summary>
+    public string FileName { get; }
+
+    /// <summary>
+    /// Gets the line number where the invariant was violated (via CallerLineNumber).
+    /// </summary>
+    public int Line { get; }
+
+    /// <summary>
+    /// Gets the UTC timestamp when the invariant violation was recorded.
+    /// </summary>
+    public DateTimeOffset UtcTimestamp { get; }
+
+    private InvariantError(
+        DomainError domainError,
+        string? messageOverride,
+        string member,
+        string fileName,
+        int line,
+        DateTimeOffset utcTimestamp)
     {
-        /// <summary>Gets the domain error associated with the invariant violation.</summary>
-        public DomainError DomainError { get; }
+        DomainError = domainError;
+        MessageOverride = messageOverride;
+        Member = member ?? string.Empty;
+        FileName = fileName ?? string.Empty;
+        Line = line;
+        UtcTimestamp = utcTimestamp;
+    }
 
-        /// <summary>Gets an optional message override to use instead of <see cref="DomainError.Message"/>.</summary>
-        public string? MessageOverride { get; }
+    /// <summary>
+    /// Creates a new <see cref="InvariantError"/> with diagnostic context.
+    /// </summary>
+    /// <param name="domainError">The domain error describing the invariant violation.</param>
+    /// <param name="messageOverride">Optional message to override the domain error's default message.</param>
+    /// <param name="member">Caller member name (auto-populated via CallerMemberName).</param>
+    /// <param name="file">Caller file path (auto-populated via CallerFilePath).</param>
+    /// <param name="line">Caller line number (auto-populated via CallerLineNumber).</param>
+    /// <returns>A new <see cref="InvariantError"/> instance.</returns>
+    /// <remarks>
+    /// This method is intended for internal use to capture detailed context about where and
+    /// why an invariant violation occurred. Caller information is automatically populated by
+    /// the compiler and should not be set manually.
+    /// </remarks>
+    internal static InvariantError Create(
+        DomainError domainError,
+        string? messageOverride = null,
+        [CallerMemberName] string member = "",
+        [CallerFilePath] string file = "",
+        [CallerLineNumber] int line = 0)
+    {
+        var fileName = string.IsNullOrEmpty(file) ? string.Empty : Path.GetFileName(file);
 
-        /// <summary>Gets the member in which the invariant was evaluated.</summary>
-        public string Member { get; }
+        return new InvariantError(
+            domainError,
+            messageOverride,
+            member,
+            fileName,
+            line,
+            DateTimeOffset.UtcNow);
+    }
 
-        /// <summary>Gets the source file name where the invariant was evaluated.</summary>
-        public string FileName { get; }
+    /// <summary>
+    /// Gets the effective message for the invariant violation, using <see cref="MessageOverride"/>
+    /// when present and falling back to <see cref="DomainError.Message"/> otherwise.
+    /// </summary>
+    public string EffectiveMessage => MessageOverride ?? DomainError.Message;
 
-        /// <summary>Gets the line number in the source file where the invariant was evaluated.</summary>
-        public int Line { get; }
+    /// <summary>
+    /// Gets the effective error code from the wrapped <see cref="DomainError"/>.
+    /// </summary>
+    public string Code => DomainError.Code;
 
-        /// <summary>Gets the correlation identifier associated with the operation.</summary>
-        public CorrelationId CorrelationId { get; }
-
-        /// <summary>Gets the trace identifier associated with the operation.</summary>
-        public TraceId TraceId { get; }
-
-        /// <summary>Gets the span identifier associated with the operation.</summary>
-        public SpanId SpanId { get; }
-
-        /// <summary>Gets the UTC timestamp when the invariant violation was recorded.</summary>
-        public DateTimeOffset UtcTimestamp { get; }
-
-        private InvariantError(
-            DomainError domainError,
-            string? messageOverride,
-            string member,
-            string fileName,
-            int line,
-            CorrelationId correlationId,
-            TraceId traceId,
-            SpanId spanId)
-        {
-            DomainError = domainError;
-            MessageOverride = messageOverride;
-            Member = member;
-            FileName = fileName;
-            Line = line;
-            CorrelationId = correlationId;
-            TraceId = traceId;
-            SpanId = spanId;
-            UtcTimestamp = DateTimeOffset.UtcNow;
-        }
-
-        /// <summary>
-        /// Creates a new instance of the InvariantError class with the specified domain error and optional contextual
-        /// information.
-        /// </summary>
-        /// <remarks>This method is intended for internal use to capture detailed context about where and
-        /// why an invariant violation occurred. Caller information is automatically populated by the compiler and
-        /// should not be set manually.</remarks>
-        /// <param name="domainError">The domain error that describes the invariant violation. Cannot be null.</param>
-        /// <param name="messageOverride">An optional message to override the default error message. If null, the default message from the domain
-        /// error is used.</param>
-        /// <param name="correlationId">An optional correlation identifier used to trace the error across systems. Defaults to an empty value if not
-        /// specified.</param>
-        /// <param name="traceId">An optional trace identifier for distributed tracing. Defaults to an empty value if not specified.</param>
-        /// <param name="spanId">An optional span identifier for distributed tracing. Defaults to an empty value if not specified.</param>
-        /// <param name="member">The name of the member that invoked this method. This value is automatically provided by the compiler.</param>
-        /// <param name="file">The full path of the source file that contains the caller. This value is automatically provided by the
-        /// compiler.</param>
-        /// <param name="line">The line number in the source file at which this method is called. This value is automatically provided by
-        /// the compiler.</param>
-        /// <returns>An InvariantError instance containing the specified domain error and contextual information.</returns>
-        internal static InvariantError Create(
-            DomainError domainError,
-            string? messageOverride = null,
-            CorrelationId? correlationId = default,
-            TraceId? traceId = default,
-            SpanId? spanId = default,
-            [CallerMemberName] string member = "",
-            [CallerFilePath] string file = "",
-            [CallerLineNumber] int line = 0)
-        {
-            var fileName = string.IsNullOrEmpty(file) ? string.Empty : Path.GetFileName(file);
-
-            return new InvariantError(
-                domainError,
-                messageOverride,
-                member,
-                fileName,
-                line,
-                correlationId ?? CorrelationId.Empty,
-                traceId ?? TraceId.Empty,
-                spanId ?? SpanId.Empty);
-        }
-
-        /// <summary>
-        /// Gets the effective message for the invariant violation, using <see cref="MessageOverride"/> when present
-        /// and falling back to <see cref="DomainError.Message"/> otherwise.
-        /// </summary>
-        public string EffectiveMessage => MessageOverride ?? DomainError.Message;
-
-        /// <inheritdoc />
-        public override string ToString()
-            => $"InvariantError={DomainError.Code}: {EffectiveMessage} @ {Member}:{Line}";
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        var result = $"[{DomainError.Code}] {EffectiveMessage} @ {Member}";
+        
+        if (Line > 0)
+            result += $":{Line}";
+        
+        if (!string.IsNullOrWhiteSpace(FileName))
+            result += $" in {FileName}";
+        
+        return result;
     }
 }

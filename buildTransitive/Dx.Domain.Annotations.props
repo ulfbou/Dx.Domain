@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  
+  <!--
+    Dx.Domain.Annotations.props
+    
+    Included automatically when a project references the Dx.Domain.Annotations NuGet package.
+    Annotations package also includes analyzers for enforcement.
+  -->
+
+  <PropertyGroup Label="Dx.Domain.Annotations">
+    <!-- Ensure analyzers are always enabled -->
+    <RunAnalyzers Condition="'$(RunAnalyzers)' == ''">true</RunAnalyzers>
+    <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
+    
+    <!-- Dx.Domain analyzers are non-negotiable -->
+    <DxDomainAnalyzersEnabled>true</DxDomainAnalyzersEnabled>
+  </PropertyGroup>
+
+  <ItemGroup Label="Dx.Domain Analyzers" Condition="Exists('$(MSBuildThisFileDirectory)..\analyzers\dotnet\cs\Dx.Domain.Analyzers.dll')">
+    <Analyzer Include="$(MSBuildThisFileDirectory)..\analyzers\dotnet\cs\Dx.Domain.Analyzers.dll" />
+  </ItemGroup>
+
+</Project>

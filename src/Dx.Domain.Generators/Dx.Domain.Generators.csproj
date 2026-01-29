@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dx.Domain\Dx.Domain.csproj" />
+    <ProjectReference Include="..\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
