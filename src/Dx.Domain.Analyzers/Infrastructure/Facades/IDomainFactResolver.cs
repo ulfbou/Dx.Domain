@@ -27,7 +27,8 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
     {
         public DomainFactResolver(Compilation compilation)
         {
-            DomainFactType = compilation.GetTypeByMetadataName("Dx.Domain.Factors.IDomainFact")
+            DomainFactType = compilation.GetTypeByMetadataName("Dx.Domain.Facts.IDomainFact")
+                             ?? compilation.GetTypeByMetadataName("Dx.Domain.Factors.IDomainFact")
                              ?? compilation.GetTypeByMetadataName("Dx.Domain.IDomainFact");
         }
 

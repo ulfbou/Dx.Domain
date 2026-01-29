@@ -12,8 +12,6 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Dx.Domain.Abstractions")]
-[assembly: InternalsVisibleTo("Dx.Domain.Attributes")]
 [assembly: InternalsVisibleTo("Dx.Domain.Analyzers")]
 [assembly: InternalsVisibleTo("Dx.Domain.Tests")]
 [assembly: InternalsVisibleTo("Dx.Domain.Analyzers.Tests")]

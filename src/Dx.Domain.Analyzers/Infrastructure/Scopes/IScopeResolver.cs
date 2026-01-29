@@ -52,6 +52,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
         /// <inheritdoc/>
         public Scope ResolveAssembly(IAssemblySymbol assembly)
         {
+            if (TryResolveScopeFromAttribute(assembly, out var attributeScope))
+                return attributeScope;
+
             if (_assemblyMap.TryGetValue(assembly.Name, out var scope))
                 return scope;
 
@@ -99,6 +102,24 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
                       .Select(s => s.Trim())
                       .Where(s => s.Length != 0)
                       .ToImmutableArray();
+        }
+
+        private static bool TryResolveScopeFromAttribute(IAssemblySymbol assembly, out Scope scope)
+        {
+            foreach (var attribute in assembly.GetAttributes())
+            {
+                if (!string.Equals(attribute.AttributeClass?.ToDisplayString(), "Dx.Domain.Annotations.DxScopeAttribute", StringComparison.Ordinal))
+                    continue;
+
+                if (attribute.ConstructorArguments.Length == 1 && attribute.ConstructorArguments[0].Value is int raw)
+                {
+                    scope = (Scope)raw;
+                    return true;
+                }
+            }
+
+            scope = Scope.S3;
+            return false;
         }
     }
 }

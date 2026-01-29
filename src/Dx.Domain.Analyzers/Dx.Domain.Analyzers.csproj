@@ -74,8 +74,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Dx.Domain.Abstractions" />
-    <InternalsVisibleTo Include="Dx.Domain.Attributes" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
     <InternalsVisibleTo Include="Dx.Domain.Tests" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers.Tests" />
