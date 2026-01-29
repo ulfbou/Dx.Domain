@@ -13,6 +13,8 @@
 using Dx.Domain.Factors;
 using Dx.Domain.Generators.Abstractions;
 using Dx.Domain.Generators.Core;
+using Dx.Domain.Generators.Model;
+using Dx.Domain.Primitives;
 
 using FluentAssertions;
 
@@ -21,25 +23,26 @@ using System.Linq;
 
 using Xunit;
 
-using static Dx.DxDomain;
-
 namespace Dx.Domain.Generators.Tests.UnitTests;
 
 public class StageAssertionSetTests
 {
-    private static StageAssertionSet CreateSet(IDictionary<string, object> assertions)
+    private static StageAssertionSet CreateSet(IEnumerable<string> keys)
     {
         // helper: treat all provided keys as required for these tests
         var builder = StageAssertionSet.Create();
 
-        foreach (var key in assertions.Keys)
+        foreach (var key in keys)
         {
             // we ignore the value dimension in the new model; only presence matters for Preconditions
-            builder.Require(new FactKey<object>("Test", key));
+            builder.Require(new FactKey<DomainIntentModel>("Test", key));
         }
 
         return builder.Build();
     }
+
+    private static IEnumerable<string> ToStoreKeys(IEnumerable<string> keys)
+        => keys.Select(key => $"Test:{key}");
 
     private static MonotonicFactStore SeedStore(IEnumerable<string> keys)
     {
@@ -51,10 +54,10 @@ public class StageAssertionSetTests
         if (proposals.Count == 0)
             return store;
 
-        var causation = DxDomain.CausationFactory.Create(
-            correlationId: DxDomain.Correlation.New(),
-            traceId: DxDomain.Trace.New(),
-            actorId: ActorId.Empty);
+        var causation = Causation.Create(
+            correlationId: CorrelationId.New(),
+            traceId: TraceId.New(),
+            actorId: null);
 
         var result = store.AtomicCommit("StageAssertionSetTests.Seed", proposals, causation);
         result.IsSuccess.Should().BeTrue("seeding the store for tests must succeed");
@@ -77,11 +80,13 @@ public class StageAssertionSetTests
             { "additionalField", "value" }
         };
 
-        var prior = CreateSet(priorAssertions);
-        var current = CreateSet(currentAssertions);
+        var priorKeys = priorAssertions.Keys.ToArray();
+        var currentKeys = currentAssertions.Keys.ToArray();
+        var prior = CreateSet(priorKeys);
+        var current = CreateSet(currentKeys);
 
         // Shim semantics: current must be valid against a store that already has prior keys
-        var store = SeedStore(prior.RequiredKeys);
+        var store = SeedStore(ToStoreKeys(priorKeys));
 
         // Act
         var result = current.Validate(store);
@@ -103,19 +108,21 @@ public class StageAssertionSetTests
             { "schema", "v2" }
         };
 
-        var prior = CreateSet(priorAssertions);
-        var current = CreateSet(currentAssertions);
+        var priorKeys = priorAssertions.Keys.ToArray();
+        var currentKeys = currentAssertions.Keys.ToArray();
+        var prior = CreateSet(priorKeys);
+        var current = CreateSet(currentKeys);
 
         // In the new model, simulate a “contradiction” as a missing required key:
         // prior is satisfied, but we do not seed current's required keys.
-        var store = SeedStore(prior.RequiredKeys);
+        var store = SeedStore(ToStoreKeys(priorKeys));
 
         // Act
         var result = current.Validate(store);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Message.Should().Contain("Missing");
+        result.Error.Diagnostic.Message.Should().Contain("Missing");
     }
 
     [Fact]
@@ -123,10 +130,11 @@ public class StageAssertionSetTests
     {
         // This behaviour (value-level numeric compatibility) is no longer represented
         // in the new assertion model; keep a smoke test that the builder works.
-        var prior = CreateSet(new Dictionary<string, object> { { "count", 42 } });
-        var current = CreateSet(new Dictionary<string, object> { { "count", 42.0 } });
+        var keys = new[] { "count" };
+        var prior = CreateSet(keys);
+        var current = CreateSet(keys);
 
-        var store = SeedStore(prior.RequiredKeys);
+        var store = SeedStore(ToStoreKeys(keys));
 
         var result = current.Validate(store);
         result.IsSuccess.Should().BeTrue();
@@ -135,23 +143,16 @@ public class StageAssertionSetTests
     [Fact]
     public void IsCompatibleWithAll_WithMultiplePriorStages_ValidatesAll()
     {
-        var stage1 = CreateSet(new Dictionary<string, object>
-        {
-            { "field1", "value1" }
-        });
-        var stage2 = CreateSet(new Dictionary<string, object>
-        {
-            { "field2", "value2" }
-        });
-        var current = CreateSet(new Dictionary<string, object>
-        {
-            { "field1", "value1" },
-            { "field2", "value2" },
-            { "field3", "value3" }
-        });
+        var stage1Keys = new[] { "field1" };
+        var stage2Keys = new[] { "field2" };
+        var currentKeys = new[] { "field1", "field2", "field3" };
+
+        var stage1 = CreateSet(stage1Keys);
+        var stage2 = CreateSet(stage2Keys);
+        var current = CreateSet(currentKeys);
 
         // Seed store with keys from both stage1 and stage2
-        var store = SeedStore(stage1.RequiredKeys.Concat(stage2.RequiredKeys));
+        var store = SeedStore(ToStoreKeys(stage1Keys.Concat(stage2Keys)));
 
         var result = current.Validate(store);
         result.IsSuccess.Should().BeTrue();
@@ -162,7 +163,7 @@ public class StageAssertionSetTests
     {
         // The new API uses a builder; validate that passing a null FactKey throws via helper
         var builder = StageAssertionSet.Create();
-        var act = () => builder.Require(new FactKey<object>("Test", null!));
+        var act = () => builder.Require(new FactKey<DomainIntentModel>("Test", null!));
         act.Should().Throw<ArgumentNullException>();
     }
 }

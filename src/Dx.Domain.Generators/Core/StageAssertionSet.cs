@@ -10,10 +10,13 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain;
+using Dx.Domain.Errors;
 using Dx.Domain.Generators.Abstractions;
 using Dx.Domain.Generators.Diagnostics;
 using Dx.Domain.Generators.Model;
 using Dx.Domain.Generators.Orchestration;
+using Dx.Domain.Generators.Internal;
 
 using System;
 using System.Collections.Generic;
@@ -162,7 +165,7 @@ namespace Dx.Domain.Generators.Core
                     fixPreview: null,
                     impact: ImpactLevel.Breaking);
 
-                return DxDomain.Result.Failure<StageSuccessPayload, StageFailurePayload>(
+                return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                     new StageFailurePayload(
                         FailureClass.IntentViolation,
                         diagnostic,
@@ -171,7 +174,7 @@ namespace Dx.Domain.Generators.Core
 
             // In a validation context with no transaction, we provide empty artifacts/transaction.
             // Note: This relies on the caller not using the Payload for writing.
-            return DxDomain.Result.Ok<StageSuccessPayload, StageFailurePayload>(
+            return Result<StageSuccessPayload, StageFailurePayload>.Success(
                 new StageSuccessPayload(
                     new StageTransaction(store),
                     ImmutableList<GeneratedArtifact>.Empty));
@@ -205,7 +208,7 @@ namespace Dx.Domain.Generators.Core
                         fixPreview: null,
                         impact: ImpactLevel.Breaking);
 
-                    return DxDomain.Result.Failure<StageSuccessPayload, StageFailurePayload>(
+                    return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                         new StageFailurePayload(FailureClass.PolicyViolation, diagnostic, null));
                 }
             }
@@ -230,7 +233,7 @@ namespace Dx.Domain.Generators.Core
                         fixPreview: null,
                         impact: ImpactLevel.Breaking);
 
-                    return DxDomain.Result.Failure<StageSuccessPayload, StageFailurePayload>(
+                    return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                         new StageFailurePayload(
                             FailureClass.InfrastructureError,
                             diagnostics,
@@ -251,14 +254,14 @@ namespace Dx.Domain.Generators.Core
                     fixPreview: null,
                     impact: ImpactLevel.Breaking);
 
-                return DxDomain.Result.Failure<StageSuccessPayload, StageFailurePayload>(
+                return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                     new StageFailurePayload(
                         FailureClass.InternalError,
                         diagnostics,
                         null));
             }
 
-            return DxDomain.Result.Ok<StageSuccessPayload, StageFailurePayload>(
+            return Result<StageSuccessPayload, StageFailurePayload>.Success(
                 new StageSuccessPayload(transaction, ImmutableList<GeneratedArtifact>.Empty));
         }
 
@@ -310,11 +313,11 @@ namespace Dx.Domain.Generators.Core
                 // We check variations of the key format to be robust
                 if (facts.ContainsKey(_fullKey) || facts.ContainsKey($"{_keyNamespace}.{_keyName}"))
                 {
-                    return DxDomain.Result.Ok<Unit, DomainError>(Unit.Value);
+                    return Result<Unit, DomainError>.Success(Unit.Value);
                 }
 
-                return DxDomain.Result.Failure<Unit, DomainError>(
-                    DxDomain.Faults.InvalidInput($"Prerequisite fact '{_fullKey}' was not found in the prior fact store."));
+                return Result<Unit, DomainError>.Failure(
+                    GeneratorFaults.InvalidInput($"Prerequisite fact '{_fullKey}' was not found in the prior fact store."));
             }
         }
 
@@ -342,17 +345,17 @@ namespace Dx.Domain.Generators.Core
             {
                 if (!facts.TryGetValue(_key, out var actual))
                 {
-                    return DxDomain.Result.Failure<Unit, DomainError>(
-                        DxDomain.Faults.InvalidInput($"Fact '{_key}' is missing."));
+                    return Result<Unit, DomainError>.Failure(
+                        GeneratorFaults.InvalidInput($"Fact '{_key}' is missing."));
                 }
 
                 if (!AreValuesCompatible(_expected, actual))
                 {
-                    return DxDomain.Result.Failure<Unit, DomainError>(
-                         DxDomain.Faults.InvalidInput($"Fact '{_key}' has value '{actual}' but expected '{_expected}'."));
+                    return Result<Unit, DomainError>.Failure(
+                         GeneratorFaults.InvalidInput($"Fact '{_key}' has value '{actual}' but expected '{_expected}'."));
                 }
 
-                return DxDomain.Result.Ok<Unit, DomainError>(Unit.Value);
+                return Result<Unit, DomainError>.Success(Unit.Value);
             }
         }
 

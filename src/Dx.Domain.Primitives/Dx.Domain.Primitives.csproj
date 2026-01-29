@@ -16,7 +16,7 @@
     <Authors>Dx.Domain Team</Authors>
     <Company>Dx.Domain Team</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;DX1001</NoWarn>
     <Nullable>enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/ulfbou/dx.domain</RepositoryUrl>
@@ -30,8 +30,15 @@
     <None Update="../../LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Dx.Domain.Analyzers" Version="1.0.0" PrivateAssets="all" />
+  <ItemGroup Condition="'$(UseAnalyzersPackage)' == 'true'">
+    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseAnalyzersPackage)' != 'true'">
+    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj"
+                      PrivateAssets="all"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

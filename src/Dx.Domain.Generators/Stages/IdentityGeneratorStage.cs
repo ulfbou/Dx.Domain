@@ -12,7 +12,7 @@
 
 using Dx.Domain;
 using Dx.Domain.Generators.Abstractions;
-using Dx.Domain.Generators.Artifacts;
+using Dx.Domain.Generators.Internal;
 using Dx.Domain.Generators.CodeGeneration;
 using Dx.Domain.Generators.Common;
 using Dx.Domain.Generators.Core;
@@ -67,7 +67,7 @@ namespace Dx.Domain.Generators.Stages
                 modelObj is not DomainIntentModel dim)
             {
                 // We can't return Failure(...) directly here because the method signature requires Result<StageSuccessPayload, StageFailurePayload>
-                return DxDomain.Result.Failure<StageSuccessPayload, StageFailurePayload>(
+                return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                     Failure("DX4001",
                     FailureClass.InferenceFailure,
                     "DomainIntentModel is missing from prior facts. Pipeline sequence violation."));
@@ -90,29 +90,23 @@ namespace Dx.Domain.Generators.Stages
 
                     // Phase B: Compute Provenance Signature
                     var contentHash = DeterministicHash.Compute(body);
-                    var header = new Artifacts.GeneratedFileHeader(
-                        DimVersion: dim.ModelVersion,
-                        TemplateVersion: StageVersion,
-                        InputFingerprint: context.Fingerprint.Value,
-                        ContentHash: contentHash,
-                        GeneratorName: StageName
-                    );
+                    var header = GeneratedFileHeader.ForValueObject(identity.Name);
 
                     // Consolidate into the final signed text
-                    var signedText = $"// {GeneratedFileHeaderSerializer.Serialize(header)}\n{body}";
+                    var signedText = $"{header}{body}";
                     var path = $"Identity/{identity.Name}.g.cs";
 
                     artifacts.Add(new GeneratedArtifact(path, signedText, contentHash));
                 }
 
                 // 4. Success: Return artifacts and the (potentially expanded) fact transaction
-                return DxDomain.Result.Ok<StageSuccessPayload, StageFailurePayload>(
+                return Result<StageSuccessPayload, StageFailurePayload>.Success(
                     new StageSuccessPayload(transaction, artifacts.ToImmutableList())
                 );
             }
             catch (Exception ex)
             {
-                return DxDomain.Result.Failure<StageSuccessPayload, StageFailurePayload>(
+                return Result<StageSuccessPayload, StageFailurePayload>.Failure(
                     Failure("DX5001", FailureClass.InternalError,
                     $"Unexpected failure during Identity generation: {ex.Message}"));
             }

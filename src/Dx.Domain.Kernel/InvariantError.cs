@@ -10,7 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Contracts;
+using Dx.Domain.Errors;
 
 namespace Dx.Domain.Kernel.Errors
 {
@@ -23,5 +23,5 @@ namespace Dx.Domain.Kernel.Errors
     internal sealed record InvariantError(
         string Code,
         string Message
-    ) : IInvariantError;
+    );
 }

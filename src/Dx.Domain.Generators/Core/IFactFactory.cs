@@ -12,9 +12,9 @@
 
 using Dx.Domain.Factors;
 
-using System.Collections.Concurrent;
-
 using System;
+using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace Dx.Domain.Generators.Core
 {
@@ -46,8 +46,8 @@ namespace Dx.Domain.Generators.Core
                 return factory(key, value, causation);
 
             // Controlled reflection fallback (cold path only)
-            var method = typeof(DxDomain.Fact)
-                .GetMethod(nameof(DxDomain.Fact.Create))!
+            var method = typeof(Fact<>)
+                .GetMethod(nameof(Fact<object>.Create), BindingFlags.NonPublic | BindingFlags.Static)!
                 .MakeGenericMethod(type);
 
             return (IDomainFact)method.Invoke(null, new[] { key, value, causation })!;

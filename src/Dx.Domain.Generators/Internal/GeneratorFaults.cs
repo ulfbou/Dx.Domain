@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Errors;
+
 namespace Dx.Domain.Generators.Internal
 {
     /// <summary>
@@ -25,21 +27,21 @@ namespace Dx.Domain.Generators.Internal
         /// </summary>
         /// <param name="details">The specifics of the missing or forbidden facts.</param>
         public static DomainError AssertionFailed(string details)
-        {
-            // We use the public Factory helper provided in Dx.Faults.cs
-            return DxDomain.Faults.Factory.Create(
+            => DomainError.Create(
                 $"{GenNamespace}.AssertionFailed",
                 $"Stage execution blocked: {details}");
-        }
 
         /// <summary>
         /// Produces a DomainError for monotonicity violations within the FactStore.
         /// </summary>
         public static DomainError MonotonicityViolation(string key)
-        {
-            return DxDomain.Faults.Factory.Create(
+            => DomainError.Create(
                 $"{GenNamespace}.MonotonicityConflict",
                 $"Monotonicity violation: Fact '{key}' has already been committed.");
-        }
+
+        public static DomainError InvalidInput(string details)
+            => DomainError.Create(
+                $"{GenNamespace}.InvalidInput",
+                details);
     }
 }
