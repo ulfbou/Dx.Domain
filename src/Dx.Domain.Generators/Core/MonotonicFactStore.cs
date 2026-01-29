@@ -10,7 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Factors;
+using Dx.Domain.Facts;
 using Dx.Domain;
 
 using System;

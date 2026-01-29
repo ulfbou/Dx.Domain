@@ -1,5 +1,5 @@
 using Dx.Domain;
-using Dx.Domain.Factors;
+using Dx.Domain.Facts;
 using Dx.Domain.Primitives;
 using Dx.Domain.Generators.Abstractions;
 using Dx.Domain.Generators.Core;
