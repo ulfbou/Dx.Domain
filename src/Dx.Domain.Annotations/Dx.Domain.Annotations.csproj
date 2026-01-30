@@ -1,4 +1,4 @@
-﻿<!-- Dx.Domain.Annotations (formerly Abstractions) Project File -->
+<!-- Dx.Domain.Annotations (formerly Abstractions) Project File -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -27,6 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="buildTransitive\Dx.Domain.Annotations.targets" Pack="true" PackagePath="buildTransitive" />
     <None Update="CHANGELOG.md" Link="docs/CHANGELOG.md" />
     <None Update="README.md"     Link="docs/README.md" />
     <None Update="../../LICENSE" Link="docs/LICENSE" />

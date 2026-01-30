@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
-    <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="buildTransitive\Dx.Domain.targets" Pack="true" PackagePath="buildTransitive" />
     <None Update="../../CHANGELOG.md" Link="docs/CHANGELOG.md" />
     <None Update="../../README.md" Link="docs/README.md" />
     <None Update="../../LICENSE" Link="docs/LICENSE" />
