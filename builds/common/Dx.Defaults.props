@@ -1,6 +1,4 @@
-<!-- builds/common/Dx.Defaults.props -->
 <Project Label="Dx.Behavior.Defaults">
-
   <ItemGroup>
     <Using Include="System" />
     <Using Include="System.Collections.Generic" />
@@ -9,31 +7,26 @@
     <Using Include="System.Runtime.CompilerServices" />
     <Using Include="System.Threading.Tasks" />
   </ItemGroup>
-
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <LangVersion Condition="'$(LangVersion)' == ''">latest</LangVersion>
     <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == ''">true</GenerateDocumentationFile>
     <ProduceReferenceAssembly Condition="'$(ProduceReferenceAssembly)' == ''">true</ProduceReferenceAssembly>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(DxIsAbstractions)' == 'true'">
     <LangVersion>10.0</LangVersion>
     <IsPackable Condition="'$(IsPackable)' == ''">true</IsPackable>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(DxIsAnalyzer)' == 'true'">
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(DxIsTest)' == 'true'">
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <NoWarn>$(NoWarn);CA1707;CS1591</NoWarn>
   </PropertyGroup>
-
 </Project>

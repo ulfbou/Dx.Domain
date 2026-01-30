@@ -1,18 +1,12 @@
 <Project Label="Dx.Hierarchy.Props">
-
   <PropertyGroup>
     <DxPropsImported>true</DxPropsImported>
   </PropertyGroup>
-
   <ItemGroup Label="Dx.Internal.Discovery">
     <DxImport Include="common/Dx.Constants.props" />
     <DxImport Include="common/Dx.Versions.props" />
     <DxImport Include="policy/Dx.Forbidden.props" />
-    <DxImport Include="ci/Dx.CI.props"
-              Condition="'$(CI)' != '' OR '$(TF_BUILD)' != ''" />
+    <DxImport Include="ci/Dx.CI.props" Condition="'$(CI)' != '' OR '$(TF_BUILD)' != ''" />
   </ItemGroup>
-
-  <Import Project="%(DxImport.Identity)"
-          Condition="Exists('%(DxImport.Identity)')" />
-
+  <Import Project="%(DxImport.Identity)" Condition="Exists('%(DxImport.Identity)')" />
 </Project>

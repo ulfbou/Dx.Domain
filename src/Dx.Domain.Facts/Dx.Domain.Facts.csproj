@@ -1,14 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" />
     <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
   </ItemGroup>
-
 </Project>

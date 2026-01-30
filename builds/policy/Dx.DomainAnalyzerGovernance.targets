@@ -1,0 +1,21 @@
+<Project Label="Dx.Policy.DomainAnalyzerGovernance">
+  <PropertyGroup>
+    <_DxIsTest Condition="'$(DxIsTest)' == ''">false</_DxIsTest>
+  </PropertyGroup>
+  <Target Name="DxDomain_EnforceAnalyzerEnable" BeforeTargets="CoreCompile" Condition="'$(_DxIsTest)' != 'true'">
+    <Error Condition=" '$(RunAnalyzers)' == 'false' " Code="DXB001" Text="[Dx Governance] Dx analyzers cannot be disabled (RunAnalyzers=false)." />
+    <Error Condition=" '$(EnableNETAnalyzers)' == 'false' " Code="DXB002" Text="[Dx Governance] NET analyzers must be enabled (EnableNETAnalyzers=false)." />
+  </Target>
+  <Target Name="DxDomain_BlockEditorConfigOverrides" BeforeTargets="CoreCompile" Condition="'$(_DxIsTest)' != 'true'">
+    <ItemGroup>
+      <_DxEditorConfigs Include="@(AdditionalFiles)" Condition="'%(Extension)' == '.editorconfig'" />
+    </ItemGroup>
+    <ReadLinesFromFile File="@(_DxEditorConfigs)" Condition="'@(_DxEditorConfigs)' != ''">
+      <Output TaskParameter="Lines" ItemName="_DxEditorConfigLines" />
+    </ReadLinesFromFile>
+    <Error Code="DXB003" Text="[Dx Governance] .editorconfig cannot override Dx diagnostics. Remove 'dotnet_diagnostic.DX*' entries. Files: @(_DxEditorConfigs)" Condition=" '@(_DxEditorConfigLines)' != '' and ( @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DXA')) or @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DXK')) or @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DXT')) or @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DX100')) or @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DX700')) )" />
+  </Target>
+  <PropertyGroup Condition="'$(_DxIsTest)' != 'true'">
+    <WarningsAsErrors>$(WarningsAsErrors);DXA*;DXK*;DXT*;DX100*;DX700*</WarningsAsErrors>
+  </PropertyGroup>
+</Project>

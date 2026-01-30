@@ -1,15 +1,7 @@
 <Project Label="Dx.Root.Ingress">
-
   <PropertyGroup>
-    <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">
-      $(MSBuildThisFileDirectory)builds\
-    </DxBuildRoot>
-
+    <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
     <DxPropsImported Condition="'$(DxPropsImported)' == ''">false</DxPropsImported>
   </PropertyGroup>
-
-  <Import Project="$(DxBuildRoot)Dx.Props.hierarchical.props"
-          Condition="'$(DxPropsImported)' != 'true'
-                 AND Exists('$(DxBuildRoot)Dx.Props.hierarchical.props')" />
-
+  <Import Project="$(DxBuildRoot)Dx.Props.hierarchical.props" Condition="'$(DxPropsImported)' != 'true' AND Exists('$(DxBuildRoot)Dx.Props.hierarchical.props')" />
 </Project>

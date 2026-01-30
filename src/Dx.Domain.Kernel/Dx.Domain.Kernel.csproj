@@ -1,15 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
-
     <RootNamespace>Dx.Domain</RootNamespace>
     <AssemblyName>Dx.Domain.Kernel</AssemblyName>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-    <Description>
-      The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.
-      It exists to make incorrect domain modeling impossible to ignore, not to act as a convenience library.
-    </Description>
+    <Description>The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.</Description>
     <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
@@ -27,15 +22,19 @@
     <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
   </ItemGroup>
 
+  <!-- DX-first: analyzers auto-load for consumers via PackageReference; no buildTransitive props/targets needed -->
   <ItemGroup>
+    <PackageReference Include="Dx.Domain.Analyzers" Version="$(DxBuildVersion)" PrivateAssets="all" IncludeAssets="analyzers" />
+  </ItemGroup>
+
+  <!-- Repo builds: if package not available yet, use local analyzer project -->
+  <ItemGroup Condition="Exists('..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj')">
     <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="buildTransitive\Dx.Domain.targets" Pack="true" PackagePath="buildTransitive" />
-    <None Update="../../CHANGELOG.md" Link="docs/CHANGELOG.md" />
-    <None Update="../../README.md" Link="docs/README.md" />
-    <None Update="../../LICENSE" Link="docs/LICENSE" />
+    <None Update="..\..\CHANGELOG.md" Link="docs/CHANGELOG.md" />
+    <None Update="..\..\README.md" Link="docs/README.md" />
+    <None Update="..\..\LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
-
 </Project>

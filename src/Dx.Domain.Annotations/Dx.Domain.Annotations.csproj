@@ -1,19 +1,11 @@
-<!-- Dx.Domain.Annotations (formerly Abstractions) Project File -->
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
-
     <AssemblyName>Dx.Domain.Annotations</AssemblyName>
     <RootNamespace>Dx.Domain.Annotations</RootNamespace>
-
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>10</LangVersion>
-
-    <Description>
-      Marker-only annotations for Dx.Domain (pure attributes). No runtime behavior.
-      Usage is enforced by analyzers and generators; composition is by namespaces only.
-    </Description>
+    <Description>Marker-only annotations for Dx.Domain (pure attributes). No runtime behavior.</Description>
     <PackageTags>dx;ddd;annotations;attributes;domain-model</PackageTags>
     <Authors>Dx.Domain Team</Authors>
     <Company>Dx.Domain Team</Company>
@@ -26,11 +18,19 @@
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
   </PropertyGroup>
 
+  <!-- DX-first: analyzers auto-load for consumers via PackageReference; no buildTransitive props/targets needed -->
   <ItemGroup>
-    <None Include="buildTransitive\Dx.Domain.Annotations.targets" Pack="true" PackagePath="buildTransitive" />
-    <None Update="CHANGELOG.md" Link="docs/CHANGELOG.md" />
-    <None Update="README.md"     Link="docs/README.md" />
-    <None Update="../../LICENSE" Link="docs/LICENSE" />
+    <PackageReference Include="Dx.Domain.Analyzers" Version="$(DxBuildVersion)" PrivateAssets="all" IncludeAssets="analyzers" />
   </ItemGroup>
 
+  <!-- Repo builds still see analyzers if the package is not available, via local project reference -->
+  <ItemGroup Condition="Exists('..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj')">
+    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CHANGELOG.md" Link="docs/CHANGELOG.md" />
+    <None Update="README.md"     Link="docs/README.md" />
+    <None Update="..\..\LICENSE" Link="docs/LICENSE" />
+  </ItemGroup>
 </Project>
