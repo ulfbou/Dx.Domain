@@ -12,6 +12,7 @@
     <LangVersion Condition="'$(LangVersion)' == ''">latest</LangVersion>
     <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == ''">true</GenerateDocumentationFile>
     <ProduceReferenceAssembly Condition="'$(ProduceReferenceAssembly)' == ''">true</ProduceReferenceAssembly>
+    <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
   </PropertyGroup>
   <PropertyGroup Condition="'$(DxIsAbstractions)' == 'true'">
     <LangVersion>10.0</LangVersion>
@@ -29,4 +30,5 @@
     <IsTestProject>true</IsTestProject>
     <NoWarn>$(NoWarn);CA1707;CS1591</NoWarn>
   </PropertyGroup>
+
 </Project>

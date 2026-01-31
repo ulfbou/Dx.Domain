@@ -4,5 +4,4 @@
   </PropertyGroup>
   <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets" Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
   <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
-  <Import Project="$(DxBuildRoot)policy/Dx.DomainAnalyzerGovernance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.DomainAnalyzerGovernance.targets')" />
 </Project>
