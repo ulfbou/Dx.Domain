@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial public release of the Dx.Domain family of packages:
-  - `Dx.Domain.Abstractions`: Core domain abstractions and contracts.
+  - `Dx.Domain.Annotations`: Semantic vocabulary and contracts.
   - `Dx.Domain.Kernel`: Result type, invariants, domain errors, and functional helpers.
   - `Dx.Domain.Primitives`: Strongly-typed primitives for identity and tracing (`ActorId`, `CorrelationId`, `FactId`, `SpanId`, `TraceId`).
   - `Dx.Domain.Generators`: Roslyn-based generators for domain models and artifacts.
