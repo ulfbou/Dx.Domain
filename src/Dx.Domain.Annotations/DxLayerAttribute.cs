@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dx.Domain;
+namespace Dx.Domain.Annotations;
 
 /// <summary>
 /// Declares the architectural layer of an assembly for Dx.Domain analyzer scope resolution.
@@ -13,9 +13,9 @@ namespace Dx.Domain;
 /// Apply this attribute at the assembly level to specify which layer rules apply.
 /// </para>
 /// <example>
-/// <code>
+/// <code><![CDATA[
 /// [assembly: DxLayer("Kernel")]
-/// </code>
+/// ]]></code>
 /// </example>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]

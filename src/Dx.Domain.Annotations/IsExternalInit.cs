@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="DxSeverities.cs" company="Dx.Domain Team">
+// <copyright file="IsExternalInit.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,12 +10,10 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain.Annotations
+namespace System.Runtime.CompilerServices
 {
-    public static class DxSeverities
-    {
-        public const string Error = "Error";
-        public const string Warning = "Warning";
-        public const string Info = "Info";
-    }
+    /// <summary>
+    /// Reserved for compiler use. This type enables the use of init-only setters in C# 9.0+.
+    /// </summary>
+    internal static class IsExternalInit { }
 }

@@ -6,17 +6,12 @@ using System;
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Marks a method or class as enforcing domain invariants.
+/// Marks a method or type as an invariant enforcement point (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// <para>
-/// This is a semantic marker for methods that perform invariant checking
-/// using <c>Invariant.That(...)</c> or <c>Require.That(...)</c>.
-/// </para>
-/// <para>
-/// Used by analyzers to identify invariant enforcement points and verify
-/// proper error handling patterns.
-/// </para>
+/// This attribute imposes no runtime semantics. Analyzers classify invariant checks
+/// and verify error‑handling patterns. SEE: Kernel Specification → Invariants &amp; Require;
+/// Rule Charter → Invariant/Require Discipline.
 /// </remarks>
 [AttributeUsage(
     AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Struct,

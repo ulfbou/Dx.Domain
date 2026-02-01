@@ -12,25 +12,16 @@
 
 using System;
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
     /// <summary>
-    /// Declares the architectural role of an assembly within the Dx.Domain framework.
+    /// Declares the architectural role of an assembly (pure metadata marker).
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This attribute must be applied at the assembly level to indicate the assembly's
-    /// role in the application architecture. Analyzers use this to enforce dependency
-    /// rules and architectural boundaries.
-    /// </para>
-    /// <para>
-    /// <b>Usage:</b> Apply once per assembly in AssemblyInfo.cs or any source file using:
-    /// <c>[assembly: DxAssemblyRole(DxAssemblyRole.Domain)]</c>
-    /// </para>
-    /// <para>
-    /// <b>Enforcement:</b> The DXK-001 analyzer will report an error if this attribute
-    /// is missing or applied multiple times.
-    /// </para>
+    /// This attribute imposes no runtime semantics. Analyzers classify assembly role and
+    /// enforce boundaries accordingly. Apply once per assembly:
+    /// <c>[assembly: DxAssemblyRole(DxAssemblyRole.Domain)]</c>.
+    /// SEE: Rule Charter → Role/Boundary Enforcement.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
     public sealed class DxAssemblyRoleAttribute : Attribute

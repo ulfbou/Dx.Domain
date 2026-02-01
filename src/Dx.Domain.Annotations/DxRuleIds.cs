@@ -10,7 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
     public static class DxRuleIds
     {

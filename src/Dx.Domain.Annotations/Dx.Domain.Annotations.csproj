@@ -6,7 +6,7 @@
     <RootNamespace>Dx.Domain.Annotations</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>10</LangVersion>
-    <Description>Marker-only annotations for Dx.Domain (pure attributes). No runtime behavior.</Description>
+    <Description>Semantic vocabulary for Dx.Domain (pure metadata: markers, attributes, canon).</Description>
     <PackageTags>dx;ddd;annotations;attributes;domain-model</PackageTags>
     <Authors>Dx.Domain Team</Authors>
     <Company>Dx.Domain Team</Company>
@@ -26,6 +26,18 @@
   <ItemGroup>
     <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
+
+  <Target Name="DxAnnotationXmlDocLint" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <_DxAnnotationFiles Include="@(Compile)" Exclude="**\obj\**" />
+    </ItemGroup>
+    <ReadLinesFromFile File="%(_DxAnnotationFiles.Identity)">
+      <Output TaskParameter="Lines" ItemName="_DxAnnotationLines" />
+    </ReadLinesFromFile>
+    <Error Code="DXB010"
+           Text="[Dx Docs] XML &lt;code&gt; blocks must use CDATA in annotations."
+           Condition="@(_DxAnnotationLines->Contains('&lt;code&gt;')) and !(@(_DxAnnotationLines->Contains('&lt;code&gt;&lt;![CDATA[')))" />
+  </Target>
 
 
   <ItemGroup>
