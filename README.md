@@ -55,6 +55,7 @@ The repository is organized as a small core plus edge packages:
 
 - `Dx.Domain.Kernel` – core invariants, results, errors, time/causation primitives.
 - `Dx.Domain.Primitives` – core value types (IDs, timestamps, etc.) built parallel to the kernel.
+- `Dx.Domain.Annotations` – semantic vocabulary (attributes + marker interfaces) for analyzers and generators.
 - `Dx.Domain.Analyzers` – Roslyn analyzers that enforce idioms and migrate legacy code toward the model.
 - `Dx.Domain.Generators` – source generators that remove boilerplate without weakening invariants.
 
