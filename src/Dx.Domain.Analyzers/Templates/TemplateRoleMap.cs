@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
+using Dx.Domain;
 using Dx.Domain.Analyzers.Roles;
 
 namespace Dx.Domain.Analyzers.Templates

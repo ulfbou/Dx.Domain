@@ -16,6 +16,7 @@ using System.Linq;
 using Dx.Domain.Analyzers.Diagnostics;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Observability;
+using Dx.Domain;
 using Dx.Domain.Analyzers.Roles;
 
 using Microsoft.CodeAnalysis;

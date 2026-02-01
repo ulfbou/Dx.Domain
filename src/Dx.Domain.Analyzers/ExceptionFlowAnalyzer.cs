@@ -19,6 +19,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 using Dx.Domain.Analyzers.Diagnostics;
+using Dx.Domain;
 using Dx.Domain.Analyzers.Roles;
 
 namespace Dx.Domain.Analyzers

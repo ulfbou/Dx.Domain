@@ -77,6 +77,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             if (HasDomainMarker(named))
                 return true;
 
+            if (ImplementsDomainInterface(named))
+                return true;
+
             var ns = type.ContainingNamespace?.ToDisplayString();
             if (ns == null)
                 return false;
@@ -95,6 +98,17 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
                     continue;
 
                 if (DomainMarkerAttributes.Contains(name, System.StringComparer.Ordinal))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool ImplementsDomainInterface(INamedTypeSymbol type)
+        {
+            foreach (var iface in type.AllInterfaces)
+            {
+                if (iface.Name == "IAggregateRoot" || iface.Name == "IValueObject")
                     return true;
             }
 

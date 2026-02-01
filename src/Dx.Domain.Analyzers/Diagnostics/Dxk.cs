@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain;
+
 using Microsoft.CodeAnalysis;
 
 namespace Dx.Domain.Analyzers.Diagnostics
@@ -20,7 +22,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXK001",
             "Assembly role required",
             "Assembly must declare exactly one DxAssemblyRole",
-            Categories.Kernel,
+            DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true,
             customTags: WellKnownDiagnosticTags.CompilationEnd);
@@ -29,7 +31,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXK002",
             "Illegal role dependency",
             "Assembly role '{0}' may not reference '{1}'",
-            Categories.Kernel,
+            DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true,
             customTags: WellKnownDiagnosticTags.CompilationEnd);
@@ -38,7 +40,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXK003",
             "Domain purity violation",
             "Domain assemblies may not reference '{0}'",
-            Categories.Kernel,
+            DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true);
 
@@ -46,7 +48,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXK004",
             "Primitive obsession",
             "Use domain primitive '{0}' instead of '{1}'",
-            Categories.Kernel,
+            DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true);
 
@@ -54,7 +56,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXK005",
             "Illegal exception flow",
             "Exceptions may not be used for flow control in {0} assemblies",
-            Categories.Kernel,
+            DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true);
 
@@ -62,7 +64,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXK006",
             "Invalid outbox payload",
             "Only IDomainFact may cross the outbox boundary",
-            Categories.Kernel,
+            DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true);
 
@@ -70,7 +72,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXK007",
             "Contract hygiene violation",
             "Contracts assemblies may not reference Dx.Domain.Kernel",
-            Categories.Kernel,
+            DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true,
             customTags: WellKnownDiagnosticTags.CompilationEnd);
@@ -79,7 +81,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXK008",
             "Observability invariant violated",
             "Host assemblies must propagate CorrelationId",
-            Categories.Kernel,
+            DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true);
     }

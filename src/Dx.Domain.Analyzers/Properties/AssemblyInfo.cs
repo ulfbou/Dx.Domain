@@ -11,7 +11,7 @@
 
 using System.Runtime.CompilerServices;
 
-using Dx.Domain.Analyzers.Roles;
+using Dx.Domain;
 
 [assembly: InternalsVisibleTo("Dx.Domain.Analyzers")]
 [assembly: InternalsVisibleTo("Dx.Domain.Tests")]

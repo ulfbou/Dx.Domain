@@ -10,6 +10,8 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain;
+
 using Microsoft.CodeAnalysis;
 
 namespace Dx.Domain.Analyzers.Diagnostics
@@ -20,7 +22,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXT001",
             "Template role completeness",
             "Template-generated project must declare role '{0}'",
-            Categories.Template,
+            DxCategories.Template,
             DiagnosticSeverity.Error,
             true,
             customTags: WellKnownDiagnosticTags.CompilationEnd);
@@ -29,7 +31,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXT002",
             "Template required reference missing",
             "Template role '{0}' requires reference to '{1}'",
-            Categories.Template,
+            DxCategories.Template,
             DiagnosticSeverity.Error,
             true,
             customTags: WellKnownDiagnosticTags.CompilationEnd);
@@ -38,7 +40,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             "DXT003",
             "Template forbidden reference present",
             "Template role '{0}' must not reference '{1}'",
-            Categories.Template,
+            DxCategories.Template,
             DiagnosticSeverity.Error,
             true,
             customTags: WellKnownDiagnosticTags.CompilationEnd);
