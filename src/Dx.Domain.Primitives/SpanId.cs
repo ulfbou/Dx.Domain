@@ -14,6 +14,8 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 
+using Dx.Domain;
+
 namespace Dx.Domain.Primitives
 {
     /// <summary>
@@ -27,6 +29,7 @@ namespace Dx.Domain.Primitives
     /// </remarks>
     [DebuggerDisplay("{ToString(),nq}")]
     public readonly struct SpanId :
+        IIdentity,
         IEquatable<SpanId>,
         IParsable<SpanId>,
         ISpanFormattable

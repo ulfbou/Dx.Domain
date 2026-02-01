@@ -14,6 +14,8 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 
+using Dx.Domain;
+
 namespace Dx.Domain.Primitives
 {
     /// <summary>
@@ -29,6 +31,7 @@ namespace Dx.Domain.Primitives
     /// </remarks>
     [DebuggerDisplay("{Value,nq}")]
     public readonly struct ActorId :
+        IIdentity,
         IEquatable<ActorId>,
         IParsable<ActorId>,
         ISpanFormattable
