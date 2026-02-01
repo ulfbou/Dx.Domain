@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
-using Dx.Domain;
+using Dx.Domain.Annotations;
 
 namespace Dx.Domain.Analyzers.Roles
 {

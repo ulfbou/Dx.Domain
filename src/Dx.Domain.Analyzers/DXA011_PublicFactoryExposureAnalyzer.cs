@@ -13,6 +13,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -32,13 +33,13 @@ namespace Dx.Domain.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA011_PublicFactoryExposureAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA011";
-        private const string Category = "Domain.Architecture";
+        public const string DiagnosticId = DxRuleIds.DXA011;
+        private const string Category = DxCategories.DomainArchitecture;
 
         private static readonly LocalizableString Title =
             "Public Factory Exposure";
         private static readonly LocalizableString MessageFormat =
-            "Public construction surface on domain type detected. Make constructor/factory internal and expose creation via Dx facade.";
+            "Public construction surface on domain type detected. Make constructor/factory internal and expose creation via Dx facade.{0}";
         private static readonly LocalizableString Description =
             "Domain types should not expose public constructors or factories to prevent consumers from bypassing the Dx facade.";
 
@@ -117,7 +118,8 @@ namespace Dx.Domain.Analyzers
                     constructor.Locations.Any())
                 {
                     var location = constructor.Locations.First();
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, location));
+                    var hint = GetFacadeHint(services.Dx, type);
+                    context.ReportDiagnostic(Diagnostic.Create(Rule, location, hint));
                 }
             }
 
@@ -131,9 +133,19 @@ namespace Dx.Domain.Analyzers
                     method.Locations.Any())
                 {
                     var location = method.Locations.First();
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, location));
+                    var hint = GetFacadeHint(services.Dx, type);
+                    context.ReportDiagnostic(Diagnostic.Create(Rule, location, hint));
                 }
             }
+        }
+
+        private static string GetFacadeHint(IDxFacadeResolver resolver, INamedTypeSymbol type)
+        {
+            var factory = resolver.FindFacadeFactoryForType(type);
+            if (factory == null)
+                return string.Empty;
+
+            return $" Use {factory.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)} instead.";
         }
 
         private static bool IsFactoryMethod(IMethodSymbol method, INamedTypeSymbol containingType)

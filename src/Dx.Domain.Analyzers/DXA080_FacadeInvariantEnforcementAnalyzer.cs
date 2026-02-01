@@ -13,6 +13,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -32,8 +33,8 @@ namespace Dx.Domain.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA080_FacadeInvariantEnforcementAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA080";
-        private const string Category = "Domain.Architecture";
+        public const string DiagnosticId = DxRuleIds.DXA080;
+        private const string Category = DxCategories.DomainArchitecture;
 
         private static readonly LocalizableString Title =
             "Facade Invariant Enforcement Missing";

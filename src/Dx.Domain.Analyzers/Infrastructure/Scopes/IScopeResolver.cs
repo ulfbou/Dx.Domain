@@ -61,22 +61,19 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
         /// <inheritdoc/>
         public Scope ResolveAssembly(IAssemblySymbol assembly)
         {
-            if (IsKernelLikeAssembly(assembly.Name))
-                return Scope.S0;
-
             if (_isTestProject)
                 return Scope.S0;
 
             if (TryResolveScopeFromLayer(_dxLayer, out var layerScope))
-                return layerScope;
+                return ApplyKernelOverride(layerScope, assembly.Name);
 
             if (TryResolveScopeFromLayer(_dxResolvedRole, out var roleScope))
-                return roleScope;
+                return ApplyKernelOverride(roleScope, assembly.Name);
 
             if (TryResolveScopeFromAttribute(assembly, out var attributeScope))
-                return attributeScope;
+                return ApplyKernelOverride(attributeScope, assembly.Name);
 
-            return Scope.S3;
+            return IsKernelLikeAssembly(assembly.Name) ? Scope.S0 : Scope.S3;
         }
 
         /// <inheritdoc/>
@@ -143,6 +140,14 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
             return string.Equals(assemblyName, "Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) ||
                    string.Equals(assemblyName, "Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) ||
                    string.Equals(assemblyName, "Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static Scope ApplyKernelOverride(Scope scope, string? assemblyName)
+        {
+            if (scope == Scope.S3 && IsKernelLikeAssembly(assemblyName))
+                return Scope.S0;
+
+            return scope;
         }
     }
 }

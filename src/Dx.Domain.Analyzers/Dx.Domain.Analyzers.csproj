@@ -14,6 +14,7 @@
     <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>
     <RepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</RepositoryUrl>
     <RootNamespace>Dx.Domain.Analyzers</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <DxProjectKind Include="true" Condition="'$(DxIsAnalyzer)' == 'true'" />
@@ -21,6 +22,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Dx.Domain.Annotations\bin\$(Configuration)\netstandard2.0\Dx.Domain.Annotations.dll"
+          Condition="Exists('..\Dx.Domain.Annotations\bin\$(Configuration)\netstandard2.0\Dx.Domain.Annotations.dll')"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />

@@ -14,6 +14,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Flow;
@@ -32,8 +33,8 @@ namespace Dx.Domain.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA020_ResultIgnoredAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA020";
-        private const string Category = "Domain.ResultHandling";
+        public const string DiagnosticId = DxRuleIds.DXA020;
+        private const string Category = DxCategories.DomainResultHandling;
 
         private static readonly LocalizableString Title =
             "Result Ignored";
@@ -51,9 +52,11 @@ namespace Dx.Domain.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc />
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc />
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -61,13 +64,9 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
-                var assemblyName = startContext.Compilation.AssemblyName;
-                if (assemblyName != null &&
-                    (assemblyName.IndexOf("Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     assemblyName.IndexOf("Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) >= 0))
-                {
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
                     return;
-                }
 
                 var services = CreateServices(startContext);
 
@@ -105,7 +104,7 @@ namespace Dx.Domain.Analyzers
                 return;
 
             var scope = services.Scope.ResolveSymbol(method);
-            if (scope == Scope.S0)
+            if (scope != Scope.S3)
                 return;
 
             var optionsProvider = context.Options.AnalyzerConfigOptionsProvider;

@@ -13,6 +13,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -25,21 +26,21 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Dx.Domain.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA060: Forbidden Vocabulary in Kernel.
-    /// Detects use of forbidden pattern vocabulary in kernel code.
+    /// Analyzer for DXA060: Forbidden Vocabulary.
+    /// Detects use of forbidden pattern vocabulary in consumer code.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA060_ForbiddenVocabularyAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA060";
-        private const string Category = "Domain.Architecture";
+        public const string DiagnosticId = DxRuleIds.DXA060;
+        private const string Category = DxCategories.DomainArchitecture;
 
         private static readonly LocalizableString Title =
-            "Forbidden Vocabulary in Kernel";
+            "Forbidden Vocabulary";
         private static readonly LocalizableString MessageFormat =
-            "Forbidden vocabulary '{0}' used in kernel. Move to adapter or rename to mechanical term.";
+            "Forbidden vocabulary '{0}' used in consumer code. Move to adapter or rename to mechanical term.";
         private static readonly LocalizableString Description =
-            "Kernel code should use mechanical terminology. Pattern-based terms like 'Repository', 'Saga', 'Apply' belong in adapters.";
+            "Pattern-based terms like 'Repository', 'Saga', 'Apply' belong in adapters rather than consumer core logic.";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
@@ -74,6 +75,8 @@ namespace Dx.Domain.Analyzers
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        private static readonly char[] separator = new char[] { '\n' };
+
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -81,13 +84,35 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
+                    return;
+
                 var services = CreateServices(startContext);
+                ImmutableArray<string> allowList = LoadAllowList(startContext.Options.AnalyzerConfigOptionsProvider);
 
                 startContext.RegisterSymbolAction(symbolContext =>
                 {
-                    AnalyzeSymbol(symbolContext, services);
+                    AnalyzeSymbol(symbolContext, services, allowList);
                 }, SymbolKind.NamedType, SymbolKind.Method, SymbolKind.Property);
             });
+        }
+
+        private static ImmutableArray<string> LoadAllowList(AnalyzerConfigOptionsProvider analyzerConfigOptionsProvider)
+        {
+            // Retrieve the options from the analyzerConfigOptionsProvider
+            var options = analyzerConfigOptionsProvider.GlobalOptions;
+
+            // Read allowList value from global options
+            if (!options.TryGetValue("allowList", out var raw) || string.IsNullOrWhiteSpace(raw))
+                return ImmutableArray<string>.Empty;
+
+            // Split the options into a list and create an ImmutableArray
+            var allowList = raw.Split(separator, StringSplitOptions.RemoveEmptyEntries)
+                .Select(item => item.Trim())
+                .ToImmutableArray();
+
+            return allowList;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
@@ -106,7 +131,7 @@ namespace Dx.Domain.Analyzers
                 new GeneratedCodeDetector(config));
         }
 
-        private static void AnalyzeSymbol(SymbolAnalysisContext context, AnalyzerServices services)
+        private static void AnalyzeSymbol(SymbolAnalysisContext context, AnalyzerServices services, ImmutableArray<string> allowList)
         {
             var symbol = context.Symbol;
 
@@ -114,9 +139,8 @@ namespace Dx.Domain.Analyzers
             if (services.Generated.IsGenerated(symbol))
                 return;
 
-            // Only analyze S0 and S1 scopes (kernel and domain)
             var scope = services.Scope.ResolveSymbol(symbol);
-            if (scope != Scope.S0 && scope != Scope.S1)
+            if (scope != Scope.S3)
                 return;
 
             // Check if symbol name contains forbidden vocabulary

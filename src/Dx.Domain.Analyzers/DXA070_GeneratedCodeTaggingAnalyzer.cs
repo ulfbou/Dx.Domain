@@ -14,6 +14,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -32,8 +33,8 @@ namespace Dx.Domain.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA070_GeneratedCodeTaggingAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA070";
-        private const string Category = "Domain.CodeGeneration";
+        public const string DiagnosticId = DxRuleIds.DXA070;
+        private const string Category = DxCategories.DomainCodeGeneration;
 
         private static readonly LocalizableString Title =
             "Generated Code Tagging";

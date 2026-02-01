@@ -13,6 +13,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Flow;
@@ -33,8 +34,8 @@ namespace Dx.Domain.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA022_DomainControlExceptionAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA022";
-        private const string Category = "Domain.ExceptionHandling";
+        public const string DiagnosticId = DxRuleIds.DXA022;
+        private const string Category = DxCategories.DomainExceptionHandling;
 
         private static readonly LocalizableString Title =
             "Discouraged Domain Control Exception";
@@ -174,6 +175,11 @@ namespace Dx.Domain.Analyzers
         private static bool IsKernelLikeLayer(AnalyzerConfigOptionsProvider optionsProvider)
         {
             if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
+            {
+                optionsProvider.GlobalOptions.TryGetValue("dx.layer", out layer);
+            }
+
+            if (string.IsNullOrWhiteSpace(layer))
                 return false;
 
             return string.Equals(layer, "Kernel", System.StringComparison.OrdinalIgnoreCase) ||

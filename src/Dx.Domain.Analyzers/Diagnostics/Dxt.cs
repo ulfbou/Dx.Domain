@@ -10,7 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain;
+using Dx.Domain.Annotations;
 
 using Microsoft.CodeAnalysis;
 
@@ -19,7 +19,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
     internal static class Dxt
     {
         public static readonly DiagnosticDescriptor DXT001 = new(
-            "DXT001",
+            DxRuleIds.DXT001,
             "Template role completeness",
             "Template-generated project must declare role '{0}'",
             DxCategories.Template,
@@ -28,7 +28,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             customTags: WellKnownDiagnosticTags.CompilationEnd);
 
         public static readonly DiagnosticDescriptor DXT002 = new(
-            "DXT002",
+            DxRuleIds.DXT002,
             "Template required reference missing",
             "Template role '{0}' requires reference to '{1}'",
             DxCategories.Template,
@@ -37,7 +37,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             customTags: WellKnownDiagnosticTags.CompilationEnd);
 
         public static readonly DiagnosticDescriptor DXT003 = new(
-            "DXT003",
+            DxRuleIds.DXT003,
             "Template forbidden reference present",
             "Template role '{0}' must not reference '{1}'",
             DxCategories.Template,

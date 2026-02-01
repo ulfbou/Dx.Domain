@@ -17,7 +17,7 @@ using Dx.Domain.Analyzers.Diagnostics;
 using Dx.Domain.Analyzers.Infrastructure.Boundaries;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
-using Dx.Domain;
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Roles;
 
 using Microsoft.CodeAnalysis;

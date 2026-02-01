@@ -12,6 +12,7 @@
 
 using System.Collections.Immutable;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -25,21 +26,21 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Dx.Domain.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA050: Temporal Helper Usage in Kernel.
-    /// Detects use of temporal/policy helpers in kernel code.
+    /// Analyzer for DXA050: Temporal Helper Usage.
+    /// Detects use of temporal/policy helpers in consumer code.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA050_TemporalHelperUsageAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA050";
-        private const string Category = "Domain.Architecture";
+        public const string DiagnosticId = DxRuleIds.DXA050;
+        private const string Category = DxCategories.DomainArchitecture;
 
         private static readonly LocalizableString Title =
-            "Temporal Helper Usage in Kernel";
+            "Temporal Helper Usage";
         private static readonly LocalizableString MessageFormat =
-            "Temporal or policy-sensitive helper used in kernel. Move to edge package or justify via DPI.";
+            "Temporal or policy-sensitive helper used in consumer code. Move to adapter or isolate policy.";
         private static readonly LocalizableString Description =
-            "Kernel code should remain mechanical, not prescriptive. Temporal helpers encode business time semantics and belong at the edges.";
+            "Temporal helpers encode business time semantics and should live in adapters or policy layers, not consumer core logic.";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
@@ -60,6 +61,10 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
+                    return;
+
                 var services = CreateServices(startContext);
 
                 startContext.RegisterOperationAction(operationContext =>
@@ -93,9 +98,8 @@ namespace Dx.Domain.Analyzers
             if (invocation.TargetMethod != null && services.Generated.IsGenerated(invocation.TargetMethod))
                 return;
 
-            // Only analyze S0 scope (kernel) - also flag in S1 when used in kernel contexts
             var scope = services.Scope.ResolveSymbol(context.ContainingSymbol);
-            if (scope != Scope.S0 && scope != Scope.S1)
+            if (scope != Scope.S3)
                 return;
 
             // Check if it's a temporal helper method

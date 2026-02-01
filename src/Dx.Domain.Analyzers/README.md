@@ -4,7 +4,13 @@ Production-grade Roslyn analyzers enforcing domain modeling principles for the D
 
 ## Overview
 
-This package provides compile-time analysis and enforcement of architectural patterns and best practices for domain-driven design using the Dx.Domain framework.
+This package provides compile-time analysis and enforcement of architectural patterns and best practices for domain-driven design using the Dx.Domain framework. Analyzer scope and authority are layer-aware (Kernel/Primitives/Annotations/Consumer).
+
+**Authority modes**:
+- **Definitional** (Kernel)
+- **Structural** (Primitives/Annotations)
+- **Constraining** (Consumer)
+- **Observational** (Kernel-aware, non-restrictive)
 
 ## Status
 
@@ -17,7 +23,8 @@ All infrastructure components are implemented and the solution builds successful
 
 ### DXA010: Construction Authority Violation
 **Severity**: Warning  
-**Scope**: S1 (Domain), S2 (Application), S3 (Consumer)
+**Scope**: Consumer only (S3)
+**Authority**: Constraining
 
 Ensures domain types are constructed only through the Dx facade, centralizing invariant enforcement and making object creation auditable.
 
@@ -42,7 +49,8 @@ var id = Dx.CausationFactory.CreateActorId(Guid.NewGuid());
 
 ### DXA020: Result Ignored
 **Severity**: Error  
-**Scope**: S1 (Domain), S2 (Application)
+**Scope**: Consumer only (S3)
+**Authority**: Constraining
 
 Prevents silent failures by ensuring all `Result<T>` values are explicitly handled.
 
@@ -70,7 +78,8 @@ return SomeMethodReturningResult();
 
 ### DXA022: Discouraged Domain Control Exception
 **Severity**: Warning  
-**Scope**: S1 (Domain), S2 (Application)
+**Scope**: Consumer only (S3)
+**Authority**: Constraining
 
 Enforces explicit Result-based error handling instead of throwing exceptions for domain control flow.
 
@@ -105,6 +114,17 @@ public Result<Order> ProcessOrder(OrderId id)
         return Result.Failure<Order>(DomainError.Create("ORDER_NOT_FOUND", "Order not found"));
     // ...
 }
+```
+
+### DXA060: Forbidden Vocabulary
+**Severity**: Error  
+**Scope**: Consumer only (S3)  
+**Authority**: Constraining
+
+Detects forbidden architectural vocabulary in consumer code. The allow-list can be configured via:
+
+```
+dx_forbidden_vocab_allow = Namespace.TypeName;Other.Namespace.*
 ```
 
 ## Infrastructure Components

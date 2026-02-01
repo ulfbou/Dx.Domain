@@ -13,6 +13,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -33,8 +34,8 @@ namespace Dx.Domain.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA010";
-        private const string Category = "Domain.Architecture";
+        public const string DiagnosticId = DxRuleIds.DXA010;
+        private const string Category = DxCategories.DomainArchitecture;
 
         private static readonly LocalizableString Title =
             "Construction Authority Violation";
@@ -66,7 +67,10 @@ namespace Dx.Domain.Analyzers
                 var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
                 var scope = scopeResolver.ResolveAssembly(startContext.Compilation.Assembly);
                 if (IsKernelLikeLayer(startContext.Options.AnalyzerConfigOptionsProvider) ||
-                    scope != Scope.S3 || IsKernelLikeAssembly(assemblyName) || IsKernelLikeCompilation(startContext.Compilation))
+                    scope != Scope.S3 ||
+                    IsKernelLikeAssembly(assemblyName) ||
+                    (assemblyName != null && assemblyName.StartsWith("Dx.Domain.", System.StringComparison.OrdinalIgnoreCase)) ||
+                    IsKernelLikeCompilation(startContext.Compilation))
                     return;
 
                 var services = CreateServices(startContext);
@@ -111,7 +115,16 @@ namespace Dx.Domain.Analyzers
             if (context.ContainingSymbol is IAssemblySymbol)
                 return;
 
+            if (context.ContainingSymbol.ContainingAssembly == null)
+                return;
+
+            if (context.ContainingSymbol.ContainingAssembly.Name.StartsWith("Dx.Domain.", System.StringComparison.OrdinalIgnoreCase))
+                return;
+
             if (IsKernelLikeAssembly(context.ContainingSymbol.ContainingAssembly?.Name))
+                return;
+
+            if (context.ContainingSymbol.ContainingAssembly?.Name?.StartsWith("Dx.Domain.", System.StringComparison.OrdinalIgnoreCase) == true)
                 return;
 
             if (IsKernelLikeLocation(context.ContainingSymbol))
@@ -120,10 +133,16 @@ namespace Dx.Domain.Analyzers
             if (IsKernelLikePath(syntax.SyntaxTree?.FilePath))
                 return;
 
+            if (IsAssemblyInfoFile(syntax.SyntaxTree?.FilePath))
+                return;
+
             if (IsKernelAssembly(context.ContainingSymbol.ContainingAssembly))
                 return;
 
             if (IsAttributeOperation(operation))
+                return;
+
+            if (operation.Type?.Name.EndsWith("Attribute", System.StringComparison.Ordinal) == true)
                 return;
 
             // Skip if generated code
@@ -164,10 +183,16 @@ namespace Dx.Domain.Analyzers
             if (IsKernelLikeAssembly(context.ContainingSymbol.ContainingAssembly?.Name))
                 return;
 
+            if (context.ContainingSymbol.ContainingAssembly?.Name?.StartsWith("Dx.Domain.", System.StringComparison.OrdinalIgnoreCase) == true)
+                return;
+
             if (IsKernelLikeLocation(context.ContainingSymbol))
                 return;
 
             if (IsKernelLikePath(syntax.SyntaxTree?.FilePath))
+                return;
+
+            if (IsAssemblyInfoFile(syntax.SyntaxTree?.FilePath))
                 return;
 
             if (IsKernelAssembly(context.ContainingSymbol.ContainingAssembly))
@@ -206,6 +231,9 @@ namespace Dx.Domain.Analyzers
         private static bool IsDomainType(ITypeSymbol? type, AnalyzerServices services)
         {
             if (type == null)
+                return false;
+
+            if (type.ContainingNamespace?.ToDisplayString() == "Dx.Domain.Annotations" && type.Name.EndsWith("Attribute", System.StringComparison.Ordinal))
                 return false;
 
             if (type.Name == "DxAssemblyRoleAttribute")
@@ -269,6 +297,11 @@ namespace Dx.Domain.Analyzers
                     path.IndexOf("Dx.Domain.Annotations", System.StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
+        private static bool IsAssemblyInfoFile(string? path)
+        {
+            return path != null && path.EndsWith("AssemblyInfo.cs", System.StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool IsKernelLikeCompilation(Compilation compilation)
         {
             return compilation.SyntaxTrees.Any(tree => IsKernelLikePath(tree.FilePath));
@@ -277,6 +310,11 @@ namespace Dx.Domain.Analyzers
         private static bool IsKernelLikeLayer(AnalyzerConfigOptionsProvider optionsProvider)
         {
             if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
+            {
+                optionsProvider.GlobalOptions.TryGetValue("dx.layer", out layer);
+            }
+
+            if (string.IsNullOrWhiteSpace(layer))
                 return false;
 
             return string.Equals(layer, "Kernel", System.StringComparison.OrdinalIgnoreCase) ||

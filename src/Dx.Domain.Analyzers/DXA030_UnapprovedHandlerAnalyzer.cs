@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -33,8 +34,8 @@ namespace Dx.Domain.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA030_UnapprovedHandlerAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA030";
-        private const string Category = "Domain.ResultHandling";
+        public const string DiagnosticId = DxRuleIds.DXA030;
+        private const string Category = DxCategories.DomainResultHandling;
 
         private static readonly LocalizableString Title =
             "Unapproved Handler Usage";

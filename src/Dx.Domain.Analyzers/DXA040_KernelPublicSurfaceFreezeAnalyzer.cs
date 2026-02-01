@@ -13,6 +13,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
@@ -31,8 +32,8 @@ namespace Dx.Domain.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA040_KernelPublicSurfaceFreezeAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DXA040";
-        private const string Category = "Domain.Architecture";
+        public const string DiagnosticId = DxRuleIds.DXA040;
+        private const string Category = DxCategories.DomainArchitecture;
 
         private static readonly LocalizableString Title =
             "Kernel Public Surface Freeze";
@@ -61,7 +62,7 @@ namespace Dx.Domain.Analyzers
             context.RegisterCompilationStartAction(startContext =>
             {
                 var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
-                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S0)
                     return;
 
                 var services = CreateServices(startContext);
@@ -98,7 +99,7 @@ namespace Dx.Domain.Analyzers
                 return;
 
             var scope = services.Scope.ResolveSymbol(symbol);
-            if (scope != Scope.S3)
+            if (scope != Scope.S0)
                 return;
 
             // Only care about public symbols
@@ -122,11 +123,55 @@ namespace Dx.Domain.Analyzers
 
         private static bool HasDpiJustification(ISymbol symbol)
         {
-            // Check for DPI justification attribute
-            return symbol.GetAttributes().Any(a =>
-                a.AttributeClass?.Name == "DpiJustifiedAttribute" ||
-                a.AttributeClass?.Name == "KernelApiAttribute" ||
-                a.AttributeClass?.Name == "ApprovedKernelApiAttribute");
+            var assemblyAttributes = symbol.ContainingAssembly?.GetAttributes() ?? ImmutableArray<AttributeData>.Empty;
+            if (HasJustificationAttributes(assemblyAttributes))
+                return true;
+
+            if (symbol.ContainingType != null && HasJustificationAttributes(symbol.ContainingType.GetAttributes()))
+                return true;
+
+            foreach (var attribute in symbol.GetAttributes())
+            {
+                var name = attribute.AttributeClass?.Name;
+                if (name != "DpiJustifiedAttribute" &&
+                    name != "KernelApiAttribute" &&
+                    name != "ApprovedKernelApiAttribute")
+                {
+                    continue;
+                }
+
+                if (attribute.ConstructorArguments.Length == 0)
+                    return true;
+
+                var arg = attribute.ConstructorArguments[0].Value as string;
+                if (!string.IsNullOrWhiteSpace(arg))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool HasJustificationAttributes(ImmutableArray<AttributeData> attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                var name = attribute.AttributeClass?.Name;
+                if (name != "DpiJustifiedAttribute" &&
+                    name != "KernelApiAttribute" &&
+                    name != "ApprovedKernelApiAttribute")
+                {
+                    continue;
+                }
+
+                if (attribute.ConstructorArguments.Length == 0)
+                    return true;
+
+                var arg = attribute.ConstructorArguments[0].Value as string;
+                if (!string.IsNullOrWhiteSpace(arg))
+                    return true;
+            }
+
+            return false;
         }
 
         private static bool IsLegacyApi(ISymbol symbol)

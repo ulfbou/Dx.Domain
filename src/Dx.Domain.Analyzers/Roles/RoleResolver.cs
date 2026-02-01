@@ -12,7 +12,7 @@
 
 using System.Linq;
 
-using Dx.Domain;
+using Dx.Domain.Annotations;
 
 using Microsoft.CodeAnalysis;
 

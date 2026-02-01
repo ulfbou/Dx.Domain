@@ -18,7 +18,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 using Dx.Domain.Analyzers.Diagnostics;
-using Dx.Domain;
+using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Roles;
 
 namespace Dx.Domain.Analyzers
@@ -77,6 +77,11 @@ namespace Dx.Domain.Analyzers
         private static bool IsKernelLikeLayer(AnalyzerConfigOptionsProvider optionsProvider)
         {
             if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
+            {
+                optionsProvider.GlobalOptions.TryGetValue("dx.layer", out layer);
+            }
+
+            if (string.IsNullOrWhiteSpace(layer))
                 return false;
 
             return string.Equals(layer, "Kernel", StringComparison.OrdinalIgnoreCase) ||
