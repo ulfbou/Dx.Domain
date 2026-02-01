@@ -59,7 +59,7 @@ namespace Dx.Domain.Analyzers
         private static void AnalyzeInvocation(
             OperationAnalysisContext context,
             CorrelationIdPropagationChecker checker,
-            IGeneratedCodeDetector generated)
+            GeneratedCodeDetector generated)
         {
             var invocation = (IInvocationOperation)context.Operation;
 

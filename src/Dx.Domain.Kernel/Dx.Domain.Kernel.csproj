@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
+    <DxLayer>Kernel</DxLayer>
     <RootNamespace>Dx.Domain</RootNamespace>
     <AssemblyName>Dx.Domain.Kernel</AssemblyName>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
@@ -10,6 +11,10 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="DxLayer" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Dx.Domain.Values" />
@@ -22,9 +27,8 @@
     <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
   </ItemGroup>
 
-  <!-- DX-first: analyzers auto-load for consumers via PackageReference; no buildTransitive props/targets needed -->
   <ItemGroup>
-    <PackageReference Include="Dx.Domain.Analyzers" Version="$(DxBuildVersion)" PrivateAssets="all" IncludeAssets="analyzers" />
+    <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
 
   <!-- Repo builds: if package not available yet, use local analyzer project -->

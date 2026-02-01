@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
+    <DxLayer>Annotations</DxLayer>
     <AssemblyName>Dx.Domain.Annotations</AssemblyName>
     <RootNamespace>Dx.Domain.Annotations</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -18,15 +19,14 @@
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
   </PropertyGroup>
 
-  <!-- DX-first: analyzers auto-load for consumers via PackageReference; no buildTransitive props/targets needed -->
   <ItemGroup>
-    <PackageReference Include="Dx.Domain.Analyzers" Version="$(DxBuildVersion)" PrivateAssets="all" IncludeAssets="analyzers" />
+    <CompilerVisibleProperty Include="DxLayer" />
   </ItemGroup>
 
-  <!-- Repo builds still see analyzers if the package is not available, via local project reference -->
-  <ItemGroup Condition="Exists('..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj')">
-    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  <ItemGroup>
+    <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
+
 
   <ItemGroup>
     <None Update="CHANGELOG.md" Link="docs/CHANGELOG.md" />

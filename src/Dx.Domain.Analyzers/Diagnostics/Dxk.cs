@@ -17,23 +17,25 @@ namespace Dx.Domain.Analyzers.Diagnostics
     internal static class Dxk
     {
         public static readonly DiagnosticDescriptor DXK001 = new(
-            "DXK-001",
+            "DXK001",
             "Assembly role required",
             "Assembly must declare exactly one DxAssemblyRole",
             Categories.Kernel,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            customTags: WellKnownDiagnosticTags.CompilationEnd);
 
         public static readonly DiagnosticDescriptor DXK002 = new(
-            "DXK-002",
+            "DXK002",
             "Illegal role dependency",
             "Assembly role '{0}' may not reference '{1}'",
             Categories.Kernel,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            customTags: WellKnownDiagnosticTags.CompilationEnd);
 
         public static readonly DiagnosticDescriptor DXK003 = new(
-            "DXK-003",
+            "DXK003",
             "Domain purity violation",
             "Domain assemblies may not reference '{0}'",
             Categories.Kernel,
@@ -41,7 +43,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             true);
 
         public static readonly DiagnosticDescriptor DXK004 = new(
-            "DXK-004",
+            "DXK004",
             "Primitive obsession",
             "Use domain primitive '{0}' instead of '{1}'",
             Categories.Kernel,
@@ -49,7 +51,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             true);
 
         public static readonly DiagnosticDescriptor DXK005 = new(
-            "DXK-005",
+            "DXK005",
             "Illegal exception flow",
             "Exceptions may not be used for flow control in {0} assemblies",
             Categories.Kernel,
@@ -57,7 +59,7 @@ namespace Dx.Domain.Analyzers.Diagnostics
             true);
 
         public static readonly DiagnosticDescriptor DXK006 = new(
-            "DXK-006",
+            "DXK006",
             "Invalid outbox payload",
             "Only IDomainFact may cross the outbox boundary",
             Categories.Kernel,
@@ -65,15 +67,16 @@ namespace Dx.Domain.Analyzers.Diagnostics
             true);
 
         public static readonly DiagnosticDescriptor DXK007 = new(
-            "DXK-007",
+            "DXK007",
             "Contract hygiene violation",
             "Contracts assemblies may not reference Dx.Domain.Kernel",
             Categories.Kernel,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            customTags: WellKnownDiagnosticTags.CompilationEnd);
 
         public static readonly DiagnosticDescriptor DXK008 = new(
-            "DXK-008",
+            "DXK008",
             "Observability invariant violated",
             "Host assemblies must propagate CorrelationId",
             Categories.Kernel,

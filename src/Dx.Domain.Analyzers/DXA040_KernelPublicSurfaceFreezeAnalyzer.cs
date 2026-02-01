@@ -60,6 +60,10 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
+                    return;
+
                 var services = CreateServices(startContext);
 
                 startContext.RegisterSymbolAction(symbolContext =>
@@ -93,9 +97,8 @@ namespace Dx.Domain.Analyzers
             if (services.Generated.IsGenerated(symbol))
                 return;
 
-            // Only analyze S0 scope (kernel)
             var scope = services.Scope.ResolveSymbol(symbol);
-            if (scope != Scope.S0)
+            if (scope != Scope.S3)
                 return;
 
             // Only care about public symbols

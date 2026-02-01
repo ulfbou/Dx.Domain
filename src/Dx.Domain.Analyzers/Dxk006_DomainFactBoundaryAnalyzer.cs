@@ -58,7 +58,7 @@ namespace Dx.Domain.Analyzers
             SymbolAnalysisContext context,
             IDomainFactResolver resolver,
             OutboxBoundaryDetector boundaryDetector,
-            IGeneratedCodeDetector generated)
+            GeneratedCodeDetector generated)
         {
             var method = (IMethodSymbol)context.Symbol;
 
@@ -71,7 +71,7 @@ namespace Dx.Domain.Analyzers
             if (generated.IsGenerated(method))
                 return;
 
-            if (!boundaryDetector.IsBoundary(method))
+            if (!OutboxBoundaryDetector.IsBoundary(method))
                 return;
 
             foreach (var parameter in method.Parameters)

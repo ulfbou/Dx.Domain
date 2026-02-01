@@ -39,6 +39,7 @@ namespace Dx.Domain.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(ctx =>
             {
@@ -49,7 +50,7 @@ namespace Dx.Domain.Analyzers
                 var symbol = ctx.SemanticModel.GetSymbolInfo(ctx.Node).Symbol;
                 var ns = symbol?.ContainingNamespace?.ToString();
 
-                if (ns != null && ForbiddenNamespaces.Any(f => ns.StartsWith(f)))
+                if (ns != null && ForbiddenNamespaces.Any(f => ns.StartsWith(f, System.StringComparison.Ordinal)))
                     ctx.ReportDiagnostic(Diagnostic.Create(Dxk.DXK003, ctx.Node.GetLocation(), ns));
 
             }, SyntaxKind.IdentifierName);

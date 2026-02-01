@@ -49,7 +49,7 @@ namespace Dx.Domain.Analyzers
             });
         }
 
-        private static void AnalyzeMethod(SymbolAnalysisContext context, PrimitiveCatalog catalog, IGeneratedCodeDetector generated)
+        private static void AnalyzeMethod(SymbolAnalysisContext context, PrimitiveCatalog catalog, GeneratedCodeDetector generated)
         {
             var method = (IMethodSymbol)context.Symbol;
 
@@ -73,7 +73,7 @@ namespace Dx.Domain.Analyzers
             }
         }
 
-        private static void AnalyzeProperty(SymbolAnalysisContext context, PrimitiveCatalog catalog, IGeneratedCodeDetector generated)
+        private static void AnalyzeProperty(SymbolAnalysisContext context, PrimitiveCatalog catalog, GeneratedCodeDetector generated)
         {
             var property = (IPropertySymbol)context.Symbol;
 
@@ -86,7 +86,7 @@ namespace Dx.Domain.Analyzers
             ReportIfPrimitive(context, catalog, property.Name, property.Type, property.Locations.FirstOrDefault());
         }
 
-        private static void AnalyzeField(SymbolAnalysisContext context, PrimitiveCatalog catalog, IGeneratedCodeDetector generated)
+        private static void AnalyzeField(SymbolAnalysisContext context, PrimitiveCatalog catalog, GeneratedCodeDetector generated)
         {
             var field = (IFieldSymbol)context.Symbol;
 

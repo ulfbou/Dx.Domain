@@ -17,27 +17,30 @@ namespace Dx.Domain.Analyzers.Diagnostics
     internal static class Dxt
     {
         public static readonly DiagnosticDescriptor DXT001 = new(
-            "DXT-001",
+            "DXT001",
             "Template role completeness",
             "Template-generated project must declare role '{0}'",
             Categories.Template,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            customTags: WellKnownDiagnosticTags.CompilationEnd);
 
         public static readonly DiagnosticDescriptor DXT002 = new(
-            "DXT-002",
+            "DXT002",
             "Template required reference missing",
             "Template role '{0}' requires reference to '{1}'",
             Categories.Template,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            customTags: WellKnownDiagnosticTags.CompilationEnd);
 
         public static readonly DiagnosticDescriptor DXT003 = new(
-            "DXT-003",
+            "DXT003",
             "Template forbidden reference present",
             "Template role '{0}' must not reference '{1}'",
             Categories.Template,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            customTags: WellKnownDiagnosticTags.CompilationEnd);
     }
 }

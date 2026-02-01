@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
+    <DxLayer>Primitives</DxLayer>
     <AssemblyName>Dx.Domain.Primitives</AssemblyName>
     <RootNamespace>Dx.Domain.Primitives</RootNamespace>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
@@ -19,8 +20,18 @@
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
+    <CompilerVisibleProperty Include="DxLayer" />
+  </ItemGroup>
+  <ItemGroup>
+    <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="CHANGELOG.md" Link="docs/CHANGELOG.md" />
     <None Update="README.md" Link="docs/README.md" />
     <None Update="..\..\LICENSE" Link="docs/LICENSE" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
   </ItemGroup>
 </Project>

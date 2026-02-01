@@ -62,6 +62,10 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
+                    return;
+
                 var services = CreateServices(startContext);
                 var approvedHandlers = LoadApprovedHandlers(startContext.Options.AnalyzerConfigOptionsProvider);
 
@@ -111,12 +115,12 @@ namespace Dx.Domain.Analyzers
             if (invocation.TargetMethod != null && services.Generated.IsGenerated(invocation.TargetMethod))
                 return;
 
-            // Only analyze S0, S1, S2 scopes
+            // Only analyze consumer scope
             if (invocation.TargetMethod == null)
                 return;
 
             var scope = services.Scope.ResolveSymbol(invocation.TargetMethod);
-            if (scope == Scope.S3)
+            if (scope != Scope.S3)
                 return;
 
             // Check if any argument is a Result type

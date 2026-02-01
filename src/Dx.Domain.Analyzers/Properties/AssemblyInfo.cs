@@ -6,12 +6,14 @@
 //     This software is licensed under the MIT License.
 //     See the project's root <c>LICENSE</c> file for details.
 //     Contributions are welcome, subject to the terms of the project's license.
-//     See the repository root <c>CONTRIBUTING.md</c> file for details.
 // </license>
 // ----------------------------------------------------------------------------------
 
 using System.Runtime.CompilerServices;
 
+using Dx.Domain.Analyzers.Roles;
+
 [assembly: InternalsVisibleTo("Dx.Domain.Analyzers")]
 [assembly: InternalsVisibleTo("Dx.Domain.Tests")]
 [assembly: InternalsVisibleTo("Dx.Domain.Analyzers.Tests")]
+[assembly: DxAssemblyRole(DxAssemblyRole.Infrastructure)]

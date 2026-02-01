@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="DxAssemblyRole.cs" company="Dx.Domain Team">
+// <copyright file="DxAssemblyRoleAttribute.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,15 +10,18 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System;
+
 namespace Dx.Domain.Analyzers.Roles
 {
-    internal enum DxAssemblyRole
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]
+    internal sealed class DxAssemblyRoleAttribute : Attribute
     {
-        Contracts = 0,
-        Domain = 1,
-        Application = 2,
-        Infrastructure = 3,
-        Host = 4,
-        Shared = 5
+        public DxAssemblyRoleAttribute(DxAssemblyRole role)
+        {
+            Role = role;
+        }
+
+        public DxAssemblyRole Role { get; }
     }
 }

@@ -16,6 +16,9 @@
     <RootNamespace>Dx.Domain.Analyzers</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <DxProjectKind Include="true" Condition="'$(DxIsAnalyzer)' == 'true'" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>

@@ -1,11 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <DxIsLibrary>true</DxIsLibrary>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" />
     <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
   </ItemGroup>
 </Project>

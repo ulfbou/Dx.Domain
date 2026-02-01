@@ -26,7 +26,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Boundaries
             "MessageBus"
         };
 
-        public bool IsBoundary(IMethodSymbol method) =>
+        public static bool IsBoundary(IMethodSymbol method) =>
             method.ContainingType != null && IsBoundary(method.ContainingType);
 
         private static bool IsBoundary(INamedTypeSymbol type)
