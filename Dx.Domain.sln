@@ -25,6 +25,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}"
 	ProjectSection(SolutionItems) = preProject
 		docs\analyzer-rules.md = docs\analyzer-rules.md
+		docs\architecture-overview.md = docs\architecture-overview.md
 		CHANGELOG.md = CHANGELOG.md
 		CONTRIBUTING.md = CONTRIBUTING.md
 		docs\DPI.md = docs\DPI.md
@@ -107,6 +108,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Wiki", "Wiki", "{506F184F-2
 		docs\wiki\Primitives.md = docs\wiki\Primitives.md
 		docs\wiki\README.md = docs\wiki\README.md
 		docs\wiki\Scopes-and-Roles.md = docs\wiki\Scopes-and-Roles.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADR", "ADR", "{C7745BD2-7FC9-4D3A-A796-EFF54BF81A0E}"
+	ProjectSection(SolutionItems) = preProject
+		docs\adr\ADR-0000-record-architecture-decisions.md = docs\adr\ADR-0000-record-architecture-decisions.md
+		docs\adr\ADR-0001-four-package-substrate.md = docs\adr\ADR-0001-four-package-substrate.md
+		docs\adr\ADR-0002-non-silence-axiom.md = docs\adr\ADR-0002-non-silence-axiom.md
+		docs\adr\ADR-0003-scope-resolution-and-authority-modes.md = docs\adr\ADR-0003-scope-resolution-and-authority-modes.md
+		docs\adr\ADR-0004-dxa010-construction-discipline.md = docs\adr\ADR-0004-dxa010-construction-discipline.md
+		docs\adr\ADR-0005-dxa022-result-vs-throw-discipline.md = docs\adr\ADR-0005-dxa022-result-vs-throw-discipline.md
+		docs\adr\ADR-0006-exclude-option-either-nonempty.md = docs\adr\ADR-0006-exclude-option-either-nonempty.md
+		docs\adr\ADR-0007-facts-split-and-kernel-cleanup.md = docs\adr\ADR-0007-facts-split-and-kernel-cleanup.md
 	EndProjectSection
 EndProject
 Global
@@ -207,6 +220,7 @@ Global
 		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{67E6894F-A386-4F5B-AA2B-DE082B7D9E0C} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{506F184F-2772-4E85-BC2D-47E528E4585A} = {8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}
+		{C7745BD2-7FC9-4D3A-A796-EFF54BF81A0E} = {8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A326CE0-DFBE-435C-AD8C-3CA905A96D98}
