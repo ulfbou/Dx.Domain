@@ -1,17 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Authority</DxLayer>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.1.0-alpha.4</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
+  </PropertyGroup>
+
   <ItemGroup>
     <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" />
-    <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
+    <PackageReference Include="Dx.Domain.Primitives" Version="0.1.0-alpha.4" />
+    <PackageReference Include="Dx.Domain.Kernel" Version="0.1.0-alpha.4" />
   </ItemGroup>
 
   <ItemGroup>

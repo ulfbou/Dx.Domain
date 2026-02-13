@@ -39,7 +39,7 @@ namespace Dx.Domain.Facts
         public TraceId TraceId { get; }
 
         /// <summary>Gets the actor responsible for the action, if known.</summary>
-        public ActorId ActorId { get; }
+        public UserId ActorId { get; }
 
         /// <summary>Gets the UTC timestamp when the causation was recorded.</summary>
         public DateTimeOffset UtcTimestamp { get; }
@@ -52,7 +52,7 @@ namespace Dx.Domain.Facts
         /// <param name="traceId">The identifier used to trace the flow of a request or operation across system boundaries.</param>
         /// <param name="actorId">The identifier of the actor responsible for the operation, or null if not applicable.</param>
         /// <param name="utcTimestamp">The timestamp, in Coordinated Universal Time (UTC), indicating when the causation event occurred.</param>
-        private Causation(CorrelationId correlationId, TraceId traceId, ActorId? actorId, DateTimeOffset utcTimestamp)
+        private Causation(CorrelationId correlationId, TraceId traceId, UserId? actorId, DateTimeOffset utcTimestamp)
         {
             CorrelationId = correlationId;
             TraceId = traceId;
@@ -75,7 +75,7 @@ namespace Dx.Domain.Facts
         /// Thrown if <paramref name="correlationId"/> or <paramref name="traceId"/> is empty.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
+        public static Causation Create(CorrelationId correlationId, TraceId traceId, UserId? actorId = null)
         {
             Invariant.That(correlationId.Value != Guid.Empty, "Kernel.Causation.MissingCorrelation", "CorrelationId must not be empty.");
             Invariant.That(!traceId.IsEmpty, "Kernel.Causation.MissingTrace", "TraceId must not be empty.");

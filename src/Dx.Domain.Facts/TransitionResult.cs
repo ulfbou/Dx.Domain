@@ -10,6 +10,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace Dx.Domain.Facts;
 
 /// <summary>
@@ -113,6 +115,56 @@ public readonly struct TransitionResult<TState>
         return new TransitionResult<TState>(
             Result<TState>.Failure(error),
             Array.Empty<IDomainFact>());
+    }
+
+    /// <summary>
+    /// Deconstructs the transition result into its success status, state, facts, and error information.
+    /// </summary>
+    /// <param name="isSuccess">When this method returns, contains <see langword="true"/> if the transition succeeded; otherwise, <see langword="false"/>.</param>
+    /// <param name="state">When this method returns, contains the state if the transition succeeded; otherwise, the default value for the type.</param>
+    /// <param name="facts">When this method returns, contains the facts emitted by the transition.</param>
+    /// <param name="error">When this method returns, contains the error if the transition failed; otherwise, the default value.</param>
+    public void Deconstruct(out bool isSuccess, out TState? state, out IReadOnlyList<IDomainFact> facts, out DomainError? error)
+    {
+        isSuccess = IsSuccess;
+        state = Outcome.IsSuccess ? Outcome.Value : default;
+        facts = Facts;
+        error = Outcome.IsFailure ? Outcome.Error : default;
+    }
+
+    /// <summary>
+    /// Deconstructs the transition result into its failure status, error, state, and facts.
+    /// </summary>
+    /// <param name="isFailure">When this method returns, contains <see langword="true"/> if the transition failed; otherwise, <see langword="false"/>.</param>
+    /// <param name="error">When this method returns, contains the error if the transition failed; otherwise, the default value.</param>
+    /// <param name="state">When this method returns, contains the state if the transition succeeded; otherwise, the default value for the type.</param>
+    /// <param name="facts">When this method returns, contains the facts emitted by the transition.</param>
+    public void Deconstruct(out bool isFailure, out DomainError? error, out TState? state, out IReadOnlyList<IDomainFact> facts)
+    {
+        isFailure = IsFailure;
+        error = Outcome.IsFailure ? Outcome.Error : default;
+        state = Outcome.IsSuccess ? Outcome.Value : default;
+        facts = Facts;
+    }
+
+    /// <summary>
+    /// Deconstructs the transition result into its state and facts.
+    /// </summary>
+    /// <param name="state">When this method returns, contains the state if the transition succeeded; otherwise, the default value for the type.</param>
+    /// <param name="facts">When this method returns, contains the facts emitted by the transition.</param>
+    public void Deconstruct(out TState? state, out IReadOnlyList<IDomainFact> facts)
+    {
+        state = Outcome.IsSuccess ? Outcome.Value : default;
+        facts = Facts;
+    }
+
+    /// <summary>
+    /// Deconstructs the transition result into its error component, if the transition failed.
+    /// </summary>
+    /// <param name="error">When this method returns, contains the error if the transition failed; otherwise, the default value.</param>
+    public void Deconstruct(out DomainError? error)
+    {
+        error = Outcome.IsFailure ? Outcome.Error : default;
     }
 
     private string DebuggerDisplay => IsSuccess
