@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Annotations</DxLayer>
@@ -17,6 +17,13 @@
     <RepositoryUrl>https://github.com/ulfbou/dx.domain</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
+    <Version>0.1.0-alpha</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.1.0-alpha.4</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

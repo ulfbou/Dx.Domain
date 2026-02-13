@@ -15,6 +15,7 @@ using System.Collections.Immutable;
 using System.Linq;
 
 using Dx.Domain.Analyzers.Diagnostics;
+using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -34,7 +35,8 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationAction(compilationContext =>
             {
-                if (IsAuthorityLayer(compilationContext.Options.AnalyzerConfigOptionsProvider))
+                var scopeResolver = new ScopeResolver(compilationContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(compilationContext.Compilation.Assembly) != Scope.S3)
                     return;
 
                 var dxtFile = compilationContext.Options.AdditionalFiles.FirstOrDefault(file =>
@@ -45,20 +47,5 @@ namespace Dx.Domain.Analyzers
             });
         }
 
-        private static bool IsAuthorityLayer(AnalyzerConfigOptionsProvider optionsProvider)
-        {
-            if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
-            {
-                optionsProvider.GlobalOptions.TryGetValue("dx.layer", out layer);
-            }
-
-            if (string.IsNullOrWhiteSpace(layer))
-                return false;
-
-            return string.Equals(layer, "Kernel", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Primitives", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Annotations", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Authority", StringComparison.OrdinalIgnoreCase);
-        }
     }
 }

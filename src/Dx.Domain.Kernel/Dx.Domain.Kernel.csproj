@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Kernel</DxLayer>
@@ -12,15 +12,19 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Version>0.1.0-alpha.4</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
+  </PropertyGroup>
+
   <ItemGroup>
     <CompilerVisibleProperty Include="DxLayer" />
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Dx.Domain.Values" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
     <InternalsVisibleTo Include="Dx.Domain.Generators" />
-    <InternalsVisibleTo Include="Dx.Domain.Persistence" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="buildTransitive\Dx.Domain.targets" Pack="true" PackagePath="buildTransitive" />
+    <None Include="buildTransitive\Dx.Domain.Kernel.targets" Pack="true" PackagePath="buildTransitive" />
     <None Update="..\..\CHANGELOG.md" Link="docs/CHANGELOG.md" />
     <None Update="..\..\README.md" Link="docs/README.md" />
     <None Update="..\..\LICENSE" Link="docs/LICENSE" />
