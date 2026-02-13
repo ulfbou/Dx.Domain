@@ -1,0 +1,19 @@
+name: Annotations XMLDoc Lint
+
+on:
+  pull_request:
+    paths:
+      - 'src/Dx.Domain.Annotations/**.cs'
+      - 'docs/annotations-xmldoc-standard.md'
+      - 'tools/validate_annotations_xmldoc.py'
+  push:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run XMLDoc validator
+        run: |
+          python3 tools/validate_annotations_xmldoc.py

@@ -32,7 +32,7 @@
 
 - [ ] This PR does **not** touch Kernel / Abstractions / Analyzers internals.
 - [ ] This PR **does** touch one or more of:
-  - [ ] `Dx.Domain.Abstractions`
+  - [ ] `Dx.Domain.Annotations`
   - [ ] `Dx.Domain` (Kernel)
   - [ ] `Dx.Domain.Analyzers`
 
@@ -48,7 +48,7 @@ Confirm that you have reviewed and satisfied the relevant items in:
 
 Then tick all that apply:
 
-- [ ] Abstractions purity: no runtime logic, control flow, or extension methods were added to `Dx.Domain.Abstractions`.
+- [ ] Annotations purity: no runtime logic, control flow, or extension methods were added to `Dx.Domain.Annotations`.
 - [ ] Assembly boundaries: no new dependency from Abstractions to Kernel or Analyzers was introduced.
 - [ ] Kernel purity: no I/O, logging, DI, or orchestration logic was added to `Dx.Domain`.
 - [ ] Facade separation: no new ergonomic facade APIs were added to Kernel; any such APIs live in an outer package.

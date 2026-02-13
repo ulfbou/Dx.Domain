@@ -52,7 +52,7 @@ namespace Dx.Domain.Analyzers.Tests.IntegrationTests
 
             var resolver = new DxFacadeResolver(compilation, mockConfig.Object);
 
-            var actorIdMetadataName = typeof(ActorId).FullName!;
+            var actorIdMetadataName = typeof(UserId).FullName!;
             var actorIdSymbol = compilation.GetTypeByMetadataName(actorIdMetadataName);
             if (actorIdSymbol is not null)
             {

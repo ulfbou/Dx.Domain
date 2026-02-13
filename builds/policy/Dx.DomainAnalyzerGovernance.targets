@@ -2,11 +2,17 @@
   <!-- Enforce analyzer discipline for all non-test projects. Tests are exempt by design. -->
   <PropertyGroup>
     <_DxIsTest Condition="'$(DxIsTest)' == ''">false</_DxIsTest>
+    <_DxIsTest Condition="'$(DxIsTest)' != ''">$(DxIsTest)</_DxIsTest>
   </PropertyGroup>
 
   <Target Name="DxDomain_EnforceAnalyzerEnable" BeforeTargets="CoreCompile" Condition="'$(_DxIsTest)' != 'true'">
     <Error Condition=" '$(RunAnalyzers)' == 'false' " Code="DXB001" Text="[Dx Governance] Dx analyzers cannot be disabled (RunAnalyzers=false)." />
     <Error Condition=" '$(EnableNETAnalyzers)' == 'false' " Code="DXB002" Text="[Dx Governance] NET analyzers must be enabled (EnableNETAnalyzers=false)." />
+  </Target>
+
+  <Target Name="DxDomain_BlockAnalyzerPackaging" BeforeTargets="Pack"
+          Condition="'$(DxIsAnalyzer)' == 'true' and '$(IsPackable)' == 'true'">
+    <Error Code="DXB004" Text="[Dx Governance] Dx.Domain.Analyzers must not be packable standalone." />
   </Target>
 
   <!-- Block .editorconfig attempts to override Dx diagnostics -->

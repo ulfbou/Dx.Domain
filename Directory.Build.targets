@@ -2,7 +2,6 @@
   <Import Project="$(DxBuildRoot)common/Dx.Defaults.props" Condition="Exists('$(DxBuildRoot)common/Dx.Defaults.props')" />
   <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets" Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
   <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
-  <!-- Single choke point: import analyzer governance only here -->
   <Import Project="$(DxBuildRoot)policy/Dx.DomainAnalyzerGovernance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.DomainAnalyzerGovernance.targets')" />
 
   <Target Name="DxCopyAnalyzerDependencies" AfterTargets="ResolveAnalyzers">
@@ -10,9 +9,21 @@
       <_DxAnnotations Include="$(MSBuildThisFileDirectory)src\Dx.Domain.Annotations\bin\$(Configuration)\netstandard2.0\Dx.Domain.Annotations.dll"
                       Condition="Exists('$(MSBuildThisFileDirectory)src\Dx.Domain.Annotations\bin\$(Configuration)\netstandard2.0\Dx.Domain.Annotations.dll')" />
     </ItemGroup>
+
+    <PropertyGroup>
+      <_DxAnalyzerFolder>$(IntermediateOutputPath)analyzers\dotnet\cs\</_DxAnalyzerFolder>
+    </PropertyGroup>
     <Copy SourceFiles="@(_DxAnnotations)"
-          DestinationFolder="$(BaseIntermediateOutputPath)analyzers\dotnet\cs"
+          DestinationFolder="$(_DxAnalyzerFolder)"
           SkipUnchangedFiles="true"
-          Condition="'@(_DxAnnotations)' != '' and Exists('$(BaseIntermediateOutputPath)analyzers\dotnet\cs')" />
+          Condition="'@(_DxAnnotations)' != '' and Exists('$(_DxAnalyzerFolder)')" />
+
+    <PropertyGroup>
+      <_DxAnalyzerFolderBase>$(BaseIntermediateOutputPath)analyzers\dotnet\cs\</_DxAnalyzerFolderBase>
+    </PropertyGroup>
+    <Copy SourceFiles="@(_DxAnnotations)"
+          DestinationFolder="$(_DxAnalyzerFolderBase)"
+          SkipUnchangedFiles="true"
+          Condition="'@(_DxAnnotations)' != '' and Exists('$(_DxAnalyzerFolderBase)')" />
   </Target>
 </Project>
