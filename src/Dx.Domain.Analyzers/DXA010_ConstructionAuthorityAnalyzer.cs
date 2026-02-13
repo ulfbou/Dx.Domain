@@ -63,14 +63,9 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
-                var assemblyName = startContext.Compilation.AssemblyName;
                 var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
                 var scope = scopeResolver.ResolveAssembly(startContext.Compilation.Assembly);
-                if (IsKernelLikeLayer(startContext.Options.AnalyzerConfigOptionsProvider) ||
-                    scope != Scope.S3 ||
-                    IsKernelLikeAssembly(assemblyName) ||
-                    (assemblyName != null && assemblyName.StartsWith("Dx.Domain.", System.StringComparison.OrdinalIgnoreCase)) ||
-                    IsKernelLikeCompilation(startContext.Compilation))
+                if (scope != Scope.S3)
                     return;
 
                 var services = CreateServices(startContext);
@@ -118,25 +113,7 @@ namespace Dx.Domain.Analyzers
             if (context.ContainingSymbol.ContainingAssembly == null)
                 return;
 
-            if (context.ContainingSymbol.ContainingAssembly.Name.StartsWith("Dx.Domain.", System.StringComparison.OrdinalIgnoreCase))
-                return;
-
-            if (IsKernelLikeAssembly(context.ContainingSymbol.ContainingAssembly?.Name))
-                return;
-
-            if (context.ContainingSymbol.ContainingAssembly?.Name?.StartsWith("Dx.Domain.", System.StringComparison.OrdinalIgnoreCase) == true)
-                return;
-
-            if (IsKernelLikeLocation(context.ContainingSymbol))
-                return;
-
-            if (IsKernelLikePath(syntax.SyntaxTree?.FilePath))
-                return;
-
             if (IsAssemblyInfoFile(syntax.SyntaxTree?.FilePath))
-                return;
-
-            if (IsKernelAssembly(context.ContainingSymbol.ContainingAssembly))
                 return;
 
             if (IsAttributeOperation(operation))
@@ -180,22 +157,7 @@ namespace Dx.Domain.Analyzers
             if (context.ContainingSymbol is IAssemblySymbol)
                 return;
 
-            if (IsKernelLikeAssembly(context.ContainingSymbol.ContainingAssembly?.Name))
-                return;
-
-            if (context.ContainingSymbol.ContainingAssembly?.Name?.StartsWith("Dx.Domain.", System.StringComparison.OrdinalIgnoreCase) == true)
-                return;
-
-            if (IsKernelLikeLocation(context.ContainingSymbol))
-                return;
-
-            if (IsKernelLikePath(syntax.SyntaxTree?.FilePath))
-                return;
-
             if (IsAssemblyInfoFile(syntax.SyntaxTree?.FilePath))
-                return;
-
-            if (IsKernelAssembly(context.ContainingSymbol.ContainingAssembly))
                 return;
 
             if (IsAttributeOperation(operation))

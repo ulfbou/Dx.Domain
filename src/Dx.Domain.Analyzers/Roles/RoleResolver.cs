@@ -10,17 +10,44 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 
 using Dx.Domain.Annotations;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dx.Domain.Analyzers.Roles
 {
     internal static class RoleResolver
     {
         public static DxAssemblyRole? Resolve(Compilation compilation)
+        {
+            return ResolveFromAttributes(compilation);
+        }
+
+        public static DxAssemblyRole? Resolve(Compilation compilation, AnalyzerConfigOptionsProvider optionsProvider)
+        {
+            var role = ResolveFromOptions(optionsProvider);
+            if (role.HasValue)
+                return role;
+
+            return ResolveFromAttributes(compilation);
+        }
+
+        private static DxAssemblyRole? ResolveFromOptions(AnalyzerConfigOptionsProvider optionsProvider)
+        {
+            if (optionsProvider.GlobalOptions.TryGetValue("build_property.DxResolvedRole", out var raw) &&
+                Enum.TryParse(raw, true, out DxAssemblyRole parsed))
+            {
+                return parsed;
+            }
+
+            return null;
+        }
+
+        private static DxAssemblyRole? ResolveFromAttributes(Compilation compilation)
         {
             var attrs = compilation.Assembly.GetAttributes()
                 .Where(a => a.AttributeClass?.Name == "DxAssemblyRoleAttribute")

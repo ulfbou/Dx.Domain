@@ -22,10 +22,12 @@ namespace Dx.Domain.Annotations
         public const string DXK006 = "DXK006";
         public const string DXK007 = "DXK007";
         public const string DXK008 = "DXK008";
+        public const string DXK009 = "DXK009";
 
         public const string DXT001 = "DXT001";
         public const string DXT002 = "DXT002";
         public const string DXT003 = "DXT003";
+        public const string DXT004 = "DXT004";
 
         public const string DXA010 = "DXA010";
         public const string DXA011 = "DXA011";

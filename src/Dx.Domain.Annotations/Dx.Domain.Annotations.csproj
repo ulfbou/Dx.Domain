@@ -27,18 +27,12 @@
     <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
 
-  <Target Name="DxAnnotationXmlDocLint" BeforeTargets="CoreCompile">
-    <ItemGroup>
-      <_DxAnnotationFiles Include="@(Compile)" Exclude="**\obj\**" />
-    </ItemGroup>
-    <ReadLinesFromFile File="%(_DxAnnotationFiles.Identity)">
-      <Output TaskParameter="Lines" ItemName="_DxAnnotationLines" />
-    </ReadLinesFromFile>
-    <Error Code="DXB010"
-           Text="[Dx Docs] XML &lt;code&gt; blocks must use CDATA in annotations."
-           Condition="@(_DxAnnotationLines->Contains('&lt;code&gt;')) and !(@(_DxAnnotationLines->Contains('&lt;code&gt;&lt;![CDATA[')))" />
-  </Target>
-
+  <ItemGroup>
+    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll"
+          Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="CHANGELOG.md" Link="docs/CHANGELOG.md" />

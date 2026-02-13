@@ -84,5 +84,14 @@ namespace Dx.Domain.Analyzers.Diagnostics
             DxCategories.Kernel,
             DiagnosticSeverity.Error,
             true);
+
+        public static readonly DiagnosticDescriptor DXK009 = new(
+            DxRuleIds.DXK009,
+            "Forbidden Dx.Domain internal package reference",
+            "Consumer projects must not reference internal package '{0}'",
+            DxCategories.Kernel,
+            DiagnosticSeverity.Error,
+            true,
+            customTags: WellKnownDiagnosticTags.CompilationEnd);
     }
 }

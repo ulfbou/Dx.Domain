@@ -16,6 +16,7 @@ using System.Linq;
 using Dx.Domain.Analyzers.Diagnostics;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Observability;
+using Dx.Domain.Analyzers.Infrastructure.Scopes;
 using Dx.Domain.Annotations;
 using Dx.Domain.Analyzers.Roles;
 
@@ -38,7 +39,11 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
-                var role = RoleResolver.Resolve(startContext.Compilation);
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
+                    return;
+
+                var role = RoleResolver.Resolve(startContext.Compilation, startContext.Options.AnalyzerConfigOptionsProvider);
                 if (role != DxAssemblyRole.Host)
                     return;
 

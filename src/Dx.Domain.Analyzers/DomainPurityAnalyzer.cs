@@ -19,6 +19,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 using Dx.Domain.Analyzers.Diagnostics;
 using Dx.Domain.Annotations;
+using Dx.Domain.Analyzers.Infrastructure.Scopes;
 using Dx.Domain.Analyzers.Roles;
 
 namespace Dx.Domain.Analyzers
@@ -42,19 +43,28 @@ namespace Dx.Domain.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(ctx =>
+            context.RegisterCompilationStartAction(startContext =>
             {
-                var role = RoleResolver.Resolve(ctx.SemanticModel.Compilation);
-                if (role != DxAssemblyRole.Domain)
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
                     return;
 
-                var symbol = ctx.SemanticModel.GetSymbolInfo(ctx.Node).Symbol;
-                var ns = symbol?.ContainingNamespace?.ToString();
+                var optionsProvider = startContext.Options.AnalyzerConfigOptionsProvider;
 
-                if (ns != null && ForbiddenNamespaces.Any(f => ns.StartsWith(f, System.StringComparison.Ordinal)))
-                    ctx.ReportDiagnostic(Diagnostic.Create(Dxk.DXK003, ctx.Node.GetLocation(), ns));
+                startContext.RegisterSyntaxNodeAction(ctx =>
+                {
+                    var role = RoleResolver.Resolve(ctx.SemanticModel.Compilation, optionsProvider);
+                    if (role != DxAssemblyRole.Domain)
+                        return;
 
-            }, SyntaxKind.IdentifierName);
+                    var symbol = ctx.SemanticModel.GetSymbolInfo(ctx.Node).Symbol;
+                    var ns = symbol?.ContainingNamespace?.ToString();
+
+                    if (ns != null && ForbiddenNamespaces.Any(f => ns.StartsWith(f, System.StringComparison.Ordinal)))
+                        ctx.ReportDiagnostic(Diagnostic.Create(Dxk.DXK003, ctx.Node.GetLocation(), ns));
+
+                }, SyntaxKind.IdentifierName);
+            });
         }
     }
 }

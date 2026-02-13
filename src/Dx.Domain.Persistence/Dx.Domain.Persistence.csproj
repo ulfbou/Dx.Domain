@@ -4,6 +4,7 @@
   <PropertyGroup>
     <!-- Template Symbols -->
     <ProjectName>Dx.Domain.Persistence</ProjectName>
+    <DxLayer>Authority</DxLayer>
     <Authors>Ulf Bourelius;Dx.Domain Team</Authors>
     <Company>Dx.Domain Team</Company>
     <Description>
@@ -68,17 +69,13 @@
     <FileVersion>$(VersionPrefix).0</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Zentient.Abstractions" Version="3.0.2" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Dx.Domain\Dx.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Dx.Domain.Abstractions" />
-    <InternalsVisibleTo Include="Dx.Domain.Attributes" />
+    <InternalsVisibleTo Include="Dx.Domain.Annotations" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
     <InternalsVisibleTo Include="Dx.Domain.Tests" />
   </ItemGroup>

@@ -1,3 +1,4 @@
+using AnalyzerScope = Dx.Domain.Analyzers.Infrastructure.Scopes.Scope;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
 using Microsoft.CodeAnalysis;
@@ -15,106 +16,77 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
     public class ScopeResolverTests
     {
         [Fact]
-        public void Explicit_Map_Maps_DxDomain_To_S0()
+        public void DxLayer_Config_Kernel_Maps_To_S0()
         {
-            var config = CreateConfigWithMap("Dx.Domain=S0");
+            var config = CreateConfig(new Dictionary<string, string>
+            {
+                ["build_property.DxLayer"] = "Kernel"
+            });
             var resolver = new ScopeResolver(config);
 
-            var assembly = CreateAssembly("Dx.Domain");
+            var scope = resolver.ResolveAssembly(CreateAssembly("SomeLibrary"));
+
+            Assert.Equal(AnalyzerScope.S0, scope);
+        }
+
+        [Fact]
+        public void DxLayerAttribute_Is_Respected_When_Config_Missing()
+        {
+            var config = CreateConfig(new Dictionary<string, string>());
+            var resolver = new ScopeResolver(config);
+
+            var assembly = CreateAssemblyWithAttribute("DxLayer", "Kernel");
             var scope = resolver.ResolveAssembly(assembly);
 
-            Assert.Equal(Scope.S0, scope);
+            Assert.Equal(AnalyzerScope.S0, scope);
         }
 
         [Fact]
-        public void Missing_Map_Returns_S3_For_Arbitrary_Assemblies()
+        public void Authority_Layer_Is_Treated_As_S0()
         {
-            var config = CreateConfigWithMap(null);
+            var config = CreateConfig(new Dictionary<string, string>
+            {
+                ["build_property.DxLayer"] = "Authority"
+            });
             var resolver = new ScopeResolver(config);
 
-            var assembly = CreateAssembly("SomeLibrary");
-            var scope = resolver.ResolveAssembly(assembly);
+            var scope = resolver.ResolveAssembly(CreateAssembly("SomeLibrary"));
 
-            Assert.Equal(Scope.S3, scope);
+            Assert.Equal(AnalyzerScope.S0, scope);
         }
 
         [Fact]
-        public void Assembly_Not_In_Map_Returns_S3()
+        public void Default_Is_Consumer_When_No_Signal()
         {
-            var config = CreateConfigWithMap("Dx.Domain=S0");
+            var config = CreateConfig(new Dictionary<string, string>());
             var resolver = new ScopeResolver(config);
 
-            var assembly = CreateAssembly("UnmappedAssembly");
-            var scope = resolver.ResolveAssembly(assembly);
+            var scope = resolver.ResolveAssembly(CreateAssembly("SomeLibrary"));
 
-            Assert.Equal(Scope.S3, scope);
+            Assert.Equal(AnalyzerScope.S3, scope);
         }
 
         [Fact]
-        public void Root_Namespace_Prefix_Match_Returns_S3()
+        public void Test_Project_Is_Excluded_From_Consumer()
         {
-            var config = CreateConfigWithRootNamespaces("MyCompany.Domain");
+            var config = CreateConfig(new Dictionary<string, string>
+            {
+                ["build_property.IsTestProject"] = "true"
+            });
             var resolver = new ScopeResolver(config);
 
-            var assembly = CreateAssemblyWithNamespace("MyCompany.Domain.Orders");
-            var scope = resolver.ResolveAssembly(assembly);
+            var scope = resolver.ResolveAssembly(CreateAssembly("SomeLibrary"));
 
-            Assert.Equal(Scope.S3, scope);
-        }
-
-        [Fact]
-        public void Multiple_Root_Namespaces_Are_Supported()
-        {
-            var config = CreateConfigWithRootNamespaces("MyCompany.Domain;MyCompany.Shared");
-            var resolver = new ScopeResolver(config);
-
-            var assembly1 = CreateAssemblyWithNamespace("MyCompany.Domain.Orders");
-            var assembly2 = CreateAssemblyWithNamespace("MyCompany.Shared.Utils");
-
-            Assert.Equal(Scope.S3, resolver.ResolveAssembly(assembly1));
-            Assert.Equal(Scope.S3, resolver.ResolveAssembly(assembly2));
-        }
-
-        [Fact]
-        public void Whitespace_In_Config_Is_Handled()
-        {
-            var config = CreateConfigWithMap(" Dx.Domain = S0 ; OtherLib = S1 ");
-            var resolver = new ScopeResolver(config);
-
-            var assembly = CreateAssembly("Dx.Domain");
-            var scope = resolver.ResolveAssembly(assembly);
-
-            Assert.Equal(Scope.S0, scope);
-        }
-
-        [Fact]
-        public void Invalid_Enum_Values_Do_Not_Throw()
-        {
-            var config = CreateConfigWithMap("Dx.Domain=InvalidScope");
-            var resolver = new ScopeResolver(config);
-
-            var assembly = CreateAssembly("Dx.Domain");
-            // Should not throw, should return S3 as default
-            var scope = resolver.ResolveAssembly(assembly);
-
-            Assert.Equal(Scope.S3, scope);
-        }
-
-        [Fact]
-        public void Multiple_Assemblies_Can_Be_Mapped()
-        {
-            var config = CreateConfigWithMap("Dx.Domain=S0;Dx.Shared=S1;MyApp=S2");
-            var resolver = new ScopeResolver(config);
-
-            Assert.Equal(Scope.S0, resolver.ResolveAssembly(CreateAssembly("Dx.Domain")));
-            Assert.Equal(Scope.S1, resolver.ResolveAssembly(CreateAssembly("Dx.Shared")));
-            Assert.Equal(Scope.S2, resolver.ResolveAssembly(CreateAssembly("MyApp")));
+            Assert.Equal(AnalyzerScope.S0, scope);
         }
 
         [Fact]
         public void ResolveSymbol_Uses_Containing_Assembly()
         {
-            var config = CreateConfigWithMap("TestAssembly=S0");
+            var config = CreateConfig(new Dictionary<string, string>
+            {
+                ["build_property.DxLayer"] = "Kernel"
+            });
             var resolver = new ScopeResolver(config);
 
             var code = "namespace TestNs { public class TestClass {} }";
@@ -127,62 +99,25 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
             Assert.NotNull(symbol);
 
             var scope = resolver.ResolveSymbol(symbol!);
-            Assert.Equal(Scope.S0, scope);
+            Assert.Equal(AnalyzerScope.S0, scope);
         }
 
-        [Fact]
-        public void Empty_Config_Values_Are_Ignored()
-        {
-            var config = CreateConfigWithMap(";;Dx.Domain=S0;;");
-            var resolver = new ScopeResolver(config);
-
-            var assembly = CreateAssembly("Dx.Domain");
-            var scope = resolver.ResolveAssembly(assembly);
-
-            Assert.Equal(Scope.S0, scope);
-        }
-
-        [Fact]
-        public void Root_Namespaces_Empty_Values_Are_Ignored()
-        {
-            var config = CreateConfigWithRootNamespaces(";;MyCompany.Domain;;");
-            var resolver = new ScopeResolver(config);
-
-            var assembly = CreateAssemblyWithNamespace("MyCompany.Domain");
-            var scope = resolver.ResolveAssembly(assembly);
-
-            Assert.Equal(Scope.S3, scope);
-        }
-
-        private static AnalyzerConfigOptionsProvider CreateConfigWithMap(string? mapValue)
+        private static AnalyzerConfigOptionsProvider CreateConfig(Dictionary<string, string> values)
         {
             var mockConfig = new Mock<AnalyzerConfigOptionsProvider>();
             var mockOptions = new Mock<AnalyzerConfigOptions>();
 
-            if (mapValue != null)
-            {
-                mockOptions.Setup(o => o.TryGetValue("dx.scope.map", out It.Ref<string?>.IsAny))
-                    .Returns((string key, out string value) =>
-                    {
-                        value = mapValue;
-                        return true;
-                    });
-            }
-
-            mockConfig.Setup(c => c.GlobalOptions).Returns(mockOptions.Object);
-            return mockConfig.Object;
-        }
-
-        private static AnalyzerConfigOptionsProvider CreateConfigWithRootNamespaces(string namespaces)
-        {
-            var mockConfig = new Mock<AnalyzerConfigOptionsProvider>();
-            var mockOptions = new Mock<AnalyzerConfigOptions>();
-
-            mockOptions.Setup(o => o.TryGetValue("dx.scope.rootNamespaces", out It.Ref<string?>.IsAny))
+            mockOptions.Setup(o => o.TryGetValue(It.IsAny<string>(), out It.Ref<string?>.IsAny))
                 .Returns((string key, out string value) =>
                 {
-                    value = namespaces;
-                    return true;
+                    if (values.TryGetValue(key, out var configured))
+                    {
+                        value = configured;
+                        return true;
+                    }
+
+                    value = string.Empty;
+                    return false;
                 });
 
             mockConfig.Setup(c => c.GlobalOptions).Returns(mockOptions.Object);
@@ -200,9 +135,20 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
             return compilation.Assembly;
         }
 
-        private static IAssemblySymbol CreateAssemblyWithNamespace(string namespaceName)
+        private static IAssemblySymbol CreateAssemblyWithAttribute(string attributeName, string layer)
         {
-            var code = $"namespace {namespaceName} {{ public class Foo {{}} }}";
+            var code = $@"""
+using System;
+
+[assembly: {attributeName}(""{layer}"")]
+
+public sealed class {attributeName}Attribute : Attribute
+{{
+    public {attributeName}Attribute(string layer) {{ }}
+}}
+
+namespace Test {{ public class Foo {{ }} }}""";
+
             var compilation = CSharpCompilation.Create(
                 "TestAssembly",
                 new[] { CSharpSyntaxTree.ParseText(code) },
@@ -210,5 +156,6 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
 
             return compilation.Assembly;
         }
+
     }
 }

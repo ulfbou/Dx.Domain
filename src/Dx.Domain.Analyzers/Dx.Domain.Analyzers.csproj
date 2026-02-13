@@ -1,14 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsAnalyzer>true</DxIsAnalyzer>
+    <DxLayer>Authority</DxLayer>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>

@@ -27,7 +27,7 @@ namespace Dx.Domain.Analyzers
     public sealed class DependencyAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
-            => ImmutableArray.Create(Dxk.DXK002, Dxk.DXK007);
+            => ImmutableArray.Create(Dxk.DXK002, Dxk.DXK007, Dxk.DXK009);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -35,35 +35,23 @@ namespace Dx.Domain.Analyzers
             context.EnableConcurrentExecution();
             context.RegisterCompilationAction(c =>
             {
-                if (IsKernelLikeLayer(c.Options.AnalyzerConfigOptionsProvider))
-                    return;
-
-                var assemblyName = c.Compilation.AssemblyName;
-                if (assemblyName != null &&
-                    (assemblyName.Equals("Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) ||
-                     assemblyName.Equals("Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) ||
-                     assemblyName.Equals("Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase)))
-                {
-                    return;
-                }
-
-                if (c.Compilation.SyntaxTrees.Any(tree => IsKernelLikePath(tree.FilePath)))
-                {
-                    return;
-                }
-
-                var role = RoleResolver.Resolve(c.Compilation);
+                var role = RoleResolver.Resolve(c.Compilation, c.Options.AnalyzerConfigOptionsProvider);
                 if (role is null)
                     return;
 
                 var scopeResolver = new Infrastructure.Scopes.ScopeResolver(c.Options.AnalyzerConfigOptionsProvider);
-                if (scopeResolver.ResolveAssembly(c.Compilation.Assembly) == Infrastructure.Scopes.Scope.S3)
+                if (scopeResolver.ResolveAssembly(c.Compilation.Assembly) != Infrastructure.Scopes.Scope.S3)
                     return;
 
                 foreach (var reference in c.Compilation.ReferencedAssemblyNames)
                 {
                     if (!Enum.TryParse(reference.Name.Split('.').Last(), out DxAssemblyRole target))
+                    {
+                        if (IsForbiddenInternalDxPackage(reference.Name))
+                            c.ReportDiagnostic(Diagnostic.Create(Dxk.DXK009, Location.None, reference.Name));
+
                         continue;
+                    }
 
                     if (!RoleMatrix.IsAllowed(role.Value, target))
                         c.ReportDiagnostic(Diagnostic.Create(Dxk.DXK002, Location.None, role, target));
@@ -74,27 +62,19 @@ namespace Dx.Domain.Analyzers
             });
         }
 
-        private static bool IsKernelLikeLayer(AnalyzerConfigOptionsProvider optionsProvider)
+        private static bool IsForbiddenInternalDxPackage(string? name)
         {
-            if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
-            {
-                optionsProvider.GlobalOptions.TryGetValue("dx.layer", out layer);
-            }
-
-            if (string.IsNullOrWhiteSpace(layer))
+            var normalized = name ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(normalized))
                 return false;
 
-            return string.Equals(layer, "Kernel", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Primitives", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Annotations", StringComparison.OrdinalIgnoreCase);
-        }
+            if (!normalized.StartsWith("Dx.Domain.", StringComparison.OrdinalIgnoreCase))
+                return false;
 
-        private static bool IsKernelLikePath(string? path)
-        {
-            return path != null &&
-                   (path.IndexOf("Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    path.IndexOf("Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    path.IndexOf("Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase) >= 0);
+            return !string.Equals(normalized, "Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalized, "Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalized, "Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase) &&
+                   !string.Equals(normalized, "Dx.Domain.Facts", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

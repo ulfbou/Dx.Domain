@@ -38,10 +38,7 @@ namespace Dx.Domain.Analyzers
             {
                 var scopeResolver = new Infrastructure.Scopes.ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
                 var scope = scopeResolver.ResolveAssembly(startContext.Compilation.Assembly);
-                if (IsKernelLikeLayer(startContext.Options.AnalyzerConfigOptionsProvider) ||
-                    scope != Infrastructure.Scopes.Scope.S3 ||
-                    IsKernelLikeAssembly(startContext.Compilation.AssemblyName) ||
-                    IsKernelLikeCompilation(startContext.Compilation))
+                if (scope != Infrastructure.Scopes.Scope.S3)
                     return;
 
                 var services = new Infrastructure.AnalyzerServices(
@@ -58,23 +55,11 @@ namespace Dx.Domain.Analyzers
                     if (containingSymbol == null)
                         return;
 
-                    var assemblyName = containingSymbol.ContainingAssembly?.Name ??
-                                       ctx.SemanticModel.Compilation.AssemblyName;
-                    if (IsKernelLikeAssembly(assemblyName))
-                        return;
-
-                    if (IsKernelLikeLocation(containingSymbol))
-                        return;
-
-                    var filePath = ctx.Node.SyntaxTree?.FilePath;
-                    if (filePath != null && IsKernelLikeAssemblyFromPath(filePath))
-                        return;
-
                     var scope = services.Scope.ResolveSymbol(containingSymbol);
                     if (scope != Infrastructure.Scopes.Scope.S3)
                         return;
 
-                    var role = RoleResolver.Resolve(ctx.SemanticModel.Compilation);
+                    var role = RoleResolver.Resolve(ctx.SemanticModel.Compilation, ctx.Options.AnalyzerConfigOptionsProvider);
                     if (role is not (DxAssemblyRole.Domain or DxAssemblyRole.Application))
                         return;
 
@@ -83,44 +68,5 @@ namespace Dx.Domain.Analyzers
             });
         }
 
-        private static bool IsKernelLikeAssembly(string? assemblyName)
-        {
-            return string.Equals(assemblyName, "Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(assemblyName, "Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(assemblyName, "Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsKernelLikeAssemblyFromPath(string path)
-        {
-            return path.IndexOf("Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                   path.IndexOf("Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                   path.IndexOf("Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
-        private static bool IsKernelLikeCompilation(Compilation compilation)
-        {
-            return compilation.SyntaxTrees.Any(tree => IsKernelLikeAssemblyFromPath(tree.FilePath));
-        }
-
-        private static bool IsKernelLikeLayer(AnalyzerConfigOptionsProvider optionsProvider)
-        {
-            if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
-            {
-                optionsProvider.GlobalOptions.TryGetValue("dx.layer", out layer);
-            }
-
-            if (string.IsNullOrWhiteSpace(layer))
-                return false;
-
-            return string.Equals(layer, "Kernel", System.StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Primitives", System.StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Annotations", System.StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsKernelLikeLocation(ISymbol symbol)
-        {
-            return symbol.Locations.Any(location =>
-                IsKernelLikeAssemblyFromPath(location.SourceTree?.FilePath ?? string.Empty));
-        }
     }
 }

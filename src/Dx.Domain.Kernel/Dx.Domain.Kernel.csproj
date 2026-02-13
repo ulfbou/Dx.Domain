@@ -41,6 +41,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll"
+          Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="buildTransitive\Dx.Domain.targets" Pack="true" PackagePath="buildTransitive" />
     <None Update="..\..\CHANGELOG.md" Link="docs/CHANGELOG.md" />
     <None Update="..\..\README.md" Link="docs/README.md" />
     <None Update="..\..\LICENSE" Link="docs/LICENSE" />

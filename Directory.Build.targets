@@ -4,4 +4,15 @@
   <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
   <!-- Single choke point: import analyzer governance only here -->
   <Import Project="$(DxBuildRoot)policy/Dx.DomainAnalyzerGovernance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.DomainAnalyzerGovernance.targets')" />
+
+  <Target Name="DxCopyAnalyzerDependencies" AfterTargets="ResolveAnalyzers">
+    <ItemGroup>
+      <_DxAnnotations Include="$(MSBuildThisFileDirectory)src\Dx.Domain.Annotations\bin\$(Configuration)\netstandard2.0\Dx.Domain.Annotations.dll"
+                      Condition="Exists('$(MSBuildThisFileDirectory)src\Dx.Domain.Annotations\bin\$(Configuration)\netstandard2.0\Dx.Domain.Annotations.dll')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_DxAnnotations)"
+          DestinationFolder="$(BaseIntermediateOutputPath)analyzers\dotnet\cs"
+          SkipUnchangedFiles="true"
+          Condition="'@(_DxAnnotations)' != '' and Exists('$(BaseIntermediateOutputPath)analyzers\dotnet\cs')" />
+  </Target>
 </Project>

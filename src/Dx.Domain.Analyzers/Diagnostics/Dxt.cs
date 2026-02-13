@@ -44,5 +44,14 @@ namespace Dx.Domain.Analyzers.Diagnostics
             DiagnosticSeverity.Error,
             true,
             customTags: WellKnownDiagnosticTags.CompilationEnd);
+
+        public static readonly DiagnosticDescriptor DXT004 = new(
+            DxRuleIds.DXT004,
+            "DXT invariants missing",
+            "Consumer solutions must include .dx/invariants.json at the solution root",
+            DxCategories.Template,
+            DiagnosticSeverity.Error,
+            true,
+            customTags: WellKnownDiagnosticTags.CompilationEnd);
     }
 }

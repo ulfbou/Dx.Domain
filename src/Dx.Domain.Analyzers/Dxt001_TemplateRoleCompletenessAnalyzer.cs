@@ -15,6 +15,7 @@ using System.Collections.Immutable;
 using Dx.Domain.Analyzers.Diagnostics;
 using Dx.Domain.Analyzers.Roles;
 using Dx.Domain.Analyzers.Templates;
+using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -34,6 +35,10 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationAction(compilationContext =>
             {
+                var scopeResolver = new ScopeResolver(compilationContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(compilationContext.Compilation.Assembly) != Scope.S3)
+                    return;
+
                 var templateId = TemplateIntentResolver.Resolve(compilationContext.Compilation);
                 if (string.IsNullOrWhiteSpace(templateId))
                     return;
@@ -41,7 +46,7 @@ namespace Dx.Domain.Analyzers
                 if (!TemplateRoleMap.TryGet(templateId!, out var definition))
                     return;
 
-                var role = RoleResolver.Resolve(compilationContext.Compilation);
+                var role = RoleResolver.Resolve(compilationContext.Compilation, compilationContext.Options.AnalyzerConfigOptionsProvider);
                 if (role == definition.Role)
                     return;
 

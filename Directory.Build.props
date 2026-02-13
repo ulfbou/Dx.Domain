@@ -2,6 +2,12 @@
   <PropertyGroup>
     <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
     <DxPropsImported Condition="'$(DxPropsImported)' == ''">false</DxPropsImported>
+    <DxLayer Condition="'$(DxLayer)' == ''">Consumer</DxLayer>
   </PropertyGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="DxLayer" />
+    <CompilerVisibleProperty Include="DxResolvedRole" />
+    <CompilerVisibleProperty Include="IsTestProject" />
+  </ItemGroup>
   <Import Project="$(DxBuildRoot)Dx.Props.hierarchical.props" Condition="'$(DxPropsImported)' != 'true' AND Exists('$(DxBuildRoot)Dx.Props.hierarchical.props')" />
 </Project>

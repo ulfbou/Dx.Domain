@@ -16,6 +16,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 using Dx.Domain.Analyzers.Diagnostics;
+using Dx.Domain.Analyzers.Infrastructure.Scopes;
 using Dx.Domain.Analyzers.Roles;
 
 namespace Dx.Domain.Analyzers
@@ -32,7 +33,11 @@ namespace Dx.Domain.Analyzers
             context.EnableConcurrentExecution();
             context.RegisterCompilationAction(c =>
             {
-                if (RoleResolver.Resolve(c.Compilation) is null)
+                var scopeResolver = new ScopeResolver(c.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(c.Compilation.Assembly) != Scope.S3)
+                    return;
+
+                if (RoleResolver.Resolve(c.Compilation, c.Options.AnalyzerConfigOptionsProvider) is null)
                     c.ReportDiagnostic(Diagnostic.Create(Dxk.DXK001, Location.None));
             });
         }

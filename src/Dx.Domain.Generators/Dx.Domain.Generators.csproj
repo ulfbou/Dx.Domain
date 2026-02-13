@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
+    <DxLayer>Authority</DxLayer>
 
     <RootNamespace>Dx.Domain.Generators</RootNamespace>
     <TargetFramework>net10.0</TargetFramework>
@@ -17,8 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Dx.Domain.Abstractions" />
-    <InternalsVisibleTo Include="Dx.Domain.Attributes" />
+    <InternalsVisibleTo Include="Dx.Domain.Annotations" />
     <InternalsVisibleTo Include="Dx.Domain.Analyzers" />
     <InternalsVisibleTo Include="Dx.Domain.Tests" />
   </ItemGroup>

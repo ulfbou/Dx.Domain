@@ -127,6 +127,13 @@ Detects forbidden architectural vocabulary in consumer code. The allow-list can 
 dx_forbidden_vocab_allow = Namespace.TypeName;Other.Namespace.*
 ```
 
+### DXT004: DXT Invariants Required
+**Severity**: Error  
+**Scope**: Consumer solutions (including tests)
+**Authority**: Constraining
+
+Ensures consumer solutions include the required `.dx/invariants.json` file at the solution root.
+
 ## Infrastructure Components
 
 ### AnalyzerServices
@@ -139,11 +146,11 @@ Composition root providing all analyzer dependencies:
 - GeneratedCodeDetector
 
 ### ScopeResolver
-Resolves assemblies and symbols to scopes (S0-S3) based on EditorConfig:
-- **S0**: Kernel - Trusted, minimal rules
-- **S1**: Domain - Strict invariant enforcement
-- **S2**: Application - Business logic rules
+Resolves assemblies and symbols to scopes (S0-S3) based on build properties and assembly metadata:
+- **S0**: Authority (Kernel/Primitives/Annotations) - Trusted, minimal rules
 - **S3**: Consumer - Construction authority enforced
+
+Scopes S1/S2 are reserved for future domain/application specialization.
 
 ### DxFacadeResolver
 Discovers and validates Dx facade factory methods, ensuring only approved construction patterns are used.
@@ -168,9 +175,12 @@ Add to your `.editorconfig`:
 ```ini
 [*.cs]
 
-# Scope mapping (required for scope-aware rules)
-dx.scope.map = Dx.Domain=S0;MyApp.Domain=S1;MyApp.Application=S2;MyApp=S3
-dx.scope.rootNamespaces = MyApp
+# Scope and role signals (MSBuild or templates)
+build_property.DxLayer = Consumer
+build_property.DxResolvedRole = Domain
+
+# Kernel API freeze (authority-only, opt-in)
+build_property.DxKernelApiFreeze = true
 
 # Generated code markers (optional)
 dx_generated_markers = Generated;__generated
@@ -185,10 +195,8 @@ dotnet_diagnostic.DXA022.severity = warning
 
 | Scope | Description | DXA010 | DXA020 | DXA022 |
 |-------|-------------|--------|--------|--------|
-| **S0** | Kernel (trusted) | Exempt | Exempt | Exempt |
-| **S1** | Domain | Enforced | Enforced | Enforced |
-| **S2** | Application | Enforced | Enforced | Enforced |
-| **S3** | Consumer | Enforced | - | - |
+| **S0** | Authority (trusted) | Exempt | Exempt | Exempt |
+| **S3** | Consumer | Enforced | Enforced | Enforced |
 
 ## Build Requirements
 

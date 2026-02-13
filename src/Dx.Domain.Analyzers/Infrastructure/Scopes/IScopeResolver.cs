@@ -33,7 +33,6 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
     internal sealed class ScopeResolver : IScopeResolver
     {
         private readonly string? _dxLayer;
-        private readonly string? _dxResolvedRole;
         private readonly bool _isTestProject;
 
         /// <summary>
@@ -50,8 +49,6 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
                 options.TryGetValue("dx.layer", out _dxLayer);
             }
 
-            options.TryGetValue("build_property.DxResolvedRole", out _dxResolvedRole);
-
             if (options.TryGetValue("build_property.IsTestProject", out var isTest))
             {
                 _isTestProject = string.Equals(isTest, "true", StringComparison.OrdinalIgnoreCase);
@@ -65,15 +62,12 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
                 return Scope.S0;
 
             if (TryResolveScopeFromLayer(_dxLayer, out var layerScope))
-                return ApplyKernelOverride(layerScope, assembly.Name);
-
-            if (TryResolveScopeFromLayer(_dxResolvedRole, out var roleScope))
-                return ApplyKernelOverride(roleScope, assembly.Name);
+                return layerScope;
 
             if (TryResolveScopeFromAttribute(assembly, out var attributeScope))
-                return ApplyKernelOverride(attributeScope, assembly.Name);
+                return attributeScope;
 
-            return IsKernelLikeAssembly(assembly.Name) ? Scope.S0 : Scope.S3;
+            return Scope.S3;
         }
 
         /// <inheritdoc/>
@@ -113,7 +107,8 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
 
             if (string.Equals(raw, "Kernel", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(raw, "Primitives", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(raw, "Annotations", StringComparison.OrdinalIgnoreCase))
+                string.Equals(raw, "Annotations", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(raw, "Authority", StringComparison.OrdinalIgnoreCase))
             {
                 scope = Scope.S0;
                 return true;
@@ -135,19 +130,5 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
             return false;
         }
 
-        private static bool IsKernelLikeAssembly(string? assemblyName)
-        {
-            return string.Equals(assemblyName, "Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(assemblyName, "Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(assemblyName, "Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static Scope ApplyKernelOverride(Scope scope, string? assemblyName)
-        {
-            if (scope == Scope.S3 && IsKernelLikeAssembly(assemblyName))
-                return Scope.S0;
-
-            return scope;
-        }
     }
 }

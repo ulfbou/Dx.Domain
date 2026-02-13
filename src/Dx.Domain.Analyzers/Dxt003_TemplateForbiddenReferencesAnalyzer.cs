@@ -15,6 +15,7 @@ using System.Linq;
 
 using Dx.Domain.Analyzers.Diagnostics;
 using Dx.Domain.Analyzers.Templates;
+using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -34,6 +35,10 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationAction(compilationContext =>
             {
+                var scopeResolver = new ScopeResolver(compilationContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(compilationContext.Compilation.Assembly) != Scope.S3)
+                    return;
+
                 var templateId = TemplateIntentResolver.Resolve(compilationContext.Compilation);
                 if (string.IsNullOrWhiteSpace(templateId))
                     return;

@@ -65,6 +65,12 @@ namespace Dx.Domain.Analyzers
                 if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S0)
                     return;
 
+                if (IsTestProject(startContext.Options.AnalyzerConfigOptionsProvider))
+                    return;
+
+                if (!IsKernelFreezeEnabled(startContext.Options.AnalyzerConfigOptionsProvider))
+                    return;
+
                 var services = CreateServices(startContext);
 
                 startContext.RegisterSymbolAction(symbolContext =>
@@ -114,7 +120,7 @@ namespace Dx.Domain.Analyzers
 
             // For now, we'll do a simple heuristic: flag new public APIs
             // In production, this would integrate with API diff tooling in CI
-            if (symbol.Locations.Any() && !IsLegacyApi(symbol))
+            if (symbol.Locations.Any())
             {
                 var location = symbol.Locations.First();
                 context.ReportDiagnostic(Diagnostic.Create(Rule, location));
@@ -174,17 +180,30 @@ namespace Dx.Domain.Analyzers
             return false;
         }
 
-        private static bool IsLegacyApi(ISymbol symbol)
+        private static bool IsKernelFreezeEnabled(AnalyzerConfigOptionsProvider optionsProvider)
         {
-            // Heuristic: consider symbols from core types as legacy
-            // In production, this would check against a baseline API surface snapshot
-            var containingType = symbol.ContainingType?.Name;
+            if (optionsProvider.GlobalOptions.TryGetValue("build_property.DxKernelApiFreeze", out var raw) &&
+                bool.TryParse(raw, out var enabled))
+            {
+                return enabled;
+            }
 
-            // Common kernel types that are grandfathered in
-            if (containingType == "Result" || containingType == "DomainError" ||
-                containingType == "InvariantViolationException" || containingType == "Dx" ||
-                containingType == "Invariant" || containingType == "Require")
-                return true;
+            if (optionsProvider.GlobalOptions.TryGetValue("dx.kernel.freeze", out raw) &&
+                bool.TryParse(raw, out enabled))
+            {
+                return enabled;
+            }
+
+            return false;
+        }
+
+        private static bool IsTestProject(AnalyzerConfigOptionsProvider optionsProvider)
+        {
+            if (optionsProvider.GlobalOptions.TryGetValue("build_property.IsTestProject", out var raw) &&
+                bool.TryParse(raw, out var isTest))
+            {
+                return isTest;
+            }
 
             return false;
         }

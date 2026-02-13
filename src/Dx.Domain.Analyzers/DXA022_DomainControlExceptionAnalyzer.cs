@@ -63,11 +63,9 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
-                var assemblyName = startContext.Compilation.AssemblyName;
                 var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
                 var scope = scopeResolver.ResolveAssembly(startContext.Compilation.Assembly);
-                if (IsKernelLikeLayer(startContext.Options.AnalyzerConfigOptionsProvider) ||
-                    scope != Scope.S3 || IsKernelLikeAssembly(assemblyName) || IsKernelLikeCompilation(startContext.Compilation))
+                if (scope != Scope.S3)
                     return;
 
                 var services = CreateServices(startContext);
@@ -99,17 +97,8 @@ namespace Dx.Domain.Analyzers
         {
             var throwOperation = (IThrowOperation)context.Operation;
 
-            if (IsKernelLikeAssembly(context.ContainingSymbol.ContainingAssembly?.Name))
-                return;
-
-            if (IsKernelLikeLocation(context.ContainingSymbol))
-                return;
-
             var syntax = throwOperation.Syntax;
             if (syntax == null)
-                return;
-
-            if (IsKernelLikePath(syntax.SyntaxTree?.FilePath))
                 return;
 
             // Skip if generated code
@@ -150,47 +139,6 @@ namespace Dx.Domain.Analyzers
                 var diagnostic = Diagnostic.Create(Rule, syntax.GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
-        }
-
-        private static bool IsKernelLikeAssembly(string? name)
-        {
-            return string.Equals(name, "Dx.Domain.Kernel", System.StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(name, "Dx.Domain.Primitives", System.StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(name, "Dx.Domain.Annotations", System.StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsKernelLikePath(string? path)
-        {
-            return path != null &&
-                   (path.IndexOf("Dx.Domain.Kernel", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    path.IndexOf("Dx.Domain.Primitives", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    path.IndexOf("Dx.Domain.Annotations", System.StringComparison.OrdinalIgnoreCase) >= 0);
-        }
-
-        private static bool IsKernelLikeCompilation(Compilation compilation)
-        {
-            return compilation.SyntaxTrees.Any(tree => IsKernelLikePath(tree.FilePath));
-        }
-
-        private static bool IsKernelLikeLayer(AnalyzerConfigOptionsProvider optionsProvider)
-        {
-            if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
-            {
-                optionsProvider.GlobalOptions.TryGetValue("dx.layer", out layer);
-            }
-
-            if (string.IsNullOrWhiteSpace(layer))
-                return false;
-
-            return string.Equals(layer, "Kernel", System.StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Primitives", System.StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(layer, "Annotations", System.StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsKernelLikeLocation(ISymbol symbol)
-        {
-            return symbol.Locations.Any(location =>
-                IsKernelLikePath(location.SourceTree?.FilePath));
         }
 
         private static bool IsContractFacing(IMethodSymbol method)

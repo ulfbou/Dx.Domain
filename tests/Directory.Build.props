@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <DxLayer>Test</DxLayer>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="IsTestProject" />
+  </ItemGroup>
+</Project>

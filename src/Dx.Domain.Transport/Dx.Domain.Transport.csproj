@@ -4,6 +4,7 @@
   <PropertyGroup>
     <!-- Template Symbols -->
     <ProjectName>Dx.Domain</ProjectName>
+    <DxLayer>Authority</DxLayer>
     <Authors>Ulf Bourelius;Dx.Domain Team</Authors>
     <Company>Dx.Domain Team</Company>
     <Description>
@@ -40,8 +41,8 @@
     <PackageReleaseNotes>See CHANGELOG.md for release notes and docs/ for full specification.</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>zentient;metadata;core;builder;scanner;immutable;runtime;reflection;extensible</PackageTags>
-    <PackageAuthors>Ulf Bourelius;Zentient Framework Team</PackageAuthors>
+    <PackageTags>dx;domain;metadata;core;builder;scanner;immutable;runtime;reflection;extensible</PackageTags>
+    <PackageAuthors>Ulf Bourelius;Dx.Domain Team</PackageAuthors>
 
     <!-- Feature Flags -->
     <EnableSigning Condition="'$(EnableSigning)' == ''">true</EnableSigning>
@@ -69,7 +70,6 @@
     <InformationalVersion>$(Version)</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Zentient.Abstractions" Version="3.0.2" />
   </ItemGroup>
 
   <ItemGroup>
