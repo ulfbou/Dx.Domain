@@ -33,7 +33,7 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
                 """;
 
             var expected = new DiagnosticResult(DxRuleIds.DXA060, DiagnosticSeverity.Error)
-                .WithSpan(3, 30, 3, 40);
+                .WithSpan(5, 21, 5, 31);
 
             await AnalyzerTestHelper<DXA060_ForbiddenVocabularyAnalyzer>.VerifyAsync(
                 source,

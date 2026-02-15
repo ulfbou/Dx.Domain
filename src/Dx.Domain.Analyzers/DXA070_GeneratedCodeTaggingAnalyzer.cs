@@ -91,9 +91,9 @@ namespace Dx.Domain.Analyzers
         {
             var type = (INamedTypeSymbol)context.Symbol;
 
-            // Only analyze S1 and S2 scopes (domain and application)
+            // Only analyze consumer scope
             var scope = services.Scope.ResolveSymbol(type);
-            if (scope != Scope.S1 && scope != Scope.S2)
+            if (scope != Scope.S3)
                 return;
 
             // Check if type looks like generated code (heuristic)

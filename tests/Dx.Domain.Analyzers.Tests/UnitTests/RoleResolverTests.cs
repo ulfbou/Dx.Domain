@@ -97,7 +97,8 @@ namespace Test {{ public class Foo {{ }} }}
             var references = new[]
             {
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(DxAssemblyRoleAttribute).Assembly.Location)
+                MetadataReference.CreateFromFile(typeof(DxAssemblyRoleAttribute).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(System.Runtime.AssemblyTargetedPatchBandAttribute).Assembly.Location)
             };
 
             return CSharpCompilation.Create(

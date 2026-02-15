@@ -105,7 +105,10 @@ namespace Dx.Domain.Analyzers
 
             // Read allowList value from global options
             if (!options.TryGetValue("allowList", out var raw) || string.IsNullOrWhiteSpace(raw))
-                return ImmutableArray<string>.Empty;
+            {
+                if (!options.TryGetValue("dx_forbidden_vocab_allow", out raw) || string.IsNullOrWhiteSpace(raw))
+                    return ImmutableArray<string>.Empty;
+            }
 
             // Split the options into a list and create an ImmutableArray
             var allowList = raw.Split(separator, StringSplitOptions.RemoveEmptyEntries)
@@ -141,6 +144,11 @@ namespace Dx.Domain.Analyzers
 
             var scope = services.Scope.ResolveSymbol(symbol);
             if (scope != Scope.S3)
+                return;
+
+            // Honor allow list
+            var displayName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            if (allowList.Contains(displayName) || allowList.Contains(symbol.Name))
                 return;
 
             // Check if symbol name contains forbidden vocabulary

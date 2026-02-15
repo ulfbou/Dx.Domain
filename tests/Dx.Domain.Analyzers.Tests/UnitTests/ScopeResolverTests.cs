@@ -138,21 +138,22 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
         private static IAssemblySymbol CreateAssemblyWithAttribute(string attributeName, string layer)
         {
             var code = $@"""
-using System;
+using Dx.Domain.Annotations;
 
 [assembly: {attributeName}(""{layer}"")]
-
-public sealed class {attributeName}Attribute : Attribute
-{{
-    public {attributeName}Attribute(string layer) {{ }}
-}}
 
 namespace Test {{ public class Foo {{ }} }}""";
 
             var compilation = CSharpCompilation.Create(
                 "TestAssembly",
                 new[] { CSharpSyntaxTree.ParseText(code) },
-                new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) });
+                new[]
+                {
+                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(DxLayerAttribute).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(System.Runtime.AssemblyTargetedPatchBandAttribute).Assembly.Location)
+                },
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
             return compilation.Assembly;
         }

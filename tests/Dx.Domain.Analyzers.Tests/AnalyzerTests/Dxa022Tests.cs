@@ -32,7 +32,7 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
 
                 public sealed class Service
                 {
-                    public Result DoWork()
+                    public Result<Unit> DoWork()
                     {
                         throw new OrderFailureException();
                     }
@@ -56,7 +56,7 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
 
                 public sealed class Service
                 {
-                    public Result DoWork()
+                    public Result<Unit> DoWork()
                     {
                         throw new OrderFailureException();
                     }

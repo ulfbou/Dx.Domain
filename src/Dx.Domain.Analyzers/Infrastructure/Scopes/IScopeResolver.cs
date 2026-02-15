@@ -80,7 +80,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
         {
             foreach (var attribute in assembly.GetAttributes())
             {
-                if (!string.Equals(attribute.AttributeClass?.Name, "DxLayerAttribute", StringComparison.Ordinal))
+                var attributeName = attribute.AttributeClass?.Name;
+                if (!string.Equals(attributeName, "DxLayerAttribute", StringComparison.Ordinal) &&
+                    !string.Equals(attributeName, "DxLayer", StringComparison.Ordinal))
                     continue;
 
                 if (attribute.ConstructorArguments.Length == 1 && attribute.ConstructorArguments[0].Value is string raw)

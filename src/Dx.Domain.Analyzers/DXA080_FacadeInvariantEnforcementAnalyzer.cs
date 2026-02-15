@@ -95,9 +95,9 @@ namespace Dx.Domain.Analyzers
             if (services.Generated.IsGenerated(method))
                 return;
 
-            // Only analyze S1 and S2 scopes (domain and application)
+            // Only analyze consumer scope
             var scope = services.Scope.ResolveSymbol(method);
-            if (scope != Scope.S1 && scope != Scope.S2)
+            if (scope != Scope.S3)
                 return;
 
             // Check if this is a Dx facade factory method

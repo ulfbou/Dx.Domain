@@ -50,14 +50,24 @@ namespace Dx.Domain.Analyzers.Roles
         private static DxAssemblyRole? ResolveFromAttributes(Compilation compilation)
         {
             var attrs = compilation.Assembly.GetAttributes()
-                .Where(a => a.AttributeClass?.Name == "DxAssemblyRoleAttribute")
+                .Where(a =>
+                {
+                    var name = a.AttributeClass?.Name;
+                    return name != null && name.StartsWith("DxAssemblyRole", StringComparison.Ordinal);
+                })
                 .ToArray();
 
-            if (attrs.Length != 1)
+            if (attrs.Length == 0)
                 return null;
 
             var arg = attrs[0].ConstructorArguments.FirstOrDefault();
-            return arg.Value is int i ? (DxAssemblyRole)i : null;
+            if (arg.Value is int i)
+                return (DxAssemblyRole)i;
+
+            if (arg.Value is DxAssemblyRole role)
+                return role;
+
+            return null;
         }
     }
 }

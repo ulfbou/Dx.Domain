@@ -22,7 +22,7 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
 
                 public sealed class Service
                 {
-                    public Result DoWork() => Result.Success();
+                    public Result<Unit> DoWork() => default;
 
                     public void Test()
                     {
@@ -49,7 +49,7 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
 
                 public sealed class Service
                 {
-                    public Result DoWork() => Result.Success();
+                    public Result<Unit> DoWork() => default;
 
                     public void Test()
                     {
@@ -76,7 +76,7 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
 
                 public sealed class Service
                 {
-                    public Result DoWork() => Result.Success();
+                    public Result<Unit> DoWork() => default;
 
                     public void Test()
                     {
@@ -103,7 +103,7 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
 
                 public sealed class Service
                 {
-                    public Result DoWork() => Result.Success();
+                    public Result<Unit> DoWork() => default;
 
                     public void Test()
                     {
@@ -132,7 +132,7 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
 
                 public sealed class Service
                 {
-                    public Result DoWork() => Result.Success();
+                    public Result<Unit> DoWork() => default;
 
                     public void Test() => DoWork();
                 }
