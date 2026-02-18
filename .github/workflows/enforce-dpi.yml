@@ -57,6 +57,59 @@ jobs:
 
           echo "DPI checklist verified."
 
+      - name: Require role approvals for governance-sensitive changes
+        if: steps.core.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const org = context.repo.owner;
+            const pr  = context.issue.number;
+
+            // Files in this PR
+            const files = (await github.rest.pulls.listFiles({
+              ...context.repo, pull_number: pr
+            })).data.map(f => f.filename);
+
+            // Which areas are implicated?
+            const needsKernel = files.some(f =>
+              f.startsWith('src/Dx.Domain.Kernel/') ||
+              f.startsWith('docs/internal/governance/kernel-') ||
+              f === 'docs/internal/governance/api-freeze.md'
+            );
+            const needsAnalyzers = files.some(f =>
+              f.startsWith('src/Dx.Domain.Analyzers/') ||
+              f.startsWith('docs/internal/rules/analyzers/') ||
+              f === 'docs/internal/governance/analyzers-law.md' ||
+              f === 'docs/internal/governance/non-silence-axiom.md'
+            );
+
+            const requiredTeams = [];
+            if (needsKernel) requiredTeams.push('kernel-owners');
+            if (needsAnalyzers) requiredTeams.push('analyzers-owners');
+            if (requiredTeams.length === 0) { return; }
+
+            // Who approved?
+            const reviews = (await github.rest.pulls.listReviews({
+              ...context.repo, pull_number: pr
+            })).data.filter(r => r.state === 'APPROVED');
+            const approvers = [...new Set(reviews.map(r => r.user.login))];
+
+            for (const team of requiredTeams) {
+              let ok = false;
+              for (const login of approvers) {
+                try {
+                  await github.rest.teams.getMembershipForUserInOrg({
+                    org, team_slug: team, username: login
+                  });
+                  ok = true; break;
+                } catch { /* not a member */ }
+              }
+              if (!ok) {
+                core.setFailed(`Missing approval from @${org}/${team} for governance-sensitive changes.`);
+              }
+            }
+
       - name: No Core changes detected
         if: steps.core.outputs.changed == 'false'
         run: echo "No Dx.Domain.Core changes detected; DPI enforcement skipped."
