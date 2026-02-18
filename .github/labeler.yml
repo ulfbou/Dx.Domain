@@ -1,0 +1,13 @@
+# .github/labeler.yml
+area:kernel:
+  - "src/Dx.Domain.Kernel/**"
+  - "docs/internal/governance/kernel-*.md"
+
+area:analyzers:
+  - "src/Dx.Domain.Analyzers/**"
+  - "docs/internal/rules/analyzers/**"
+  - "docs/internal/governance/analyzers-law.md"
+  - "docs/internal/governance/non-silence-axiom.md"
+
+area:docs:
+  - "docs/**"
