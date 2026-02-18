@@ -6,6 +6,7 @@ using Dx.Domain.Errors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -66,10 +67,10 @@ public readonly struct TransitionResult<TState>
     /// <param name="facts">The domain facts emitted by the transition.</param>
     /// <returns>A <see cref="TransitionResult{TState}"/> representing a successful transition.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Factory helpers are intentional on TransitionResult.")]
     public static TransitionResult<TState> Success(TState state, IReadOnlyList<IDomainFact> facts)
     {
-        if (state == null)
-            throw new ArgumentNullException(nameof(state));
+        ArgumentNullException.ThrowIfNull(state);
 
         return new TransitionResult<TState>(
             Result<TState>.Success(state),
@@ -83,12 +84,11 @@ public readonly struct TransitionResult<TState>
     /// <param name="fact">The single domain fact emitted by the transition.</param>
     /// <returns>A <see cref="TransitionResult{TState}"/> representing a successful transition.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Factory helpers are intentional on TransitionResult.")]
     public static TransitionResult<TState> Success(TState state, IDomainFact fact)
     {
-        if (state == null)
-            throw new ArgumentNullException(nameof(state));
-        if (fact == null)
-            throw new ArgumentNullException(nameof(fact));
+        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(fact);
 
         return new TransitionResult<TState>(
             Result<TState>.Success(state),
@@ -104,10 +104,11 @@ public readonly struct TransitionResult<TState>
     /// and whose <see cref="Facts"/> collection is empty.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Factory helpers are intentional on TransitionResult.")]
     public static TransitionResult<TState> Failure(DomainError error)
     {
-        if (error == null)
-            throw new ArgumentNullException(nameof(error));
+        if (error.Equals(default))
+            throw new ArgumentException("Error must be initialized.", nameof(error));
 
         return new TransitionResult<TState>(
             Result<TState>.Failure(error),

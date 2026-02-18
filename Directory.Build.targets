@@ -1,13 +1,7 @@
-<!-- Directory.Build.targets -->
 <Project Label="Dx.Root.Egress">
-
-  <Import Project="$(DxBuildRoot)common/Dx.Defaults.props"
-          Condition="Exists('$(DxBuildRoot)common/Dx.Defaults.props')" />
-
-  <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets"
-          Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
-
-  <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets"
-          Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
-
+  <Import Project="$(DxBuildRoot)common/Dx.Defaults.props" Condition="Exists('$(DxBuildRoot)common/Dx.Defaults.props')" />
+  <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets" Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
+  <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
+  <!-- Single choke point: import analyzer governance only here -->
+  <Import Project="$(DxBuildRoot)policy/Dx.DomainAnalyzerGovernance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.DomainAnalyzerGovernance.targets')" />
 </Project>

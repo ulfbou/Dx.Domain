@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Immutable;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,6 +19,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 using Dx.Domain.Analyzers.Diagnostics;
+using Dx.Domain;
 using Dx.Domain.Analyzers.Roles;
 
 namespace Dx.Domain.Analyzers
@@ -30,15 +32,90 @@ namespace Dx.Domain.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(ctx =>
+            context.RegisterCompilationStartAction(startContext =>
             {
-                var role = RoleResolver.Resolve(ctx.SemanticModel.Compilation);
-                if (role is not (DxAssemblyRole.Domain or DxAssemblyRole.Application))
+                var scopeResolver = new Infrastructure.Scopes.ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                var scope = scopeResolver.ResolveAssembly(startContext.Compilation.Assembly);
+                if (IsKernelLikeLayer(startContext.Options.AnalyzerConfigOptionsProvider) ||
+                    scope != Infrastructure.Scopes.Scope.S3 ||
+                    IsKernelLikeAssembly(startContext.Compilation.AssemblyName) ||
+                    IsKernelLikeCompilation(startContext.Compilation))
                     return;
 
-                ctx.ReportDiagnostic(Diagnostic.Create(Dxk.DXK005, ctx.Node.GetLocation(), role));
-            }, SyntaxKind.ThrowStatement);
+                var services = new Infrastructure.AnalyzerServices(
+                    new Infrastructure.Scopes.ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider),
+                    new Infrastructure.Facades.DxFacadeResolver(startContext.Compilation, startContext.Options.AnalyzerConfigOptionsProvider),
+                    new Infrastructure.Facades.SemanticClassifier(startContext.Compilation),
+                    new Infrastructure.Exceptions.ExceptionIntentClassifier(startContext.Compilation, startContext.Options.AnalyzerConfigOptionsProvider),
+                    new Infrastructure.Flow.ResultFlowEngineWrapper(),
+                    new Infrastructure.Generated.GeneratedCodeDetector(startContext.Options.AnalyzerConfigOptionsProvider));
+
+                startContext.RegisterSyntaxNodeAction(ctx =>
+                {
+                    var containingSymbol = ctx.ContainingSymbol;
+                    if (containingSymbol == null)
+                        return;
+
+                    var assemblyName = containingSymbol.ContainingAssembly?.Name ??
+                                       ctx.SemanticModel.Compilation.AssemblyName;
+                    if (IsKernelLikeAssembly(assemblyName))
+                        return;
+
+                    if (IsKernelLikeLocation(containingSymbol))
+                        return;
+
+                    var filePath = ctx.Node.SyntaxTree?.FilePath;
+                    if (filePath != null && IsKernelLikeAssemblyFromPath(filePath))
+                        return;
+
+                    var scope = services.Scope.ResolveSymbol(containingSymbol);
+                    if (scope != Infrastructure.Scopes.Scope.S3)
+                        return;
+
+                    var role = RoleResolver.Resolve(ctx.SemanticModel.Compilation);
+                    if (role is not (DxAssemblyRole.Domain or DxAssemblyRole.Application))
+                        return;
+
+                    ctx.ReportDiagnostic(Diagnostic.Create(Dxk.DXK005, ctx.Node.GetLocation(), role));
+                }, SyntaxKind.ThrowStatement);
+            });
+        }
+
+        private static bool IsKernelLikeAssembly(string? assemblyName)
+        {
+            return string.Equals(assemblyName, "Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(assemblyName, "Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(assemblyName, "Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsKernelLikeAssemblyFromPath(string path)
+        {
+            return path.IndexOf("Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   path.IndexOf("Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   path.IndexOf("Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private static bool IsKernelLikeCompilation(Compilation compilation)
+        {
+            return compilation.SyntaxTrees.Any(tree => IsKernelLikeAssemblyFromPath(tree.FilePath));
+        }
+
+        private static bool IsKernelLikeLayer(AnalyzerConfigOptionsProvider optionsProvider)
+        {
+            if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
+                return false;
+
+            return string.Equals(layer, "Kernel", System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(layer, "Primitives", System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(layer, "Annotations", System.StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsKernelLikeLocation(ISymbol symbol)
+        {
+            return symbol.Locations.Any(location =>
+                IsKernelLikeAssemblyFromPath(location.SourceTree?.FilePath ?? string.Empty));
         }
     }
 }

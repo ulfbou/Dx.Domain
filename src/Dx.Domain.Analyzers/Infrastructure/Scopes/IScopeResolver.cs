@@ -15,7 +15,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 using System.Collections.Immutable;
 using System;
-using System.Linq;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Scopes
 {
@@ -33,10 +32,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
     /// assemblies or symbols should be treated according to their configured scope.</remarks>
     internal sealed class ScopeResolver : IScopeResolver
     {
-        private static readonly char[] ScopeSeparator = { ';' };
-
-        private readonly ImmutableDictionary<string, Scope> _assemblyMap;
-        private readonly ImmutableArray<string> _rootNamespaces;
+        private readonly string? _dxLayer;
+        private readonly string? _dxResolvedRole;
+        private readonly bool _isTestProject;
 
         /// <summary>
         /// Initializes a new instance of the ScopeResolver class using the specified analyzer configuration options.
@@ -45,81 +43,106 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
         /// namespaces. Cannot be null.</param>
         public ScopeResolver(AnalyzerConfigOptionsProvider config)
         {
-            _assemblyMap = ParseAssemblyMap(config);
-            _rootNamespaces = ParseRootNamespaces(config);
+            var options = config.GlobalOptions;
+            options.TryGetValue("build_property.DxLayer", out _dxLayer);
+            if (string.IsNullOrWhiteSpace(_dxLayer))
+            {
+                options.TryGetValue("dx.layer", out _dxLayer);
+            }
+
+            options.TryGetValue("build_property.DxResolvedRole", out _dxResolvedRole);
+
+            if (options.TryGetValue("build_property.IsTestProject", out var isTest))
+            {
+                _isTestProject = string.Equals(isTest, "true", StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         /// <inheritdoc/>
         public Scope ResolveAssembly(IAssemblySymbol assembly)
         {
+            if (IsKernelLikeAssembly(assembly.Name))
+                return Scope.S0;
+
+            if (_isTestProject)
+                return Scope.S0;
+
+            if (TryResolveScopeFromLayer(_dxLayer, out var layerScope))
+                return layerScope;
+
+            if (TryResolveScopeFromLayer(_dxResolvedRole, out var roleScope))
+                return roleScope;
+
             if (TryResolveScopeFromAttribute(assembly, out var attributeScope))
                 return attributeScope;
-
-            if (_assemblyMap.TryGetValue(assembly.Name, out var scope))
-                return scope;
-
-            foreach (var ns in _rootNamespaces)
-            {
-                if (assembly.GlobalNamespace.ToDisplayString().StartsWith(ns, StringComparison.Ordinal))
-                    return Scope.S3;
-            }
 
             return Scope.S3;
         }
 
         /// <inheritdoc/>
         public Scope ResolveSymbol(ISymbol symbol) =>
-            ResolveAssembly(symbol.ContainingAssembly);
-
-        private static ImmutableDictionary<string, Scope> ParseAssemblyMap(AnalyzerConfigOptionsProvider config)
-        {
-            var options = config.GlobalOptions;
-            if (!options.TryGetValue("dx.scope.map", out var raw))
-                return ImmutableDictionary<string, Scope>.Empty;
-
-            var builder = ImmutableDictionary.CreateBuilder<string, Scope>(StringComparer.Ordinal);
-
-            foreach (var entry in raw.Split(ScopeSeparator))
-            {
-                if (string.IsNullOrWhiteSpace(entry))
-                    continue;
-
-                var parts = entry.Split('=');
-                if (parts.Length == 2 && Enum.TryParse(parts[1].Trim(), out Scope scope))
-                    builder[parts[0].Trim()] = scope;
-            }
-
-            return builder.ToImmutable();
-        }
-
-        private static ImmutableArray<string> ParseRootNamespaces(AnalyzerConfigOptionsProvider config)
-        {
-            var options = config.GlobalOptions;
-            if (!options.TryGetValue("dx.scope.rootNamespaces", out var raw))
-                return ImmutableArray<string>.Empty;
-
-            return raw.Split(ScopeSeparator)
-                      .Select(s => s.Trim())
-                      .Where(s => s.Length != 0)
-                      .ToImmutableArray();
-        }
+            symbol is IAssemblySymbol assembly
+                ? ResolveAssembly(assembly)
+                : ResolveAssembly(symbol.ContainingAssembly);
 
         private static bool TryResolveScopeFromAttribute(IAssemblySymbol assembly, out Scope scope)
         {
             foreach (var attribute in assembly.GetAttributes())
             {
-                if (!string.Equals(attribute.AttributeClass?.ToDisplayString(), "Dx.Domain.Annotations.DxScopeAttribute", StringComparison.Ordinal))
+                if (!string.Equals(attribute.AttributeClass?.Name, "DxLayerAttribute", StringComparison.Ordinal))
                     continue;
 
-                if (attribute.ConstructorArguments.Length == 1 && attribute.ConstructorArguments[0].Value is int raw)
+                if (attribute.ConstructorArguments.Length == 1 && attribute.ConstructorArguments[0].Value is string raw)
                 {
-                    scope = (Scope)raw;
-                    return true;
+                    if (TryResolveScopeFromLayer(raw, out var attributeScope))
+                    {
+                        scope = attributeScope;
+                        return true;
+                    }
                 }
             }
 
             scope = Scope.S3;
             return false;
+        }
+
+        private static bool TryResolveScopeFromLayer(string? raw, out Scope scope)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                scope = Scope.S3;
+                return false;
+            }
+
+            if (string.Equals(raw, "Kernel", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(raw, "Primitives", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(raw, "Annotations", StringComparison.OrdinalIgnoreCase))
+            {
+                scope = Scope.S0;
+                return true;
+            }
+
+            if (string.Equals(raw, "Consumer", StringComparison.OrdinalIgnoreCase))
+            {
+                scope = Scope.S3;
+                return true;
+            }
+
+            if (string.Equals(raw, "Test", StringComparison.OrdinalIgnoreCase))
+            {
+                scope = Scope.S0;
+                return true;
+            }
+
+            scope = Scope.S3;
+            return false;
+        }
+
+        private static bool IsKernelLikeAssembly(string? assemblyName)
+        {
+            return string.Equals(assemblyName, "Dx.Domain.Kernel", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(assemblyName, "Dx.Domain.Primitives", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(assemblyName, "Dx.Domain.Annotations", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

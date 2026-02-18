@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Immutable;
+using System.Linq;
 
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
@@ -19,6 +20,7 @@ using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
@@ -60,13 +62,24 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
+                var assemblyName = startContext.Compilation.AssemblyName;
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                var scope = scopeResolver.ResolveAssembly(startContext.Compilation.Assembly);
+                if (IsKernelLikeLayer(startContext.Options.AnalyzerConfigOptionsProvider) ||
+                    scope != Scope.S3 || IsKernelLikeAssembly(assemblyName) || IsKernelLikeCompilation(startContext.Compilation))
+                    return;
+
                 var services = CreateServices(startContext);
 
                 startContext.RegisterOperationAction(operationContext =>
                 {
                     AnalyzeObjectCreation(operationContext, services);
+                }, OperationKind.ObjectCreation);
+
+                startContext.RegisterOperationAction(operationContext =>
+                {
                     AnalyzeFactoryInvocation(operationContext, services);
-                }, OperationKind.ObjectCreation, OperationKind.Invocation);
+                }, OperationKind.Invocation);
             });
         }
 
@@ -88,7 +101,30 @@ namespace Dx.Domain.Analyzers
 
         private static void AnalyzeObjectCreation(OperationAnalysisContext context, AnalyzerServices services)
         {
-            var operation = (IObjectCreationOperation)context.Operation;
+            if (context.Operation is not IObjectCreationOperation operation)
+                return;
+
+            var syntax = operation.Syntax;
+            if (syntax == null)
+                return;
+
+            if (context.ContainingSymbol is IAssemblySymbol)
+                return;
+
+            if (IsKernelLikeAssembly(context.ContainingSymbol.ContainingAssembly?.Name))
+                return;
+
+            if (IsKernelLikeLocation(context.ContainingSymbol))
+                return;
+
+            if (IsKernelLikePath(syntax.SyntaxTree?.FilePath))
+                return;
+
+            if (IsKernelAssembly(context.ContainingSymbol.ContainingAssembly))
+                return;
+
+            if (IsAttributeOperation(operation))
+                return;
 
             // Skip if generated code
             if (operation.Type != null && services.Generated.IsGenerated(operation.Type))
@@ -101,8 +137,7 @@ namespace Dx.Domain.Analyzers
             // Get the scope of the call site
             var callSiteScope = services.Scope.ResolveSymbol(context.ContainingSymbol);
 
-            // S0 (kernel) is trusted - allow direct construction
-            if (callSiteScope == Scope.S0)
+            if (!IsConsumerScope(callSiteScope))
                 return;
 
             // Check if we're inside a type constructor of the type itself
@@ -110,13 +145,36 @@ namespace Dx.Domain.Analyzers
                 return;
 
             // Report diagnostic
-            var diagnostic = Diagnostic.Create(Rule, operation.Syntax.GetLocation());
+            var diagnostic = Diagnostic.Create(Rule, syntax.GetLocation());
             context.ReportDiagnostic(diagnostic);
         }
 
         private static void AnalyzeFactoryInvocation(OperationAnalysisContext context, AnalyzerServices services)
         {
-            var operation = (IInvocationOperation)context.Operation;
+            if (context.Operation is not IInvocationOperation operation)
+                return;
+
+            var syntax = operation.Syntax;
+            if (syntax == null)
+                return;
+
+            if (context.ContainingSymbol is IAssemblySymbol)
+                return;
+
+            if (IsKernelLikeAssembly(context.ContainingSymbol.ContainingAssembly?.Name))
+                return;
+
+            if (IsKernelLikeLocation(context.ContainingSymbol))
+                return;
+
+            if (IsKernelLikePath(syntax.SyntaxTree?.FilePath))
+                return;
+
+            if (IsKernelAssembly(context.ContainingSymbol.ContainingAssembly))
+                return;
+
+            if (IsAttributeOperation(operation))
+                return;
 
             // Skip if generated code
             if (services.Generated.IsGenerated(operation.TargetMethod))
@@ -133,8 +191,7 @@ namespace Dx.Domain.Analyzers
             // Get the scope of the call site
             var callSiteScope = services.Scope.ResolveSymbol(context.ContainingSymbol);
 
-            // S0 (kernel) is trusted
-            if (callSiteScope == Scope.S0)
+            if (!IsConsumerScope(callSiteScope))
                 return;
 
             // Check if this is a Dx facade factory method
@@ -142,13 +199,24 @@ namespace Dx.Domain.Analyzers
                 return;
 
             // Report diagnostic
-            var diagnostic = Diagnostic.Create(Rule, operation.Syntax.GetLocation());
+            var diagnostic = Diagnostic.Create(Rule, syntax.GetLocation());
             context.ReportDiagnostic(diagnostic);
         }
 
         private static bool IsDomainType(ITypeSymbol? type, AnalyzerServices services)
         {
             if (type == null)
+                return false;
+
+            if (type.Name == "DxAssemblyRoleAttribute")
+                return false;
+
+            if (type is INamedTypeSymbol named && InheritsFromException(named))
+                return false;
+
+            if (services.Semantic.IsKernelResultType(type) ||
+                services.Semantic.IsDomainErrorType(type) ||
+                services.Semantic.IsInvariantException(type))
                 return false;
 
             // Check if it's a Result type (domain types return Result)
@@ -175,6 +243,69 @@ namespace Dx.Domain.Analyzers
             }
 
             return false;
+        }
+
+        private static bool IsAttributeOperation(IOperation operation)
+        {
+            return operation.Syntax is AttributeSyntax ||
+                   operation.Syntax is AttributeListSyntax ||
+                   operation.Syntax?.AncestorsAndSelf().OfType<AttributeSyntax>().Any() == true;
+        }
+
+        private static bool IsConsumerScope(Scope scope) => scope == Scope.S3;
+
+        private static bool IsKernelLikeAssembly(string? name)
+        {
+            return string.Equals(name, "Dx.Domain.Kernel", System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(name, "Dx.Domain.Primitives", System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(name, "Dx.Domain.Annotations", System.StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsKernelLikePath(string? path)
+        {
+            return path != null &&
+                   (path.IndexOf("Dx.Domain.Kernel", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    path.IndexOf("Dx.Domain.Primitives", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    path.IndexOf("Dx.Domain.Annotations", System.StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
+        private static bool IsKernelLikeCompilation(Compilation compilation)
+        {
+            return compilation.SyntaxTrees.Any(tree => IsKernelLikePath(tree.FilePath));
+        }
+
+        private static bool IsKernelLikeLayer(AnalyzerConfigOptionsProvider optionsProvider)
+        {
+            if (!optionsProvider.GlobalOptions.TryGetValue("build_property.DxLayer", out var layer))
+                return false;
+
+            return string.Equals(layer, "Kernel", System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(layer, "Primitives", System.StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(layer, "Annotations", System.StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsKernelLikeLocation(ISymbol symbol)
+        {
+            return symbol.Locations.Any(location =>
+                IsKernelLikePath(location.SourceTree?.FilePath));
+        }
+
+        private static bool InheritsFromException(INamedTypeSymbol type)
+        {
+            for (var current = type; current != null; current = current.BaseType)
+            {
+                if (current.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::System.Exception")
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsKernelAssembly(IAssemblySymbol? assembly)
+        {
+            var name = assembly?.Name;
+            return name != null &&
+                   name.IndexOf("Dx.Domain.Kernel", System.StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

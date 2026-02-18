@@ -61,6 +61,10 @@ namespace Dx.Domain.Analyzers
 
             context.RegisterCompilationStartAction(startContext =>
             {
+                var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+                if (scopeResolver.ResolveAssembly(startContext.Compilation.Assembly) != Scope.S3)
+                    return;
+
                 var services = CreateServices(startContext);
 
                 startContext.RegisterSymbolAction(symbolContext =>
@@ -94,11 +98,8 @@ namespace Dx.Domain.Analyzers
             if (services.Generated.IsGenerated(type))
                 return;
 
-            // Only analyze S0 and S1 scopes (kernel and domain)
-            // S0 (kernel) is WHERE factories are typically defined and should be checked
-            // S1 (domain) also needs to be checked for domain types
             var scope = services.Scope.ResolveSymbol(type);
-            if (scope != Scope.S0 && scope != Scope.S1)
+            if (scope != Scope.S3)
                 return;
 
             // Use centralized semantic classifier for domain type detection

@@ -1,20 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" Label="Dx.Domain.Kernel">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
-
+    <DxLayer>Kernel</DxLayer>
     <RootNamespace>Dx.Domain</RootNamespace>
     <AssemblyName>Dx.Domain.Kernel</AssemblyName>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-    <Description>
-      The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.
-      It exists to make incorrect domain modeling impossible to ignore, not to act as a convenience library.
-    </Description>
+    <Description>The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.</Description>
     <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="DxLayer" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Dx.Domain.Values" />
@@ -28,14 +28,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="buildTransitive\Dx.Domain.targets" Pack="true" PackagePath="buildTransitive" />
-    <None Update="../../CHANGELOG.md" Link="docs/CHANGELOG.md" />
-    <None Update="../../README.md" Link="docs/README.md" />
-    <None Update="../../LICENSE" Link="docs/LICENSE" />
+    <!-- Embed the analyzer so consumers get rules automatically -->
+    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll"
+          Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="..\..\CHANGELOG.md" Link="docs/CHANGELOG.md" />
+    <None Update="..\..\README.md" Link="docs/README.md" />
+    <None Update="..\..\LICENSE" Link="docs/LICENSE" />
+  </ItemGroup>
 </Project>

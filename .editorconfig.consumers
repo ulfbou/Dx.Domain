@@ -1,0 +1,23 @@
+root = true
+
+[*.cs]
+dotnet_analyzer_diagnostic.category-Style.severity = silent
+dotnet_analyzer_diagnostic.category-Performance.severity = suggestion
+dotnet_analyzer_diagnostic.category-Design.severity = suggestion
+
+build_property.DxLayer = S3
+dx_facade_root = Dx.Dx
+dx_result_handlers = Dx.Domain.ResultExtensions.Match;Dx.Domain.ResultExtensions.Bind;Dx.Domain.ResultExtensions.Map
+
+dx_exception_intent.validation = System.ArgumentException;System.ArgumentNullException;System.ArgumentOutOfRangeException;System.InvalidOperationException
+dx_exception_intent.controlFlow = System.OperationCanceledException;System.Threading.Tasks.TaskCanceledException
+dx_exception_domain_types =
+
+# Conservative defaults to avoid noisy builds for external consumers
+dotnet_diagnostic.DXA020.severity = error
+dotnet_diagnostic.DXA022.severity = warning
+dotnet_diagnostic.DXA010.severity = warning
+dotnet_diagnostic.DXA011.severity = warning
+dotnet_diagnostic.DXA080.severity = warning
+dotnet_diagnostic.DXA060.severity = warning
+dotnet_diagnostic.DXA070.severity = suggestion

@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
+using Dx.Domain;
+
 namespace Dx.Domain.Analyzers.Roles
 {
     internal static class RoleMatrix
@@ -22,8 +24,8 @@ namespace Dx.Domain.Analyzers.Roles
         private static readonly Dictionary<DxAssemblyRole, DxAssemblyRole[]> Allowed = new()
         {
             { DxAssemblyRole.Contracts, new[]{ DxAssemblyRole.Contracts } },
-            { DxAssemblyRole.Domain, new[]{ DxAssemblyRole.Domain, DxAssemblyRole.Application } },
-            { DxAssemblyRole.Application, new[]{ DxAssemblyRole.Domain, DxAssemblyRole.Application } },
+            { DxAssemblyRole.Domain, new[]{ DxAssemblyRole.Contracts, DxAssemblyRole.Domain, DxAssemblyRole.Application, DxAssemblyRole.Shared } },
+            { DxAssemblyRole.Application, new[]{ DxAssemblyRole.Contracts, DxAssemblyRole.Domain, DxAssemblyRole.Application, DxAssemblyRole.Shared } },
             { DxAssemblyRole.Infrastructure, new[]{ DxAssemblyRole.Domain, DxAssemblyRole.Application, DxAssemblyRole.Infrastructure } },
             { DxAssemblyRole.Host, new[]{ DxAssemblyRole.Application, DxAssemblyRole.Infrastructure, DxAssemblyRole.Host } },
             { DxAssemblyRole.Shared, new[]{ DxAssemblyRole.Shared } }

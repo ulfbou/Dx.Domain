@@ -1,0 +1,30 @@
+root = true
+
+[*.cs]
+dotnet_analyzer_diagnostic.category-Style.severity = silent
+dotnet_analyzer_diagnostic.category-Performance.severity = warning
+dotnet_analyzer_diagnostic.category-Design.severity = warning
+
+# Dx analyzers: configuration keys supported by your analyzer code
+build_property.DxLayer = Kernel
+dx_facade_root = Dx.Dx
+dx_result_handlers = Dx.Domain.ResultExtensions.Match;Dx.Domain.ResultExtensions.Bind;Dx.Domain.ResultExtensions.Map
+
+dx_exception_intent.validation = System.ArgumentException;System.ArgumentNullException;System.ArgumentOutOfRangeException;System.InvalidOperationException
+dx_exception_intent.controlFlow = System.OperationCanceledException;System.Threading.Tasks.TaskCanceledException
+dx_exception_domain_types =
+
+# Strict gates (maintainers/CI)
+dotnet_diagnostic.DXA040.severity = error     # Kernel Public Surface Freeze
+dotnet_diagnostic.DXA020.severity = error     # Result ignored
+dotnet_diagnostic.DXA022.severity = warning   # Discouraged domain control exception
+dotnet_diagnostic.DXA010.severity = error     # Construction authority
+dotnet_diagnostic.DXA011.severity = error     # Public factory exposure
+dotnet_diagnostic.DXA080.severity = warning   # Facade invariant enforcement
+dotnet_diagnostic.DXA060.severity = error     # Forbidden vocabulary (kernel/domain)
+dotnet_diagnostic.DXK001.severity = error     # Assembly role required
+dotnet_diagnostic.DXK002.severity = error     # Illegal role dependency
+dotnet_diagnostic.DXK003.severity = error     # Domain purity
+dotnet_diagnostic.DXK007.severity = error     # Contract hygiene
+dotnet_diagnostic.DXK008.severity = warning   # Observability invariant
+dotnet_diagnostic.DXA070.severity = warning   # Generated code tagging

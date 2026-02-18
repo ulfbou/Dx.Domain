@@ -13,6 +13,8 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+
+using Dx.Domain;
 using System.Runtime.CompilerServices;
 
 namespace Dx.Domain.Primitives
@@ -28,6 +30,7 @@ namespace Dx.Domain.Primitives
     /// </remarks>
     [DebuggerDisplay("{ToString(),nq}")]
     public readonly struct TraceId :
+        IIdentity,
         IEquatable<TraceId>,
         IParsable<TraceId>,
         ISpanFormattable

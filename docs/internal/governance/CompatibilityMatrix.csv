@@ -1,0 +1,4 @@
+"ChangeId";"Area";"Rule/ID";"AffectedPackages";"PublicTypesOrMembers";"DefaultSeverity";"ExpectedConsumerAction";"Mitigation/Compatibility";"Notes"
+"RP-000";"Docs only";"(none)";"(none)";"(none)";"(none)";"None";"(none)";"Establishes Analyzers Law; no behavior change"
+"RP-001";"Analyzer infrastructure";"ScopeResolver precision";"Dx.Domain.Analyzers";"Dx.Domain.Analyzers.ScopeResolver";"N/A";"None";"Fail-open maintained; classification tests added";"No runtime coupling to Kernel remains" 
+"RP-002";"Diagnostics docs";"DXA010/020/022/040 docs";"Dx.Domain.Analyzers";"N/A";"N/A";"Review docs only";"No rule behavior change";"Rule catalog receives scope tables"

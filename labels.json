@@ -1,0 +1,48 @@
+[
+  { "name": "area:kernel",       "color": "0366d6", "description": "Kernel code or governance" },
+  { "name": "area:analyzers",    "color": "0e8a16", "description": "Analyzer rules/infrastructure" },
+  { "name": "area:annotations",  "color": "1d76db", "description": "Annotations/abstractions" },
+  { "name": "area:primitives",   "color": "0052cc", "description": "Primitives package" },
+  { "name": "area:facts",        "color": "5b6ac0", "description": "Facts/causation" },
+  { "name": "area:docs",         "color": "5319e7", "description": "Documentation" },
+  { "name": "area:governance",   "color": "c2e0c6", "description": "Policies, laws, ADRs" },
+  { "name": "area:ci",           "color": "bfd4f2", "description": "CI workflows and gates" },
+  { "name": "area:build",        "color": "f9d0c4", "description": "Build/packaging/tooling" },
+
+  { "name": "type:bug",          "color": "d73a4a", "description": "Defect or regression" },
+  { "name": "type:feat",         "color": "a2eeef", "description": "Feature request" },
+  { "name": "type:refactor",     "color": "cfd3d7", "description": "Internal cleanup; no behavior change" },
+  { "name": "type:docs",         "color": "c5def5", "description": "Documentation-only" },
+  { "name": "type:rfc",          "color": "fbca04", "description": "Design discussion leading to ADR" },
+  { "name": "type:chore",        "color": "ededed", "description": "Housekeeping" },
+
+  { "name": "prio:P0",           "color": "b60205", "description": "Urgent/breakage" },
+  { "name": "prio:P1",           "color": "e99695", "description": "Next release" },
+  { "name": "prio:P2",           "color": "f9d0c4", "description": "Backlog" },
+  { "name": "prio:P3",           "color": "fef2c0", "description": "Nice-to-have" },
+
+  { "name": "impact:breaking",   "color": "a295d6", "description": "Potentially breaks consumers" },
+  { "name": "impact:behavioral", "color": "b1f2ff", "description": "Behavior changes but not breaking" },
+  { "name": "impact:docs-only",  "color": "d4c5f9", "description": "Docs only; no code impact" },
+
+  { "name": "scope:S0",          "color": "5319e7", "description": "Kernel scope" },
+  { "name": "scope:S1",          "color": "0052cc", "description": "Domain facades scope" },
+  { "name": "scope:S2",          "color": "0e8a16", "description": "Application scope" },
+  { "name": "scope:S3",          "color": "0366d6", "description": "Consumer scope" },
+
+  { "name": "rule:DXA010",       "color": "f9d0c4", "description": "Construction authority" },
+  { "name": "rule:DXA020",       "color": "f9d0c4", "description": "Result ignored" },
+  { "name": "rule:DXA022",       "color": "f9d0c4", "description": "Result vs throw" },
+  { "name": "rule:DXA040",       "color": "f9d0c4", "description": "Kernel API freeze" },
+  { "name": "rule:DXK002",       "color": "fef2c0", "description": "Illegal dependency (role matrix)" },
+  { "name": "rule:DXK007",       "color": "fef2c0", "description": "Illegal dependency (variant)" },
+
+  { "name": "needs-approval",    "color": "bfe5bf", "description": "Awaiting governance approval" },
+  { "name": "approved",          "color": "0e8a16", "description": "Approved for merge" },
+  { "name": "approved-breaking", "color": "b60205", "description": "Approved with breaking change & mitigation" },
+
+  { "name": "status:blocked",        "color": "d73a4a", "description": "Blocked on external dependency or decision" },
+  { "name": "status:ready-for-review","color": "0e8a16", "description": "Ready for maintainers to review" },
+  { "name": "status:needs-info",     "color": "fbca04", "description": "Needs more information" },
+  { "name": "good-first-issue",      "color": "7057ff", "description": "Low-risk starter issue" }
+]

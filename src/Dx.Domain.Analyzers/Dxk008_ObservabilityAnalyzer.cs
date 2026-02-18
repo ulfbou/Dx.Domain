@@ -16,6 +16,7 @@ using System.Linq;
 using Dx.Domain.Analyzers.Diagnostics;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Observability;
+using Dx.Domain;
 using Dx.Domain.Analyzers.Roles;
 
 using Microsoft.CodeAnalysis;
@@ -59,7 +60,7 @@ namespace Dx.Domain.Analyzers
         private static void AnalyzeInvocation(
             OperationAnalysisContext context,
             CorrelationIdPropagationChecker checker,
-            IGeneratedCodeDetector generated)
+            GeneratedCodeDetector generated)
         {
             var invocation = (IInvocationOperation)context.Operation;
 

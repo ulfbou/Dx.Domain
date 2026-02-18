@@ -280,6 +280,7 @@ namespace Dx.Domain
             }
             catch (Exception ex)
             {
+                // return Result.Failure<T, TError>(...) would hide the original exception
                 throw InvariantViolationException.Create(
                     "Result.Recover.RecoveryFunctionThrewException",
                     "An error occurred while executing the recovery function.",
@@ -299,6 +300,7 @@ namespace Dx.Domain
             }
             catch (Exception ex)
             {
+                // return Result.Failure<T, TError>(...) would hide the original exception
                 throw InvariantViolationException.Create(
                     "Result.Recover.RecoveryFunctionThrewException",
                     "An error occurred while executing the recovery function.",
@@ -320,6 +322,7 @@ namespace Dx.Domain
             }
             catch (Exception ex)
             {
+                // return Result.Failure<T, TError>(...) would hide the original exception
                 throw InvariantViolationException.Create(
                     "Result.Recover.RecoveryFunctionThrewException",
                     "An error occurred while executing the recovery function.",
@@ -341,6 +344,7 @@ namespace Dx.Domain
             }
             catch (Exception ex)
             {
+                // return Result.Failure<T, TError>(...) would hide the original exception
                 throw InvariantViolationException.Create(
                     "Result.Recover.RecoveryFunctionThrewException",
                     "An error occurred while executing the recovery function.",

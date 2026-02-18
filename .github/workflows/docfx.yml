@@ -23,10 +23,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK (install 9.0.100 to match global.json)
+      - name: Setup .NET SDKs (8.x, 9.0.100, 10.x)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.100'
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: Dotnet --list-sdks (diagnostic)
+        run: dotnet --info
 
       - name: Dotnet info (diagnostic)
         run: dotnet --info
@@ -40,21 +46,21 @@ jobs:
       - name: Build documentation
         run: docfx docfx.json --output _site
 
-      - name: Copy additional documentation (Markdown, YAML, images)
-        run: |
-          set -euo pipefail
-          mkdir -p _site/docs
-          cp -r docs/* _site/docs/ || true
-          find . -maxdepth 1 -type f \( -name '*.md' -o -name '*.yml' \) -exec cp {} _site/ \;
-          # Copy common static assets if present
-          for ext in png jpg jpeg gif svg pdf; do
-            find docs/ -type f -name "*.$ext" -exec cp --parents {} _site/ \; || true
-          done
-          # Copy all assets (images, diagrams, etc.) from assets/ to _site/assets
-          if [ -d assets ]; then
-            mkdir -p _site/assets
-            cp -r assets/* _site/assets/ || true
-          fi
+      # - name: Copy additional documentation (Markdown, YAML, images)
+      #   run: |
+      #     set -euo pipefail
+      #     mkdir -p _site/docs
+      #     cp -r docs/* _site/docs/ || true
+      #     find . -maxdepth 1 -type f \( -name '*.md' -o -name '*.yml' \) -exec cp {} _site/ \;
+      #     # Copy common static assets if present
+      #     for ext in png jpg jpeg gif svg pdf; do
+      #       find docs/ -type f -name "*.$ext" -exec cp --parents {} _site/ \; || true
+      #     done
+      #     # Copy all assets (images, diagrams, etc.) from assets/ to _site/assets
+      #     if [ -d assets ]; then
+      #       mkdir -p _site/assets
+      #       cp -r assets/* _site/assets/ || true
+      #     fi
 
       - name: Upload generated site as artifact
         uses: actions/upload-artifact@v4

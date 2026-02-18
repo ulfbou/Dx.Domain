@@ -1,16 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" Label="Dx.Domain.Primitives">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
-
+    <DxLayer>Primitives</DxLayer>
     <AssemblyName>Dx.Domain.Primitives</AssemblyName>
     <RootNamespace>Dx.Domain.Primitives</RootNamespace>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>
-      The Dx.Domain.Primitives package provides low-level, opinionated primitives for domain modeling and
-      observability, including strongly-typed identifiers (ActorId, FactId), correlation and trace identifiers
-      (CorrelationId, TraceId, SpanId), and related helpers. These types are designed to be immutable, value-based,
-      and suitable for use as keys, identifiers, and tracing anchors across services.
+      The Dx.Domain.Primitives package provides low-level primitives for domain modeling and observability.
     </Description>
     <PackageTags>dx;ddd;primitives;actor-id;fact-id;correlation-id;trace-id;span-id;observability</PackageTags>
     <Authors>Dx.Domain Team</Authors>
@@ -23,22 +19,29 @@
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="DxLayer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Embed the analyzer so consumers get rules automatically -->
+    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll"
+          Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="CHANGELOG.md" Link="docs/CHANGELOG.md" />
     <None Update="README.md" Link="docs/README.md" />
-    <None Update="../../LICENSE" Link="docs/LICENSE" />
+    <None Update="..\..\LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(UseAnalyzersPackage)' == 'true'">
-    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  <ItemGroup>
+    <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(UseAnalyzersPackage)' != 'true'">
-    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj"
-                      PrivateAssets="all"
-                      ReferenceOutputAssembly="false"
-                      OutputItemType="Analyzer" />
-  </ItemGroup>
-
 </Project>

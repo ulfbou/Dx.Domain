@@ -1,15 +1,16 @@
 <Project Label="Dx.Root.Ingress">
-
   <PropertyGroup>
-    <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">
-      $(MSBuildThisFileDirectory)builds\
-    </DxBuildRoot>
-
+    <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
     <DxPropsImported Condition="'$(DxPropsImported)' == ''">false</DxPropsImported>
   </PropertyGroup>
 
-  <Import Project="$(DxBuildRoot)Dx.Props.hierarchical.props"
-          Condition="'$(DxPropsImported)' != 'true'
-                 AND Exists('$(DxBuildRoot)Dx.Props.hierarchical.props')" />
+  <PropertyGroup>
+    <EnablePublicApiAnalyzers>true</EnablePublicApiAnalyzers>
+  </PropertyGroup>
 
+  <ItemGroup Condition="'$(EnablePublicApiAnalyzers)' == 'true'">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Import Project="$(DxBuildRoot)Dx.Props.hierarchical.props" Condition="'$(DxPropsImported)' != 'true' AND Exists('$(DxBuildRoot)Dx.Props.hierarchical.props')" />
 </Project>

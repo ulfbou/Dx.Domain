@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
+using Dx.Domain;
 using Dx.Domain.Analyzers.Roles;
 
 namespace Dx.Domain.Analyzers.Templates
@@ -35,6 +36,14 @@ namespace Dx.Domain.Analyzers.Templates
             }.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
 
         public static bool TryGet(string templateId, out TemplateDefinition definition)
-            => Map.TryGetValue(templateId, out definition);
+        {
+            if (string.IsNullOrWhiteSpace(templateId))
+            {
+                definition = default!;
+                return false;
+            }
+
+            return Map.TryGetValue(templateId, out definition!);
+        }
     }
 }

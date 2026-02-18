@@ -12,6 +12,8 @@
 
 using System.Linq;
 
+using Dx.Domain;
+
 using Microsoft.CodeAnalysis;
 
 namespace Dx.Domain.Analyzers.Roles

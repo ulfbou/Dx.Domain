@@ -12,6 +12,7 @@
 
 using Microsoft.CodeAnalysis;
 
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -29,6 +30,11 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
         private readonly ImmutableHashSet<INamedTypeSymbol> _resultTypes;
         private readonly INamedTypeSymbol? _domainError;
         private readonly INamedTypeSymbol? _invariantViolation;
+        private static readonly string[] DomainMarkerAttributes =
+        {
+            "AggregateRootAttribute",
+            "ValueObjectAttribute"
+        };
 
         public SemanticClassifier(Compilation compilation)
         {
@@ -65,15 +71,48 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
 
         public bool IsDomainType(ITypeSymbol type)
         {
-            // Centralized domain type detection
+            if (type is not INamedTypeSymbol named)
+                return false;
+
+            if (HasDomainMarker(named))
+                return true;
+
+            if (ImplementsDomainInterface(named))
+                return true;
+
             var ns = type.ContainingNamespace?.ToDisplayString();
             if (ns == null)
                 return false;
 
-            // Check for Dx.Domain namespace or domain-related namespaces
             return ns.StartsWith("Dx.Domain", System.StringComparison.Ordinal) ||
                    ns.Contains(".Domain.") ||
                    ns.EndsWith(".Domain", System.StringComparison.Ordinal);
+        }
+
+        private static bool HasDomainMarker(INamedTypeSymbol type)
+        {
+            foreach (var attribute in type.GetAttributes())
+            {
+                var name = attribute.AttributeClass?.Name;
+                if (name == null)
+                    continue;
+
+                if (DomainMarkerAttributes.Contains(name, System.StringComparer.Ordinal))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool ImplementsDomainInterface(INamedTypeSymbol type)
+        {
+            foreach (var iface in type.AllInterfaces)
+            {
+                if (iface.Name == "IAggregateRoot" || iface.Name == "IValueObject")
+                    return true;
+            }
+
+            return false;
         }
 
         private static ImmutableHashSet<INamedTypeSymbol> LoadResultTypes(Compilation c)

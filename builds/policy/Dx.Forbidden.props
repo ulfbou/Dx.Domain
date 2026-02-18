@@ -9,5 +9,4 @@
     <DxForbiddenProperty Include="TreatWarningsAsErrors" />
     <DxForbiddenProperty Include="GenerateDocumentationFile" />
   </ItemGroup>
-
 </Project>

@@ -1,0 +1,42 @@
+# path: .github/workflows/labels-sync.yml
+name: Labels Sync
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/labels-sync.yml'
+      - 'scripts/labels-seed.sh'
+      - 'labels.json'
+
+# Least-privilege for updating repository labels via REST API
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: labels-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure script is executable
+        run: chmod +x scripts/labels-seed.sh
+
+      - name: Sync labels from labels.json
+        env:
+          REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/labels-seed.sh
+
+      - name: Show changed files (debug)
+        if: always()
+        run: |
+          echo "Changed files in this push:"
+          git fetch --depth=2 origin ${{ github.ref }}
+          git diff --name-only HEAD~1 HEAD || true

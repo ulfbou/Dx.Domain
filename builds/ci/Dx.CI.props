@@ -1,10 +1,8 @@
 <Project Label="Dx.CI.Discipline">
-
   <PropertyGroup>
     <DxCI>true</DxCI>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <DisableBuildServer>true</DisableBuildServer>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
 </Project>
