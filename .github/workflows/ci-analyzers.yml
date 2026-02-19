@@ -1,0 +1,43 @@
+# path: .github/workflows/ci-analyzers.yml
+name: CI (Analyzers & Docs Governance)
+on:
+  pull_request:
+    branches: [ main ]
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: List installed SDKs
+        run: dotnet --list-sdks
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (warnings as errors for DX*)
+        run: dotnet build -warnaserror
+
+      - name: Run analyzer tests
+        run: dotnet test tests/Dx.Domain.Analyzers.Tests -c Release --no-build
+
+      - name: Public API baseline check (Analyzers)
+        run: dotnet build src/Dx.Domain.Analyzers/Dx.Domain.Analyzers.csproj -p:GeneratePublicApi=true
+
+      - name: Docs lint (broken links + metadata)
+        if: hashFiles('scripts/docs-lint.sh') != ''
+        run: scripts/docs-lint.sh  # checks YAML front matter, links under docs/
+
+      - name: Snippet compile (public docs)
+        if: hashFiles('scripts/docs-snippets-compile.sh') != ''
+        run: scripts/docs-snippets-compile.sh docs/public net8.0
+
+      - name: Block unapproved breaking changes
+        run: scripts/api-diff-gate.sh  # fails on public API diff unless PR label "approved-breaking" present

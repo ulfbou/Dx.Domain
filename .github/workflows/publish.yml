@@ -1,0 +1,73 @@
+name: publish
+on:
+  push:
+    tags:
+      - 'v*'   # v0.1.0, v0.1.0-rc.1, v0.1.0-beta.1, v0.1.0-alpha.5
+
+jobs:
+  pack-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_FEED: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      NUGET_FEED:  https://api.nuget.org/v3/index.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: Restore
+        run: dotnet restore
+
+      # 1) Build analyzers first (so the DLL exists for embed)
+      - name: Build analyzers
+        run: dotnet build src/Dx.Domain.Analyzers/Dx.Domain.Analyzers.csproj -c Release --no-restore
+
+      # 2) Build and pack all
+      - name: Build all (Release)
+        run: dotnet build -c Release --no-restore
+
+      - name: Pack Annotations
+        run: dotnet pack src/Dx.Domain.Annotations/Dx.Domain.Annotations.csproj -c Release --no-build -o ./artifacts
+
+      - name: Pack Primitives
+        run: dotnet pack src/Dx.Domain.Primitives/Dx.Domain.Primitives.csproj -c Release --no-build -o ./artifacts
+
+      - name: Pack Kernel
+        run: dotnet pack src/Dx.Domain.Kernel/Dx.Domain.Kernel.csproj -c Release --no-build -o ./artifacts
+
+      - name: Pack Facts
+        run: dotnet pack src/Dx.Domain.Facts/Dx.Domain.Facts.csproj -c Release --no-build -o ./artifacts
+
+      - name: Pack Analyzers
+        run: dotnet pack src/Dx.Domain.Analyzers/Dx.Domain.Analyzers.csproj -c Release --no-build -o ./artifacts
+
+      # 3) Publish by maturity
+      - name: Publish alpha to GitHub Packages
+        if: contains(github.ref_name, '-alpha.')
+        run: dotnet nuget push "./artifacts/*.nupkg" --source "$GITHUB_FEED" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+
+      - name: Publish beta/rc/ga to NuGet (Annotations + Primitives + Analyzers)
+        if: contains(github.ref_name, '-beta.') || contains(github.ref_name, '-rc.') || (!contains(github.ref_name, '-'))
+        run: |
+          shopt -s nullglob
+          for pkg in ./artifacts/*.nupkg; do
+            case "$pkg" in
+              *Dx.Domain.Annotations.*|*Dx.Domain.Primitives.*|*Dx.Domain.Analyzers.*)
+                dotnet nuget push "$pkg" --source "$NUGET_FEED" --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+                ;;
+              *)
+                echo "Skip NuGet for $pkg (Kernel/Facts currently gated)"
+                ;;
+            esac
+          done
+
+      - name: Mirror beta/rc/ga to GitHub Packages (optional)
+        if: contains(github.ref_name, '-beta.') || contains(github.ref_name, '-rc.') || (!contains(github.ref_name, '-'))
+        run: dotnet nuget push "./artifacts/*.nupkg" --source "$GITHUB_FEED" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
