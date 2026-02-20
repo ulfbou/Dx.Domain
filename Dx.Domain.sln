@@ -64,11 +64,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dx.Domain", "Dx.Domain", "{61BE2535-9F7C-4B8F-96F2-EB1A190DC0A8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Actions", "{F647DAB3-D845-4E0A-BE5B-425612706944}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{F647DAB3-D845-4E0A-BE5B-425612706944}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\ci-cd.yml = .github\workflows\ci-cd.yml
-		.github\workflows\docfx.yml = .github\workflows\docfx.yml
-		.github\workflows\enforce-dpi.yml = .github\workflows\enforce-dpi.yml
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 	EndProjectSection
 EndProject
@@ -77,6 +74,34 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Analyzers.Tests", "tests\Dx.Domain.Analyzers.Tests\Dx.Domain.Analyzers.Tests.csproj", "{01213E48-FA8B-44FB-B2DE-E30939B9C3A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Tests", "tests\Dx.Domain.Tests\Dx.Domain.Tests.csproj", "{E8212177-BAF0-4736-824A-B0144E76E41D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUES_TEMPLATE", "ISSUES_TEMPLATE", "{E8DDEE9F-601E-45D5-BB48-BCC69126A237}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PR_TEMPLATE", "PR_TEMPLATE", "{4C50D39A-6D4C-4DE3-98AB-4FFC87C87FFC}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
+		.github\ISSUE_TEMPLATE\cicd_issue.md = .github\ISSUE_TEMPLATE\cicd_issue.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{AED66750-10AC-4AC6-959B-5B78EA99F42D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-validate.yml = .github\workflows\build-validate.yml
+		.github\workflows\ci-analyzers.yml = .github\workflows\ci-analyzers.yml
+		.github\workflows\ci-cd.yml = .github\workflows\ci-cd.yml
+		.github\workflows\docfx.yml = .github\workflows\docfx.yml
+		.github\workflows\drift-protection.yml = .github\workflows\drift-protection.yml
+		.github\workflows\enforce-dpi.yml = .github\workflows\enforce-dpi.yml
+		.github\workflows\integration-ci.yml = .github\workflows\integration-ci.yml
+		.github\workflows\labels-sync.yml = .github\workflows\labels-sync.yml
+		.github\workflows\pr-labeler.yml = .github\workflows\pr-labeler.yml
+		.github\workflows\pre-merge-ci.yml = .github\workflows\pre-merge-ci.yml
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+		.github\workflows\release-cd.yml = .github\workflows\release-cd.yml
+		.github\workflows\security-scan.yml = .github\workflows\security-scan.yml
+		.github\workflows\sign-packages.yml = .github\workflows\sign-packages.yml
+		.github\workflows\workflow-validation.yml = .github\workflows\workflow-validation.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -175,6 +200,9 @@ Global
 		{61BE2535-9F7C-4B8F-96F2-EB1A190DC0A8} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{01213E48-FA8B-44FB-B2DE-E30939B9C3A5} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{E8212177-BAF0-4736-824A-B0144E76E41D} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{E8DDEE9F-601E-45D5-BB48-BCC69126A237} = {F647DAB3-D845-4E0A-BE5B-425612706944}
+		{4C50D39A-6D4C-4DE3-98AB-4FFC87C87FFC} = {F647DAB3-D845-4E0A-BE5B-425612706944}
+		{AED66750-10AC-4AC6-959B-5B78EA99F42D} = {F647DAB3-D845-4E0A-BE5B-425612706944}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A326CE0-DFBE-435C-AD8C-3CA905A96D98}

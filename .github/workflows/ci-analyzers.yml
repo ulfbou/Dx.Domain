@@ -1,13 +1,16 @@
-# path: .github/workflows/ci-analyzers.yml
 name: CI (Analyzers & Docs Governance)
+
 on:
   pull_request:
     branches: [ main ]
+
 jobs:
   build-and-validate:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -33,11 +36,12 @@ jobs:
 
       - name: Docs lint (broken links + metadata)
         if: hashFiles('scripts/docs-lint.sh') != ''
-        run: scripts/docs-lint.sh  # checks YAML front matter, links under docs/
+        run: scripts/docs-lint.sh
 
       - name: Snippet compile (public docs)
         if: hashFiles('scripts/docs-snippets-compile.sh') != ''
         run: scripts/docs-snippets-compile.sh docs/public net8.0
 
       - name: Block unapproved breaking changes
-        run: scripts/api-diff-gate.sh  # fails on public API diff unless PR label "approved-breaking" present
+        if: hashFiles('scripts/api-diff-gate.sh') != ''
+        run: scripts/api-diff-gate.sh

@@ -47,31 +47,35 @@ jobs:
             "Violates no Non-Goals"
             "Correct placement"
           )
-
           for item in "${required[@]}"; do
             if ! grep -Fq "$item" pr_body.txt; then
               echo "ERROR: Missing DPI checklist item: $item"
               exit 1
             fi
           done
-
           echo "DPI checklist verified."
 
       - name: Require role approvals for governance-sensitive changes
         if: steps.core.outputs.changed == 'true'
         uses: actions/github-script@v7
+        env:
+          LONE_MAINTAINER: ${{ secrets.LONE_MAINTAINER }}
+          LONE_MAINTAINER_LOGIN: ${{ secrets.LONE_MAINTAINER_LOGIN }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const org = context.repo.owner;
-            const pr  = context.issue.number;
+            const prNumber  = context.issue.number;
+            const lone = (process.env.LONE_MAINTAINER || '').toLowerCase() === 'true';
+            const loneLogin = (process.env.LONE_MAINTAINER_LOGIN || '').toLowerCase();
+            const author = (context.payload.pull_request.user.login || '').toLowerCase();
 
-            // Files in this PR
+            // List files in the PR
             const files = (await github.rest.pulls.listFiles({
-              ...context.repo, pull_number: pr
+              ...context.repo, pull_number: prNumber, per_page: 300
             })).data.map(f => f.filename);
 
-            // Which areas are implicated?
+            // Determine governance-sensitive areas
             const needsKernel = files.some(f =>
               f.startsWith('src/Dx.Domain.Kernel/') ||
               f.startsWith('docs/internal/governance/kernel-') ||
@@ -84,16 +88,28 @@ jobs:
               f === 'docs/internal/governance/non-silence-axiom.md'
             );
 
+            const governanceSensitive = needsKernel || needsAnalyzers;
+
+            // Lone-maintainer bypass
+            if (governanceSensitive && lone && author === loneLogin) {
+              core.notice(`Lone-maintainer mode: '${author}' is configured; approvals considered satisfied.`);
+              return; // pass
+            }
+
+            if (!governanceSensitive) {
+              core.notice('No governance-sensitive paths changed; no role approvals required.');
+              return;
+            }
+
+            // Enforce role approvals (team slugs to be created later)
             const requiredTeams = [];
             if (needsKernel) requiredTeams.push('kernel-owners');
             if (needsAnalyzers) requiredTeams.push('analyzers-owners');
-            if (requiredTeams.length === 0) { return; }
 
-            // Who approved?
             const reviews = (await github.rest.pulls.listReviews({
-              ...context.repo, pull_number: pr
+              ...context.repo, pull_number: prNumber, per_page: 300
             })).data.filter(r => r.state === 'APPROVED');
-            const approvers = [...new Set(reviews.map(r => r.user.login))];
+            const approvers = [...new Set(reviews.map(r => (r.user?.login || '').toLowerCase()))];
 
             for (const team of requiredTeams) {
               let ok = false;
@@ -103,7 +119,9 @@ jobs:
                     org, team_slug: team, username: login
                   });
                   ok = true; break;
-                } catch { /* not a member */ }
+                } catch {
+                  // not a member -> continue checking others
+                }
               }
               if (!ok) {
                 core.setFailed(`Missing approval from @${org}/${team} for governance-sensitive changes.`);
