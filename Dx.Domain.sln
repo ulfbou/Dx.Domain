@@ -53,6 +53,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D8
 		Dx.Domain.snk = Dx.Domain.snk
 		favicon.png = favicon.png
 		filterConfig.yml = filterConfig.yml
+		labels.json = labels.json
 		test.runsettings = test.runsettings
 		toc.yml = toc.yml
 	EndProjectSection
@@ -66,6 +67,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dx.Domain", "Dx.Domain", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{F647DAB3-D845-4E0A-BE5B-425612706944}"
 	ProjectSection(SolutionItems) = preProject
+		.github\CODEOWNERS = .github\CODEOWNERS
+		.github\GitVersion.yml = .github\GitVersion.yml
+		.github\labeler.yml = .github\labeler.yml
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 	EndProjectSection
 EndProject
@@ -76,12 +80,18 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Tests", "tests\Dx.Domain.Tests\Dx.Domain.Tests.csproj", "{E8212177-BAF0-4736-824A-B0144E76E41D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUES_TEMPLATE", "ISSUES_TEMPLATE", "{E8DDEE9F-601E-45D5-BB48-BCC69126A237}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PR_TEMPLATE", "PR_TEMPLATE", "{4C50D39A-6D4C-4DE3-98AB-4FFC87C87FFC}"
 	ProjectSection(SolutionItems) = preProject
 		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
 		.github\ISSUE_TEMPLATE\cicd_issue.md = .github\ISSUE_TEMPLATE\cicd_issue.md
+		.github\ISSUE_TEMPLATE\docs_request.md = .github\ISSUE_TEMPLATE\docs_request.md
 		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
+		.github\ISSUE_TEMPLATE\rfc.md = .github\ISSUE_TEMPLATE\rfc.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PR_TEMPLATE", "PR_TEMPLATE", "{4C50D39A-6D4C-4DE3-98AB-4FFC87C87FFC}"
+	ProjectSection(SolutionItems) = preProject
+		.github\PULL_REQUEST_TEMPLATE\analyzers.md = .github\PULL_REQUEST_TEMPLATE\analyzers.md
+		.github\PULL_REQUEST_TEMPLATE\kernel-dpi.md = .github\PULL_REQUEST_TEMPLATE\kernel-dpi.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{AED66750-10AC-4AC6-959B-5B78EA99F42D}"
@@ -95,12 +105,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\integration-ci.yml = .github\workflows\integration-ci.yml
 		.github\workflows\labels-sync.yml = .github\workflows\labels-sync.yml
 		.github\workflows\pr-labeler.yml = .github\workflows\pr-labeler.yml
+		.github\workflows\pr-self-ack.yml = .github\workflows\pr-self-ack.yml
 		.github\workflows\pre-merge-ci.yml = .github\workflows\pre-merge-ci.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 		.github\workflows\release-cd.yml = .github\workflows\release-cd.yml
 		.github\workflows\security-scan.yml = .github\workflows\security-scan.yml
 		.github\workflows\sign-packages.yml = .github\workflows\sign-packages.yml
 		.github\workflows\workflow-validation.yml = .github\workflows\workflow-validation.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{B81E7FC8-93F9-417F-A67F-5563FF4CC032}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\enforce-dpi.sh = scripts\enforce-dpi.sh
+		scripts\labels-seed.sh = scripts\labels-seed.sh
 	EndProjectSection
 EndProject
 Global
