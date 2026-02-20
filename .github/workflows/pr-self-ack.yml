@@ -9,11 +9,13 @@ jobs:
     name: second-eyes
     runs-on: ubuntu-latest
     steps:
+
       - name: Enforce minimum cool-down + explicit self-ack
         uses: actions/github-script@v7
         with:
           script: |
             const pr = context.payload.pull_request;
+            if (pr.draft) { core.notice('Draft PR; second-eyes emulation skipped.'); return; }
             const opened = new Date(pr.created_at).getTime();
             const now = Date.now();
             const hoursOpen = (now - opened) / 3_600_000;
