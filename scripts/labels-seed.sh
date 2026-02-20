@@ -56,7 +56,7 @@ jq -c '.[]' labels.json | while read -r label; do
     curl -fsSL -X PATCH \
       -H "${AUTH_HEADER}" -H "${ACCEPT_HEADER}" \
       -d "$(jq -n --arg newname "$name" --arg color "$color" --arg desc "$desc" '{new_name:$newname, color:$color, description:$desc}')" \
-      "${API}/$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$name'''))")" >/dev/null
+      "${API}/$(jq -rn --arg s "$name" '$s|@uri')" >/dev/null
   else
     echo "Creating label: ${name}"
     # GitHub API: POST /repos/{owner}/{repo}/labels
