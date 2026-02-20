@@ -25,6 +25,7 @@ jobs:
         run: dotnet --list-sdks
 
       - name: Use maintainer analyzer profile
+        if: hashFiles('.editorconfig.maintainers') != ''
         run: cp .editorconfig.maintainers .editorconfig
 
       - name: Restore

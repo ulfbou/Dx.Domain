@@ -1,13 +1,36 @@
+# toc.yml
 - name: Home
-  href: README.md
-- name: Getting Started
-  href: docs/getting-started.md
-- name: Architecture
-  href: docs/architecture.md
-- name: Contributing
-  href: CONTRIBUTING.md
-- name: Changelog
-  href: CHANGELOG.md
+  href: docs/public/index.md
+
+- name: Architecture Overview
+  href: docs/public/architecture-overview.md
+
+- name: Packages
+  items:
+    - name: Kernel
+      href: docs/public/packages/kernel.md
+    - name: Primitives
+      href: docs/public/packages/primitives.md
+    - name: Facts
+      href: docs/public/packages/facts.md
+    - name: Annotations
+      href: docs/public/packages/annotations.md
+    - name: Analyzers
+      href: docs/public/packages/analyzers.md
+
+- name: Release Notes
+  items:
+    - name: Kernel
+      href: docs/public/changelog/kernel.md
+    - name: Primitives
+      href: docs/public/changelog/primitives.md
+    - name: Facts
+      href: docs/public/changelog/facts.md
+    - name: Annotations
+      href: docs/public/changelog/annotations.md
+    - name: Analyzers
+      href: docs/public/changelog/analyzers.md
+
 - name: API Reference
   href: api/
   homepage: api/index.md

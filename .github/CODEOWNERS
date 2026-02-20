@@ -1,15 +1,21 @@
 # .github/CODEOWNERS
 
 # Kernel code & its internal governance
-/src/Dx.Domain.Kernel/**                  @<org>/kernel-owners
-/docs/internal/governance/kernel-*.md     @<org>/kernel-owners
-/docs/internal/governance/api-freeze.md   @<org>/kernel-owners
+# Temporary: single maintainer
+/src/Dx.Domain.Kernel/**                    @ulfbou
+/src/Dx.Domain.Analyzers/**                 @ulfbou
+/docs/**                                    @ulfbou
+*                                           @ulfbou
+
+# /src/Dx.Domain.Kernel/**                  @<org>/kernel-owners
+# /docs/internal/governance/kernel-*.md     @<org>/kernel-owners
+# /docs/internal/governance/api-freeze.md   @<org>/kernel-owners
 
 # Analyzers code, rules, and analyzer governance
-/src/Dx.Domain.Analyzers/**               @<org>/analyzers-owners
-/docs/internal/rules/analyzers/**         @<org>/analyzers-owners
-/docs/internal/governance/analyzers-law.md @<org>/analyzers-owners
-/docs/internal/governance/non-silence-axiom.md @<org>/analyzers-owners
+# /src/Dx.Domain.Analyzers/**               @<org>/analyzers-owners
+# /docs/internal/rules/analyzers/**         @<org>/analyzers-owners
+# /docs/internal/governance/analyzers-law.md @<org>/analyzers-owners
+# /docs/internal/governance/non-silence-axiom.md @<org>/analyzers-owners
 
 # Docs (public + internal conventions)
-docs/**                                   @<org>/docs-leads
+# docs/**                                   @<org>/docs-leads
