@@ -16,5 +16,5 @@
       href: docs/public/packages/analyzers.md
 
 - name: API Reference
-  href: api/
-  homepage: api/index.md
+  href: /api/
+  homepage: /api/index.md

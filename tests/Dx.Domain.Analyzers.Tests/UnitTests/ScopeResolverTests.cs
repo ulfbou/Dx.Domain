@@ -161,7 +161,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
 
             if (mapValue != null)
             {
-                mockOptions.Setup(o => o.TryGetValue("dx.scope.map", out It.Ref<string>.IsAny))
+                mockOptions.Setup(o => o.TryGetValue("dx.scope.map", out It.Ref<string?>.IsAny))
                     .Returns((string key, out string value) =>
                     {
                         value = mapValue;
@@ -178,7 +178,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
             var mockConfig = new Mock<AnalyzerConfigOptionsProvider>();
             var mockOptions = new Mock<AnalyzerConfigOptions>();
 
-            mockOptions.Setup(o => o.TryGetValue("dx.scope.rootNamespaces", out It.Ref<string>.IsAny))
+            mockOptions.Setup(o => o.TryGetValue("dx.scope.rootNamespaces", out It.Ref<string?>.IsAny))
                 .Returns((string key, out string value) =>
                 {
                     value = namespaces;

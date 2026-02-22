@@ -1,45 +1,79 @@
 {
   "metadata": [
     {
-      "src": [
-        {
-          "files": [ "src/**/*.csproj" ],
-          "exclude": [ "**/bin/**", "**/obj/**" ]
-        }
-      ],
-      "dest": "api"
+      "src": [ { "files": [ "src/Dx.Domain.Annotations/Dx.Domain.Annotations.csproj" ] } ],
+      "dest": "api/annotations",
+      "msbuildProperties": {
+        "Configuration": "Release",
+        "TargetFramework": "netstandard2.0"
+      }
+    },
+    {
+      "src": [ { "files": [ "src/Dx.Domain.Analyzers/Dx.Domain.Analyzers.csproj" ] } ],
+      "dest": "api/analyzers",
+      "msbuildProperties": {
+        "Configuration": "Release",
+        "TargetFramework": "netstandard2.0"
+      }
+    },
+    {
+      "src": [ { "files": [ "src/Dx.Domain.Primitives/Dx.Domain.Primitives.csproj" ] } ],
+      "dest": "api/primitives",
+      "msbuildProperties": {
+        "Configuration": "Release",
+        "TargetFramework": "net10.0"
+      }
+    },
+    {
+      "src": [ { "files": [ "src/Dx.Domain.Kernel/Dx.Domain.Kernel.csproj" ] } ],
+      "dest": "api/kernel",
+      "msbuildProperties": {
+        "Configuration": "Release",
+        "TargetFramework": "net10.0"
+      }
+    },
+    {
+      "src": [ { "files": [ "src/Dx.Domain.Facts/Dx.Domain.Facts.csproj" ] } ],
+      "dest": "api/facts",
+      "msbuildProperties": {
+        "Configuration": "Release",
+        "TargetFramework": "net10.0"
+      }
     }
   ],
   "build": {
     "content": [
-      { "files": [ "api/**/*.yml", "api/index.md" ] },
-
-      // Public docs only
+      { "files": [ "api/**/**/*.yml" ] },
       {
-        "files": [ "docs/public/**/*.md", "docs/public/**/toc.yml" ],
+        "files": [ "docs/public/**/*.md", "docs/public/**/*.toc.yml" ],
         "exclude": [ "**/bin/**", "**/obj/**", "_site/**" ]
       },
-
-      // Root and top-level docs that actually exist
-      { "files": [ "README.md", "docs/CHANGELOG.md", "docs/CONTRIBUTING.md" ] },
-
-      // Site-level markdown (home, overview)
+      {
+        "files": [ "README.md", "docs/CHANGELOG.md", "docs/CONTRIBUTING.md" ],
+        "exclude": [ "**/bin/**", "**/obj/**" ]
+      },
       {
         "files": [ "toc.yml", "*.md" ],
         "exclude": [ "LICENSE", "obj/**", "_site/**" ]
       }
     ],
     "resource": [
-      { "files": [ "images/**" ], "exclude": [ "**/bin/**", "**/obj/**" ] },
+      {
+        "files": [ "images/**" ],
+        "exclude": [ "**/bin/**", "**/obj/**" ]
+      },
       { "files": [ "docs/public/images/**" ] },
-      { "files": [ "assets/**" ], "exclude": [ "**/bin/**", "**/obj/**" ] }
+      {
+        "files": [ "assets/**" ],
+        "exclude": [ "**/bin/**", "**/obj/**" ]
+      }
     ],
     "dest": "_site",
     "template": [ "default" ],
     "globalMetadata": {
       "_appTitle": "Dx.Domain Documentation",
       "_appName": "Dx.Domain",
-      "_appFooter": "Copyright © 2026 Dx.Domain Team. All rights reserved.",
+      "_appFooter": "Copyright (c) 2026 Dx.Domain Team. All rights reserved.",
       "_enableSearch": true,
       "_enableNewTab": true,
       "_disableNavbar": false,
@@ -50,29 +84,13 @@
         "repo": "https://github.com/ulfbou/Dx.Domain",
         "branch": "main"
       },
-      "_gitUrlPattern": "github",
-      "_customMetadata": {
-        "company": "Dx.Domain Team",
-        "version": "0.x",
-        "framework": "net8.0;net9.0;net10.0"
-      }
-    },
-    "fileMetadata": {
-      "_tocTitle": { "api/**/*.yml": "API Reference" },
-      "_tocRel": { "api/**/*.md": "../toc.yml" }
+      "_gitUrlPattern": "github"
     },
     "markdownEngineName": "markdig",
     "markdownEngineProperties": {
       "noMangle": true,
       "noHeadingId": false,
-      "extensions": [
-        "tasklists",
-        "advanced",
-        "gridtables",
-        "emphasisextras",
-        "footnotes",
-        "citations"
-      ]
+      "extensions": [ "tasklists", "advanced", "gridtables", "emphasisextras", "footnotes", "citations" ]
     }
   },
   "serve": { "port": 8080 }
