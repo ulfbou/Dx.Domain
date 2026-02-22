@@ -37,8 +37,6 @@ jobs:
 
       - name: Test (Debug)
         run: dotnet test -c Debug --no-build --verbosity normal
-      - name: Restore
-        run: dotnet restore
 
       # Optional: docs lint/snippet compile – wire up your actual scripts here
       - name: Docs lint (placeholder)

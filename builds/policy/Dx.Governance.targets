@@ -1,0 +1,26 @@
+<Project Label="Dx.Policy.IntentValidation">
+  <Target Name="DxValidateProjectIntent" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <_DxDeclaredKind Include="@(DxProjectKind)" Condition="'%(DxProjectKind.Identity)' == 'true'" />
+    </ItemGroup>
+    <Error Condition="'@(_DxDeclaredKind->Count())' > '1'" Code="DX011" File="$(MSBuildProjectFullPath)" Text="[Dx Intent] Multiple DxIs flags detected: (@(_DxDeclaredKind)). Exactly one project role must be declared." />
+    <Error Condition="'@(_DxDeclaredKind->Count())' == '0' AND '$(IsPackable)' == 'true'" Code="DX012" File="$(MSBuildProjectFullPath)" Text="[Dx Intent] Packable projects must declare exactly one DxIs* role from the kernel vocabulary." />
+  </Target>
+  <Target Name="DxValidateConstantsPurity" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <_DxConstantsPath>$(DxBuildRoot)common/Dx.Constants.props</_DxConstantsPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_DxConstants Include="$(_DxConstantsPath)" Condition="Exists('$(_DxConstantsPath)')" />
+    </ItemGroup>
+
+    <ReadLinesFromFile File="@(_DxConstants)" Condition="'@(_DxConstants)' != ''">
+      <Output TaskParameter="Lines" ItemName="_DxConstantsLines" />
+    </ReadLinesFromFile>
+
+    <Error Code="DX020"
+           Condition="'@(_DxConstantsLines->Contains(`Condition=`))' == 'true'"
+           Text="[Dx Architecture] Dx.Constants.props contains conditional logic. Constants must be unconditional facts only." />
+  </Target>
+</Project>
