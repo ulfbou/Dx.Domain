@@ -30,16 +30,22 @@
       }
     ],
     "resource": [
-      { "files": [ "images/**" ], "exclude": [ "**/bin/**", "**/obj/**" ] },
+      {
+        "files": [ "images/**" ],
+        "exclude": [ "**/bin/**", "**/obj/**" ]
+      },
       { "files": [ "docs/public/images/**" ] },
-      { "files": [ "assets/**" ], "exclude": [ "**/bin/**", "**/obj/**" ] }
+      {
+        "files": [ "assets/**" ],
+        "exclude": [ "**/bin/**", "**/obj/**" ]
+      }
     ],
     "dest": "_site",
     "template": [ "default" ],
     "globalMetadata": {
       "_appTitle": "Dx.Domain Documentation",
       "_appName": "Dx.Domain",
-      "_appFooter": "Copyright © 2026 Dx.Domain Team. All rights reserved.",
+      "_appFooter": "Copyright ï¿½ 2026 Dx.Domain Team. All rights reserved.",
       "_enableSearch": true,
       "_enableNewTab": true,
       "_disableNavbar": false,
