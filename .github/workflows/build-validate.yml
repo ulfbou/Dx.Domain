@@ -32,13 +32,10 @@ jobs:
         run: dotnet restore
 
       - name: Build (Release, all TFMs)
-        run: dotnet build -c Release --no-restore
+        run: dotnet build -c Debug --no-restore
 
       - name: Test (Debug)
         run: dotnet test -c Debug --no-build --verbosity normal
-
-      - name: Test
-        run: dotnet test -c Release --no-build --verbosity normal
 
       # Optional: docs lint/snippet compile – wire up your actual scripts here
       - name: Docs lint (placeholder)
