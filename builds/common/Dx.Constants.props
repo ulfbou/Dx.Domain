@@ -1,0 +1,16 @@
+<!-- Dx Constants -->
+<Project Label="Dx.Common.Constants">
+  <PropertyGroup Label="Dx.Metadata">
+    <DxCompany>Dx.Domain Team</DxCompany>
+    <DxAuthors>Ulf Bourelius (Original Author);$(DxCompany)</DxAuthors>
+    <DxRepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</DxRepositoryUrl>
+    <DxCopyright>Copyright © $([System.DateTime]::Now.ToString("yyyy")) $(DxCompany). All rights reserved.</DxCopyright>
+  </PropertyGroup>
+  <PropertyGroup Label="Dx.Global">
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DxIdentityFrozen>false</DxIdentityFrozen>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,12 @@
+<Project Label="Dx.Policy.Forbidden">
+  <ItemGroup>
+    <DxForbiddenProperty Include="Version" />
+    <DxForbiddenProperty Include="PackageVersion" />
+    <DxForbiddenProperty Include="Authors" />
+    <DxForbiddenProperty Include="Company" />
+    <DxForbiddenProperty Include="Copyright" />
+    <DxForbiddenProperty Include="SignAssembly" />
+    <DxForbiddenProperty Include="TreatWarningsAsErrors" />
+    <DxForbiddenProperty Include="GenerateDocumentationFile" />
+  </ItemGroup>
+</Project>
