@@ -1,0 +1,45 @@
+name: build-validate
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: List installed SDKs
+        run: dotnet --list-sdks
+
+      - name: Use maintainer analyzer profile
+        if: hashFiles('.editorconfig.maintainers') != ''
+        run: cp .editorconfig.maintainers .editorconfig
+
+      - name: Restore
+        run: dotnet restore
+
+      # Build in Debug so legacy pack targets (Release-only) do NOT run
+      - name: Build (Debug, no pack)
+        run: dotnet build -c Debug --no-restore
+
+      - name: Test (Debug)
+        run: dotnet test -c Debug --no-build --verbosity normal
+      - name: Restore
+        run: dotnet restore
+
+      # Optional: docs lint/snippet compile – wire up your actual scripts here
+      - name: Docs lint (placeholder)
+        run: echo "Docs lint here (link-check/snippet-compile)."
