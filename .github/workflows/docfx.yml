@@ -17,7 +17,7 @@ on:
       - '.github/workflows/docfx.yml'
   workflow_dispatch: {}
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
   build-docfx:
@@ -45,8 +45,12 @@ jobs:
       - name: Add .dotnet/tools to PATH
         run: echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
 
+      # Build API metadata explicitly first (more robust on CI)
+      - name: Build DocFX metadata
+        run: docfx metadata docfx.json
+
       - name: Build documentation
-        run: docfx docfx.json --output _site
+        run: docfx build docfx.json --output _site
 
       - name: Upload generated site as artifact
         uses: actions/upload-artifact@v4
