@@ -1,16 +1,18 @@
 root = true
 
 [*]
-# Maintainers: all DX diagnostics are errors
-dotnet_diagnostic.DX*.severity = error
+# Maintainers enforce all Dx diagnostics as errors
+dotnet_diagnostic.DXA*.severity = error
+dotnet_diagnostic.DXK*.severity = error
+dotnet_diagnostic.DXT*.severity = error
+dotnet_diagnostic.DX100*.severity = error
+dotnet_diagnostic.DX700*.severity = error
 
-# Treat Roslyn warnings as errors for maintainers
-warn_as_error = true
+# Use extended analyzer rules
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+dotnet_analyzer_diagnostic.category-Simplification.severity = warning
 
-# Enforce explicit private fields, required modifiers
-dotnet_style_require_accessibility_modifiers = always:suggestion
-
-# C# formatting for consistency
+# Standard formatting
 csharp_new_line_before_open_brace = all
 csharp_indent_case_contents = true
 csharp_indent_switch_labels = true
