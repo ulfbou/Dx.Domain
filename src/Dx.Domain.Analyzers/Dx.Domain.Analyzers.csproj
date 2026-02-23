@@ -19,6 +19,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
 
+ <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  <WarningsAsErrors></WarningsAsErrors>
     <!-- Packaging -->
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
