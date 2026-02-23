@@ -1,0 +1,7 @@
+<Project Label="Dx.Root.Egress">
+  <PropertyGroup>
+    <DxPropsImported>true</DxPropsImported>
+  </PropertyGroup>
+  <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets" Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
+  <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets" Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
+</Project>

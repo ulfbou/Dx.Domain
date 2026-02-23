@@ -301,4 +301,4 @@ git commit -m "feat: add feature" -m "+semver: minor"
 
 ---
 
-**Questions?** See [CI/CD Documentation](./.github/CI-CD-PIPELINE.md) or create an issue with the `ci-cd` label.
+**Questions?** See CI/CD Documentation or create an issue with the `ci-cd` label.

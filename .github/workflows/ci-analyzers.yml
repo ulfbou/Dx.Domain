@@ -1,0 +1,56 @@
+# path: .github/workflows/ci-analyzers.yml
+name: CI (Analyzers & Docs Governance)
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: List installed SDKs
+        run: dotnet --list-sdks
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (Release)
+        # Governance decides DX*, not CLI
+        run: dotnet build -c Release --no-restore -p:TreatWarningsAsErrors=false
+
+      - name: Run analyzer tests
+        env:
+          FA_DISABLE_STARTUP_MESSAGE: "1"
+        run: |
+          dotnet test tests/Dx.Domain.Analyzers.Tests/Dx.Domain.Analyzers.Tests.csproj \
+            -c Release --no-build --no-restore --verbosity normal
+
+      - name: Public API baseline check (Analyzers)
+        run: dotnet build src/Dx.Domain.Analyzers/Dx.Domain.Analyzers.csproj -c Release --no-restore -p:GeneratePublicApi=true
+
+      - name: Docs lint (broken links + metadata)
+        if: hashFiles('scripts/docs-lint.sh') != ''
+        run: scripts/docs-lint.sh
+
+      - name: Snippet compile (public docs)
+        if: hashFiles('scripts/docs-snippets-compile.sh') != ''
+        run: scripts/docs-snippets-compile.sh docs/public net8.0
+
+      - name: Block unapproved breaking changes
+        if: hashFiles('scripts/api-diff-gate.sh') != ''
+        run: scripts/api-diff-gate.sh

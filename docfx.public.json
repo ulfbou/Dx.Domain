@@ -1,0 +1,22 @@
+{
+  "build": {
+    "content": [
+      {
+        "src": "docs/public",
+        "files": [ "**/*.md", "**/*.yml" ]
+      },
+      {
+        "src": "docs/internal",
+        "files": [ "**/*.md", "**/*.yml" ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [ "images/**" ],
+        "exclude": [ "**/bin/**", "**/obj/**" ]
+      },
+      { "files": [ "docs/images/**" ] }
+    ],
+    "dest": "_site"
+  }
+}

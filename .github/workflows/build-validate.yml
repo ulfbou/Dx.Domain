@@ -1,19 +1,20 @@
-name: build-validate
+name: Build & Validate
+
 on:
   pull_request:
     branches: [ main ]
-  push:
-    branches: [ main ]
+
+permissions:
+  contents: read
 
 jobs:
-  validate:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -21,23 +22,34 @@ jobs:
             9.x
             10.x
 
-      - name: List installed SDKs
+      - name: List SDKs
         run: dotnet --list-sdks
 
+      # Analyzer profile resolution (maintainer → consumer → fallback)
       - name: Use maintainer analyzer profile
-        if: hashFiles('.editorconfig.maintainers') != ''
+        if: ${{ hashFiles('.editorconfig.maintainers') != '' }}
         run: cp .editorconfig.maintainers .editorconfig
+
+      - name: Use consumer analyzer profile (fallback)
+        if: ${{ hashFiles('.editorconfig.maintainers') == '' && hashFiles('.editorconfig.consumers') != '' }}
+        run: cp .editorconfig.consumers .editorconfig
+
+      - name: Ensure .editorconfig exists (final fallback)
+        if: ${{ hashFiles('.editorconfig') == '' }}
+        run: |
+          echo "root = true" > .editorconfig
+          echo "" >> .editorconfig
+          echo "[*]" >> .editorconfig
 
       - name: Restore
         run: dotnet restore
 
-      # Build in Debug so legacy pack targets (Release-only) do NOT run
-      - name: Build (Debug, no pack)
-        run: dotnet build -c Debug --no-restore
+      - name: Build (Release)
+        # Governance decides DX*, not CLI
+        run: dotnet build -c Release --no-restore -p:TreatWarningsAsErrors=false
 
-      - name: Test (Debug)
-        run: dotnet test -c Debug --no-build --verbosity normal
+      - name: Run tests
+        run: dotnet test -c Release --no-build --verbosity normal
 
-      # Optional: docs lint/snippet compile – wire up your actual scripts here
       - name: Docs lint (placeholder)
-        run: echo "Docs lint here (link-check/snippet-compile)."
+        run: echo "Docs lint not yet implemented"
