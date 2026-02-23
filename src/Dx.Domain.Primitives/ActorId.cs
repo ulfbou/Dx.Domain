@@ -26,51 +26,51 @@ namespace Dx.Domain.Primitives
     /// Canonical string format is <c>"N"</c> (32 hexadecimal characters, no separators).
     /// </para>
     /// <para>
-    /// <see cref="ActorId"/> does not permit empty values.
+    /// <see cref="UserId"/> does not permit empty values.
     /// </para>
     /// </remarks>
     [DebuggerDisplay("{Value,nq}")]
-    public readonly struct ActorId :
+    public readonly struct UserId :
         IIdentity,
-        IEquatable<ActorId>,
-        IParsable<ActorId>,
+        IEquatable<UserId>,
+        IParsable<UserId>,
         ISpanFormattable
     {
         /// <summary>Gets the underlying GUID value of this actor identifier.</summary>
         public Guid Value { get; }
 
-        private ActorId(Guid value) => Value = value;
+        private UserId(Guid value) => Value = value;
 
         /// <summary>
-        /// Creates a new random <see cref="ActorId"/> instance.
+        /// Creates a new random <see cref="UserId"/> instance.
         /// </summary>
-        /// <returns>A new <see cref="ActorId"/> with a randomly generated GUID value.</returns>
-        public static ActorId New() => new(Guid.NewGuid());
+        /// <returns>A new <see cref="UserId"/> with a randomly generated GUID value.</returns>
+        public static UserId New() => new(Guid.NewGuid());
 
         /// <summary>
-        /// Creates an <see cref="ActorId"/> from a non-empty GUID.
+        /// Creates an <see cref="UserId"/> from a non-empty GUID.
         /// </summary>
         /// <param name="value">The GUID value. Must not be <see cref="Guid.Empty"/>.</param>
-        /// <returns>A new <see cref="ActorId"/> instance wrapping the specified GUID.</returns>
+        /// <returns>A new <see cref="UserId"/> instance wrapping the specified GUID.</returns>
         /// <exception cref="ArgumentException">Thrown when <paramref name="value"/> is <see cref="Guid.Empty"/>.</exception>
-        public static ActorId FromGuid(Guid value)
+        public static UserId FromGuid(Guid value)
         {
             if (value == Guid.Empty)
-                throw new ArgumentException("ActorId cannot be empty.", nameof(value));
+                throw new ArgumentException("UserId cannot be empty.", nameof(value));
 
-            return new ActorId(value);
+            return new UserId(value);
         }
 
         /// <inheritdoc />
-        public static ActorId Parse(string s, IFormatProvider? provider)
+        public static UserId Parse(string s, IFormatProvider? provider)
             => FromGuid(Guid.ParseExact(s ?? throw new ArgumentNullException(nameof(s)), "N"));
 
         /// <inheritdoc />
-        public static bool TryParse(string? s, IFormatProvider? provider, out ActorId result)
+        public static bool TryParse(string? s, IFormatProvider? provider, out UserId result)
         {
             if (Guid.TryParseExact(s, "N", out var g) && g != Guid.Empty)
             {
-                result = new ActorId(g);
+                result = new UserId(g);
                 return true;
             }
 
@@ -98,12 +98,12 @@ namespace Dx.Domain.Primitives
         }
 
         /// <inheritdoc />
-        public bool Equals(ActorId other)
+        public bool Equals(UserId other)
             => Value.Equals(other.Value);
 
         /// <inheritdoc />
         public override bool Equals(object? obj)
-            => obj is ActorId other && Equals(other);
+            => obj is UserId other && Equals(other);
 
         /// <inheritdoc />
         public override int GetHashCode() => Value.GetHashCode();
@@ -126,21 +126,21 @@ namespace Dx.Domain.Primitives
             => Value.ToString(string.IsNullOrEmpty(format) ? "N" : format!, formatProvider ?? CultureInfo.InvariantCulture);
 
         /// <summary>
-        /// Determines whether two <see cref="ActorId"/> values are equal.
+        /// Determines whether two <see cref="UserId"/> values are equal.
         /// </summary>
         /// <param name="left">The first actor identifier to compare.</param>
         /// <param name="right">The second actor identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
-        public static bool operator ==(ActorId left, ActorId right)
+        public static bool operator ==(UserId left, UserId right)
             => left.Equals(right);
 
         /// <summary>
-        /// Determines whether two <see cref="ActorId"/> values are not equal.
+        /// Determines whether two <see cref="UserId"/> values are not equal.
         /// </summary>
         /// <param name="left">The first actor identifier to compare.</param>
         /// <param name="right">The second actor identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
-        public static bool operator !=(ActorId left, ActorId right)
+        public static bool operator !=(UserId left, UserId right)
             => !(left == right);
     }
 }

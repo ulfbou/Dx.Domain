@@ -34,10 +34,10 @@ Ensures domain types are constructed only through the Dx facade, centralizing in
 **Example Violation**:
 ```csharp
 // ❌ Violation - direct construction
-var id = new ActorId(Guid.NewGuid());
+var id = new UserId(Guid.NewGuid());
 
 // ✅ Correct - use Dx facade
-var id = Dx.CausationFactory.CreateActorId(Guid.NewGuid());
+var id = UserId.New();
 ```
 
 ### DXA020: Result Ignored
