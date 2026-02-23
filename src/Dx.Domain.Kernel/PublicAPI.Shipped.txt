@@ -1,0 +1,2 @@
+# src/Dx.Domain.Kernel/PublicAPI.Shipped.txt
+# (empty during start; filled after first inventory)
