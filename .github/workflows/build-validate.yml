@@ -1,19 +1,17 @@
-name: build-validate
+name: Build & Validate
+
 on:
   pull_request:
     branches: [ main ]
-  push:
-    branches: [ main ]
 
 jobs:
-  validate:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -21,12 +19,30 @@ jobs:
             9.x
             10.x
 
-      - name: List installed SDKs
+      - name: List SDKs
         run: dotnet --list-sdks
 
-      - name: Use maintainer analyzer profile
+      #
+      # Analyzer profile resolution
+      #
+      - name: Use maintainer analyzer profile (if present)
+        if: ${{ hashFiles('.editorconfig.maintainers') != '' }}
         run: cp .editorconfig.maintainers .editorconfig
 
+      - name: Use consumer analyzer profile (fallback)
+        if: ${{ hashFiles('.editorconfig.maintainers') == '' && hashFiles('.editorconfig.consumers') != '' }}
+        run: cp .editorconfig.consumers .editorconfig
+
+      - name: Ensure .editorconfig exists (ultimate fallback)
+        if: ${{ hashFiles('.editorconfig') == '' }}
+        run: |
+          echo "root = true" > .editorconfig
+          echo "" >> .editorconfig
+          echo "[*]" >> .editorconfig
+
+      #
+      # Build & test
+      #
       - name: Restore
         run: dotnet restore
 
@@ -36,6 +52,8 @@ jobs:
       - name: Test
         run: dotnet test -c Release --no-build --verbosity normal
 
-      # Optional: docs lint/snippet compile – wire up your actual scripts here
+      #
+      # Docs lint placeholder
+      #
       - name: Docs lint (placeholder)
-        run: echo "Docs lint here (link-check/snippet-compile)."
+        run: echo "Docs lint not yet implemented"

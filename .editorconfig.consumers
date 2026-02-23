@@ -1,0 +1,13 @@
+root = true
+
+[*]
+# Consumers: all DX diagnostics are warnings
+dotnet_diagnostic.DX*.severity = warning
+
+# Consumers should not have their build fail due to style
+warn_as_error = false
+
+# Relaxed formatting compared to maintainers
+csharp_new_line_before_open_brace = all
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
