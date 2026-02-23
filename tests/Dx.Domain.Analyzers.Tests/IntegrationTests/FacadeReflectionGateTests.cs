@@ -6,6 +6,7 @@ using System.Reflection;
 using Dx;
 using Dx.Domain;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
+using Dx.Domain.Primitives;
 
 using FluentAssertions;
 
@@ -52,11 +53,11 @@ namespace Dx.Domain.Analyzers.Tests.IntegrationTests
 
             var resolver = new DxFacadeResolver(compilation, mockConfig.Object);
 
-            var actorIdMetadataName = typeof(Domain.ActorId).FullName!;
-            var actorIdSymbol = compilation.GetTypeByMetadataName(actorIdMetadataName);
-            if (actorIdSymbol is not null)
+            var UserIdMetadataName = typeof(UserId).FullName!;
+            var UserIdSymbol = compilation.GetTypeByMetadataName(UserIdMetadataName);
+            if (UserIdSymbol is not null)
             {
-                var factory = resolver.FindFacadeFactoryForType(actorIdSymbol);
+                var factory = resolver.FindFacadeFactoryForType(UserIdSymbol);
                 factory.Should().NotBeNull();
             }
         }

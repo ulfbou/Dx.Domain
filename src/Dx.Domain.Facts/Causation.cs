@@ -25,7 +25,7 @@ namespace Dx.Domain.Facts
     /// <remarks>
     /// Typical usage when emitting a fact:
     /// <code>
-    /// var causation = Causation.Create(correlationId, traceId, actorId);
+    /// var causation = Causation.Create(correlationId, traceId, UserId);
     /// var fact = Fact.Create("OrderPlaced", payload, causation);
     /// </code>
     /// </remarks>
@@ -39,7 +39,7 @@ namespace Dx.Domain.Facts
         public TraceId TraceId { get; }
 
         /// <summary>Gets the actor responsible for the action, if known.</summary>
-        public ActorId ActorId { get; }
+        public UserId UserId { get; }
 
         /// <summary>Gets the UTC timestamp when the causation was recorded.</summary>
         public DateTimeOffset UtcTimestamp { get; }
@@ -50,13 +50,13 @@ namespace Dx.Domain.Facts
         /// </summary>
         /// <param name="correlationId">The unique identifier that correlates related operations or events.</param>
         /// <param name="traceId">The identifier used to trace the flow of a request or operation across system boundaries.</param>
-        /// <param name="actorId">The identifier of the actor responsible for the operation, or null if not applicable.</param>
+        /// <param name="UserId">The identifier of the actor responsible for the operation, or null if not applicable.</param>
         /// <param name="utcTimestamp">The timestamp, in Coordinated Universal Time (UTC), indicating when the causation event occurred.</param>
-        private Causation(CorrelationId correlationId, TraceId traceId, ActorId? actorId, DateTimeOffset utcTimestamp)
+        private Causation(CorrelationId correlationId, TraceId traceId, UserId? UserId, DateTimeOffset utcTimestamp)
         {
             CorrelationId = correlationId;
             TraceId = traceId;
-            ActorId = actorId ?? default;
+            UserId = UserId ?? default;
             UtcTimestamp = utcTimestamp;
         }
 
@@ -65,7 +65,7 @@ namespace Dx.Domain.Facts
         /// </summary>
         /// <param name="correlationId">The correlation identifier. Must not be empty.</param>
         /// <param name="traceId">The trace identifier. Must not be empty.</param>
-        /// <param name="actorId">The optional actor responsible for the action.</param>
+        /// <param name="UserId">The optional actor responsible for the action.</param>
         /// <returns>A new <see cref="Causation"/> instance whose <see cref="UtcTimestamp"/> is set to <see cref="DateTimeOffset.UtcNow"/>.</returns>
         /// <remarks>
         /// This method enforces the invariant that both <paramref name="correlationId"/> and <paramref name="traceId"/>
@@ -75,18 +75,18 @@ namespace Dx.Domain.Facts
         /// Thrown if <paramref name="correlationId"/> or <paramref name="traceId"/> is empty.
         /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Causation Create(CorrelationId correlationId, TraceId traceId, ActorId? actorId = null)
+        public static Causation Create(CorrelationId correlationId, TraceId traceId, UserId? UserId = null)
         {
             Invariant.That(correlationId.Value != Guid.Empty, "Kernel.Causation.MissingCorrelation", "CorrelationId must not be empty.");
             Invariant.That(!traceId.IsEmpty, "Kernel.Causation.MissingTrace", "TraceId must not be empty.");
-            return new Causation(correlationId, traceId, actorId, DateTimeOffset.UtcNow);
+            return new Causation(correlationId, traceId, UserId, DateTimeOffset.UtcNow);
         }
 
         /// <inheritdoc />
         public bool Equals(Causation other)
             => CorrelationId == other.CorrelationId &&
                TraceId == other.TraceId &&
-               ActorId == other.ActorId &&
+               UserId == other.UserId &&
                UtcTimestamp == other.UtcTimestamp;
 
         /// <inheritdoc />
@@ -94,7 +94,7 @@ namespace Dx.Domain.Facts
 
         /// <inheritdoc />
         public override int GetHashCode()
-            => HashCode.Combine(CorrelationId, TraceId, ActorId, UtcTimestamp);
+            => HashCode.Combine(CorrelationId, TraceId, UserId, UtcTimestamp);
 
         /// <inheritdoc />
         public static bool operator ==(Causation left, Causation right) => left.Equals(right);
@@ -103,6 +103,6 @@ namespace Dx.Domain.Facts
         public static bool operator !=(Causation left, Causation right) => !left.Equals(right);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => $"Causation={CorrelationId}, {TraceId}, {ActorId}, {UtcTimestamp:O}";
+        private string DebuggerDisplay => $"Causation={CorrelationId}, {TraceId}, {UserId}, {UtcTimestamp:O}";
     }
 }
