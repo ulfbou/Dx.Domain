@@ -4,7 +4,7 @@
 
 Dx.Domain is defined as much by what it **excludes** as by what it enforces.  
 These are not “out of scope for now.” They are **structural refusals** that
-protect the kernel described in the [Manifesto](MANIFESTO.md).
+protect the kernel described in the Manifesto.
 
 If a proposal conflicts with these non‑goals, it is not a feature request –
 it is a request to change the project’s identity.
@@ -50,7 +50,7 @@ Persistence exists only as **adapters**, never as a design center:
 - No coupling between domain primitives and specific databases or transport
   stacks.
 
-See the scope notes in the [Manifesto](MANIFESTO.md#scope--evolution).
+See the scope notes in the Manifesto.
 
 ### 4. A Runtime‑First Safety Net
 

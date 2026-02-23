@@ -18,13 +18,20 @@
   ],
   "build": {
     "content": [
-      { "files": [ "api/**.yml", "api/index.md" ] },
-      { "files": [ "docs/**.md", "docs/**/toc.yml" ], "exclude": [ "**/bin/**", "**/obj/**", "_site/**" ] },
-      { "files": [ "README.md", "CHANGELOG.md", "CONTRIBUTING.md" ] },
-      { "files": [ "toc.yml", "*.md" ], "exclude": [ "LICENSE", "obj/**", "_site/**" ] }
+      {
+        "files": [ "**/*.md", "**/*.yml" ],
+        "src": "docs/public"
+      },
+      {
+        "files": [ "**/*.md", "**/*.yml" ],
+        "src": "docs/internal"
+      }
     ],
     "resource": [
-      { "files": [ "images/**" ], "exclude": [ "**/bin/**", "**/obj/**" ] },
+      {
+        "files": [ "images/**" ],
+        "exclude": [ "**/bin/**", "**/obj/**" ]
+      },
       { "files": [ "docs/images/**" ] }
     ],
     "dest": "_site",

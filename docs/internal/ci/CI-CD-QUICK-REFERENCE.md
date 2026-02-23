@@ -278,7 +278,7 @@ git tag -l
 
 ## Getting Help
 
-1. **Documentation**: Read `.github/CI-CD-PIPELINE.md`
+1. **Documentation**: Read `docs/internal/ci/CI-CD-PIPELINE.md`
 2. **Workflow Logs**: Check Actions tab for detailed logs
 3. **Artifacts**: Download reports and logs from workflow runs
 4. **Issues**: Create GitHub issue with `ci-cd` label
