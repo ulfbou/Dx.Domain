@@ -5,27 +5,30 @@ VisualStudioVersion = 18.3.11222.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{23C415C5-9A2F-4DAB-91F7-96C480B17B11}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 		builds\Dx.Props.hierarchical.props = builds\Dx.Props.hierarchical.props
 		builds\Dx.Props.hierarchical.targets = builds\Dx.Props.hierarchical.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D829B9CA-75B7-4129-962A-2E31338C4A20}"
 	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		docfx.json = docfx.json
+		docfx.full.json = docfx.full.json
+		docfx.public.json = docfx.public.json
 		Dockerfile = Dockerfile
+		dotnet-tools.json = dotnet-tools.json
 		favicon.png = favicon.png
 		filterConfig.yml = filterConfig.yml
 		test.runsettings = test.runsettings
-		toc.yml = toc.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Actions", "{F647DAB3-D845-4E0A-BE5B-425612706944}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-validate.yml = .github\workflows\build-validate.yml
 		.github\workflows\ci-cd.yml = .github\workflows\ci-cd.yml
 		.github\workflows\docfx.yml = .github\workflows\docfx.yml
 		.github\workflows\enforce-dpi.yml = .github\workflows\enforce-dpi.yml
@@ -79,6 +82,24 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Analyzers.Tests", "tests\Dx.Domain.Analyzers.Tests\Dx.Domain.Analyzers.Tests.csproj", "{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{EC72B488-EFAB-4E0C-BF1B-AA162EC7E2A2}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\architecture-overview.md = docs\public\architecture-overview.md
+		docs\public\DPI.md = docs\public\DPI.md
+		docs\public\index.md = docs\public\index.md
+		docs\public\MANIFESTO.md = docs\public\MANIFESTO.md
+		docs\public\OVERVIEW.md = docs\public\OVERVIEW.md
+		docs\public\README.md = docs\public\README.md
+		docs\public\toc.yml = docs\public\toc.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "internal", "internal", "{4A7D9BB6-C80A-4B4C-BD9A-7CABB195C8D0}"
+	ProjectSection(SolutionItems) = preProject
+		docs\internal\CONTRIBUTING.md = docs\internal\CONTRIBUTING.md
+		docs\internal\CONVENTIONAL_COMMITS.md = docs\internal\CONVENTIONAL_COMMITS.md
+		docs\internal\NON_GOALS.md = docs\internal\NON_GOALS.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -177,6 +198,8 @@ Global
 		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{EC72B488-EFAB-4E0C-BF1B-AA162EC7E2A2} = {8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}
+		{4A7D9BB6-C80A-4B4C-BD9A-7CABB195C8D0} = {8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A326CE0-DFBE-435C-AD8C-3CA905A96D98}

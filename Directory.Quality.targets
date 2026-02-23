@@ -1,6 +1,6 @@
 <!-- Directory.Quality.targets -->
 <!-- This file contains quality assurance targets for all projects in the solution. -->
-<Project>
+<Project Label="Directory.Quality.targets">
 
   <Target Name="RunCodeAnalysis" BeforeTargets="Build" Condition="'$(RunCodeAnalysis)' == 'true'">
     <Message Text="Running code analysis..." Importance="high" />
