@@ -1,0 +1,16 @@
+root = true
+
+[*]
+# Maintainers: all DX diagnostics are errors
+dotnet_diagnostic.DX*.severity = error
+
+# Treat Roslyn warnings as errors for maintainers
+warn_as_error = true
+
+# Enforce explicit private fields, required modifiers
+dotnet_style_require_accessibility_modifiers = always:suggestion
+
+# C# formatting for consistency
+csharp_new_line_before_open_brace = all
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
