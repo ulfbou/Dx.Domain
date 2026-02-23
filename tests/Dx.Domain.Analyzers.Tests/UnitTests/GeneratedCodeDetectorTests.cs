@@ -193,7 +193,7 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
 
             if (namespaceMarkers != null)
             {
-                mockOptions.Setup(o => o.TryGetValue("dx_generated_markers", out It.Ref<string>.IsAny))
+                mockOptions.Setup(o => o.TryGetValue("dx_generated_markers", out It.Ref<string>.IsAny!))
                     .Returns((string key, out string value) =>
                     {
                         value = namespaceMarkers;
