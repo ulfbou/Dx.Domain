@@ -41,3 +41,16 @@ jobs:
       # Optional: docs lint/snippet compile – wire up your actual scripts here
       - name: Docs lint (placeholder)
         run: echo "Docs lint here (link-check/snippet-compile)."
+
+      - name: Verify per-package docs (README/CHANGELOG)
+        run: |
+          set -euo pipefail
+          pkgs=("src/Dx.Domain.Kernel" "src/Dx.Domain.Primitives" "src/Dx.Domain.Facts" "src/Dx.Domain.Annotations")
+          for p in "${pkgs[@]}"; do
+            test -s "$p/README.md" || { echo "::error file=$p/README.md::Missing README.md"; exit 1; }
+            test -s "$p/CHANGELOG.md" || { echo "::error file=$p/CHANGELOG.md::Missing CHANGELOG.md"; exit 1; }
+            lines=$(( $(wc -l < "$p/README.md") + $(wc -l < "$p/CHANGELOG.md") ))
+            if [ "$lines" -lt 20 ]; then
+              echo "::error file=$p::README+CHANGELOG too small ($lines lines)"; exit 1;
+            fi
+          done
