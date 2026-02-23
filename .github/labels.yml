@@ -1,0 +1,35 @@
+- name: area/kernel
+  color: "1f77b4"
+  description: Kernel & primitives changes
+
+- name: area/analyzers
+  color: "ff7f0e"
+  description: Analyzer rules, infra, tests
+
+- name: area/docs
+  color: "2ca02c"
+  description: Documentation changes
+
+- name: area/ci
+  color: "9467bd"
+  description: CI & workflows
+
+- name: type/feat
+  color: "17becf"
+  description: New feature
+
+- name: type/fix
+  color: "d62728"
+  description: Bug fix
+
+- name: type/chore
+  color: "7f7f7f"
+  description: Infra / maintenance / refactor
+
+- name: governance
+  color: "000000"
+  description: Governance-related change
+
+- name: dpi-required
+  color: "bcbd22"
+  description: Requires DPI justification in PR body

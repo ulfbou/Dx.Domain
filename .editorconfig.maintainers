@@ -1,18 +1,18 @@
 root = true
 
 [*]
-# Maintainers enforce all Dx diagnostics as errors
+# Maintainers: ALL Dx diagnostics are errors (non‑silence axiom)
 dotnet_diagnostic.DXA*.severity = error
 dotnet_diagnostic.DXK*.severity = error
 dotnet_diagnostic.DXT*.severity = error
 dotnet_diagnostic.DX100*.severity = error
 dotnet_diagnostic.DX700*.severity = error
 
-# Use extended analyzer rules
+# Keep general analyzer categories visible but not noisy
 dotnet_analyzer_diagnostic.category-Style.severity = warning
 dotnet_analyzer_diagnostic.category-Simplification.severity = warning
 
-# Standard formatting
+# Formatting (light, non-controversial)
 csharp_new_line_before_open_brace = all
 csharp_indent_case_contents = true
 csharp_indent_switch_labels = true

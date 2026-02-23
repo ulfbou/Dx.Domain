@@ -1,4 +1,3 @@
-# path: .github/workflows/ci-analyzers.yml
 name: CI (Analyzers & Docs Governance)
 
 on:
@@ -30,7 +29,6 @@ jobs:
         run: dotnet restore
 
       - name: Build (Release)
-        # Governance decides DX*, not CLI
         run: dotnet build -c Release --no-restore -p:TreatWarningsAsErrors=false
 
       - name: Run analyzer tests

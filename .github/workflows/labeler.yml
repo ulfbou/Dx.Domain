@@ -1,0 +1,24 @@
+# Auto-label PRs based on changed paths
+area/kernel:
+  - "src/Dx.Domain.Kernel/**"
+  - "src/Dx.Domain.Primitives/**"
+
+area/analyzers:
+  - "src/Dx.Domain.Analyzers/**"
+  - "tests/Dx.Domain.Analyzers.Tests/**"
+
+area/docs:
+  - "docs/**"
+  - ".github/ISSUE_TEMPLATE/**"
+  - ".github/PULL_REQUEST_TEMPLATE/**"
+
+area/ci:
+  - ".github/workflows/**"
+
+type/docs:
+  - "docs/**"
+
+type/chore:
+  - ".github/**"
+  - "builds/**"
+  - "Directory.*"

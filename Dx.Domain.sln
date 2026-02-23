@@ -28,10 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Actions", "{F647DAB3-D845-4E0A-BE5B-425612706944}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\build-validate.yml = .github\workflows\build-validate.yml
-		.github\workflows\ci-cd.yml = .github\workflows\ci-cd.yml
-		.github\workflows\docfx.yml = .github\workflows\docfx.yml
-		.github\workflows\enforce-dpi.yml = .github\workflows\enforce-dpi.yml
+		.github\GitVersion.yml = .github\GitVersion.yml
+		.github\labels.yml = .github\labels.yml
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 	EndProjectSection
 EndProject
@@ -86,9 +84,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{EC72B488-EFAB-4E0C-BF1B-AA162EC7E2A2}"
 	ProjectSection(SolutionItems) = preProject
 		docs\public\architecture-overview.md = docs\public\architecture-overview.md
-		docs\public\DPI.md = docs\public\DPI.md
 		docs\public\index.md = docs\public\index.md
-		docs\public\MANIFESTO.md = docs\public\MANIFESTO.md
 		docs\public\OVERVIEW.md = docs\public\OVERVIEW.md
 		docs\public\README.md = docs\public\README.md
 		docs\public\toc.yml = docs\public\toc.yml
@@ -96,9 +92,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{EC72B4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "internal", "internal", "{4A7D9BB6-C80A-4B4C-BD9A-7CABB195C8D0}"
 	ProjectSection(SolutionItems) = preProject
-		docs\internal\CONTRIBUTING.md = docs\internal\CONTRIBUTING.md
 		docs\internal\CONVENTIONAL_COMMITS.md = docs\internal\CONVENTIONAL_COMMITS.md
+		docs\internal\DPI.md = docs\internal\DPI.md
+		docs\internal\MANIFESTO.md = docs\internal\MANIFESTO.md
 		docs\internal\NON_GOALS.md = docs\internal\NON_GOALS.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{B5297459-6693-4D66-9A16-0626CD85D8F5}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
+		.github\ISSUE_TEMPLATE\cicd_issue.md = .github\ISSUE_TEMPLATE\cicd_issue.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{97673280-05A4-493C-BB7D-A399AA4780C2}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-validate.yml = .github\workflows\build-validate.yml
+		.github\workflows\ci-analyzers.yml = .github\workflows\ci-analyzers.yml
+		.github\workflows\docfx.yml = .github\workflows\docfx.yml
+		.github\workflows\labeler.yml = .github\workflows\labeler.yml
+		.github\workflows\labels-sync.yml = .github\workflows\labels-sync.yml
+		.github\workflows\pr-labeler.yml = .github\workflows\pr-labeler.yml
 	EndProjectSection
 EndProject
 Global
@@ -200,6 +214,8 @@ Global
 		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{EC72B488-EFAB-4E0C-BF1B-AA162EC7E2A2} = {8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}
 		{4A7D9BB6-C80A-4B4C-BD9A-7CABB195C8D0} = {8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}
+		{B5297459-6693-4D66-9A16-0626CD85D8F5} = {F647DAB3-D845-4E0A-BE5B-425612706944}
+		{97673280-05A4-493C-BB7D-A399AA4780C2} = {F647DAB3-D845-4E0A-BE5B-425612706944}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A326CE0-DFBE-435C-AD8C-3CA905A96D98}

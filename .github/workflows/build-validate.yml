@@ -25,7 +25,6 @@ jobs:
       - name: List SDKs
         run: dotnet --list-sdks
 
-      # Analyzer profile resolution (maintainer → consumer → fallback)
       - name: Use maintainer analyzer profile
         if: ${{ hashFiles('.editorconfig.maintainers') != '' }}
         run: cp .editorconfig.maintainers .editorconfig
@@ -45,7 +44,6 @@ jobs:
         run: dotnet restore
 
       - name: Build (Release)
-        # Governance decides DX*, not CLI
         run: dotnet build -c Release --no-restore -p:TreatWarningsAsErrors=false
 
       - name: Run tests
