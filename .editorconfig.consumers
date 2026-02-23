@@ -1,13 +1,18 @@
 root = true
 
 [*]
-# Consumers: all DX diagnostics are warnings
-dotnet_diagnostic.DX*.severity = warning
+# Consumers see Dx diagnostics but not as errors
+dotnet_diagnostic.DXA*.severity = warning
+dotnet_diagnostic.DXK*.severity = warning
+dotnet_diagnostic.DXT*.severity = warning
+dotnet_diagnostic.DX100*.severity = warning
+dotnet_diagnostic.DX700*.severity = warning
 
-# Consumers should not have their build fail due to style
-warn_as_error = false
+# Relax general analyzer severities for forks
+dotnet_analyzer_diagnostic.category-Style.severity = silent
+dotnet_analyzer_diagnostic.category-Simplification.severity = silent
 
-# Relaxed formatting compared to maintainers
+# Formatting settings
 csharp_new_line_before_open_brace = all
 csharp_indent_case_contents = true
 csharp_indent_switch_labels = true
