@@ -1,0 +1,13 @@
+<!-- This file enables implicit usings for the Dx.Domain project -->
+<Project>
+  <ItemGroup Condition="'$(TargetFramework)' != ''">
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
+    <Using Include="System.Runtime.CompilerServices" />
+
+    <Using Include="Dx.Domain" />
+
+    <Using Include="static System.Diagnostics.Debug" />
+  </ItemGroup>
+</Project>
