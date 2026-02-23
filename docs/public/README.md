@@ -254,8 +254,8 @@ When adding new workflows:
 ## Support
 
 For help with CI/CD:
-1. Check [CI-CD-PIPELINE.md](CI-CD-PIPELINE.md)
-2. Check [CI-CD-QUICK-REFERENCE.md](CI-CD-QUICK-REFERENCE.md)
+1. Check CI-CD-PIPELINE.md
+2. Check CI-CD-QUICK-REFERENCE.md
 3. Review workflow logs
 4. Create issue with `ci-cd` label
 5. Contact DevOps team

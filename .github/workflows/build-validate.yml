@@ -25,18 +25,16 @@ jobs:
         run: dotnet --list-sdks
 
       - name: Use maintainer analyzer profile
-        if: hashFiles('.editorconfig.maintainers') != ''
         run: cp .editorconfig.maintainers .editorconfig
 
       - name: Restore
         run: dotnet restore
 
-      # Build in Debug so legacy pack targets (Release-only) do NOT run
-      - name: Build (Debug, no pack)
-        run: dotnet build -c Debug --no-restore
+      - name: Build (Release, all TFMs)
+        run: dotnet build -c Release --no-restore
 
-      - name: Test (Debug)
-        run: dotnet test -c Debug --no-build --verbosity normal
+      - name: Test
+        run: dotnet test -c Release --no-build --verbosity normal
 
       # Optional: docs lint/snippet compile – wire up your actual scripts here
       - name: Docs lint (placeholder)
