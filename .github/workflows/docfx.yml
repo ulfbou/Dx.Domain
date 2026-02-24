@@ -41,7 +41,7 @@ jobs:
         run: dotnet tool restore
 
       - name: Build public docs
-        run: docfx docfx.public.json --output _site
+        run: dotnet docfx docfx.public.json --output _site
 
       - name: Upload generated public site
         uses: actions/upload-artifact@v4
