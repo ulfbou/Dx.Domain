@@ -39,5 +39,6 @@ namespace Dx.Domain.Annotations
         public const string DXA060 = "DXA060";
         public const string DXA070 = "DXA070";
         public const string DXA080 = "DXA080";
+        public const string DXA090 = "DXA090";
     }
 }

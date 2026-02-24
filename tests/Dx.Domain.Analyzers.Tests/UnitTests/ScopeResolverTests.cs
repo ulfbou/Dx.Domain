@@ -138,9 +138,15 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
         private static IAssemblySymbol CreateAssemblyWithAttribute(string attributeName, string layer)
         {
             var code = $@"""
-using Dx.Domain.Annotations;
+using System;
 
-[assembly: {attributeName}(""{layer}"")]
+[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
+public sealed class {attributeName}Attribute : Attribute
+{{
+    public {attributeName}Attribute(string layer) {{ }}
+}}
+
+[assembly: {attributeName}Attribute(""{layer}"")]
 
 namespace Test {{ public class Foo {{ }} }}""";
 
@@ -150,7 +156,6 @@ namespace Test {{ public class Foo {{ }} }}""";
                 new[]
                 {
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(DxLayerAttribute).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(System.Runtime.AssemblyTargetedPatchBandAttribute).Assembly.Location)
                 },
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));

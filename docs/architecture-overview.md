@@ -7,7 +7,7 @@
 A small, opinionated **substrate** for invariants, results, errors, identities, and structural history — designed so **incorrect domain models are hard to express**. If it **compiles**, **passes analyzers**, and the **Kernel accepts it**, the state is valid. 
 
 ## The Four Packages
-- **Annotations (Abstractions)** — pure vocabulary and metadata; **no runtime logic**. 
+- **Annotations** — pure vocabulary and metadata; **no runtime logic**. 
 - **Primitives** — immutable, side-effect-free value types (IDs, tracing). 
 - **Kernel** — the runtime **judge** of invariants, results, errors, facts; no I/O/infrastructure. 
 - **Facts** — structural, lineage-aware, **meaning-agnostic** history; **not** domain events. 

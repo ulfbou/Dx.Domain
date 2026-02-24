@@ -1,12 +1,13 @@
-# Dx.Domain Kernel Admission Test
+# Dx.Domain Authority Admission Test (v001)
 
-This checklist defines the **non-negotiable conditions** for any change to the Dx.Domain foundations.
+This checklist defines the **non-negotiable conditions** for any change to the Dx.Domain foundations. It ensures the framework remains a "closed-loop" architectural compiler where authority layers are pure and self-hosting.
 
-It is derived from `docs/kernel.refactorization.specification.md` and is **normative** for:
+It is normative for:
 
-- `Dx.Domain.Abstractions` (Vocabulary)
-- `Dx.Domain` (Kernel)
-- `Dx.Domain.Analyzers` (Tooling)
+* `Dx.Domain.Annotations` (Vocabulary)
+* `Dx.Domain.Primitives` (Identities)
+* `Dx.Domain.Kernel` (Logic & Invariants)
+* `Dx.Domain.Analyzers` (Enforcement)
 
 Any PR touching these assemblies **must** satisfy this document.
 
@@ -14,172 +15,110 @@ Any PR touching these assemblies **must** satisfy this document.
 
 ## 1. Assembly & Dependency Jurisdiction
 
-For every PR, verify:
+For every PR, verify the strict **Authority Hierarchy**:
 
-- **Abstractions** (`Dx.Domain.Abstractions`):
-  - [ ] Does **not** reference `Dx.Domain` (Kernel) or `Dx.Domain.Analyzers`.
-  - [ ] Contains only:
-    - Marker interfaces
-    - Attributes
-    - Metadata records
-    - Diagnostic canon (`DxRuleIds`, `DxCategories`, `DxSeverities`)
+* **Annotations** (`Dx.Domain.Annotations`):
+* [ ] **ZERO** dependencies.
+* [ ] Contains only: Marker interfaces, Attributes, and Diagnostic Canon (`DxRuleIds`, etc.).
 
-- **Kernel** (`Dx.Domain`):
-  - [ ] References `Dx.Domain.Abstractions`.
-  - [ ] Does **not** reference analyzers, generators, or infrastructure libraries.
 
-- **Analyzers** (`Dx.Domain.Analyzers`):
-  - [ ] References `Dx.Domain.Abstractions` (and Roslyn/runtime) only.
-  - [ ] Does **not** introduce types that Abstractions must depend on.
+* **Primitives** (`Dx.Domain.Primitives`):
+* [ ] References **only** `Dx.Domain.Annotations`.
+* [ ] Contains fundamental identity types (e.g., `ActorId`, `CorrelationId`).
 
----
 
-## 2. Abstractions Purity Test (Vocabulary-Only)
+* **Kernel** (`Dx.Domain.Kernel`):
+* [ ] References `Annotations` and `Primitives`.
+* [ ] Does **not** reference analyzers, generators, or infrastructure.
 
-For any change under `Dx.Domain.Abstractions`:
 
-- [ ] No methods with control flow (`if`, `switch`, loops, `try/catch`, `yield`).
-- [ ] No exceptions, guards, or validation helpers.
-- [ ] No identity value types, `Result` types, or other runtime primitives.
-- [ ] No extension methods.
-- [ ] All attributes are:
-  - [ ] `sealed`
-  - [ ] Parameterised only by primitives (`string`, `bool`, `enum`).
-- [ ] All metadata types are `record`(-like) and:
-  - [ ] Immutable
-  - [ ] Contain **no** runtime behavior (no reflection, no lazy evaluation).
+* **Analyzers** (`Dx.Domain.Analyzers`):
+* [ ] References `Annotations` (for vocabulary) and Roslyn/runtime only.
+* [ ] **Short-circuits** all consumer rules (DXA*) if `DxLayer != Consumer`.
 
-Abstractions are **0% logic, 100% metadata**.
+
 
 ---
 
-## 3. Kernel Scope Test (The Judge Only)
+## 2. Annotations Purity Test (Vocabulary-Only)
 
-For any change in `Dx.Domain` (Kernel):
+For any change under `Dx.Domain.Annotations`:
 
-- [ ] No ambient context (`HttpContext`, thread-local, static global state, service locators).
-- [ ] No I/O, persistence, networking, or logging.
-- [ ] No orchestration or policies (no retries, backoff, telemetry, metrics).
-- [ ] Public primitives are effectively final:
-  - `sealed` classes or `readonly struct`s
-  - No public base types intended for external inheritance.
-
-Kernel code **judges values**; it never coordinates infrastructure.
+* [ ] **0% Logic:** No methods, control flow (`if`, `switch`), or extension methods.
+* [ ] **No Runtime Primitives:** No `Result` types, no Exceptions, no `Guid` wrappers.
+* [ ] **Attribute Constraints:** All attributes are `sealed` and parameterized only by primitives (`string`, `bool`, `enum`).
+* [ ] **Metadata:** All metadata types are immutable `record`s with no runtime behavior.
 
 ---
 
-## 4. Facade Exclusion Rule
+## 3. Primitives Admission Test (Identities)
 
-Developer-friendly facades **must not** live in the Kernel.
+For types in `Dx.Domain.Primitives`:
 
-- [ ] `Dx.Domain` contains **no** ergonomic facades (e.g. `DxDomain` static entry points).
-- [ ] Any convenience or sugar API lives in an **outer** assembly (e.g. `Dx.Domain.Runtime`, `Dx.Domain.Extensions`).
-- [ ] Outer facades may depend on Kernel and Abstractions, but **never** the other way around.
-
-Kernel exposes:
-
-- Core primitives (identities, `Result`, `Fact<TPayload>`, `Causation`, `TransitionResult<TState>`, error types).
-- Judges (`Invariant.That`, `Require.That`).
-- Pure functional extensions (`Map`, `Bind`, `Tap`, `Ensure`).
+* [ ] Implemented as a `readonly struct`.
+* [ ] **Guarded Creation:** No public constructors; creation via internal factories (e.g., `InternalNew`).
+* [ ] **Purity:** No implicit casts to/from `Guid` or `string`.
+* [ ] **Generation:** Uses only allowed generators (e.g., `Guid.NewGuid()`); no business-semantic or sequential logic.
+* [ ] **Standards:** Implements `IParsable<T>` and `ISpanFormattable`.
 
 ---
 
-## 5. Identity Admission Test
+## 4. Kernel Scope Test (The Logic Judge)
 
-For each identity primitive (`ActorId`, `TraceId`, `CorrelationId`, `SpanId`, `FactId`, or any new identity type):
+For any change in `Dx.Domain.Kernel`:
 
-- [ ] Implemented as a `readonly struct`.
-- [ ] No public constructors; creation is guarded via internal factories (e.g. `InternalNew`, `InternalFrom`).
-- [ ] Implements `IIdentity` from `Dx.Domain.Abstractions`.
-- [ ] Implements `IParsable<T>` and `ISpanFormattable` where applicable.
-- [ ] No implicit conversions to or from primitive types (`Guid`, `string`, etc.).
-- [ ] Uses only **allowed** generators:
-  - `Guid.NewGuid()` and/or cryptographic randomness.
-  - No time-based, sequential, or business-semantic generation.
+* [ ] **No Ambient Context:** No `HttpContext`, static state, or service locators.
+* [ ] **No Side Effects:** No I/O, persistence, networking, or logging.
+* [ ] **Sealed by Default:** Public types are `sealed` or `readonly struct`. No public base types for external inheritance.
+* [ ] **Judge-Only:** Kernel code **judges values**; it never coordinates infrastructure.
 
 ---
 
-## 6. Result Algebra Test
+## 5. Result Algebra & Error Canon
 
-For `Result`, `Result<T>`, `Result<T, TError>` and their extensions:
-
-- [ ] No implicit cast operators.
-- [ ] Failures are represented as values (`DomainError` / `TError`), not by throwing.
-- [ ] All `Map`, `Bind`, `Tap`, `Ensure`, etc. are:
-  - Pure
-  - Side-effect-free
-  - Free of ambient state and I/O
-
-Result is the exclusive flow-control mechanism inside the Kernel.
+* [ ] **Result Purity:** All `Map`, `Bind`, `Tap`, and `Ensure` extensions are side-effect-free.
+* [ ] **Error Immutability:** `DomainError` and `InvariantError` are immutable data holders with no environment access.
+* [ ] **The Canon:** `DxDomain.Codes` remains a pure catalog of stable constants. New codes follow the grouping scheme (e.g., `Invariant.*`, `Domain.*`).
 
 ---
 
-## 7. Invariant & Require Test
+## 6. Invariant & Require Test
 
-For `Invariant`, `Require`, and any new enforcement helpers:
-
-- [ ] `Invariant.That(...)`:
-  - [ ] Throws **only** `InvariantViolationException` on failure.
-  - [ ] Always constructs an `InvariantError` containing code, message, member, file, line, and correlation context.
-- [ ] `Require.That(...)` and friends:
-  - [ ] Never throw for normal failures; they return `Result.Failure(...)`.
-  - [ ] Use `DomainError` and canonical codes from `DxDomain.Codes`.
-- [ ] No logging or side effects in either path.
-
-Diagnostics are **data**, not logs.
+* [ ] `Invariant.That(...)`: Throws **only** `InvariantViolationException`. Constructs a full `InvariantError` (code, line, member, context).
+* [ ] `Require.That(...)`: Never throws; returns `Result.Failure`.
+* [ ] **No Logging:** Diagnostics are treated as **Data**, not logs. Side effects in these paths are forbidden.
 
 ---
 
-## 8. Error & Codes Canon Test
+## 7. Facade Exclusion Rule
 
-For `DomainError`, `InvariantError`, and `DxDomain.Codes`:
-
-- [ ] Errors are immutable and contain no side effects.
-- [ ] No logging or environment access in error construction.
-- [ ] `DxDomain.Codes` is a **pure** catalog of constants, logically grouped (e.g. `Invariant`, `Domain`, `Common`, `Validation`).
-- [ ] New codes follow the existing naming scheme and are treated as stable identifiers.
-
-Error codes are part of the public canon and must not be silently repurposed.
+* [ ] `Dx.Domain.Kernel` contains **no** ergonomic facades (e.g., static `DxDomain` entry points).
+* [ ] All "Sugar APIs" live in outer assemblies (e.g., `Dx.Domain.Runtime`) which may depend on the Kernel.
 
 ---
 
-## 9. Fact System Admission Test
+## 8. Fact System Admission
 
-For `Fact<TPayload>`, `Causation`, `TransitionResult<TState>` and related types:
+For `Fact<TPayload>`, `Causation`, and `TransitionResult`:
 
-- [ ] Types are structural holders of history and causation, not behavior.
-- [ ] No event dispatch, messaging, or integration logic is present in Kernel.
-- [ ] Construction is guarded via internal factories; no public mutable constructors.
-- [ ] Facts are explicitly **not** domain events.
-
----
-
-## 10. Analyzer Contract Test
-
-For any change that affects attributes, marker interfaces, or metadata consumed by analyzers:
-
-- [ ] Contracts (`[AggregateRoot]`, `[ValueObject]`, `IdentityMetadata`, etc.) live in `Dx.Domain.Abstractions`.
-- [ ] Kernel merely consumes these; it does not redefine or shadow them.
-- [ ] New rules reflected in:
-  - `DxRuleIds`
-  - `DxCategories`
-  - `DxSeverities`
-- [ ] Analyzers can enforce at least:
-  - Factory-only construction
-  - Result usage discipline
-  - Identity and immutability rules
-  - Vocabulary purity (no Kernel semantics in Abstractions)
+* [ ] Types are structural holders of history/lineage, not behavior.
+* [ ] **No Messaging:** No event dispatch or integration logic.
+* [ ] Facts are explicitly **not** domain events.
 
 ---
 
-## 11. Mandatory Review Acknowledgement
+## 9. Analyzer Short-Circuit Test
 
-Every PR touching Kernel, Abstractions, or Analyzers **must** include:
+For any change affecting analyzer logic:
 
-- [ ] A short note in the PR description linking to this file.
-- [ ] An explicit statement by the author confirming that this checklist was reviewed and all applicable items are satisfied.
+* [ ] **Authority Exemption:** Verify the analyzer skips `DXA*` rules if `DxLayer` is `Kernel`, `Primitives`, or `Annotations`.
+* [ ] **Self-Hosting:** The framework must build and pass tests with analyzers enabled **without requiring a `.dx/invariants.json` file**.
 
-If any item cannot be satisfied, the PR must:
+---
 
-- Clearly document the deviation, and
-- Mark it as a **spec defect** to be fixed, not as a new precedent.
+## 10. Mandatory Review Acknowledgement
+
+Every PR touching these authority layers **must** include:
+
+* [ ] A link to this file in the PR description.
+* [ ] A statement confirming: *"This PR adheres to the Authority Admission Test (v001). No consumer-discipline rules were suppressed; the layer-short-circuit logic was verified."*

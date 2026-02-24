@@ -1,491 +1,249 @@
-# Dx.Domain.Kernel Refactorization Specification
+# Agent Instructions
 
-## Kernel & Abstractions v1.0 (Authoritative)
+## Dx.Domain Enforcement Refactoring (Repository-Local)
 
----
+### Role of the Agent
 
-## 0. Status of This Document
+You are operating **inside the `dx.domain` repository only**.
 
-This specification is **normative**.
+You are **not** responsible for:
 
-* Any implementation claiming compliance with Dx.Domain **must** conform to this document.
-* Any deviation is a defect, not an interpretation difference.
-* Kernel and Abstractions are considered **foundational infrastructure** and are expected to remain stable across major framework evolution.
+* implementing `dx.templates`
+* generating `.dx/invariants.json`
+* defining the final DXT schema
 
----
+You **are** responsible for ensuring that **dx.domain fully defines, enforces, and defends the ground rules** that `dx.templates` and consumers must obey.
 
-## 1. Core Philosophy: The Substrate of Correctness
-
-Dx.Domain does **not** model business logic.
-
-It provides the **substrate upon which incorrect business logic is structurally difficult to express**.
-
-The architectural invariant is:
-
-> **If it compiles, passes analyzers, and the Kernel accepts it, the state is valid.**
-
-This is achieved through a strict separation of concerns:
-
-* **Dx.Domain.Abstractions** defines *semantic vocabulary* for intent and invariants.
-* **Dx.Domain.Kernel** defines *runtime judgment* for validity and failure.
-* **Dx.Domain.Analyzers** (out of scope for this document) enforce the contract at design time.
+> `dx.templates` depends on `dx.domain` rules — not the other way around.
+> Lack of template implementation is **never** a valid reason to stop work in this repo.
 
 ---
 
-## 2. Package Boundaries & Dependency Model
+## Invalid Stopping Reasons (Explicit)
 
-### 2.1 Canonical Dependency Graph (Corrected)
+You MUST NOT stop work for any of the following reasons:
 
-```text
-      [Dx.Domain.Abstractions] <------- (Implements / Uses) -----------------+
-             ^        ^                                                      |
-             |        |                                                      |
-    (Analyzes)        +---------------------+                                |
-             |                              |                                |
-   [Dx.Domain.Analyzers]           [Dx.Domain.Kernel]                        |
-             ^                              ^                                |
-             |                              |                                |
-             +--------- (Analyzes) ---------+                                |
-                                            |                                |
-                                     [User Domain Code] -- (Depends on) -----+
-```
+* “DXT schema is not finalized”
+* “dx.templates work is out of scope”
+* “Consumers cannot yet emit `.dx/invariants.json`”
+* “Template CI is not implemented yet”
 
-### Dependency Rules (Strict)
+All of the above are **downstream concerns**.
 
-* **Dx.Domain.Abstractions**
+You must proceed by:
 
-  * Has **no dependencies** on Kernel, Analyzers, or user code.
-* **Dx.Domain.Kernel**
-
-  * **Must depend on Dx.Domain.Abstractions**
-  * **Must not depend on Dx.Domain.Analyzers**
-* **Dx.Domain.Analyzers**
-
-  * Depends on **Dx.Domain.Abstractions**
-  * May analyze Kernel and User Domain code
-* **User Domain Code**
-
-  * Depends on Kernel and Abstractions
-  * Never depends on Analyzers at runtime
-
-### Packaging vs. Assembly Clarification
-
-* A **NuGet meta-package** (e.g., `Dx.Domain`) may bundle:
-
-  * Kernel
-  * Abstractions
-  * Analyzers
-* **Assemblies remain strictly decoupled**
-
-  * `Dx.Domain.Kernel.dll` never references analyzers
-  * Analyzer assemblies are compiler-only artifacts
+* defining strict expectations,
+* enforcing fail-fast behavior,
+* and providing deterministic diagnostics when expectations are unmet.
 
 ---
 
-## 3. Dx.Domain.Abstractions
+## Valid Stopping Reasons (Only These)
 
-### *The Vocabulary*
+You MAY stop **only if all repository-local invariants below are satisfied**.
 
-### 3.1 Purpose
-
-Dx.Domain.Abstractions defines **semantic intent** that is visible to:
-
-* The compiler
-* Roslyn analyzers
-* Source generators
-
-It encodes *meaning*, not behavior.
+If any checklist item is incomplete, stopping is a failure.
 
 ---
 
-### 3.2 Hard Constraints
+## Repository-Local Objectives (What You Must Finish)
 
-Abstractions **must not contain**:
+### Objective A — DXT Contract Enforcement (Without Templates)
 
-* Runtime logic
-* Control flow
-* Extension methods
-* Exceptions
-* Validation helpers
-* Identity value types
-* Result types
-* Time, randomness, or environment access
+You must fully implement **DXT enforcement behavior** even if no real DXT file exists yet.
 
-Abstractions are **pure metadata**.
+#### Required Actions
 
----
+* Treat `.dx/invariants.json` as an **opaque external contract**
+* Do **not** assume its structure beyond what is strictly required
+* Enforce the following behaviors:
 
-### 3.3 Assembly Contents (Authoritative)
+##### A.1 Presence Semantics
 
-#### 3.3.1 Marker Interfaces (Semantic Roles)
+* If project is **consumer scope** and:
 
-Marker interfaces exist **only** to communicate semantic role.
+  * no `.dx/invariants.json` is found → **emit deterministic DX error**
+* If project is **authority scope**:
 
-```csharp
-IAggregateRoot
-IEntity
-IValueObject
-IDomainEvent
-IDomainPolicy
-IDomainFactory
-IIdentity
-```
+  * analyzers must **never attempt to locate or read DXT**
 
-Rules:
+##### A.2 Authority Immunity
 
-* No members
-* No inheritance chains
-* No default implementations
-* Used exclusively for:
+* Confirm in code that **no analyzer path**:
 
-  * Generic constraints
-  * Analyzer targeting
-  * Kernel integration
+  * probes for DXT
+  * fails
+  * or logs diagnostics
+    when running in authority scope
+
+> You are enforcing *absence tolerance* for authority and *presence requirement* for consumers.
 
 ---
 
-#### 3.3.2 Attributes (Semantic Assertions)
+### Objective B — Analyzer Rule Completeness (Scope-Exact)
 
-Attributes declare **intent**, never behavior.
+You must verify and, if necessary, harden **every DX analyzer** so that:
 
-Mandatory attributes include (non-exhaustive):
+#### Required Actions
 
-```csharp
-[AggregateRoot]
-[Entity]
-[ValueObject]
-[DomainEvent]
-[Invariant]
-[Identity]
-[Factory]
-[Policy]
-```
+* Every DXA* and DXK* rule explicitly checks:
 
-Rules:
+  * authority vs consumer
+  * test vs non-test
+* No rule relies on:
 
-* Attributes must be `sealed`
-* Parameters must be primitives (`string`, `bool`, `enum`)
-* Attributes must never encode lifecycle or execution semantics
+  * naming heuristics
+  * assembly name matching
+  * folder structure guesses
 
----
+##### B.1 Zero False Positives for Authority
 
-#### 3.3.3 Metadata Records (Analyzer Contracts)
+* Authority projects must produce **zero consumer-discipline diagnostics**
+* This is a hard invariant; “unlikely” is insufficient
 
-Metadata records describe **structural shape** for analyzers and generators.
+##### B.2 Deterministic Failure for Consumers
 
-Examples:
+* Consumer misuse must:
 
-```csharp
-AggregateMetadata
-IdentityMetadata
-InvariantMetadata
-FactoryMetadata
-```
-
-Rules:
-
-* `record` only
-* Immutable
-* No reflection helpers
-* No lazy evaluation
-* No runtime behavior
-
-**Primitive Discipline:**
-If identifiers or samples are required, use **string representations**, not `Guid`, to preserve zero-runtime semantics.
+  * always produce a DX diagnostic
+  * never silently pass
+  * never degrade into warnings when forbidden
 
 ---
 
-#### 3.3.4 Diagnostic Canon
+### Objective C — Dependency Geometry Enforcement (Template-Agnostic)
 
-Abstractions define the **canonical diagnostic vocabulary**.
+You must enforce **strict dependency rules** even without DXT contents.
 
-```csharp
-DxRuleIds
-DxCategories
-DxSeverities
-```
+#### Required Actions
 
-Rule families (minimum):
+* Encode **hard forbids** that do NOT require DXT data, at minimum:
 
-* DXA01x — Construction authority
-* DXA02x — Result discipline
-* DXA03x — Identity violations
-* DXA04x — Immutability violations
-* DXA05x — Vocabulary pollution
-* DXA06x — Analyzer-only semantic leaks
+  * Domain → Infrastructure
+  * Contracts → Kernel
+  * Consumer → internal `dx.domain.*` packages
+* These must:
 
-This canon is:
+  * apply only to consumer scope
+  * fail deterministically
+  * be impossible to suppress
 
-* Versioned
-* Append-only
-* Shared by all analyzers
+> DXT may *add* allow-lists later, but the base physics live here.
 
 ---
 
-## 4. Dx.Domain.Kernel
+### Objective D — MSBuild Governance Finalization (Repo-Local)
 
-### *The Judge*
+You must complete governance **as far as it applies to `dx.domain` itself**.
 
-### 4.1 Purpose
+#### Required Actions
 
-Dx.Domain.Kernel provides the **exclusive runtime authority** for:
+* Verify that:
 
-* Validity
-* Failure
-* Identity
-* Invariants
-* Transitions
-* Structural history
+  * `dx.domain` builds successfully **with analyzers enabled**
+  * no DXT is required
+  * no consumer-only Non-Silence rules accidentally trip
 
-Kernel types **judge values**.
-They never act on infrastructure, I/O, or environment.
+* Explicitly document (in repo docs):
 
----
+  * which governance rules are consumer-only
+  * which never apply to authority repos
 
-### 4.2 Mandatory Dependency on Abstractions
-
-Kernel **must reference Dx.Domain.Abstractions** in order to:
-
-* Implement marker interfaces (`IIdentity`, etc.)
-* Consume attributes (`[Invariant]`, `[Factory]`)
-* Align runtime behavior with analyzer semantics
-
-This dependency is **strict and one-way**.
+> This prevents future regressions when governance evolves.
 
 ---
 
-### 4.3 Laws of the Kernel (Final)
+### Objective E — Analyzer Distribution Invariants
 
-#### Law 1: No Ambient Context
+You must ensure distribution rules are **self-evident and non-regressible**.
 
-Kernel code must never access:
+#### Required Actions
 
-* Global state
-* Thread-local storage
-* HttpContext
-* Service locators
+* Verify:
 
-All context is explicit and immutable.
+  * analyzers are included as assets in Kernel / Primitives / Annotations packages
+  * analyzers are **not packable standalone**
+* Add explicit safeguards (build or doc-level) preventing:
 
----
-
-#### Law 2: Restricted Generation
-
-Kernel may generate values **only if**:
-
-1. No business semantics
-2. No ordering meaning
-3. Algorithm invariant across runtimes
-
-Allowed:
-
-* `Guid.NewGuid()` for infrastructure identity
-* Cryptographic randomness
-
-Forbidden:
-
-* Sequential IDs
-* Time-based ordering
-* Database-derived identifiers
+  * accidental publication of `Dx.Domain.Analyzers`
 
 ---
 
-#### Law 3: Diagnostics as Data
+### Objective F — CI Readiness (dx.domain Only)
 
-Invariant violations produce **structured data**, not logs.
+You are **not** implementing template CI.
 
-`InvariantError` must include:
+You **are** responsible for ensuring that:
 
-* Code
-* Message
-* Member
-* File
-* Line
-* Correlation context
+* dx.domain CI:
 
-Kernel never logs.
+  * runs analyzers
+  * passes with no DXT present
+  * fails if authority code accidentally triggers consumer rules
 
----
-
-#### Law 4: Functional Purity
-
-Kernel extension methods are:
-
-* Pure
-* Side-effect-free
-* Referentially transparent
-
-Side effects belong to the caller.
+If CI cannot express this yet, document the invariant **explicitly**.
 
 ---
 
-#### Law 5: Kernel Types Are Final
+## Required Output Artifacts
 
-No public inheritance from Kernel primitives.
+Before stopping, you must produce **all** of the following inside the repo:
 
----
+1. **Analyzer behavior guarantees** (documented):
 
-#### Law 6: Kernel Has No Opinions
+   * authority vs consumer vs test
+2. **DXT enforcement semantics** (documented):
 
-Kernel contains:
-
-* No retries
-* No policies
-* No telemetry
-* No orchestration
-
----
-
-### 4.4 Assembly Contents (Authoritative)
-
-#### 4.4.1 Identity Primitives
-
-Examples:
-
-```csharp
-ActorId
-TraceId
-CorrelationId
-SpanId
-FactId
-```
-
-Requirements:
-
-* `readonly struct`
-* No public constructors
-* Guarded creation only
-* Implements `IIdentity` (from Abstractions)
-* Implements `IParsable<T>` and `ISpanFormattable`
-* No implicit conversions
+   * presence required for consumers
+   * absence tolerated for authority
+3. **Non-negotiable dependency physics** (documented + enforced)
+4. **Distribution guarantees** for analyzers
+5. **Clear “out of scope” notes** explaining what `dx.templates` must implement — without blocking this repo
 
 ---
 
-#### 4.4.2 Result Algebra (Canonical)
+## Completion Checklist (Stop Condition)
 
-```csharp
-Result
-Result<T>
-Result<T, TError>
-```
+You may stop **only when all are true**:
 
-Rules:
+* [ ] No analyzer path depends on template implementation
+* [ ] All consumer-discipline rules are scope-exact
+* [ ] Authority code is immune to DXT and consumer rules
+* [ ] Missing DXT in consumers fails deterministically
+* [ ] dx.domain builds clean with analyzers enabled
+* [ ] Analyzer packaging cannot regress accidentally
+* [ ] Remaining work is **strictly downstream** (templates / consumers)
 
-* Exclusive flow-control mechanism
-* Failures are values, not exceptions
-* No implicit casting
-* Allocation-aware
-
----
-
-#### 4.4.3 Error Model
-
-```csharp
-DomainError
-InvariantError
-```
-
-Rules:
-
-* Errors are immutable data
-* No logging
-* Carry causation where applicable
+If any box is unchecked, you must continue.
 
 ---
 
-#### 4.4.4 Invariant Enforcement
+## Final Instruction (Non-Negotiable)
 
-Two explicit mechanisms:
-
-```csharp
-Invariant.That(...)   // Panic (exception)
-Require.That(...)     // Recoverable failure
-```
-
-Rules:
-
-* Panic throws only `InvariantViolationException`
-* Recoverable failures return `Result.Failure`
-* Full diagnostic context is mandatory
+> **dx.domain defines the law.
+> dx.templates comply with it.
+> The absence of a citizen does not suspend the constitution.**
 
 ---
 
-#### 4.4.5 Fact System (Structural History)
+## Repository Outputs
 
-```csharp
-Fact<TPayload>
-Causation
-TransitionResult<TState>
-```
-
-Facts are:
-
-* Structural
-* Lineage-aware
-* Meaning-agnostic
-
-Facts are **not domain events**.
+- Repository-local enforcement guarantees are documented in `docs/enforcement-guarantees.md`.
 
 ---
 
-#### 4.4.6 Functional Extensions
+## Refactorization Progress (dx.domain repo)
 
-Permitted:
+### Completed
 
-```csharp
-Map
-Bind
-Tap
-Ensure
-```
+- Scope resolution no longer uses assembly-name or path heuristics; authority/consumer are resolved from build metadata only.
+- Authority layer metadata is set on repo-local projects and tests to avoid DXT enforcement.
+- DXT enforcement is authority-immune and deterministic for consumers via `DXT004`.
+- Consumer dependency physics now forbid internal `Dx.Domain.*` package references via `DXK009`.
+- Kernel API freeze enforcement is opt-in via `build_property.DxKernelApiFreeze` and skips tests.
+- Repository-local enforcement guarantees are documented in `docs/enforcement-guarantees.md`.
+- Governance rules (`DXB001`-`DXB003`) are documented as consumer-only and excluded from authority repositories.
+- Analyzer packaging is guarded by defaults and DXB004 to prevent standalone publication.
+- Kernel pack now self-heals missing `buildTransitive` assets before packing.
 
-Rules:
-
-* Pure
-* Explicit
-* No hidden control flow
-
----
-
-### 4.5 Explicit Non-Goals
-
-Kernel will **never** contain:
-
-* Repositories
-* Event dispatch
-* Persistence
-* Serialization
-* Clocks
-* Time abstractions
-* Infrastructure adapters
-
----
-
-## 5. Tooling Contract (Analyzer Alignment)
-
-Analyzers consume **Abstractions** and analyze **Kernel + User Code**.
-
-Mandatory enforcement includes:
-
-1. Immutability of `[ValueObject]` and `[DomainEvent]`
-2. Aggregate root identity enforcement
-3. Factory-only construction
-4. Result usage discipline
-5. Vocabulary pollution detection
-
-Analyzers are **external judges**, never runtime participants.
-
----
-
-## 6. Final Assessment
-
-With the corrected dependency graph and mandatory Kernel → Abstractions linkage:
-
-* The architecture is sound
-* The semantic contract is enforceable
-* Runtime purity is preserved
-* Tooling authority is externalized correctly
-
-This document is now the **authoritative definition of Dx.Domain**.
-
-No further structural changes are required before v1.0 release.
+Proceed accordingly.

@@ -57,7 +57,8 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
                 TestCode = source
             };
 
-            test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorConfig));
+            var normalizedConfig = EnsureTestProjectFlag(editorConfig);
+            test.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", normalizedConfig));
             test.TestState.AdditionalReferences.Add(MetadataReference.CreateFromFile(typeof(AggregateRootAttribute).Assembly.Location));
 
             if (!includeKernelReferences)
@@ -68,6 +69,14 @@ namespace Dx.Domain.Analyzers.Tests.AnalyzerTests
             test.ExpectedDiagnostics.AddRange(expected);
 
             await test.RunAsync();
+        }
+
+        private static string EnsureTestProjectFlag(string editorConfig)
+        {
+            if (editorConfig.Contains("build_property.IsTestProject", StringComparison.OrdinalIgnoreCase))
+                return editorConfig;
+
+            return $"{editorConfig}\n            build_property.IsTestProject = false\n            ";
         }
     }
 }

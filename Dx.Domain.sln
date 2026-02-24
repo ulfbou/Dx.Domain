@@ -32,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6
 		CHANGELOG.md = CHANGELOG.md
 		CONTRIBUTING.md = CONTRIBUTING.md
 		docs\DPI.md = docs\DPI.md
+		docs\dx.domain.analyzers-dod.md = docs\dx.domain.analyzers-dod.md
 		docs\dx.domain.analyzers-spec.md = docs\dx.domain.analyzers-spec.md
 		docs\kernel.admission-test.md = docs\kernel.admission-test.md
 		docs\kernel.refactorization.specification.md = docs\kernel.refactorization.specification.md

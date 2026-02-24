@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "templates": {
+    "dx-sln": {
+      "projects": {
+        "Shared.Api": {
+          "role": "Host",
+          "layer": "Shared",
+          "requiredReferences": [
+            "Dx.Domain.Primitives"
+          ],
+          "forbiddenReferences": [
+            "Dx.Domain.Kernel"
+          ],
+          "namespacePrefix": "Shared.Api",
+          "directory": "src/Shared/Shared.Api",
+          "semanticCaps": {
+            "emitsApiHost": true,
+            "emitsObservability": true
+          }
+        }
+      },
+      "invariants": [
+        "DXT-001",
+        "DXT-002",
+        "DXT-003"
+      ]
+    }
+  }
+}

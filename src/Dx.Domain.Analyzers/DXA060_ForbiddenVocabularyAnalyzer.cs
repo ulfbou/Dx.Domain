@@ -147,7 +147,8 @@ namespace Dx.Domain.Analyzers
                 return;
 
             // Honor allow list
-            var displayName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var displayName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                .Replace("global::", string.Empty);
             if (allowList.Contains(displayName) || allowList.Contains(symbol.Name))
                 return;
 

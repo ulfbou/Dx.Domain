@@ -82,9 +82,22 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
         private static Compilation CreateCompilationWithRoleAttribute(DxAssemblyRole role)
         {
             var code = $@"""
-using Dx.Domain.Annotations;
+using System;
 
-[assembly: DxAssemblyRole(DxAssemblyRole.{role})]
+public enum DxAssemblyRole
+{{
+    Domain = 1,
+    Application = 2,
+    Host = 4
+}}
+
+[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
+public sealed class DxAssemblyRoleAttribute : Attribute
+{{
+    public DxAssemblyRoleAttribute(DxAssemblyRole role) {{ }}
+}}
+
+[assembly: DxAssemblyRoleAttribute(DxAssemblyRole.{role})]
 
 namespace Test {{ public class Foo {{ }} }}
 """;
@@ -97,7 +110,6 @@ namespace Test {{ public class Foo {{ }} }}
             var references = new[]
             {
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(DxAssemblyRoleAttribute).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(System.Runtime.AssemblyTargetedPatchBandAttribute).Assembly.Location)
             };
 
