@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup>
+    <!-- Nothing is packable unless explicitly opted in -->
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Basic metadata so restore does not complain -->
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">0.0.0-local</VersionPrefix>
+    <Company>Dx</Company>
+    <Authors>Ulf Bourelius</Authors>
+  </PropertyGroup>
+
+  <!-- Analyzer and Kernel are never packable -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Dx.Domain.Analyzers' OR '$(MSBuildProjectName)' == 'Dx.Domain.Kernel'">
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+</Project>
