@@ -25,6 +25,25 @@ jobs:
       - name: List SDKs
         run: dotnet --list-sdks
 
+      - name: Debug - list props and project refs
+        run: |
+          echo "=== Directory.Build.props ==="
+          cat Directory.Build.props
+          echo "=== Facts csproj refs ==="
+          grep -n "Reference Include" src/Dx.Domain.Facts/Dx.Domain.Facts.csproj || true
+          echo "=== MSBuild evaluated IsPackable ==="
+          dotnet msbuild src/Dx.Domain.Facts/Dx.Domain.Facts.csproj -getProperty:IsPackable
+
+      - name: Restore with binary log
+        run: dotnet restore -bl:restore.binlog
+
+      - name: Upload restore log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restore-binlog
+          path: restore.binlog
+
       # Analyzer profile resolution (maintainer → consumer → fallback)
       - name: Use maintainer analyzer profile
         if: ${{ hashFiles('.editorconfig.maintainers') != '' }}

@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="Markers.cs" company="Dx.Domain Team">
+// <copyright file="Metadata.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -12,24 +12,16 @@
 
 namespace Dx.Domain.Annotations
 {
-    public interface IAggregateRoot { }
-
-    public interface IEntity { }
-
-    public interface IValueObject { }
-
-    public interface IDomainEvent { }
-
-    public interface IDomainPolicy { }
-
-    public interface IDomainFactory { }
+    public sealed record AggregateMetadata(string Name, string Identity);
 
     /// <summary>
-    /// Semantic marker interface for Dx.Domain identity vocabulary (pure metadata).
+    /// Metadata describing identity shape for analyzers/generators (pure data).
     /// </summary>
     /// <remarks>
-    /// Caries no members or default implementations; used by analyzers and Kernel to classify
-    /// identity intent. SEE: Kernel Specification → Identity Primitives.
+    /// Records must be immutable and contain no runtime logic. SEE: Annotations Spec → Metadata Records.
     /// </remarks>
-    public interface IIdentity { }
+    public sealed record IdentityMetadata(string Name, string? Example);
+    public sealed record InvariantMetadata(string Code, string Description);
+
+    public sealed record FactoryMetadata(string Name, string ResultType);
 }

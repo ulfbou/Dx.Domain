@@ -36,4 +36,14 @@ namespace Dx.Domain.Facts
         /// <summary>Gets the payload of the fact.</summary>
         object GetPayload();
     }
+
+    /// <summary>
+    /// Represents a domain fact with a strongly typed payload.
+    /// </summary>
+    /// <typeparam name="TPayload">The payload type.</typeparam>
+    public interface IDomainFact<out TPayload> : IDomainFact
+    {
+        /// <summary>Gets the payload of the fact.</summary>
+        new TPayload GetPayload();
+    }
 }

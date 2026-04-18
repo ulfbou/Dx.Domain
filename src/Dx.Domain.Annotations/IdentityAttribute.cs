@@ -6,29 +6,31 @@ using System;
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Marks a type as a domain identity primitive.
+/// Marks a type as a domain identity primitive (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// <para>
-/// Identity types must be <c>readonly struct</c>, implement <c>IIdentity</c>,
-/// have no public constructors, and use guarded creation only.
-/// </para>
-/// <para>
-/// Enforced by DXA030 (Identity violations) and related analyzers.
-/// </para>
-/// <example>
-/// <code>
+/// This attribute imposes no runtime semantics. Analyzers classify identity intent; the
+/// *normative requirements* are defined in the Kernel specification and the identity
+/// discipline rule charter. See the Kernel specification for identity primitives and the
+/// rule charter for identity discipline.
+///
+/// <para><b>Example (Kernel realization, non‑prescriptive):</b></para>
+/// <code><![CDATA[
 /// [Identity]
 /// public readonly struct OrderId : IIdentity
 /// {
 ///     private readonly Guid _value;
-///     
 ///     private OrderId(Guid value) => _value = value;
-///     
-///     public static Result&lt;OrderId&gt; Create(Guid value) => ...;
+///     public static Result<OrderId> Create(Guid value) => /* guarded creation */;
 /// }
-/// </code>
-/// </example>
+/// ]]></code>
+/// 
+/// <para><b>Example (Usage, non‑prescriptive):</b></para>
+/// <code><![CDATA[
+/// var maybeId = OrderId.Create(guid);
+/// if (maybeId.IsFailure) return maybeId.Error;
+/// OrderId id = maybeId.Value;
+/// ]]></code>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 public sealed class IdentityAttribute : Attribute

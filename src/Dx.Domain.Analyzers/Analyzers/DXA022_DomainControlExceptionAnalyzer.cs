@@ -17,7 +17,6 @@ using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Flow;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
-using Dx.Domain.Analyzers.Infrastructure.Semantics;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -66,6 +65,14 @@ namespace Dx.Domain.Analyzers.Analyzers
 
                 startContext.RegisterOperationAction(operationContext =>
                 {
+                    // 1. Kernel types are implementation, not subject to DXA011
+                    if (services.Scope.IsKernelInternal(operationContext.Compilation.Assembly))
+                        return;
+
+                    // 2. Generated code – SymbolAnalysisContext has no IsGeneratedCode, use the detector
+                    if (operationContext.IsGeneratedCode)
+                        return;
+
                     AnalyzeThrow(operationContext, services);
                 }, OperationKind.Throw);
             });

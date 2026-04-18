@@ -10,11 +10,15 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
     public static class DxCategories
     {
         public const string Kernel = "Dx.Domain.Kernel";
         public const string Template = "Dx.Templates";
+        public const string DomainArchitecture = "Domain.Architecture";
+        public const string DomainResultHandling = "Domain.ResultHandling";
+        public const string DomainExceptionHandling = "Domain.ExceptionHandling";
+        public const string DomainCodeGeneration = "Domain.CodeGeneration";
     }
 }

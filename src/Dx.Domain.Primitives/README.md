@@ -11,13 +11,13 @@ These primitives are designed to be:
 
 The library currently includes:
 
-- `Dx.Domain.Primitives.UserId`
+- `Dx.Domain.Primitives.ActorId`
 - `Dx.Domain.CorrelationId`
 - `Dx.Domain.FactId`
 - `Dx.Domain.Primitives.SpanId`
 - `Dx.Domain.Primitives.TraceId`
 
-> Note that `CorrelationId` and `FactId` live directly under the `Dx.Domain` namespace, while `UserId`, `SpanId`, and `TraceId` live under `Dx.Domain.Primitives`.
+> Note that `CorrelationId` and `FactId` live directly under the `Dx.Domain` namespace, while `ActorId`, `SpanId`, and `TraceId` live under `Dx.Domain.Primitives`.
 
 ## Package goals
 
@@ -31,7 +31,7 @@ These primitives are intentionally minimal: they model identity and tracing conc
 
 ## Primitives overview
 
-### UserId (`Dx.Domain.Primitives.UserId`)
+### ActorId (`Dx.Domain.Primitives.ActorId`)
 
 A strongly-typed identifier for an actor.
 
@@ -42,10 +42,10 @@ A strongly-typed identifier for an actor.
 Key members:
 
 - `public Guid Value { get; }`
-- `public static UserId New()`
-- `public static UserId FromGuid(Guid value)`
-- `public static UserId Parse(string s, IFormatProvider? provider)`
-- `public static bool TryParse(string? s, IFormatProvider? provider, out UserId result)`
+- `public static ActorId New()`
+- `public static ActorId FromGuid(Guid value)`
+- `public static ActorId Parse(string s, IFormatProvider? provider)`
+- `public static bool TryParse(string? s, IFormatProvider? provider, out ActorId result)`
 - `public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)`
 
 Example:
@@ -53,9 +53,9 @@ Example:
 ```csharp
 using Dx.Domain.Primitives;
 
-UserId id = UserId.New();
+ActorId id = ActorId.New();
 string s = id.ToString();          // 32 hex chars, no dashes
-UserId parsed = UserId.Parse(s, null);
+ActorId parsed = ActorId.Parse(s, null);
 ```
 
 ### CorrelationId (`Dx.Domain.CorrelationId`)

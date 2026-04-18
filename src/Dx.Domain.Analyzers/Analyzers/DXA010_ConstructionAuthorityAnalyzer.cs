@@ -16,7 +16,6 @@ using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
-using Dx.Domain.Analyzers.Infrastructure.Semantics;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -65,8 +64,24 @@ namespace Dx.Domain.Analyzers.Analyzers
 
                 startContext.RegisterOperationAction(operationContext =>
                 {
-                    AnalyzeObjectCreation(operationContext, services);
-                    AnalyzeFactoryInvocation(operationContext, services);
+                    // 1. Kernel boundary – must be first
+                    if (services.Scope.IsKernelInternal(operationContext.Compilation.Assembly))
+                        return;
+
+                    // 2. Generated code – use the built-in flag, not IsGenerated(SyntaxTree)
+                    if (operationContext.IsGeneratedCode)
+                        return;
+
+                    // 3. Safe dispatch
+                    switch (operationContext.Operation)
+                    {
+                        case IObjectCreationOperation:
+                            AnalyzeObjectCreation(operationContext, services);
+                            break;
+                        case IInvocationOperation:
+                            AnalyzeFactoryInvocation(operationContext, services);
+                            break;
+                    }
                 }, OperationKind.ObjectCreation, OperationKind.Invocation);
             });
         }

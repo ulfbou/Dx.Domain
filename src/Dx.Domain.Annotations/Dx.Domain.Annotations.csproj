@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk" Label="Dx.Domain.Annotations">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Annotations</DxLayer>
@@ -6,7 +6,7 @@
     <RootNamespace>Dx.Domain.Annotations</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>10</LangVersion>
-    <Description>Marker-only annotations for Dx.Domain (pure attributes). No runtime behavior.</Description>
+    <Description>Semantic vocabulary for Dx.Domain (pure metadata: markers, attributes, canon).</Description>
     <PackageTags>dx;ddd;annotations;attributes;domain-model</PackageTags>
     <Authors>Dx.Domain Team</Authors>
     <Company>Dx.Domain Team</Company>
@@ -17,6 +17,13 @@
     <RepositoryUrl>https://github.com/ulfbou/dx.domain</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
+    <Version>0.1.0-alpha</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.1.0-alpha.4</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,9 +34,7 @@
     <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
 
-
   <ItemGroup>
-    <!-- Embed Dx.Domain.Analyzers so consumers get rules automatically -->
     <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll"
           Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')"
           Pack="true"

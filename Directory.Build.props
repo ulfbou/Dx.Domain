@@ -1,11 +1,27 @@
-<!-- Directory.Build.props -->
-<!-- This file is used to centralize and standardize build configurations across multiple projects in a repository. -->
 <Project>
+  <PropertyGroup>
+    <!-- Packaging off by default -->
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
-  <!-- 1️⃣ Core build configuration first -->
-  <Import Project="Directory.Core.props" Condition="Exists('Directory.Core.props')" />
+    <!-- Versions: numeric for CLR, suffix only for informational -->
+    <VersionPrefix>0.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(Configuration)' == 'Debug'">local</VersionSuffix>
+    <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
 
-  <!-- Single Source global usings for Dx.Domain when enabled -->
-  <Import Project="src/Dx.Domain/build/Dx.Domain.props" Condition="Exists('src/Dx.Domain/build/Dx.Domain.props') AND '$(DxDomainSingleSource)' == 'true'" />
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
 
+    <!-- Common metadata -->
+    <Authors>Ulf Bourelius</Authors>
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Docs metadata -->
+    <GenerateDocumentationFile Condition="'$(DxIsTest)' != 'true'">true</GenerateDocumentationFile>
+  </PropertyGroup>
 </Project>

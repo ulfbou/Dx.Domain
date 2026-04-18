@@ -12,11 +12,20 @@
 
 using System;
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
     /// <summary>
-    /// Declares the template intent for a template-generated assembly.
+    /// Declares template intent for a template‑generated assembly (pure metadata marker).
     /// </summary>
+    /// <remarks>
+    /// This attribute imposes no runtime semantics; analyzers/generators may use it to
+    /// classify template provenance. See tooling docs for template intent and traceability.
+    /// 
+    /// <para><b>Example (non‑prescriptive):</b></para>
+    /// <code><![CDATA[
+    /// [assembly: DxTemplate("dx-service")]
+    /// ]]></code>
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]
     public sealed class DxTemplateAttribute : Attribute
     {

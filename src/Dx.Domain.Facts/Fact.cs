@@ -1,7 +1,9 @@
 // Copyright (c) Dx.Domain Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Dx.Domain.Errors;
 using Dx.Domain.Primitives;
+using Dx.Domain;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -27,7 +29,7 @@ namespace Dx.Domain.Facts;
 /// </para>
 /// </remarks>
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public readonly struct Fact<TPayload> : IDomainFact
+public readonly struct Fact<TPayload> : IDomainFact<TPayload>
     where TPayload : notnull
 {
     /// <inheritdoc />
@@ -48,7 +50,9 @@ public readonly struct Fact<TPayload> : IDomainFact
     public DateTimeOffset UtcTimestamp { get; }
 
     /// <inheritdoc />
-    public object GetPayload() => Payload;
+    public TPayload GetPayload() => Payload;
+
+    object IDomainFact.GetPayload() => Payload;
 
     private Fact(
         FactId id,
@@ -100,6 +104,45 @@ public readonly struct Fact<TPayload> : IDomainFact
             utcTimestamp: utcTimestamp);
     }
 
+    /// <summary>
+    /// Tries to create a new domain fact with the specified type, payload, and causation metadata.
+    /// </summary>
+    /// <param name="factType">The logical type or category of the fact. Must not be null or whitespace.</param>
+    /// <param name="payload">The fact payload. Must not be null.</param>
+    /// <param name="causation">The causation metadata associated with this fact.</param>
+    /// <param name="utcTimestamp">
+    /// The UTC timestamp when the fact occurred. If null, the current UTC time is used.
+    /// </param>
+    /// <returns>A <see cref="Result{TValue}"/> containing the new fact or a failure error.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SuppressMessage("Design", "CA1000:Do not declare static members on generic types",
+        Justification = "Factory pattern for immutable struct; idiomatic for Facts")]
+    public static Result<Fact<TPayload>> TryCreate(
+        string factType,
+        TPayload payload,
+        Causation causation,
+        DateTimeOffset? utcTimestamp = null)
+    {
+        if (string.IsNullOrWhiteSpace(factType))
+            return Result<Fact<TPayload>>.Failure(CreateInvalidFactTypeError());
+
+        if (payload is null)
+            return Result<Fact<TPayload>>.Failure(CreateNullPayloadError());
+
+        return Result<Fact<TPayload>>.Success(new Fact<TPayload>(
+            id: FactId.New(),
+            factType: factType,
+            payload: payload,
+            causation: causation,
+            utcTimestamp: utcTimestamp));
+    }
+
     private string DebuggerDisplay
         => $"Fact<{typeof(TPayload).Name}>: {FactType} (Id={Id}, Time={UtcTimestamp:O})";
+
+    private static DomainError CreateInvalidFactTypeError()
+        => DomainError.Create("dx.facts.invalid_fact_type", "Fact type must not be null or whitespace.");
+
+    private static DomainError CreateNullPayloadError()
+        => DomainError.Create("dx.facts.null_payload", "Fact payload must not be null.");
 }
