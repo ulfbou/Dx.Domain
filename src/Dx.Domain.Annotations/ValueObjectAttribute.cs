@@ -12,19 +12,26 @@
 
 using System;
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
     /// <summary>
-    /// Marks a type as a <b>Value Object</b>.
+    /// Marks a type as a Value Object (pure metadata marker).
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This attribute is a <b>pure marker</b>. Typical expectations (checked by analyzers)
-    /// include immutability and equality by value rather than identity.
-    /// </para>
-    /// <para>
-    /// <b>Non-goals:</b> This attribute does not implement or enforce equality or immutability at runtime.
-    /// </para>
+    /// This attribute imposes no runtime semantics. Analyzers classify value objects for
+    /// immutability and value‑equality checks. See the Kernel specification for value
+    /// objects and the value object discipline rule charter.
+    /// 
+    /// <para><b>Example (Kernel realization, non‑prescriptive):</b></para>
+    /// <code><![CDATA[
+    /// [ValueObject]
+    /// public readonly struct Money
+    /// {
+    ///     public decimal Amount { get; }
+    ///     public string Currency { get; }
+    ///     public Money(decimal amount, string currency) { Amount = amount; Currency = currency; }
+    /// }
+    /// ]]></code>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     public sealed class ValueObjectAttribute : Attribute { }

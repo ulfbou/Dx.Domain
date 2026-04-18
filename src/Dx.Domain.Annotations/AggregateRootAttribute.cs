@@ -12,21 +12,33 @@
 
 using System;
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
-
     /// <summary>
-    /// Marks a class as an <b>Aggregate Root</b> in the domain model.
+    /// Marks a class as an Aggregate Root (pure metadata marker).
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This attribute is a <b>pure marker</b>. It enables analyzers/generators to enforce
-    /// aggregate rules (e.g., aggregate boundaries, ownership of identity, reference constraints).
-    /// </para>
-    /// <para>
-    /// <b>Usage:</b> Apply to the single type that defines the aggregate boundary and
-    /// acts as the entry point for modifications to the aggregate.
-    /// </para>
+    /// This attribute imposes no runtime semantics. Analyzers classify aggregate boundaries;
+    /// the normative guidance is defined in the Kernel specification and relevant rule charters.
+    /// See the Kernel specification for aggregates and the aggregate discipline rule charter.
+    /// 
+    /// <para><b>Example (Kernel realization, non‑prescriptive):</b></para>
+    /// <code><![CDATA[
+    /// [AggregateRoot]
+    /// public sealed class Order
+    /// {
+    ///     public OrderId Id { get; }
+    ///     // Aggregate behavior and invariants live here
+    /// }
+    /// ]]></code>
+    /// 
+    /// <para><b>Example (Usage, non‑prescriptive):</b></para>
+    /// <code><![CDATA[
+    /// // Aggregate used via facade/factory (simplified)
+    /// var created = OrderFacade.CreateOrder(customerId, ...);
+    /// if (created.IsFailure) return created.Error;
+    /// var order = created.Value;
+    /// ]]></code>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class AggregateRootAttribute : Attribute { }

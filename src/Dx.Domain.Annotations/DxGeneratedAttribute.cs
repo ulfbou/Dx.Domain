@@ -6,25 +6,21 @@ using System;
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Marks code as generated, exempting it from Dx.Domain analyzer enforcement.
+/// Marks code as generated (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// <para>
-/// Use this attribute when <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/>
-/// is not feasible (e.g., source generators targeting older frameworks).
-/// </para>
-/// <para>
-/// Recognized by DXA070 (Generated Code Tagging) and other analyzers that skip generated code.
-/// </para>
-/// <example>
-/// <code>
+/// This attribute imposes no runtime semantics. It is recognized by analyzers that
+/// skip generated code (e.g., DXA070). Use it when
+/// <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/> is not feasible.
+///
+/// <para><b>Example (non‑prescriptive):</b></para>
+/// <code><![CDATA[
 /// [DxGenerated]
 /// public partial class GeneratedEntity
 /// {
 ///     // Auto-generated property implementations
 /// }
-/// </code>
-/// </example>
+/// ]]></code>
 /// </remarks>
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method |

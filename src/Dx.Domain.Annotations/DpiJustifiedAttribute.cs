@@ -6,23 +6,17 @@ using System;
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Documents a deviation from standard patterns with a DPI-aligned justification.
+/// Documents a deviation from standard patterns with a DPI‑aligned justification (pure marker).
 /// </summary>
 /// <remarks>
-/// <para>
-/// Use this attribute to explicitly document design decisions that might appear
-/// unconventional but are justified by the Dx.Domain Perturbation Index (DPI) principles.
-/// </para>
-/// <para>
-/// This is a documentation-only attribute; it does not affect analyzer behavior
-/// but aids code review and architectural decision tracking.
-/// </para>
-/// <example>
-/// <code>
+/// This attribute imposes no runtime semantics; it records rationale for code review
+/// and audit trails. SEE: Governance Docs → DPI / ADR Process.
+///
+/// <para><b>Example (non‑prescriptive):</b></para>
+/// <code><![CDATA[
 /// [DpiJustified("Mutable internal cache is mechanical optimization, not semantic state")]
-/// private Dictionary&lt;string, CompiledPattern&gt; _patternCache;
-/// </code>
-/// </example>
+/// private Dictionary<string, CompiledPattern> _patternCache;
+/// ]]></code>
 /// </remarks>
 [AttributeUsage(AttributeTargets.All, AllowMultiple = true, Inherited = false)]
 public sealed class DpiJustifiedAttribute : Attribute

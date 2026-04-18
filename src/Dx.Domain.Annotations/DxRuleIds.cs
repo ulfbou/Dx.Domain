@@ -10,7 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
     public static class DxRuleIds
     {
@@ -22,10 +22,12 @@ namespace Dx.Domain
         public const string DXK006 = "DXK006";
         public const string DXK007 = "DXK007";
         public const string DXK008 = "DXK008";
+        public const string DXK009 = "DXK009";
 
         public const string DXT001 = "DXT001";
         public const string DXT002 = "DXT002";
         public const string DXT003 = "DXT003";
+        public const string DXT004 = "DXT004";
 
         public const string DXA010 = "DXA010";
         public const string DXA011 = "DXA011";
@@ -37,5 +39,6 @@ namespace Dx.Domain
         public const string DXA060 = "DXA060";
         public const string DXA070 = "DXA070";
         public const string DXA080 = "DXA080";
+        public const string DXA090 = "DXA090";
     }
 }

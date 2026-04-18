@@ -1,12 +1,12 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="CorrelationId.cs" company="Dx.Domain Team">
-//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// <copyright>
+//   Copyright (c) 2025 Dx.Domain Team.
 // </copyright>
 // <license>
-//     This software is licensed under the MIT License.
-//     See the project's root <c>LICENSE</c> file for details.
-//     Contributions are welcome, subject to the terms of the project's license.
-//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+//   This software is licensed under the MIT License.
+//   See the project's root <c>LICENSE</c> file for details.
+//   Contributions are welcome, subject to the terms of the project's license.
+//   See the repository root <c>CONTRIBUTING.md</c> file for details.
 // </license>
 // ----------------------------------------------------------------------------------
 
@@ -18,54 +18,58 @@ using System.Globalization;
 namespace Dx.Domain.Primitives
 {
     /// <summary>
-    /// Correlates related operations across system boundaries.
+    /// Represents a strongly typed identifier for an actor.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Empty values are permitted to represent an uncorrelated context.
+    /// Canonical string format is <c>"N"</c> (32 hexadecimal characters, no separators).
     /// </para>
     /// <para>
-    /// Canonical string format is <c>"N"</c>.
+    /// <see cref="UserId"/> does not permit empty values.
     /// </para>
     /// </remarks>
     [DebuggerDisplay("{Value,nq}")]
-    public readonly struct CorrelationId :
+    public readonly struct UserId :
         IIdentity,
-        IEquatable<CorrelationId>,
-        IParsable<CorrelationId>,
+        IEquatable<UserId>,
+        IParsable<UserId>,
         ISpanFormattable
     {
-        /// <summary>An empty correlation identifier representing an uncorrelated context.</summary>
-        public static readonly CorrelationId Empty = new(Guid.Empty);
-
-        /// <summary>Gets the underlying GUID value of this correlation identifier.</summary>
+        /// <summary>Gets the underlying GUID value of this actor identifier.</summary>
         public Guid Value { get; }
 
-        private CorrelationId(Guid value) => Value = value;
+        private UserId(Guid value) => Value = value;
 
         /// <summary>
-        /// Creates a new random <see cref="CorrelationId"/> instance.
+        /// Creates a new random <see cref="UserId"/> instance.
         /// </summary>
-        /// <returns>A new <see cref="CorrelationId"/> with a randomly generated GUID value.</returns>
-        public static CorrelationId New() => new(Guid.NewGuid());
+        /// <returns>A new <see cref="UserId"/> with a randomly generated GUID value.</returns>
+        public static UserId New() => new(Guid.NewGuid());
 
         /// <summary>
-        /// Creates a <see cref="CorrelationId"/> from a GUID value.
+        /// Creates an <see cref="UserId"/> from a non-empty GUID.
         /// </summary>
-        /// <param name="value">The GUID value. May be <see cref="Guid.Empty"/> to represent an uncorrelated context.</param>
-        /// <returns>A new <see cref="CorrelationId"/> instance wrapping the specified GUID.</returns>
-        public static CorrelationId FromGuid(Guid value) => new(value);
-
-        /// <inheritdoc />
-        public static CorrelationId Parse(string s, IFormatProvider? provider)
-            => new(Guid.ParseExact(s ?? throw new ArgumentNullException(nameof(s)), "N"));
-
-        /// <inheritdoc />
-        public static bool TryParse(string? s, IFormatProvider? provider, out CorrelationId result)
+        /// <param name="value">The GUID value. Must not be <see cref="Guid.Empty"/>.</param>
+        /// <returns>A new <see cref="UserId"/> instance wrapping the specified GUID.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="value"/> is <see cref="Guid.Empty"/>.</exception>
+        public static UserId FromGuid(Guid value)
         {
-            if (Guid.TryParseExact(s, "N", out var g))
+            if (value == Guid.Empty)
+                throw new ArgumentException("UserId cannot be empty.", nameof(value));
+
+            return new UserId(value);
+        }
+
+        /// <inheritdoc />
+        public static UserId Parse(string s, IFormatProvider? provider)
+            => FromGuid(Guid.ParseExact(s ?? throw new ArgumentNullException(nameof(s)), "N"));
+
+        /// <inheritdoc />
+        public static bool TryParse(string? s, IFormatProvider? provider, out UserId result)
+        {
+            if (Guid.TryParseExact(s, "N", out var g) && g != Guid.Empty)
             {
-                result = new CorrelationId(g);
+                result = new UserId(g);
                 return true;
             }
 
@@ -93,10 +97,12 @@ namespace Dx.Domain.Primitives
         }
 
         /// <inheritdoc />
-        public bool Equals(CorrelationId other) => Value.Equals(other.Value);
+        public bool Equals(UserId other)
+            => Value.Equals(other.Value);
 
         /// <inheritdoc />
-        public override bool Equals(object? obj) => obj is CorrelationId other && Equals(other);
+        public override bool Equals(object? obj)
+            => obj is UserId other && Equals(other);
 
         /// <inheritdoc />
         public override int GetHashCode() => Value.GetHashCode();
@@ -114,26 +120,26 @@ namespace Dx.Domain.Primitives
         /// </remarks>
         /// <param name="format">The format specifier. If null or empty, defaults to <c>"N"</c>.</param>
         /// <param name="formatProvider">The format provider. If null, uses <see cref="CultureInfo.InvariantCulture"/>.</param>
-        /// <returns>A string representation of this correlation identifier.</returns>
+        /// <returns>A string representation of this actor identifier.</returns>
         public string ToString(string? format, IFormatProvider? formatProvider)
             => Value.ToString(string.IsNullOrEmpty(format) ? "N" : format!, formatProvider ?? CultureInfo.InvariantCulture);
 
         /// <summary>
-        /// Determines whether two specified CorrelationId instances are equal.
+        /// Determines whether two <see cref="UserId"/> values are equal.
         /// </summary>
-        /// <param name="left">The first identifier to compare.</param>
-        /// <param name="right">The second identifier to compare.</param>
+        /// <param name="left">The first actor identifier to compare.</param>
+        /// <param name="right">The second actor identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are equal; otherwise, <see langword="false"/>.</returns>
-        public static bool operator ==(CorrelationId left, CorrelationId right)
+        public static bool operator ==(UserId left, UserId right)
             => left.Equals(right);
 
         /// <summary>
-        /// Determines whether two specified CorrelationId instances are not equal.
+        /// Determines whether two <see cref="UserId"/> values are not equal.
         /// </summary>
-        /// <param name="left">The first identifier to compare.</param>
-        /// <param name="right">The second identifier to compare.</param>
+        /// <param name="left">The first actor identifier to compare.</param>
+        /// <param name="right">The second actor identifier to compare.</param>
         /// <returns><see langword="true"/> if the identifiers are not equal; otherwise, <see langword="false"/>.</returns>
-        public static bool operator !=(CorrelationId left, CorrelationId right)
+        public static bool operator !=(UserId left, UserId right)
             => !(left == right);
     }
 }

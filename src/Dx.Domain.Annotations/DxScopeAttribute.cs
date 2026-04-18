@@ -6,18 +6,17 @@ using System;
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Declares the architectural scope of an assembly for Dx.Domain analyzer enforcement.
+/// Declares the architectural scope of an assembly (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// <para>
-/// Apply this attribute at the assembly level to specify which scope rules apply.
-/// If not specified, the assembly defaults to <see cref="Scope.S3"/> (strictest enforcement).
-/// </para>
-/// <example>
-/// <code>
+/// This attribute imposes no runtime semantics; analyzers use it to classify scope
+/// for enforcement. If not specified, scope defaults to <see cref="Scope.S3"/>.
+/// SEE: Refactoring Spec → Scope Resolution; Rule Charter → Scope/Authority Modes.
+///
+/// <para><b>Example (non‑prescriptive):</b></para>
+/// <code><![CDATA[
 /// [assembly: DxScope(Scope.S1)]
-/// </code>
-/// </example>
+/// ]]></code>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]
 public sealed class DxScopeAttribute : Attribute

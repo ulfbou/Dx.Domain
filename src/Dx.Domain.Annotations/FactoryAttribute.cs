@@ -6,26 +6,28 @@ using System;
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Marks a method as a domain factory, indicating it creates domain entities or value objects.
+/// Marks a method as a domain factory (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// <para>
-/// Factory methods are the approved construction mechanism for domain types.
-/// They must return <c>Result&lt;T&gt;</c> and perform invariant validation.
-/// </para>
-/// <para>
-/// Enforced by DXA010 (Construction Authority) and DXA011 (Public Factory Exposure).
-/// </para>
-/// <example>
-/// <code>
+/// This attribute imposes no runtime semantics. Analyzers classify factory methods
+/// for construction discipline (DXA010/011). SEE: Rule Charter → DXA010 Construction Discipline.
+///
+/// <para><b>Example (Kernel realization, non‑prescriptive):</b></para>
+/// <code><![CDATA[
 /// [Factory]
-/// public static Result&lt;Order&gt; CreateOrder(CustomerId customerId, ...)
+/// public static Result<Order> CreateOrder(CustomerId customerId, ...)
 /// {
-///     Require.That(customerId.IsValid(), "Invalid customer");
+///     // validation + construction
 ///     return Result.Success(new Order(customerId, ...));
 /// }
-/// </code>
-/// </example>
+/// ]]></code>
+/// 
+/// <para><b>Example (Usage, non‑prescriptive):</b></para>
+/// <code><![CDATA[
+/// var created = OrderFactory.CreateOrder(customerId, ...);
+/// if (created.IsFailure) return created.Error;
+/// var order = created.Value;
+/// ]]></code>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
 public sealed class FactoryAttribute : Attribute

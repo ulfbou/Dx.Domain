@@ -10,16 +10,14 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
     /// <summary>
-    /// Defines the architectural role of an assembly within the Dx.Domain framework.
+    /// Defines the architectural role vocabulary (pure metadata).
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This enumeration is used by analyzers to enforce architectural boundaries and
-    /// dependency rules across the application layers.
-    /// </para>
+    /// This enumeration imposes no runtime semantics. Analyzers use it to classify roles
+    /// and apply dependency/boundary rules. SEE: Rule Charter → Role/Boundary Enforcement.
     /// </remarks>
     public enum DxAssemblyRole
     {
@@ -29,17 +27,17 @@ namespace Dx.Domain
         Contracts = 0,
 
         /// <summary>
-        /// Domain assemblies containing domain logic, entities, value objects, and domain services.
+        /// Domain assemblies containing domain model code (entities, value objects, domain services).
         /// </summary>
         Domain = 1,
 
         /// <summary>
-        /// Application assemblies containing application services, use cases, and orchestration logic.
+        /// Application assemblies hosting use cases/orchestration.
         /// </summary>
         Application = 2,
 
         /// <summary>
-        /// Infrastructure assemblies containing implementations for persistence, external services, etc.
+        /// Infrastructure assemblies (persistence, external service adapters, etc.).
         /// </summary>
         Infrastructure = 3,
 

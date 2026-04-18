@@ -1,11 +1,21 @@
-<!-- Directory.Build.props -->
-<!-- This file is used to centralize and standardize build configurations across multiple projects in a repository. -->
-<Project>
+<Project Label="Dx.Root.Ingress">
+  <PropertyGroup>
+    <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">$(MSBuildThisFileDirectory)builds\</DxBuildRoot>
+    <DxPropsImported Condition="'$(DxPropsImported)' == ''">false</DxPropsImported>
+  </PropertyGroup>
 
-  <!-- 1️⃣ Core build configuration first -->
-  <Import Project="Directory.Core.props" Condition="Exists('Directory.Core.props')" />
+  <PropertyGroup>
+    <EnablePublicApiAnalyzers>true</EnablePublicApiAnalyzers>
+  </PropertyGroup>
 
+<<<<<<< HEAD
   <!-- Single Source global usings for Dx.Domain when enabled -->
   <Import Project="src/Dx.Domain/build/Dx.Domain.props" Condition="Exists('src/Dx.Domain/build/Dx.Domain.props') AND '$(DxDomainSingleSource)' == 'true'" />
+=======
+  <ItemGroup Condition="'$(EnablePublicApiAnalyzers)' == 'true'">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" PrivateAssets="all" />
+  </ItemGroup>
+>>>>>>> origin/chore/msbuild-phase2
 
+  <Import Project="$(DxBuildRoot)Dx.Props.hierarchical.props" Condition="'$(DxPropsImported)' != 'true' AND Exists('$(DxBuildRoot)Dx.Props.hierarchical.props')" />
 </Project>
