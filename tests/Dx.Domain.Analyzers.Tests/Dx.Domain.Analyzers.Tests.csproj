@@ -35,10 +35,10 @@
   <!-- Test Framework Dependencies -->
   <ItemGroup>
     <!-- Essential for test discovery and execution -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageReference Include="NuGet.Common" Version="7.0.1" />
-    <PackageReference Include="NuGet.Packaging" Version="7.0.1" />
-    <PackageReference Include="NuGet.Protocol" Version="7.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+    <PackageReference Include="NuGet.Common" Version="7.3.1" />
+    <PackageReference Include="NuGet.Packaging" Version="7.3.1" />
+    <PackageReference Include="NuGet.Protocol" Version="7.3.1" />
 
     <!-- Core xUnit packages for library testing -->
     <PackageReference Include="xunit" Version="2.9.3" />

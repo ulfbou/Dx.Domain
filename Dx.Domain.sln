@@ -5,6 +5,8 @@ VisualStudioVersion = 18.3.11222.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{23C415C5-9A2F-4DAB-91F7-96C480B17B11}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Quality.targets = Directory.Quality.targets
 		builds\Dx.Props.hierarchical.props = builds\Dx.Props.hierarchical.props
 		builds\Dx.Props.hierarchical.targets = builds\Dx.Props.hierarchical.targets
 	EndProjectSection

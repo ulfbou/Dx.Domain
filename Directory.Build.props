@@ -1,17 +1,27 @@
 <Project>
   <PropertyGroup>
-    <!-- Nothing is packable unless explicitly opted in -->
+    <!-- Packaging off by default -->
     <IsPackable>false</IsPackable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
-    <!-- Basic metadata so restore does not complain -->
-    <VersionPrefix Condition="'$(VersionPrefix)' == ''">0.0.0-local</VersionPrefix>
-    <Company>Dx</Company>
-    <Authors>Ulf Bourelius</Authors>
-  </PropertyGroup>
+    <!-- Versions: numeric for CLR, suffix only for informational -->
+    <VersionPrefix>0.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(Configuration)' == 'Debug'">local</VersionSuffix>
+    <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
 
-  <!-- Analyzer and Kernel are never packable -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Dx.Domain.Analyzers' OR '$(MSBuildProjectName)' == 'Dx.Domain.Kernel'">
-    <IsPackable>false</IsPackable>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+
+    <!-- Common metadata -->
+    <Authors>Ulf Bourelius</Authors>
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Docs metadata -->
+    <GenerateDocumentationFile Condition="'$(DxIsTest)' != 'true'">true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>
