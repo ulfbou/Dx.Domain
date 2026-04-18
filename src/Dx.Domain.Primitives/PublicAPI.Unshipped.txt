@@ -1,2 +1,0 @@
-# src/Dx.Domain.Primitives/PublicAPI.Unshipped.txt
-# Add initial diagnosis lines here from the first build, then move to Shipped.txt

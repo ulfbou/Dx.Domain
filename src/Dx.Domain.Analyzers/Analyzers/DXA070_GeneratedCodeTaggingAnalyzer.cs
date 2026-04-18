@@ -18,7 +18,6 @@ using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
-using Dx.Domain.Analyzers.Infrastructure.Semantics;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -66,6 +65,14 @@ namespace Dx.Domain.Analyzers.Analyzers
 
                 startContext.RegisterSymbolAction(symbolContext =>
                 {
+                    // 1. Kernel types are implementation, not subject to DXA011
+                    if (services.Scope.IsKernelInternal(symbolContext.Compilation.Assembly))
+                        return;
+
+                    // 2. Generated code – SymbolAnalysisContext has no IsGeneratedCode, use the detector
+                    if (symbolContext.IsGeneratedCode)
+                        return;
+
                     AnalyzeNamedType(symbolContext, services);
                 }, SymbolKind.NamedType);
             });
@@ -90,6 +97,10 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static void AnalyzeNamedType(SymbolAnalysisContext context, AnalyzerServices services)
         {
             var type = (INamedTypeSymbol)context.Symbol;
+
+            // Skip if generated code
+            if (services.Generated.IsGenerated(type))
+                return;
 
             // Only analyze S1 and S2 scopes (domain and application)
             var scope = services.Scope.ResolveSymbol(type);
