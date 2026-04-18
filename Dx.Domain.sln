@@ -40,9 +40,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Actions", "{F647DAB3-D845-4E0A-BE5B-425612706944}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\ci-cd.yml = .github\workflows\ci-cd.yml
+		.github\workflows\build-validate.yml = .github\workflows\build-validate.yml
+		.github\workflows\ci-analyzers.yml = .github\workflows\ci-analyzers.yml
 		.github\workflows\docfx.yml = .github\workflows\docfx.yml
-		.github\workflows\enforce-dpi.yml = .github\workflows\enforce-dpi.yml
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 	EndProjectSection
 EndProject
