@@ -1,8 +1,6 @@
-using Dx.Domain.Analyzers.Infrastructure.Semantics;
-
+using Dx.Domain.Analyzers.Infrastructure.Facades;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-
 using Xunit;
 
 using Assert = Xunit.Assert;

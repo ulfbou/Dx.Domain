@@ -12,20 +12,25 @@
 
 using System;
 
-namespace Dx.Domain
+namespace Dx.Domain.Annotations
 {
     /// <summary>
-    /// Marks a class as a domain <b>Entity</b>.
+    /// Marks a class as a domain Entity (pure metadata marker).
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// This attribute is a <b>pure marker</b> used by analyzers and generators to enforce
-    /// domain modeling rules (e.g., identity semantics). It has <b>no runtime behavior</b>.
-    /// </para>
-    /// <para>
-    /// <b>Non-goals:</b> This attribute does not imply persistence mapping, lifecycle, or
-    /// infrastructure concerns. Those are out of scope and should be handled outside the domain model.
-    /// </para>
+    /// This attribute imposes no runtime semantics. Analyzers classify entity types
+    /// for identity and modeling checks. See the Kernel specification for entities and
+    /// the entity discipline rule charter.
+    /// 
+    /// <para><b>Example (Kernel realization, non‑prescriptive):</b></para>
+    /// <code><![CDATA[
+    /// [Entity]
+    /// public sealed class LineItem
+    /// {
+    ///     public LineItemId Id { get; }
+    ///     public Money Price { get; }
+    /// }
+    /// ]]></code>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class EntityAttribute : Attribute { }

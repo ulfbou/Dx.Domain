@@ -1,25 +1,28 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" Label="Dx.Domain.Facts">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
+    <DxLayer>Authority</DxLayer>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.1.0-alpha.4</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
+  </PropertyGroup>
+
   <ItemGroup>
     <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Embed the analyzer so consumers get rules automatically -->
-    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll"
-          Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')"
-          Pack="true"
-          PackagePath="analyzers/dotnet/cs" />
+    <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
+    <ProjectReference Include="..\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" />
-    <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
     <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
   </ItemGroup>
 </Project>

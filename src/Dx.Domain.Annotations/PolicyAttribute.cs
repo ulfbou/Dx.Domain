@@ -6,29 +6,21 @@ using System;
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Marks a class as implementing domain policy logic.
+/// Marks a class as a domain policy (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// <para>
-/// Policy classes encapsulate domain rules and business logic in a reusable,
-/// testable form. They are structural, not infrastructural.
-/// </para>
-/// <para>
-/// Policies must be pure (no side effects) and return <c>Result&lt;T&gt;</c>
-/// to indicate success or failure.
-/// </para>
-/// <example>
-/// <code>
+/// This attribute imposes no runtime semantics. Analyzers classify policy types
+/// for structural checks. See the Kernel specification for policy structure and
+/// the policy discipline rule charter.
+///
+/// <para><b>Example (Kernel realization, non‑prescriptive):</b></para>
+/// <code><![CDATA[
 /// [Policy]
 /// public class OrderValidationPolicy
 /// {
-///     public Result Validate(Order order)
-///     {
-///         // Pure validation logic
-///     }
+///     public Result Validate(Order order) => /* pure validation logic */;
 /// }
-/// </code>
-/// </example>
+/// ]]></code>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 public sealed class PolicyAttribute : Attribute

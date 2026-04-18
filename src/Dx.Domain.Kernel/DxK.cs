@@ -1,7 +1,6 @@
 // Copyright (c) Dx.Domain Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using Dx.Domain.Annotations;
 using Dx.Domain.Errors;
 
 using System.Runtime.CompilerServices;

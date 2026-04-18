@@ -1,12 +1,12 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="IScopeResolver.cs" company="Dx.Domain Team">
-//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
-//     This software is licensed under the MIT License.
-//     See the project's root <c>LICENSE</c> file for details.
-//     Contributions are welcome, subject to the terms of the project's license.
-//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// This software is licensed under the MIT License.
+// See the project's root <c>LICENSE</c> file for details.
+// Contributions are welcome, subject to the terms of the project's license.
+// See the repository root <c>CONTRIBUTING.md</c> file for details.
 // </license>
 // ----------------------------------------------------------------------------------
 
@@ -23,6 +23,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
     {
         Scope ResolveAssembly(IAssemblySymbol assembly);
         Scope ResolveSymbol(ISymbol symbol);
+        bool IsKernelInternal(IAssemblySymbol assembly);
     }
 
     public sealed class ScopeResolver : IScopeResolver
@@ -40,6 +41,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
 
         public Scope ResolveAssembly(IAssemblySymbol assembly)
         {
+            if (IsKernelInternal(assembly))
+                return Scope.S0; // S0 = infrastructure, never analyzed
+
             if (_assemblyMap.TryGetValue(assembly.Name, out var scope))
                 return scope;
 
@@ -54,6 +58,13 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
 
         public Scope ResolveSymbol(ISymbol symbol) =>
             ResolveAssembly(symbol.ContainingAssembly);
+
+        public bool IsKernelInternal(IAssemblySymbol assembly)
+        {
+            // hard architectural boundary, not config
+            return assembly.Name.Equals("Dx.Domain.Kernel", StringComparison.Ordinal)
+                || assembly.Name.StartsWith("Dx.Domain.Kernel.", StringComparison.Ordinal);
+        }
 
         private static ImmutableDictionary<string, Scope> ParseAssemblyMap(AnalyzerConfigOptionsProvider config)
         {
@@ -83,9 +94,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
                 return ImmutableArray<string>.Empty;
 
             return raw.Split(ScopeSeparator)
-                      .Select(s => s.Trim())
-                      .Where(s => s.Length != 0)
-                      .ToImmutableArray();
+                     .Select(s => s.Trim())
+                     .Where(s => s.Length != 0)
+                     .ToImmutableArray();
         }
     }
 }

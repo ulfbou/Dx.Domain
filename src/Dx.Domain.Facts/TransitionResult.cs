@@ -5,9 +5,9 @@ using Dx.Domain.Errors;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Dx.Domain.Facts;
@@ -32,6 +32,8 @@ namespace Dx.Domain.Facts;
 public readonly struct TransitionResult<TState>
     where TState : notnull
 {
+    private readonly ImmutableArray<IDomainFact> _facts;
+
     /// <summary>
     /// Gets the result of the transition.
     /// </summary>
@@ -40,7 +42,13 @@ public readonly struct TransitionResult<TState>
     /// <summary>
     /// Gets the domain facts emitted by the transition.
     /// </summary>
-    public IReadOnlyList<IDomainFact> Facts { get; }
+    public IReadOnlyList<IDomainFact> Facts => FactsImmutable;
+
+    /// <summary>
+    /// Gets the domain facts emitted by the transition as an immutable array.
+    /// </summary>
+    public ImmutableArray<IDomainFact> FactsImmutable
+        => _facts.IsDefault ? ImmutableArray<IDomainFact>.Empty : _facts;
 
     /// <summary>
     /// Gets a value indicating whether the transition was successful.
@@ -54,10 +62,10 @@ public readonly struct TransitionResult<TState>
 
     private TransitionResult(
         Result<TState> outcome,
-        IReadOnlyList<IDomainFact> facts)
+        ImmutableArray<IDomainFact> facts)
     {
         Outcome = outcome;
-        Facts = facts ?? Array.Empty<IDomainFact>();
+        _facts = facts.IsDefault ? ImmutableArray<IDomainFact>.Empty : facts;
     }
 
     /// <summary>
@@ -70,11 +78,11 @@ public readonly struct TransitionResult<TState>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Factory helpers are intentional on TransitionResult.")]
     public static TransitionResult<TState> Success(TState state, IReadOnlyList<IDomainFact> facts)
     {
-        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(facts);
 
         return new TransitionResult<TState>(
             Result<TState>.Success(state),
-            facts ?? Array.Empty<IDomainFact>());
+            NormalizeFacts(facts));
     }
 
     /// <summary>
@@ -87,12 +95,11 @@ public readonly struct TransitionResult<TState>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Factory helpers are intentional on TransitionResult.")]
     public static TransitionResult<TState> Success(TState state, IDomainFact fact)
     {
-        ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(fact);
 
         return new TransitionResult<TState>(
             Result<TState>.Success(state),
-            new[] { fact });
+            ImmutableArray.Create(fact));
     }
 
     /// <summary>
@@ -112,10 +119,172 @@ public readonly struct TransitionResult<TState>
 
         return new TransitionResult<TState>(
             Result<TState>.Failure(error),
-            Array.Empty<IDomainFact>());
+            ImmutableArray<IDomainFact>.Empty);
+    }
+
+    /// <summary>
+    /// Transforms the successful state while preserving facts.
+    /// </summary>
+    /// <typeparam name="TNext">The type of the resulting state.</typeparam>
+    /// <param name="map">The mapping function to apply to the state.</param>
+    /// <returns>A new transition result with the mapped state and preserved facts.</returns>
+    public TransitionResult<TNext> Map<TNext>(Func<TState, TNext> map)
+        where TNext : notnull
+    {
+        ArgumentNullException.ThrowIfNull(map);
+
+        if (IsFailure)
+            return TransitionResult<TNext>.Failure(Outcome.Error);
+
+        return new TransitionResult<TNext>(
+            Result<TNext>.Success(map(Outcome.Value)),
+            _facts);
+    }
+
+    /// <summary>
+    /// Composes transitions, concatenating facts on success.
+    /// </summary>
+    /// <typeparam name="TNext">The type of the resulting state.</typeparam>
+    /// <param name="bind">The transition function to apply to the state.</param>
+    /// <returns>A composed transition result.</returns>
+    public TransitionResult<TNext> Bind<TNext>(Func<TState, TransitionResult<TNext>> bind)
+        where TNext : notnull
+    {
+        ArgumentNullException.ThrowIfNull(bind);
+
+        if (IsFailure)
+            return TransitionResult<TNext>.Failure(Outcome.Error);
+
+        var next = bind(Outcome.Value);
+        if (next.IsFailure)
+            return TransitionResult<TNext>.Failure(next.Outcome.Error);
+
+        var combinedFacts = ConcatFacts(_facts, next._facts);
+        return new TransitionResult<TNext>(
+            Result<TNext>.Success(next.Outcome.Value),
+            combinedFacts);
+    }
+
+    /// <summary>
+    /// LINQ projection over a successful state.
+    /// </summary>
+    /// <typeparam name="TNext">The type of the resulting state.</typeparam>
+    /// <param name="selector">The projection to apply.</param>
+    /// <returns>A new transition result with the projected state and preserved facts.</returns>
+    public TransitionResult<TNext> Select<TNext>(Func<TState, TNext> selector)
+        where TNext : notnull
+        => Map(selector);
+
+    /// <summary>
+    /// LINQ composition over transitions with fact accumulation.
+    /// </summary>
+    /// <typeparam name="TNext">The type produced by the bind step.</typeparam>
+    /// <typeparam name="TResult">The type produced by the projection.</typeparam>
+    /// <param name="bind">The bind function.</param>
+    /// <param name="project">The projection combining the original and bound state.</param>
+    /// <returns>A composed transition result with accumulated facts.</returns>
+    public TransitionResult<TResult> SelectMany<TNext, TResult>(
+        Func<TState, TransitionResult<TNext>> bind,
+        Func<TState, TNext, TResult> project)
+        where TNext : notnull
+        where TResult : notnull
+    {
+        ArgumentNullException.ThrowIfNull(bind);
+        ArgumentNullException.ThrowIfNull(project);
+
+        if (IsFailure)
+            return TransitionResult<TResult>.Failure(Outcome.Error);
+
+        var next = bind(Outcome.Value);
+        if (next.IsFailure)
+            return TransitionResult<TResult>.Failure(next.Outcome.Error);
+
+        var projected = project(Outcome.Value, next.Outcome.Value);
+        var combinedFacts = ConcatFacts(_facts, next._facts);
+
+        return new TransitionResult<TResult>(
+            Result<TResult>.Success(projected),
+            combinedFacts);
+    }
+
+    /// <summary>
+    /// Deconstructs the transition result into its success status, state, facts, and error information.
+    /// </summary>
+    /// <param name="isSuccess">When this method returns, contains <see langword="true"/> if the transition succeeded; otherwise, <see langword="false"/>.</param>
+    /// <param name="state">When this method returns, contains the state if the transition succeeded; otherwise, the default value for the type.</param>
+    /// <param name="facts">When this method returns, contains the facts emitted by the transition.</param>
+    /// <param name="error">When this method returns, contains the error if the transition failed; otherwise, the default value.</param>
+    public void Deconstruct(out bool isSuccess, out TState? state, out IReadOnlyList<IDomainFact> facts, out DomainError? error)
+    {
+        isSuccess = IsSuccess;
+        state = Outcome.IsSuccess ? Outcome.Value : default;
+        facts = Facts;
+        error = Outcome.IsFailure ? Outcome.Error : default;
+    }
+
+    /// <summary>
+    /// Deconstructs the transition result into its failure status, error, state, and facts.
+    /// </summary>
+    /// <param name="isFailure">When this method returns, contains <see langword="true"/> if the transition failed; otherwise, <see langword="false"/>.</param>
+    /// <param name="error">When this method returns, contains the error if the transition failed; otherwise, the default value.</param>
+    /// <param name="state">When this method returns, contains the state if the transition succeeded; otherwise, the default value for the type.</param>
+    /// <param name="facts">When this method returns, contains the facts emitted by the transition.</param>
+    public void Deconstruct(out bool isFailure, out DomainError? error, out TState? state, out IReadOnlyList<IDomainFact> facts)
+    {
+        isFailure = IsFailure;
+        error = Outcome.IsFailure ? Outcome.Error : default;
+        state = Outcome.IsSuccess ? Outcome.Value : default;
+        facts = Facts;
+    }
+
+    /// <summary>
+    /// Deconstructs the transition result into its state and facts.
+    /// </summary>
+    /// <param name="state">When this method returns, contains the state if the transition succeeded; otherwise, the default value for the type.</param>
+    /// <param name="facts">When this method returns, contains the facts emitted by the transition.</param>
+    public void Deconstruct(out TState? state, out IReadOnlyList<IDomainFact> facts)
+    {
+        state = Outcome.IsSuccess ? Outcome.Value : default;
+        facts = Facts;
+    }
+
+    /// <summary>
+    /// Deconstructs the transition result into its error component, if the transition failed.
+    /// </summary>
+    /// <param name="error">When this method returns, contains the error if the transition failed; otherwise, the default value.</param>
+    public void Deconstruct(out DomainError? error)
+    {
+        error = Outcome.IsFailure ? Outcome.Error : default;
     }
 
     private string DebuggerDisplay => IsSuccess
         ? $"Success: State = {Outcome.Value}, Facts.Count = {Facts.Count}"
         : $"Failure: Error = {Outcome.Error}";
+
+    private static ImmutableArray<IDomainFact> NormalizeFacts(IReadOnlyList<IDomainFact>? facts)
+    {
+        if (facts is null || facts.Count == 0)
+            return ImmutableArray<IDomainFact>.Empty;
+
+        if (facts is ImmutableArray<IDomainFact> immutable)
+            return immutable;
+
+        return ImmutableArray.CreateRange(facts);
+    }
+
+    private static ImmutableArray<IDomainFact> ConcatFacts(
+        ImmutableArray<IDomainFact> first,
+        ImmutableArray<IDomainFact> second)
+    {
+        if (first.IsDefaultOrEmpty)
+            return second.IsDefault ? ImmutableArray<IDomainFact>.Empty : second;
+
+        if (second.IsDefaultOrEmpty)
+            return first;
+
+        var builder = ImmutableArray.CreateBuilder<IDomainFact>(first.Length + second.Length);
+        builder.AddRange(first);
+        builder.AddRange(second);
+        return builder.MoveToImmutable();
+    }
 }

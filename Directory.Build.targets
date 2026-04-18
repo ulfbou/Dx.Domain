@@ -1,8 +1,0 @@
-<!-- Directory.Build.targets -->
-<!-- This file is used to centralize and standardize build targets across multiple projects in a repository. -->
-<Project>
-
-  <!-- 1️⃣ Core build targets first -->
-  <Import Project="Directory.Core.targets" Condition="Exists('Directory.Core.targets')" />
-
-</Project>
