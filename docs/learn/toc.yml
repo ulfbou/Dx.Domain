@@ -1,0 +1,62 @@
+- name: Overview
+  href: index.md
+- name: Getting Started
+  href: getting-started.md
+- name: Quickstart
+  href: quickstart.md
+- name: Concepts
+  href: concepts/results.md
+  items:
+    - name: Results
+      href: concepts/results.md
+    - name: Errors
+      href: concepts/errors.md
+    - name: Invariants
+      href: concepts/invariants.md
+    - name: Facades & Construction
+      href: concepts/facades.md
+    - name: Facts vs Events
+      href: concepts/facts-vs-events.md
+    - name: Scopes & Roles
+      href: concepts/scopes-and-roles.md
+    - name: Generated Code
+      href: concepts/generated-code.md
+- name: Guides
+  items:
+    - name: Handle Errors
+      href: guides/handle-errors.md
+    - name: Result Handling Patterns
+      href: guides/result-handling-patterns.md
+    - name: Build a Facade
+      href: guides/build-a-facade.md
+    - name: Define a Primitive
+      href: guides/define-a-primitive.md
+    - name: Emit Facts
+      href: guides/emit-facts.md
+    - name: Exceptions Policy
+      href: guides/exceptions-policy.md
+- name: Reference
+  items:
+    - name: Diagnostics
+      href: reference/diagnostics/DXA010.md
+      items:
+        - name: DXA010 Construction Authority
+          href: reference/diagnostics/DXA010.md
+        - name: DXA020 Result must be handled
+          href: reference/diagnostics/DXA020.md
+- name: Reference
+  href: reference/api/kernel.md
+  items:
+    - name: API (Human Guide)
+      href: reference/api/kernel.md
+    - name: Diagnostics
+      href: reference/diagnostics/DXA010.md
+    - name: Configuration
+      href: reference/configuration.md
+- name: Release
+  href: changelog/index.md
+  items:
+    - name: Changelog
+      href: changelog/index.md
+    - name: Release Notes
+      href: release-notes/index.md

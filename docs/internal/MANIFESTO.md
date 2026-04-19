@@ -84,7 +84,6 @@ patterns by being **unable to express the wrong ones**.
 
 ---
 
-## Kernel Rule: Mechanics vs. Semantics
 
 > The kernel forbids semantic expansion, not mechanical support.
 
