@@ -3,14 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.3.11222.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{23C415C5-9A2F-4DAB-91F7-96C480B17B11}"
-	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
-		Directory.Quality.targets = Directory.Quality.targets
-		builds\Dx.Props.hierarchical.props = builds\Dx.Props.hierarchical.props
-		builds\Dx.Props.hierarchical.targets = builds\Dx.Props.hierarchical.targets
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D829B9CA-75B7-4129-962A-2E31338C4A20}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -18,64 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D8
 		.gitignore = .gitignore
 		docfx.json = docfx.json
 		Dockerfile = Dockerfile
-		favicon.png = favicon.png
 		filterConfig.yml = filterConfig.yml
 		test.runsettings = test.runsettings
 		toc.yml = toc.yml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}"
-	ProjectSection(SolutionItems) = preProject
-		docs\analyzer-rules.md = docs\analyzer-rules.md
-		docs\architecture-overview.md = docs\architecture-overview.md
-		CHANGELOG.md = CHANGELOG.md
-		CONTRIBUTING.md = CONTRIBUTING.md
-		docs\DPI.md = docs\DPI.md
-		docs\kernel.refactorization.specification.md = docs\kernel.refactorization.specification.md
-		LICENSE = LICENSE
-		docs\MANIFESTO.md = docs\MANIFESTO.md
-		docs\NON_GOALS.md = docs\NON_GOALS.md
-		README.md = README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Actions", "{F647DAB3-D845-4E0A-BE5B-425612706944}"
-	ProjectSection(SolutionItems) = preProject
-		.github\workflows\build-validate.yml = .github\workflows\build-validate.yml
-		.github\workflows\ci-analyzers.yml = .github\workflows\ci-analyzers.yml
-		.github\workflows\docfx.yml = .github\workflows\docfx.yml
-		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzer", "analyzer", "{93A06F62-3201-49B9-AA69-179DF003004A}"
-	ProjectSection(SolutionItems) = preProject
-		builds\analyzer\analyzer.props = builds\analyzer\analyzer.props
-		builds\analyzer\analyzer.targets = builds\analyzer\analyzer.targets
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Policy", "Policy", "{9202A97C-35CC-4FF9-9170-A29B14DB6FF2}"
-	ProjectSection(SolutionItems) = preProject
-		builds\policy\Dx.DomainAnalyzerGovernance.targets = builds\policy\Dx.DomainAnalyzerGovernance.targets
-		builds\policy\Dx.Forbidden.props = builds\policy\Dx.Forbidden.props
-		builds\policy\Dx.Governance.targets = builds\policy\Dx.Governance.targets
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{8292D1DC-CDD9-4099-87E8-72F4F34F0E65}"
-	ProjectSection(SolutionItems) = preProject
-		builds\identity\Dx.Identity.props = builds\identity\Dx.Identity.props
-		builds\identity\Dx.ResolveIdentity.targets = builds\identity\Dx.ResolveIdentity.targets
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{A0AEF5B3-1A61-4F1B-96B4-4CDC8E298DE0}"
-	ProjectSection(SolutionItems) = preProject
-		builds\common\Dx.Constants.props = builds\common\Dx.Constants.props
-		builds\common\Dx.Defaults.props = builds\common\Dx.Defaults.props
-		builds\common\Dx.ProjectKinds.props = builds\common\Dx.ProjectKinds.props
-		builds\common\Dx.Versions.props = builds\common\Dx.Versions.props
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{618A276E-71FB-42BA-8D24-2DEE8478F045}"
-	ProjectSection(SolutionItems) = preProject
-		builds\ci\Dx.CI.props = builds\ci\Dx.CI.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
@@ -89,38 +26,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Kernel", "src\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj", "{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Primitives", "src\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj", "{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Wiki", "Wiki", "{506F184F-2772-4E85-BC2D-47E528E4585A}"
-	ProjectSection(SolutionItems) = preProject
-		docs\wiki\Analyzers-and-Rules.md = docs\wiki\Analyzers-and-Rules.md
-		docs\wiki\Architecture.md = docs\wiki\Architecture.md
-		docs\wiki\Build-Enforcement.md = docs\wiki\Build-Enforcement.md
-		docs\wiki\CI-and-Release.md = docs\wiki\CI-and-Release.md
-		docs\wiki\CodeFixProviders.md = docs\wiki\CodeFixProviders.md
-		docs\wiki\Facts-System.md = docs\wiki\Facts-System.md
-		docs\wiki\FAQ.md = docs\wiki\FAQ.md
-		docs\wiki\Generators.md = docs\wiki\Generators.md
-		docs\wiki\Glossary.md = docs\wiki\Glossary.md
-		docs\wiki\Kernel.md = docs\wiki\Kernel.md
-		docs\wiki\Migration-Guide.md = docs\wiki\Migration-Guide.md
-		docs\wiki\Overview.md = docs\wiki\Overview.md
-		docs\wiki\Packages.md = docs\wiki\Packages.md
-		docs\wiki\Primitives.md = docs\wiki\Primitives.md
-		docs\wiki\README.md = docs\wiki\README.md
-		docs\wiki\Scopes-and-Roles.md = docs\wiki\Scopes-and-Roles.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ADR", "ADR", "{C7745BD2-7FC9-4D3A-A796-EFF54BF81A0E}"
-	ProjectSection(SolutionItems) = preProject
-		docs\adr\ADR-0000-record-architecture-decisions.md = docs\adr\ADR-0000-record-architecture-decisions.md
-		docs\adr\ADR-0001-four-package-substrate.md = docs\adr\ADR-0001-four-package-substrate.md
-		docs\adr\ADR-0002-non-silence-axiom.md = docs\adr\ADR-0002-non-silence-axiom.md
-		docs\adr\ADR-0003-scope-resolution-and-authority-modes.md = docs\adr\ADR-0003-scope-resolution-and-authority-modes.md
-		docs\adr\ADR-0004-dxa010-construction-discipline.md = docs\adr\ADR-0004-dxa010-construction-discipline.md
-		docs\adr\ADR-0005-dxa022-result-vs-throw-discipline.md = docs\adr\ADR-0005-dxa022-result-vs-throw-discipline.md
-		docs\adr\ADR-0006-exclude-option-either-nonempty.md = docs\adr\ADR-0006-exclude-option-either-nonempty.md
-		docs\adr\ADR-0007-facts-split-and-kernel-cleanup.md = docs\adr\ADR-0007-facts-split-and-kernel-cleanup.md
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
@@ -213,17 +118,11 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9202A97C-35CC-4FF9-9170-A29B14DB6FF2} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
-		{8292D1DC-CDD9-4099-87E8-72F4F34F0E65} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
-		{A0AEF5B3-1A61-4F1B-96B4-4CDC8E298DE0} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
-		{618A276E-71FB-42BA-8D24-2DEE8478F045} = {23C415C5-9A2F-4DAB-91F7-96C480B17B11}
 		{68EA1AB2-609D-4346-8A55-C424566E475D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{FE15694B-E46C-49D7-A19D-C45B249B7A1B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{B0F5765F-B879-4DF4-88D4-29ECB198EE35} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{506F184F-2772-4E85-BC2D-47E528E4585A} = {8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}
-		{C7745BD2-7FC9-4D3A-A796-EFF54BF81A0E} = {8A1CD592-6BF5-4BA4-BA7E-829C80C3505E}
 		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
