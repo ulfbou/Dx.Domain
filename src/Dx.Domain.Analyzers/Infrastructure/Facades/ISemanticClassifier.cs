@@ -16,15 +16,44 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
+
 namespace Dx.Domain.Analyzers.Infrastructure.Facades
 {
+    /// <summary>
+    /// Classifies types according to Dx semantic categories.
+    /// </summary>
+    /// <remarks>
+    /// Distinguishes Kernel Result types, DomainError, invariant exceptions, and domain types marked by attributes.
+    /// </remarks>
     public interface ISemanticClassifier
     {
+        /// <summary>Determines whether the specified type is a Kernel Result type.</summary>
+        /// <param name="type">The type to evaluate.</param>
+        /// <returns>True if the type is Result or Result{T}; otherwise, false.</returns>
         bool IsKernelResultType(ITypeSymbol type);
+
+        /// <summary>Determines whether the specified type is DomainError.</summary>
+        /// <param name="type">The type to evaluate.</param>
+        /// <returns>True if the type is DomainError; otherwise, false.</returns>
         bool IsDomainErrorType(ITypeSymbol type);
+
+        /// <summary>Determines whether the specified type is an invariant violation exception.</summary>
+        /// <param name="type">The type to evaluate.</param>
+        /// <returns>True if the type represents an invariant violation; otherwise, false.</returns>
         bool IsInvariantException(ITypeSymbol type);
+
+        /// <summary>Determines whether the specified type is a domain type.</summary>
+        /// <param name="type">The type to evaluate.</param>
+        /// <returns>True if the type is classified as a domain type; otherwise, false.</returns>
         bool IsDomainType(ITypeSymbol type);
     }
+
+    /// <summary>
+    /// Default implementation of <see cref="ISemanticClassifier"/> based on compilation symbols.
+    /// </summary>
+    /// <remarks>
+    /// Caches well-known Kernel types for performance. Classification is conservative.
+    /// </remarks>
     public sealed class SemanticClassifier : ISemanticClassifier
     {
         private readonly ImmutableHashSet<INamedTypeSymbol> _resultTypes;
@@ -36,6 +65,8 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             "ValueObjectAttribute"
         };
 
+        /// <summary>Initializes a new instance of the <see cref="SemanticClassifier"/> class.</summary>
+        /// <param name="compilation">The compilation to analyze.</param>
         public SemanticClassifier(Compilation compilation)
         {
             _resultTypes = LoadResultTypes(compilation);
@@ -44,15 +75,18 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
                 compilation.GetTypeByMetadataName("Dx.Domain.InvariantViolationException");
         }
 
+        /// <inheritdoc/>
         public bool IsKernelResultType(ITypeSymbol type) =>
             type is INamedTypeSymbol nt &&
             _resultTypes.Any(r =>
                 SymbolEqualityComparer.Default.Equals(nt.ConstructedFrom, r));
 
+        /// <inheritdoc/>
         public bool IsDomainErrorType(ITypeSymbol type) =>
             _domainError != null &&
             SymbolEqualityComparer.Default.Equals(type, _domainError);
 
+        /// <inheritdoc/>
         public bool IsInvariantException(ITypeSymbol type)
         {
             if (_invariantViolation == null)
@@ -69,6 +103,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             return false;
         }
 
+        /// <inheritdoc/>
         public bool IsDomainType(ITypeSymbol type)
         {
             if (type is not INamedTypeSymbol named)

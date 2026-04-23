@@ -21,46 +21,55 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
-namespace Dx.Domain.Analyzers.Infrastructure.Flow
+/// <summary>
+/// Provides cached access to Result flow analysis for analyzers.
+/// </summary>
+/// <remarks>
+/// Wraps the ResultFlowEngine and implements fail-open caching. Used by Result-related analyzers to determine handling.
+/// </remarks>
+public sealed class ResultFlowEngineWrapper
 {
-    public sealed class ResultFlowEngineWrapper
-    {
-        private readonly ResultFlowEngine _engine = new();
+    private readonly ResultFlowEngine _engine = new();
         private readonly ConcurrentDictionary<string, FlowGraph> _cache = new();
 
-        public FlowGraph Analyze(
-            IMethodSymbol method,
-            Compilation compilation,
-            AnalyzerConfigOptions options,
-            CancellationToken ct)
+    /// <summary>Analyzes the specified method for Result flow.</summary>
+    /// <param name="method">The method to analyze.</param>
+    /// <param name="compilation">The compilation context.</param>
+    /// <param name="options">The analyzer options.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The flow graph, or an empty graph if analysis fails.</returns>
+    public FlowGraph Analyze(
+        IMethodSymbol method,
+        Compilation compilation,
+        AnalyzerConfigOptions options,
+        CancellationToken ct)
+    {
+        try
         {
-            try
-            {
-                var key = BuildKey(method);
-                return _cache.GetOrAdd(key,
-                    _ => _engine.Analyze(method, compilation, options, ct));
-            }
-            catch
-            {
-                // Fail-open: return invalid empty graph on any error
-                return new FlowGraph(
-                    ImmutableArray<ResultNode>.Empty,
-                    ImmutableDictionary<ResultNode, ResultState>.Empty,
-                    ImmutableArray<FlowDiagnostic>.Empty,
-                    isValid: false);
-            }
+            var key = BuildKey(method);
+            return _cache.GetOrAdd(key,
+                _ => _engine.Analyze(method, compilation, options, ct));
         }
-
-        private static string BuildKey(IMethodSymbol method)
+        catch
         {
-            var syntax = method.DeclaringSyntaxReferences.First();
-            var tree = syntax.SyntaxTree;
-            var checksumBytes = tree.GetText().GetChecksum();
-            var checksum = BitConverter.ToString(checksumBytes.ToArray()).Replace("-", string.Empty);
-
-            var symbolId = method.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-            return $"{symbolId}::{checksum}";
+            // Fail-open: return invalid empty graph on any error
+            return new FlowGraph(
+                ImmutableArray<ResultNode>.Empty,
+                ImmutableDictionary<ResultNode, ResultState>.Empty,
+                ImmutableArray<FlowDiagnostic>.Empty,
+                isValid: false);
         }
+    }
+
+    private static string BuildKey(IMethodSymbol method)
+    {
+        var syntax = method.DeclaringSyntaxReferences.First();
+        var tree = syntax.SyntaxTree;
+        var checksumBytes = tree.GetText().GetChecksum();
+        var checksum = BitConverter.ToString(checksumBytes.ToArray()).Replace("-", string.Empty);
+
+        var symbolId = method.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        return $"{symbolId}::{checksum}";
     }
 }

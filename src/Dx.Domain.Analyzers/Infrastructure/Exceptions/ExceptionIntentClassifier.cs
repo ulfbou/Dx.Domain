@@ -20,12 +20,10 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Dx.Domain.Analyzers.Infrastructure.Exceptions
 {
     /// <summary>
-    /// Classifies <see cref="IThrowOperation"/> instances into high level intent buckets
-    /// that other analyzers can use when reasoning about exception usage.
+    /// Classifies throw operations into high-level intent buckets for analyzer consumption.
     /// </summary>
     /// <remarks>
-    /// The implementation is deliberately conservative and fail-open: when it cannot
-    /// confidently determine an intent, it returns <see cref="ExceptionIntent.Unknown"/>.
+    /// The implementation is deliberately conservative and fail-open. When intent cannot be confidently determined, <see cref="ExceptionIntent.Unknown"/> is returned.
     /// </remarks>
     public sealed class ExceptionIntentClassifier : IExceptionIntentClassifier
     {
@@ -43,11 +41,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Exceptions
         private readonly ISet<INamedTypeSymbol> _controlFlowExceptions;
         private readonly ISet<INamedTypeSymbol> _domainControlExceptions;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExceptionIntentClassifier"/> class.
-        /// </summary>
-        /// <param name="compilation">The compilation used for symbol resolution.</param>
-        /// <param name="config">Analyzer configuration options for optional overrides.</param>
+        /// <summary>Initializes a new instance of the <see cref="ExceptionIntentClassifier"/> class.</summary>
+        /// <param name="compilation">The compilation to analyze.</param>
+        /// <param name="config">The analyzer configuration provider.</param>
         public ExceptionIntentClassifier(Compilation compilation, AnalyzerConfigOptionsProvider config)
         {
             _argumentException = compilation.GetTypeByMetadataName("System.ArgumentException");

@@ -20,15 +20,33 @@ using System.Linq;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Generated
 {
+    /// <summary>
+    /// Detects symbols originating from generated code.
+    /// </summary>
+    /// <remarks>
+    /// Supplements Roslyn's built-in detection with Dx-specific markers.
+    /// </remarks>
     public interface IGeneratedCodeDetector
     {
+        /// <summary>Determines whether the specified symbol is generated.</summary>
+        /// <param name="symbol">The symbol to evaluate.</param>
+        /// <returns>True if the symbol is generated; otherwise, false.</returns>
         bool IsGenerated(ISymbol symbol);
     }
+
+    /// <summary>
+    /// Default implementation of <see cref="IGeneratedCodeDetector"/> using configuration and attributes.
+    /// </summary>
+    /// <remarks>
+    /// Evaluates GeneratedCodeAttribute and configured namespace markers. Implementation is fail-open.
+    /// </remarks>
     public sealed class GeneratedCodeDetector : IGeneratedCodeDetector
     {
         private static readonly char[] NamespaceSeparators = { ';' };
         private readonly HashSet<string> _namespaceMarkers;
 
+        /// <summary>Initializes a new instance of the <see cref="GeneratedCodeDetector"/> class.</summary>
+        /// <param name="config">The analyzer configuration provider.</param>
         public GeneratedCodeDetector(AnalyzerConfigOptionsProvider config)
         {
             if (!config.GlobalOptions.TryGetValue("dx_generated_markers", out var raw))
@@ -43,6 +61,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Generated
 
         }
 
+        /// <inheritdoc/>
         public bool IsGenerated(ISymbol symbol)
         {
             if (symbol.GetAttributes().Any(a =>

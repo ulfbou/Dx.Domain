@@ -26,54 +26,52 @@ namespace System.Runtime.CompilerServices
 namespace Dx.Domain.Analyzers.Infrastructure
 {
     /// <summary>
-    /// Represents the intent behind an exception being thrown.
+    /// Defines the classified intent of a throw operation for use by analyzers.
     /// </summary>
+    /// <remarks>
+    /// Used to distinguish argument validation, invariant violations, and domain control flow from infrastructure exceptions. Classification is conservative and fail-open.
+    /// </remarks>
     public enum ExceptionIntent
     {
-        /// <summary>
-        /// Intent cannot be determined or is ambiguous.
-        /// </summary>
+        /// <summary>Intent cannot be determined or is ambiguous.</summary>
         Unknown,
 
-        /// <summary>
-        /// Exception is thrown for argument validation (e.g., ArgumentNullException, ArgumentException).
-        /// </summary>
+        /// <summary>Exception is thrown to validate arguments.</summary>
         ArgumentValidation,
 
-        /// <summary>
-        /// Exception is thrown for invariant violation (e.g., InvariantViolationException).
-        /// </summary>
+        /// <summary>Exception is thrown to signal a Kernel invariant violation.</summary>
         InvariantViolation,
 
-        /// <summary>
-        /// Exception is thrown to signal a control flow decision (e.g., OperationCanceledException).
-        /// </summary>
+        /// <summary>Exception is thrown to alter control flow, such as cancellation.</summary>
         ControlFlow,
 
-        /// <summary>
-        /// Exception is thrown for domain control flow.
-        /// </summary>
+        /// <summary>Exception is thrown to signal domain-level control flow that should use Result.</summary>
         DomainControl,
 
-        /// <summary>
-        /// Exception is thrown for infrastructure concerns.
-        /// </summary>
+        /// <summary>Exception is thrown for infrastructure or I/O concerns.</summary>
         Infrastructure
     }
 
     /// <summary>
-    /// Classifies exception throw operations by their intent.
+    /// Classifies throw operations by intent for analyzer consumption.
     /// </summary>
+    /// <remarks>
+    /// Provides the single source of truth for exception intent. Implementations must be conservative and return <see cref="ExceptionIntent.Unknown"/> when classification is ambiguous.
+    /// </remarks>
     public interface IExceptionIntentClassifier
     {
-        /// <summary>
-        /// Classifies the intent of a throw operation.
-        /// </summary>
+        /// <summary>Classifies the intent of a throw operation.</summary>
         /// <param name="throwOperation">The throw operation to classify.</param>
         /// <returns>The classified intent, or <see cref="ExceptionIntent.Unknown"/> if classification fails.</returns>
         ExceptionIntent Classify(Microsoft.CodeAnalysis.Operations.IThrowOperation throwOperation);
     }
 
+    /// <summary>
+    /// Aggregates the infrastructure services required by analyzers.
+    /// </summary>
+    /// <remarks>
+    /// Serves as the composition root for scope resolution, Facade discovery, semantic classification, exception intent classification, Result flow analysis, and generated code detection. Instances are created per compilation start and are immutable.
+    /// </remarks>
     public sealed record AnalyzerServices(
         IScopeResolver Scope,
         IDxFacadeResolver Dx,
