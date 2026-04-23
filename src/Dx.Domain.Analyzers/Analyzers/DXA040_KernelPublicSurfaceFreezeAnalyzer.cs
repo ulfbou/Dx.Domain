@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Dx.Domain.Analyzers.Infrastructure;
@@ -25,13 +26,30 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA040: Kernel Public Surface Freeze.
-    /// Detects new public API additions in kernel assemblies without DPI justification.
+    /// Preserves Kernel public surface stability by detecting unauthorized additions to Kernel assemblies.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The Kernel provides the foundational contracts for Result, Invariant, and Error. Changes to its public surface affect all downstream layers and must be explicitly justified.
+    /// </para>
+    /// <para>
+    /// Scope behavior: Applies exclusively to S0. Additions require documented design proposal and impact analysis.
+    /// </para>
+    /// <para>
+    /// The analyzer operates fail-open and evaluates only newly introduced public APIs in Kernel assemblies.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA040_KernelPublicSurfaceFreezeAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for Kernel public surface changes.
+        /// </summary>
         public const string DiagnosticId = "DXA040";
+
+        /// <inheritdoc/>
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -41,6 +59,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Kernel API surface should remain minimal. New public types or members require DPI justification to prevent kernel drift.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for Kernel public surface freeze violations.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule protects the stability of Kernel contracts and prevents unintentional surface expansion.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -50,9 +74,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
-
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -77,7 +99,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "MicrosoftCodeAnalysisCorrectness",
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]

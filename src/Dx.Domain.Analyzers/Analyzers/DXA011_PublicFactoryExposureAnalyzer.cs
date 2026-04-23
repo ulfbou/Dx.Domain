@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Dx.Domain.Analyzers.Infrastructure;
@@ -26,13 +27,27 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA011: Public Factory Exposure.
-    /// Detects public constructors or public static factory methods on domain types.
+    /// Prevents exposure of public constructors and public static factories on domain types to preserve Facade-mediated construction.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Public construction surface on domain types allows consumers to bypass the Dx Facade. This breaks centralized invariant enforcement and auditability.
+    /// </para>
+    /// <para>
+    /// Scope behavior: S0 is the defining scope for internal factories. S1, S2, and S3 must not expose public construction surface on domain types.
+    /// </para>
+    /// <para>
+    /// The analyzer is conservative and ignores generated types and non-domain types classified by the semantic classifier.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA011_PublicFactoryExposureAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for public factory exposure.
+        /// </summary>
         public const string DiagnosticId = "DXA011";
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -42,6 +57,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Domain types should not expose public constructors or factories to prevent consumers from bypassing the Dx facade.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for public factory exposure.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule targets type declarations and enforces encapsulation of construction authority within the Kernel and Facade.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -51,9 +72,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -70,7 +93,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "MicrosoftCodeAnalysisCorrectness",
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]

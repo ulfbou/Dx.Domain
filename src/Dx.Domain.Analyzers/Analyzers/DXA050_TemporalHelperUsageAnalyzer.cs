@@ -25,15 +25,31 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA050: Temporal Helper Usage in Kernel.
-    /// Detects use of temporal/policy helpers in kernel code.
+    /// Prohibits temporal and policy helpers in Kernel code to maintain mechanical purity.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The Kernel must remain free of time, scheduling, and policy concerns. Temporal helpers introduce non-determinism and violate the mechanical nature of invariant enforcement.
+    /// </para>
+    /// <para>
+    /// Scope behavior: Applies exclusively to S0. Temporal concerns belong to application layers S1 through S3.
+    /// </para>
+    /// <para>
+    /// The analyzer is conservative and flags known temporal helper patterns. Generated code is excluded.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA050_TemporalHelperUsageAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for temporal helper usage in the Kernel.
+        /// </summary>
         public const string DiagnosticId = "DXA050";
-        private const string Category = "Domain.Architecture";
 
+        /// <inheritdoc/>
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+        private const string Category = "Domain.Architecture";
         private static readonly LocalizableString Title =
             "Temporal Helper Usage in Kernel";
         private static readonly LocalizableString MessageFormat =
@@ -41,6 +57,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Kernel code should remain mechanical, not prescriptive. Temporal helpers encode business time semantics and belong at the edges.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for temporal helper usage.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule enforces separation of mechanical Kernel logic from temporal policy.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -50,9 +72,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
-
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

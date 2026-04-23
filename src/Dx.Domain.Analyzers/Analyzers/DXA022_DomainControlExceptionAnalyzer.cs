@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
@@ -23,18 +24,32 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
+
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA022: Discouraged Domain Control Exception.
-    /// Detects methods that return Result&lt;T&gt; but throw domain control exceptions instead of returning Result.Failure.
+    /// Enforces Result-based error signaling by prohibiting domain control exceptions in Result-returning methods.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Methods that return Result must communicate failure through Result.Failure, not through exceptions. Throwing for control flow breaks the explicit contract of the Kernel and makes error paths non-observable.
+    /// </para>
+    /// <para>
+    /// Scope behavior: Applies to S1, S2, and S3. S0 may define exception types but must not use them for domain control flow in Result-returning APIs.
+    /// </para>
+    /// <para>
+    /// The analyzer is conservative and classifies intent using the exception intent classifier. Infrastructure exceptions and invariant violations are not flagged.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA022_DomainControlExceptionAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for discouraged domain control exceptions.
+        /// </summary>
         public const string DiagnosticId = "DXA022";
-        private const string Category = "Domain.ExceptionHandling";
 
+        private const string Category = "Domain.ExceptionHandling";
         private static readonly LocalizableString Title =
             "Discouraged Domain Control Exception";
         private static readonly LocalizableString MessageFormat =
@@ -42,6 +57,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Methods that return Result should use Result.Failure instead of throwing exceptions for domain control flow.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for domain control exceptions.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule preserves Result as the single error channel for domain operations.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -51,9 +72,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc />
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -78,7 +101,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "MicrosoftCodeAnalysisCorrectness",
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]

@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
@@ -26,15 +27,28 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA020: Result Ignored.
-    /// Detects when a Result&lt;T&gt; is created but not explicitly handled, returned, or checked.
+    /// Requires explicit handling of Result values to preserve explicit control flow.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A Result represents a domain outcome that must be observed. Ignoring a Result silently discards failure information and violates the explicitness principle of the Kernel.
+    /// </para>
+    /// <para>
+    /// Scope behavior: Applies to S1, S2, and S3. S0 is exempt for internal Result construction.
+    /// </para>
+    /// <para>
+    /// The analyzer tracks Result creation, return, and inspection via IsSuccess, IsFailure, Match, Map, and Bind. Values passed to approved handlers are considered handled. Analysis is fail-open.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA020_ResultIgnoredAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for ignored Result values.
+        /// </summary>
         public const string DiagnosticId = "DXA020";
-        private const string Category = "Domain.ResultHandling";
 
+        private const string Category = "Domain.ResultHandling";
         private static readonly LocalizableString Title =
             "Result Ignored";
         private static readonly LocalizableString MessageFormat =
@@ -42,6 +56,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Result instances must be explicitly handled to prevent silent failures and lost domain errors.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for ignored Result values.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule enforces that every Result is either returned, inspected, or passed to an approved handler.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -51,9 +71,16 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for ignored Result values.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule enforces that every Result is either returned, inspected, or passed to an approved handler.
+        /// </remarks>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -83,7 +110,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "MicrosoftCodeAnalysisCorrectness",
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]

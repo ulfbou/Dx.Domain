@@ -26,13 +26,27 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA080: Facade Invariant Enforcement Missing.
-    /// Detects facade factory methods that don't enforce invariants.
+    /// Verifies that Facade factory methods enforce invariants before returning domain instances.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The Facade is the architectural boundary where all construction authority converges. A factory that returns without invoking invariant validation breaks the Kernel guarantee.
+    /// </para>
+    /// <para>
+    /// Scope behavior: Applies only to methods recognized as Facade factories by the Facade resolver. Analysis is limited to S0 implementations.
+    /// </para>
+    /// <para>
+    /// This is a structural check. It verifies the presence of an invariant call on success paths, not the semantic correctness of the invariant.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA080_FacadeInvariantEnforcementAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for missing invariant enforcement in Facade factories.
+        /// </summary>
         public const string DiagnosticId = "DXA080";
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -42,6 +56,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Dx facade factory methods must enforce invariants to guarantee creation boundary correctness.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for Facade invariant enforcement.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule protects the integrity of the construction boundary without imposing specific invariant implementations.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -51,9 +71,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

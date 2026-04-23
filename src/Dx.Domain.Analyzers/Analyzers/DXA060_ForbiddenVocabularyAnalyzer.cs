@@ -25,13 +25,30 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA060: Forbidden Vocabulary in Kernel.
-    /// Detects use of forbidden pattern vocabulary in kernel code.
+    /// Enforces mechanical vocabulary in the Kernel by prohibiting semantic or pattern-specific terminology.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The Kernel provides primitives, not domain patterns. Use of forbidden vocabulary indicates semantic leakage into the mechanical layer and compromises neutrality.
+    /// </para>
+    /// <para>
+    /// Scope behavior: Applies exclusively to S0. Vocabulary restrictions preserve the Kernel as a stable, pattern-agnostic foundation.
+    /// </para>
+    /// <para>
+    /// The analyzer evaluates identifiers and type names against the configured forbidden vocabulary list.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA060_ForbiddenVocabularyAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for forbidden vocabulary in the Kernel.
+        /// </summary>
         public const string DiagnosticId = "DXA060";
+
+        /// <inheritdoc/>
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -41,6 +58,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Kernel code should use mechanical terminology. Pattern-based terms like 'Repository', 'Saga', 'Apply' belong in adapters.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for forbidden vocabulary.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule maintains Kernel neutrality by restricting terminology to mechanical concepts.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -71,10 +94,9 @@ namespace Dx.Domain.Analyzers.Analyzers
             "Snapshot"
         );
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
-
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
+
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();

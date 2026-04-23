@@ -24,18 +24,32 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
+
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA030: Unapproved Handler Usage.
-    /// Detects Result values being passed to non-approved handlers.
+    /// Restricts Result consumption to approved handlers to preserve auditability and explicit handling.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Allowing arbitrary handlers to consume Result values creates implicit control flow and bypasses the Kernel's explicitness guarantee. An allow-list ensures handling is intentional and observable.
+    /// </para>
+    /// <para>
+    /// Scope behavior: Applies to S1, S2, and S3. Handlers are configured via analyzer configuration and resolved at compilation start.
+    /// </para>
+    /// <para>
+    /// The analyzer operates fail-open. Unresolvable symbols and generated code are ignored.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA030_UnapprovedHandlerAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for unapproved handler usage.
+        /// </summary>
         public const string DiagnosticId = "DXA030";
-        private const string Category = "Domain.ResultHandling";
 
+        private const string Category = "Domain.ResultHandling";
         private static readonly LocalizableString Title =
             "Unapproved Handler Usage";
         private static readonly LocalizableString MessageFormat =
@@ -43,6 +57,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Result values should only be passed to approved handlers to ensure explicit and analyzable result handling.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for unapproved handler usage.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule enforces that Result values are passed only to handlers explicitly approved in configuration.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -52,9 +72,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

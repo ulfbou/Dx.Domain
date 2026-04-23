@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
@@ -25,13 +26,30 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA010: Construction Authority Violation.
-    /// Detects direct construction of domain types outside permitted Dx facade factories.
+    /// Enforces construction authority by requiring all domain instances to be created through the Dx Facade.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This rule protects the Kernel invariant that construction is the single point where invariants are enforced and audited. Direct use of constructors or public factories bypasses that guarantee.
+    /// </para>
+    /// <para>
+    /// Scope behavior: S0 is exempt. S1, S2, and S3 must use the Facade.
+    /// </para>
+    /// <para>
+    /// The analyzer operates fail-open and excludes generated code.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for construction authority violations.
+        /// </summary>
         public const string DiagnosticId = "DXA010";
+
+        /// <inheritdoc/>
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -41,6 +59,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Domain types should be constructed through the Dx facade to centralize invariant enforcement and make creation auditable.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for construction authority violations.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning to preserve build continuity while enforcing architectural intent. The rule applies to object creation and invocation operations outside the Kernel.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -50,9 +74,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
-
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -86,7 +108,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "MicrosoftCodeAnalysisCorrectness",
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]

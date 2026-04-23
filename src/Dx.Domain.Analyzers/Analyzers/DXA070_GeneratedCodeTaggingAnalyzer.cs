@@ -12,6 +12,7 @@
 
 using System.CodeDom.Compiler;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Dx.Domain.Analyzers.Infrastructure;
@@ -26,13 +27,30 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA070: Generated Code Tagging.
-    /// Detects generated code missing required generator tags.
+    /// Ensures generated code is correctly tagged to enable accurate scope resolution and analyzer exclusion.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Analyzers rely on reliable identification of generated code to avoid false positives and to apply correct scope rules. Missing or incorrect generator tags break this detection.
+    /// </para>
+    /// <para>
+    /// Scope behavior: Applies to all scopes where generators emit code. Tagging requirements are enforced regardless of S0 through S3 classification.
+    /// </para>
+    /// <para>
+    /// The analyzer verifies the presence of standard generated code attributes and comments. It operates fail-open for unrecognized generation patterns.
+    /// </para>
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA070_GeneratedCodeTaggingAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Gets the diagnostic identifier for missing generated code tagging.
+        /// </summary>
         public const string DiagnosticId = "DXA070";
+
+        /// <inheritdoc/>
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
         private const string Category = "Domain.CodeGeneration";
 
         private static readonly LocalizableString Title =
@@ -42,6 +60,12 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Description =
             "Generated code should be tagged with [GeneratedCode] attribute to prevent false positives from analyzers.";
 
+        /// <summary>
+        /// Defines the diagnostic descriptor for generated code tagging violations.
+        /// </summary>
+        /// <remarks>
+        /// Severity is Warning. The rule ensures generators emit identifiable markers required by the analyzer infrastructure.
+        /// </remarks>
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             Title,
@@ -51,9 +75,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
-
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
@@ -78,7 +100,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "MicrosoftCodeAnalysisCorrectness",
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
