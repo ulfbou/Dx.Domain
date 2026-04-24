@@ -356,8 +356,8 @@ namespace Dx.Domain.Analyzers.ResultFlow
         "Dx.Domain.Result`1");
         public ImmutableHashSet<string> InspectionMemberNames { get; init; } =
         ImmutableHashSet.Create("IsSuccess", "IsFailure", "Match", "Map", "Bind");
-        public string HandlerConfigKey { get; init; } = "dx.result.handlers";
-        public string TerminalizerConfigKey { get; init; } = "dx.result.terminalizers";
+        public string HandlerConfigKey { get; init; } = "Result.handlers";
+        public string TerminalizerConfigKey { get; init; } = "Result.terminalizers";
     }
     internal sealed class ResultTypeResolver
     {
