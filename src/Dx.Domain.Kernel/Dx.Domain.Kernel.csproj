@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Kernel</DxLayer>
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.1.0-alpha.4</Version>
+    <Version>0.1.0-alpha</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
   </PropertyGroup>

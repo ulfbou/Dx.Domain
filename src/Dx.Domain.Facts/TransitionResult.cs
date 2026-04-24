@@ -21,7 +21,7 @@ namespace Dx.Domain.Facts;
 /// This type is typically returned from aggregate state transition methods:
 /// <code>
 /// var result = TransitionResult&lt;OrderState&gt;.Success(newState, facts);
-/// if (result.IsSuccess) { /* persist newState and facts */ }
+/// if (Result.IsSuccess) { /* persist newState and facts */ }
 /// </code>
 /// </para>
 /// <para>
@@ -146,7 +146,7 @@ public readonly struct TransitionResult<TState>
     /// </summary>
     /// <typeparam name="TNext">The type of the resulting state.</typeparam>
     /// <param name="bind">The transition function to apply to the state.</param>
-    /// <returns>A composed transition result.</returns>
+    /// <returns>A composed transition Result.</returns>
     public TransitionResult<TNext> Bind<TNext>(Func<TState, TransitionResult<TNext>> bind)
         where TNext : notnull
     {
