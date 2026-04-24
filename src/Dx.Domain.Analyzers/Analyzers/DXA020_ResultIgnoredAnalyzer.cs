@@ -26,17 +26,36 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Dx.Domain.Analyzers.Analyzers
 {
     /// <summary>
-    /// Analyzer for DXA020: Result Ignored.
-    /// Detects when a Result&lt;T&gt; is created but not explicitly handled, returned, or checked.
+    /// Enforces Dx.Domain rule DXA020: Result Ignored.
     /// </summary>
+    /// <remarks>
+    /// This analyzer enforces explicit handling of Result values.
+    /// Producing a Result without observing or propagating it is
+    /// treated as a compile-time correctness violation.
+    ///
+    /// Scope:
+    /// - Applies to S1–S3.
+    /// - Explicitly ignored in kernel code.
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - Result handling intent must be made explicit by the developer.
+    ///
+    /// DX-first principle:
+    /// Failures must never be silently discarded.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA020_ResultIgnoredAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA020.
+        /// </summary>
         public const string DiagnosticId = "DXA020";
+
         private const string Category = "Domain.ResultHandling";
 
         private static readonly LocalizableString Title =
-            "Result Ignored";
+        "Result Ignored";
         private static readonly LocalizableString MessageFormat =
             "Result value is produced and ignored. Either handle, return, or explicitly discard with intent.";
         private static readonly LocalizableString Description =
@@ -51,9 +70,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

@@ -25,13 +25,32 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Dx.Domain.Analyzers.Analyzers
 {
+
     /// <summary>
-    /// Analyzer for DXA022: Discouraged Domain Control Exception.
-    /// Detects methods that return Result&lt;T&gt; but throw domain control exceptions instead of returning Result.Failure.
+    /// Enforces Dx.Domain rule DXA022: Discouraged Domain Control Exception.
     /// </summary>
+    /// <remarks>
+    /// This analyzer enforces a Result-centric control-flow model.
+    /// Methods that return Result must not use exceptions
+    /// for domain-level control flow.
+    ///
+    /// Scope:
+    /// - Applies to S1–S3.
+    /// - Kernel invariant and argument-validation exceptions are allowed.
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - No runtime behavior is altered.
+    ///
+    /// DX-first principle:
+    /// Domain control must be explicit and representable as data.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA022_DomainControlExceptionAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA022.
+        /// </summary>
         public const string DiagnosticId = "DXA022";
         private const string Category = "Domain.ExceptionHandling";
 
@@ -51,9 +70,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

@@ -25,13 +25,31 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dx.Domain.Analyzers.Analyzers
 {
+
     /// <summary>
-    /// Analyzer for DXA011: Public Factory Exposure.
-    /// Detects public constructors or public static factory methods on domain types.
+    /// Enforces Dx.Domain rule DXA011: Public Factory Exposure.
     /// </summary>
+    /// <remarks>
+    /// This analyzer enforces a compile-time architectural invariant:
+    /// domain types must not expose public constructors or public static factory methods.
+    ///
+    /// Scope:
+    /// - Applies to S0 and S1 domain types.
+    /// - Generated code is ignored.
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - No automatic fixes are applied.
+    ///
+    /// DX-first principle:
+    /// Construction surfaces are restricted to preserve creation authority.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA011_PublicFactoryExposureAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA011.
+        /// </summary>
         public const string DiagnosticId = "DXA011";
         private const string Category = "Domain.Architecture";
 
@@ -51,9 +69,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

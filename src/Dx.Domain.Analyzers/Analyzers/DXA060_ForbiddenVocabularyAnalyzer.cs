@@ -24,14 +24,33 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dx.Domain.Analyzers.Analyzers
 {
+
     /// <summary>
-    /// Analyzer for DXA060: Forbidden Vocabulary in Kernel.
-    /// Detects use of forbidden pattern vocabulary in kernel code.
+    /// Enforces Dx.Domain rule DXA060: Forbidden Vocabulary in Kernel.
     /// </summary>
+    /// <remarks>
+    /// This analyzer enforces mechanical terminology within kernel code
+    /// by prohibiting pattern- or architecture-specific vocabulary.
+    ///
+    /// Scope:
+    /// - Applies to S0 and S1.
+    /// - Generated code is ignored.
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - Vocabulary must be renamed or moved to adapters.
+    ///
+    /// DX-first principle:
+    /// Kernel language must describe mechanics, not patterns or intent.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA060_ForbiddenVocabularyAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA060.
+        /// </summary>
         public const string DiagnosticId = "DXA060";
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -71,9 +90,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             "Snapshot"
         );
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

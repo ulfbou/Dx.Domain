@@ -26,14 +26,33 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Dx.Domain.Analyzers.Analyzers
 {
+
     /// <summary>
-    /// Analyzer for DXA030: Unapproved Handler Usage.
-    /// Detects Result values being passed to non-approved handlers.
+    /// Enforces Dx.Domain rule DXA030: Unapproved Handler Usage.
     /// </summary>
+    /// <remarks>
+    /// This analyzer enforces a compile-time Result-handling invariant:
+    /// Result values may only be passed to approved handlers.
+    ///
+    /// Scope:
+    /// - Applies to S1–S3 (shared, domain, application).
+    /// - Kernel code is trusted and ignored.
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - Approved handlers are configured explicitly via EditorConfig.
+    ///
+    /// DX-first principle:
+    /// Result handling must remain explicit, analyzable, and intentional.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA030_UnapprovedHandlerAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA030.
+        /// </summary>
         public const string DiagnosticId = "DXA030";
+
         private const string Category = "Domain.ResultHandling";
 
         private static readonly LocalizableString Title =
@@ -52,9 +71,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

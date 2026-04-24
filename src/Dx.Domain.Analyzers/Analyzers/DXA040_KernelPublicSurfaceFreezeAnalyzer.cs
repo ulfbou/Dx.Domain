@@ -24,14 +24,33 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dx.Domain.Analyzers.Analyzers
 {
+
     /// <summary>
-    /// Analyzer for DXA040: Kernel Public Surface Freeze.
-    /// Detects new public API additions in kernel assemblies without DPI justification.
+    /// Enforces Dx.Domain rule DXA040: Kernel Public Surface Freeze.
     /// </summary>
+    /// <remarks>
+    /// This analyzer enforces kernel minimalism by preventing unreviewed
+    /// expansion of the public kernel API surface.
+    ///
+    /// Scope:
+    /// - Applies exclusively to S0 (kernel).
+    /// - Generated and legacy symbols are excluded.
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - New public APIs require explicit DPI justification.
+    ///
+    /// DX-first principle:
+    /// Kernel growth must be deliberate, justified, and exceptional.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA040_KernelPublicSurfaceFreezeAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA040.
+        /// </summary>
         public const string DiagnosticId = "DXA040";
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -50,9 +69,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
