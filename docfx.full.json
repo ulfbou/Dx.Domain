@@ -37,9 +37,9 @@
     "dest": "_site",
     "template": [ "default" ],
     "globalMetadata": {
-      "_appTitle": "Zentient.Metadata Documentation",
-      "_appName": "Zentient.Metadata",
-      "_appFooter": "Copyright © 2025 Zentient Framework Team. All rights reserved.",
+      "_appTitle": "Dx.Domain Documentation",
+      "_appName": "Dx.Domain",
+      "_appFooter": "Copyright 2025 Dx.Domain contributors",
       "_enableSearch": true,
       "_enableNewTab": true,
       "_disableNavbar": false,
@@ -47,14 +47,14 @@
       "_disableAffix": false,
       "_disableContribution": false,
       "_gitContribute": {
-        "repo": "https://github.com/ulfbou/Zentient.Metadata",
+        "repo": "https://github.com/ulfbou/dx.domain",
         "branch": "main"
       },
       "_gitUrlPattern": "github",
       "_customMetadata": {
-        "company": "Zentient Framework Team",
-        "version": "1.0.0",
-        "framework": "net8.0;net9.0"
+        "company": "Dx.Domain contributors",
+        "version": "0.1.0",
+          "framework": "net8.0;net9.0;net10.0"
       }
     },
     "fileMetadata": {
