@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="IGeneratedCodeDetector.cs" company="Dx.Domain Team">
+// <copyright file="ResultState.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -10,16 +10,14 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Microsoft.CodeAnalysis;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Dx.Domain.Analyzers.Infrastructure.Generated
+namespace Dx.Domain.Analyzers.ResultFlow
 {
-    public interface IGeneratedCodeDetector
+    public enum ResultState
     {
-        bool IsGenerated(ISymbol symbol);
+        Created = 0,
+        Checked = 1,
+        Propagated = 2,
+        Terminated = 3,
+        Ignored = 4
     }
 }

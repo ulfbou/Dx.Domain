@@ -25,14 +25,32 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Dx.Domain.Analyzers.Analyzers
 {
+
     /// <summary>
-    /// Analyzer for DXA080: Facade Invariant Enforcement Missing.
-    /// Detects facade factory methods that don't enforce invariants.
+    /// Enforces Dx.Domain rule DXA080: Facade Invariant Enforcement Missing.
     /// </summary>
+    /// <remarks>
+    /// This analyzer enforces invariant checking at domain creation boundaries.
+    /// Dx facade factories must not bypass invariant enforcement.
+    ///
+    /// Scope:
+    /// - Applies to S1 and S2.
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - Facade factories must return Result or enforce invariants explicitly.
+    ///
+    /// DX-first principle:
+    /// Construction boundaries must be correctness-preserving.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA080_FacadeInvariantEnforcementAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA080.
+        /// </summary>
         public const string DiagnosticId = "DXA080";
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -51,9 +69,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

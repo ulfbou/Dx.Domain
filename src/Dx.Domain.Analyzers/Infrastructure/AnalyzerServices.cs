@@ -74,6 +74,19 @@ namespace Dx.Domain.Analyzers.Infrastructure
         ExceptionIntent Classify(Microsoft.CodeAnalysis.Operations.IThrowOperation throwOperation);
     }
 
+    /// <summary>
+    /// Aggregates shared analyzer services used during compilation analysis.
+    /// </summary>
+    /// <param name="Scope">The scope resolver service.</param>
+    /// <param name="Dx">The Dx facade resolver service.</param>
+    /// <param name="Semantic">The semantic classifier service.</param>
+    /// <param name="Exceptions">The exception intent classifier service.</param>
+    /// <param name="Flow">The result flow engine wrapper service.</param>
+    /// <param name="Generated">The generated code detector service.</param>
+    /// <remarks>
+    /// This record is pure analyzer metadata.
+    /// It is immutable, contains no behavior, and imposes no runtime semantics.
+    /// </remarks>
     public sealed record AnalyzerServices(
         IScopeResolver Scope,
         IDxFacadeResolver Dx,
