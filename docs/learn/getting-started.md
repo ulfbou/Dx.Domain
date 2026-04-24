@@ -84,5 +84,5 @@ var message = result.Match(
 - Up: [Dx.Domain in 90 seconds](index.md)
 - Next: [Quickstart](quickstart.md)
 - Reference: [DXA020](../analyzers/dxa020.md)
-- Governance: [ADR-0018](../adr/ADR-0018-kernel-public-surface.md)
+- Governance: [ADR-0018](../adr/adr-0018-kernel-public-surface.md)
 

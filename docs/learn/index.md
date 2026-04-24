@@ -35,21 +35,21 @@
 
 1. [Getting Started](getting-started.md): install packages and enable analyzers
 2. [Quickstart](quickstart.md): one cohesive scenario with Result, DomainError, a primitive, and a facade
-3. [What the analyzers enforce](../analyzers/DXA010.md): read DXA010 and DXA020 first
+3. [What the analyzers enforce](../analyzers/dxa010.md): read DXA010 and DXA020 first
 
 ## Related links
 
-- Up: [Public Overview](../public/OVERVIEW.md)
+- Up: [Public Overview](../public/overview.md)
 - Concept: [Results](concepts/results.md)
-- Governance: [ADR-0018: Kernel Public Surface](../adr/ADR-0018-kernel-public-surface.md)
+- Governance: [ADR-0018: Kernel Public Surface](../adr/adr-0018-kernel-public-surface.md)
 - Architecture: [Architecture Overview](../public/architecture-overview.md)
 
 ### Additional resources
 
-- [CHANGELOG](CHANGELOG.md)
-- [ENFORCEMENT_MAP](ENFORCEMENT_MAP.md)
-- [STABILITY](STABILITY.md)
-- [OVERVIEW](OVERVIEW.md)
+- [CHANGELOG](changelog.md)
+- [ENFORCEMENT_MAP](enforcement-map.md)
+- [STABILITY](stability.md)
+- [OVERVIEW](overview.md)
 - [Architecture Overview](architecture-overview.md)
 
 - [Release Notes](release-notes/index.md)

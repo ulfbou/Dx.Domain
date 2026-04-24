@@ -255,15 +255,15 @@ In the event of conflict:
 ```
 Dx.Domain Enforcement Specification
 ↓
-[LIMITATIONS.md](../learn/STABILITY.md)
+[LIMITATIONS.md](../learn/stability.md)
 ↓
-[ENFORCEMENT_MODEL.md](../learn/ENFORCEMENT_MAP.md)
+[ENFORCEMENT_MODEL.md](../learn/enforcement-map.md)
 ↓
-[ENFORCEMENT_MAP.md](../learn/ENFORCEMENT_MAP.md)
+[ENFORCEMENT_MAP.md](../learn/enforcement-map.md)
 ↓
 ADR-0001 … ADR-0016
 ↓
-[README](../../README.md) / comments / blog posts
+[README](../../readme.md) / comments / blog posts
 ```
 
 ---

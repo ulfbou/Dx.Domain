@@ -3,11 +3,11 @@
 Navigation hub for this directory.
 
 ## Documents
-- [Contributing](CONTRIBUTING.md)
-- [Conventional Commits](CONVENTIONAL_COMMITS.md)
-- [DPI](DPI.md)
-- [Manifesto](MANIFESTO.md)
-- [Non-Goals](NON_GOALS.md)
+- [Contributing](contributing.md)
+- [Conventional Commits](conventional-commits.md)
+- [DPI](dpi.md)
+- [Manifesto](manifesto.md)
+- [Non-Goals](non-goals.md)
 - [Analyzer Authoring](analyzer-authoring.md)
 - [API Surface Process](api-surface-process.md)
 - [Release Process](release-process.md)
