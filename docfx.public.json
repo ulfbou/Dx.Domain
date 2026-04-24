@@ -3,20 +3,23 @@
     "content": [
       {
         "src": "docs/public",
-        "files": [ "**/*.md", "**/*.yml" ]
-      },
-      {
-        "src": "docs/internal",
-        "files": [ "**/*.md", "**/*.yml" ]
+        "files": ["**/*.md", "**/*.yml"]
       }
     ],
     "resource": [
-      {
-        "files": [ "images/**" ],
-        "exclude": [ "**/bin/**", "**/obj/**" ]
-      },
-      { "files": [ "docs/images/**" ] }
+      { "files": ["images/**"], "exclude": ["**/bin/**", "**/obj/**"] },
+      { "files": ["docs/images/**"] }
     ],
-    "dest": "_site"
+    "dest": "_site",
+    "template": ["default"],
+    "globalMetadata": {
+      "_appTitle": "Dx.Domain",
+      "_appName": "Dx.Domain",
+      "_enableSearch": true,
+      "_gitContribute": {
+        "repo": "https://github.com/ulfbou/dx.domain",
+        "branch": "main"
+      }
+    }
   }
 }

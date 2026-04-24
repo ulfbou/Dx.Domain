@@ -4,16 +4,15 @@
 name: Build & Publish DocFX Documentation
 
 on:
-  workflow_dispatch: {}
   push:
     branches: [main]
     paths:
       - 'docs/**'
-      - 'docfx.json'
-      - 'assets/**'
+      - 'docfx.public.json' 
+      - 'docfx.full.json' 
+      - 'filterConfig.yml'
+      - '.config/dotnet-tools.json'
       - '.github/workflows/docfx.yml'
-  release:
-    types: [published]
 
 jobs:
   build-docfx:
@@ -41,7 +40,7 @@ jobs:
         run: dotnet tool restore
 
       - name: Build public docs
-        run: docfx docfx.public.json --output _site
+        run: dotnet docfx docfx.public.json -o _site
 
       - name: Upload generated public site
         uses: actions/upload-artifact@v4

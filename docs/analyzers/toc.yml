@@ -1,0 +1,22 @@
+- name: Analyzer Index
+  href: index.md
+- name: DXA010 Construction Authority
+  href: DXA010.md
+- name: DXA011 Public Factory Exposure
+  href: DXA011.md
+- name: DXA020 Result Ignored
+  href: DXA020.md
+- name: DXA022 Domain Control Exception
+  href: DXA022.md
+- name: DXA030 Unapproved Handler
+  href: DXA030.md
+- name: DXA040 Kernel Surface Freeze
+  href: DXA040.md
+- name: DXA050 Temporal Helper Usage
+  href: DXA050.md
+- name: DXA060 Forbidden Vocabulary
+  href: DXA060.md
+- name: DXA070 Generated Code Tagging
+  href: DXA070.md
+- name: DXA080 Facade Invariant Enforcement
+  href: DXA080.md

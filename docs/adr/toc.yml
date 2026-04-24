@@ -1,0 +1,37 @@
+- name: ADR Index
+  href: index.md
+- name: ADR-0001 UTC Time Only
+  href: ADR-0001-utc-only-domaintime.md
+- name: ADR-0002 Empty CorrelationId
+  href: ADR-0002-empty-correlationid.md
+- name: ADR-0003 DXA010 Warning
+  href: ADR-0003-dxa010-warning.md
+- name: ADR-0004 Result Struct
+  href: ADR-0004-result-struct.md
+- name: ADR-0005 No Public Setters
+  href: ADR-0005-no-public-setters.md
+- name: ADR-0006 Failure Model
+  href: ADR-0006-result-as-failure-model.md
+- name: ADR-0007 System Hardening Sequence
+  href: ADR-0007-system-hardening-sequence.md
+- name: ADR-0008 DXA011 Factory Exposure
+  href: ADR-0008-dxa011-public-factory-exposure.md
+- name: ADR-0009 DXA020 Result Ignored
+  href: ADR-0009-dxa020-result-ignored.md
+- name: ADR-0010 DXA022 Exception Control
+  href: ADR-0010-dxa022-domain-control-exception.md
+- name: ADR-0011 DXA030 Handler Approval
+  href: ADR-0011-dxa030-unapproved-handler.md
+- name: ADR-0012 DXA040 Surface Freeze
+  href: ADR-0012-dxa040-kernel-public-surface-freeze.md
+- name: ADR-0013 DXA050 Temporal Helpers
+  href: ADR-0013-dxa050-temporal-helper-usage.md
+- name: ADR-0014 DXA060 Forbidden Vocabulary
+  href: ADR-0014-dxa060-forbidden-vocabulary.md
+- name: ADR-0015 DXA070 Generated Code
+  href: ADR-0015-dxa070-generated-code-tagging.md
+- name: ADR-0016 DXA080 Facade Invariants
+  href: ADR-0016-dxa080-facade-invariant-enforcement.md
+- name: ADR-0017 Suppress Governance
+  href: ADR-0017-suppress-governance.md
+

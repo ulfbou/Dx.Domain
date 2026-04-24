@@ -1,11 +1,36 @@
 - name: Overview
-  href: overview.md
+  href: index.md
+
+- name: Getting Started
+  href: getting-started.md
 
 - name: Architecture
   href: architecture-overview.md
 
-- name: Changelog
-  href: changelog/
+- name: Core Specification
+  href: specification/core-platform.md
+
+- name: Packages
+  items:
+    - name: Annotations
+      href: packages/annotations.md
+    - name: Kernel
+      href: packages/kernel.md
+    - name: Primitives
+      href: packages/primitives.md
+    - name: Facts
+      href: packages/facts.md
+    - name: Analyzers
+      href: packages/analyzers.md
+
+- name: Examples
+  items:
+    - name: Basic Result Usage
+      href: examples/basic-result.md
 
 - name: Release Notes
-  href: release-notes/
+  items:
+    - name: Index
+      href: release-notes/index.md
+    - name: 0.1.0
+      href: release-notes/0.1.0.md
