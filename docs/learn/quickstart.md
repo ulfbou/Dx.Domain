@@ -92,6 +92,6 @@ dx.facade.root = MyApp.Domain.Dx
 
 - Up: [Getting Started](getting-started.md)
 - Concept: [Results](concepts/results.md)
-- Reference: [DXA010](../analyzers/DXA010.md)
+- Reference: [DXA010](../analyzers/dxa010.md)
 - Architecture: [Architecture Overview](../public/architecture-overview.md)
 
