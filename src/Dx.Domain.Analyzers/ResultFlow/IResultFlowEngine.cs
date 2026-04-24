@@ -1,5 +1,5 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
-// <copyright file="IGeneratedCodeDetector.cs" company="Dx.Domain Team">
+// <copyright file="IResultFlowEngine.cs" company="Dx.Domain Team">
 //     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
@@ -11,15 +11,16 @@
 // ----------------------------------------------------------------------------------
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Dx.Domain.Analyzers.Infrastructure.Generated
+namespace Dx.Domain.Analyzers.ResultFlow
 {
-    public interface IGeneratedCodeDetector
+    public interface IResultFlowEngine
     {
-        bool IsGenerated(ISymbol symbol);
+        FlowGraph Analyze(
+        IMethodSymbol method,
+        Compilation compilation,
+        AnalyzerConfigOptions options,
+        CancellationToken cancellationToken);
     }
 }

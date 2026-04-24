@@ -24,14 +24,33 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Dx.Domain.Analyzers.Analyzers
 {
+
     /// <summary>
-    /// Analyzer for DXA050: Temporal Helper Usage in Kernel.
-    /// Detects use of temporal/policy helpers in kernel code.
+    /// Enforces Dx.Domain rule DXA050: Temporal Helper Usage in Kernel.
     /// </summary>
+    /// <remarks>
+    /// This analyzer enforces separation of concerns between
+    /// kernel mechanics and time- or policy-sensitive logic.
+    ///
+    /// Scope:
+    /// - Applies to S0 and selected S1 kernel-adjacent contexts.
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - Temporal helpers must be moved to edge packages
+    ///   or justified explicitly.
+    ///
+    /// DX-first principle:
+    /// The kernel must remain mechanical and policy-free.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA050_TemporalHelperUsageAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA050.
+        /// </summary>
         public const string DiagnosticId = "DXA050";
+
         private const string Category = "Domain.Architecture";
 
         private static readonly LocalizableString Title =
@@ -50,9 +69,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

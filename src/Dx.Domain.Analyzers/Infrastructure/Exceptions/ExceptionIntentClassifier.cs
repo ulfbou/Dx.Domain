@@ -20,12 +20,12 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Dx.Domain.Analyzers.Infrastructure.Exceptions
 {
     /// <summary>
-    /// Classifies <see cref="IThrowOperation"/> instances into high level intent buckets
-    /// that other analyzers can use when reasoning about exception usage.
+    /// Represents the intent behind an exception being thrown.
     /// </summary>
     /// <remarks>
-    /// The implementation is deliberately conservative and fail-open: when it cannot
-    /// confidently determine an intent, it returns <see cref="ExceptionIntent.Unknown"/>.
+    /// This enumeration is pure analyzer vocabulary used for static classification.
+    /// It imposes no runtime semantics.
+    /// Values are interpreted conservatively by analyzers.
     /// </remarks>
     public sealed class ExceptionIntentClassifier : IExceptionIntentClassifier
     {

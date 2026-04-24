@@ -14,7 +14,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -25,76 +24,6 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Dx.Domain.Analyzers.ResultFlow
 {
-    public enum ResultState
-    {
-        Created = 0,
-        Checked = 1,
-        Propagated = 2,
-        Terminated = 3,
-        Ignored = 4
-    }
-    [DebuggerDisplay("{Id} {Type.Name} State={State}")]
-    public sealed class ResultNode : IEquatable<ResultNode>
-    {
-        public ResultNode(int id, IOperation producer, ITypeSymbol type)
-        {
-            Id = id;
-            Producer = producer ?? throw new ArgumentNullException(nameof(producer));
-            Type = type ?? throw new ArgumentNullException(nameof(type));
-        }
-        public int Id { get; }
-        public IOperation Producer { get; }
-        public ITypeSymbol Type { get; }
-        internal ResultState State { get; set; }
-        public bool Equals(ResultNode? other)
-        {
-            if (ReferenceEquals(this, other))
-                return true;
-            if (other is null)
-                return false;
-            return Id == other.Id;
-        }
-        public override bool Equals(object? obj) => Equals(obj as ResultNode);
-        public override int GetHashCode() => Id;
-        public override string ToString() => $"ResultNode#{Id} Type={Type.ToDisplayString()} State={State}";
-    }
-    [DebuggerDisplay("{Message}")]
-    public sealed class FlowDiagnostic
-    {
-        public FlowDiagnostic(string message, IOperation? operation = null)
-        {
-            Message = message ?? throw new ArgumentNullException(nameof(message));
-            Operation = operation;
-        }
-        public string Message { get; }
-        public IOperation? Operation { get; }
-    }
-    public sealed class FlowGraph
-    {
-        public FlowGraph(
-        ImmutableArray<ResultNode> resultNodes,
-        ImmutableDictionary<ResultNode, ResultState> nodeStates,
-        ImmutableArray<FlowDiagnostic> diagnostics,
-        bool isValid = true)
-        {
-            ResultNodes = resultNodes;
-            NodeStates = nodeStates;
-            Diagnostics = diagnostics;
-            IsValid = isValid;
-        }
-        public ImmutableArray<ResultNode> ResultNodes { get; }
-        public ImmutableDictionary<ResultNode, ResultState> NodeStates { get; }
-        public ImmutableArray<FlowDiagnostic> Diagnostics { get; }
-        public bool IsValid { get; }
-    }
-    public interface IResultFlowEngine
-    {
-        FlowGraph Analyze(
-        IMethodSymbol method,
-        Compilation compilation,
-        AnalyzerConfigOptions options,
-        CancellationToken cancellationToken);
-    }
     public sealed class ResultFlowEngine : IResultFlowEngine
     {
         private readonly ResultFlowEngineOptions _options;

@@ -25,14 +25,32 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dx.Domain.Analyzers.Analyzers
 {
+
     /// <summary>
-    /// Analyzer for DXA070: Generated Code Tagging.
-    /// Detects generated code missing required generator tags.
+    /// Enforces Dx.Domain rule DXA070: Generated Code Tagging.
     /// </summary>
+    /// <remarks>
+    /// This analyzer ensures generated code is explicitly marked
+    /// to prevent false positives from other analyzers.
+    ///
+    /// Scope:
+    /// - Applies to S1 and S2 (domain and application).
+    ///
+    /// Enforcement model:
+    /// - Violations produce diagnostics.
+    /// - Code must be tagged using Accepted GeneratedCode markers.
+    ///
+    /// DX-first principle:
+    /// Generated code must be clearly distinguishable from authored code.
+    /// </remarks>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DXA070_GeneratedCodeTaggingAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Diagnostic contract identifier for DXA070.
+        /// </summary>
         public const string DiagnosticId = "DXA070";
+
         private const string Category = "Domain.CodeGeneration";
 
         private static readonly LocalizableString Title =
@@ -51,9 +69,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             isEnabledByDefault: true,
             description: Description);
 
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
 
+        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
