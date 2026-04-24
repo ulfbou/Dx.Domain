@@ -11,7 +11,6 @@
 // ----------------------------------------------------------------------------------
 
 using Dx.Domain.Errors;
-using Dx.Domain.Kernel;
 
 using System;
 using System.Diagnostics;
@@ -67,7 +66,7 @@ namespace Dx.Domain
                 Invariant.That(
                     IsSuccess,
                     "Result.InvalidState",
-                    "Cannot access Value on a failed result.");
+                    "Cannot access Value on a failed Result.");
                 return _value!;
             }
         }
@@ -82,15 +81,15 @@ namespace Dx.Domain
                 Invariant.That(
                     IsFailure,
                     "Result.InvalidState",
-                    "Cannot access Error on a successful result.");
+                    "Cannot access Error on a successful Result.");
                 return _error!.Value;
             }
         }
 
         /// <summary>
-        /// Creates a successful result.
+        /// Creates a successful Result.
         /// </summary>
-        /// <param name="value">The value to wrap in a successful result.</param>
+        /// <param name="value">The value to wrap in a successful Result.</param>
         /// <returns>A successful result containing the provided value.</returns>
         internal static Result<TValue> Success(TValue value) => new(value);
 
@@ -101,7 +100,7 @@ namespace Dx.Domain
         internal static Result<Unit> Success() => new(Unit.Value);
 
         /// <summary>
-        /// Creates a failed result.
+        /// Creates a failed Result.
         /// </summary>
         /// <param name="error">The domain error describing the failure.</param>
         /// <returns>A failed result containing the provided error.</returns>
@@ -111,7 +110,7 @@ namespace Dx.Domain
         /// Creates a result from an inner result with <see cref="DomainError" /> as the error type.
         /// </summary>
         /// <param name="inner">The inner result to convert.</param>
-        /// <returns>A result containing the value and error from the inner result.</returns>
+        /// <returns>A result containing the value and error from the inner Result.</returns>
         internal static Result<TValue> From(Result<TValue, DomainError> inner) => new(inner);
 
         /// <summary>

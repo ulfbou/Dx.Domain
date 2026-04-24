@@ -11,11 +11,12 @@
 // ----------------------------------------------------------------------------------
 
 using Dx.Domain.Errors;
-using Dx.Domain.Kernel;
 
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using static Dx.Domain.Dx;
 
 namespace Dx.Domain
 {

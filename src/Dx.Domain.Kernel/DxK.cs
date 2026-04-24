@@ -66,8 +66,8 @@ internal static class DxK
         /// <summary>Identity value is empty when required.</summary>
         public const string Identity_Empty = "dx.kernel.identity.empty";
 
-        /// <summary>Result operation attempted on failed result.</summary>
-        public const string Result_OperationOnFailure = "dx.kernel.result.operation_on_failure";
+        /// <summary>Result operation attempted on failed Result.</summary>
+        public const string Result_OperationOnFailure = "dx.kernel.Result.operation_on_failure";
 
         /// <summary>Invariant violation (structural constraint broken).</summary>
         public const string Invariant_Violation = "dx.kernel.invariant.violation";
