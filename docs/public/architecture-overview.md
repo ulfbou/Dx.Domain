@@ -18,7 +18,7 @@ It is intentionally small. Everything else belongs at the edges.
 4. Analyzers depends on Annotations only
 
 ## Scopes S0–S3
-- **S0 Kernel** — Dx.Domain itself. Trusted, exempt from DXA010/DXA011 per [ADR-0018](../adr/ADR-0018-kernel-public-surface.md)
+- **S0 Kernel** — Dx.Domain itself. Trusted, exempt from DXA010/DXA011 per [ADR-0018](../adr/adr-0018-kernel-public-surface.md)
 - **S1 Domain Facades** — construction boundary
 - **S2 Application** — orchestration
 - **S3 Infrastructure** — I/O and adapters
@@ -31,8 +31,8 @@ dx.scope.map = S0:Dx.Domain;S1:MyApp.Domain;S2:MyApp.Application;S3:MyApp.Api
 ## Analyzer Governance
 Analyzers apply to S1–S3 only:
 
-- **DXA010** Construction Authority — [ADR-0003](../adr/ADR-0003-dxa010-warning.md)
-- **DXA011** Public Factory Exposure — [ADR-0008](../adr/ADR-0008-dxa011-public-factory-exposure.md)
+- **DXA010** Construction Authority — [ADR-0003](../adr/adr-0003-dxa010-warning.md)
+- **DXA011** Public Factory Exposure — [ADR-0008](../adr/adr-0008-dxa011-public-factory-exposure.md)
 - **DXA020** Result Ignored
 - **DXA022** No throw in Result methods
 - **DXA030** Unapproved Handler
@@ -43,7 +43,7 @@ Analyzers apply to S1–S3 only:
 - **DXA080** Facade Invariant Enforcement
 
 ## Navigation
-**Up:** [Overview](OVERVIEW.md)
+**Up:** [Overview](overview.md)
 **Next:** [Core Platform Specification](specification/core-platform.md)
 **Learn:** [Dx.Domain in 90 seconds](../learn/index.md)
 **Packages:** [Annotations](packages/annotations.md) | [Primitives](packages/primitives.md) | [Kernel](packages/kernel.md) | [Facts](packages/facts.md) | [Analyzers](packages/analyzers.md)

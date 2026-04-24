@@ -1,5 +1,5 @@
 # CI/CD
 
 ## Documents
-- [CI/CD Pipeline](CI-CD-PIPELINE.md)
-- [CI/CD Quick Reference](CI-CD-QUICK-REFERENCE.md)
+- [CI/CD Pipeline](ci-cd-pipeline.md)
+- [CI/CD Quick Reference](ci-cd-quick-reference.md)

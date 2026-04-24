@@ -1,4 +1,4 @@
 # Changelog
 
-See [CHANGELOG](../CHANGELOG.md)
+See [CHANGELOG](../changelog.md)
 

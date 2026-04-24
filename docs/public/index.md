@@ -6,7 +6,7 @@ Deterministic domain modeling for .NET. If it compiles, passes analyzers, and th
 
 ## Start here (2 minutes)
 
-1. [Overview](OVERVIEW.md) — what it is and why
+1. [Overview](overview.md) — what it is and why
 2. [Getting Started](getting-started.md) — install packages and write your first type
 3. [Core Specification](specification/core-platform.md) — the normative rules
 
@@ -41,8 +41,8 @@ All behavior is governed by the [Core Platform Specification](specification/core
 
 ### Additional
 
-- [README](README.md)
-- [CHANGELOG](CHANGELOG.md)
+- [README](readme.md)
+- [CHANGELOG](changelog.md)
 - [Examples](examples/index.md)
 - [Release Notes](release-notes/index.md)
 - [Changelog](changelog/index.md)

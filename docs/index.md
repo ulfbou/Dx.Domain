@@ -2,13 +2,13 @@
 
 ## Navigation
 
-- [README](../README.md)
-- [MANIFESTO](MANIFESTO.md)
-- [NON_GOALS](NON_GOALS.md)
-- [DPI](DPI.md)
-- [ROADMAP](ROADMAP.md)
-- [SECURITY](SECURITY.md)
-- [TODO](TODO.md)
+- [README](../readme.md)
+- [MANIFESTO](manifesto.md)
+- [NON_GOALS](non_goals.md)
+- [DPI](dpi.md)
+- [ROADMAP](roadmap.md)
+- [SECURITY](security.md)
+- [TODO](todo.md)
 - [When the Compiler Fails](when-the-compiler-fails.md)
 - [ADR Index](adr/index.md)
 - [Learn](learn/index.md)

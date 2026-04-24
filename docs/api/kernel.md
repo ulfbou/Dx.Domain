@@ -10,5 +10,5 @@ This file is a mechanical projection of the public API surface of `Dx.Domain.Ker
 - `Unit`
 
 ---
-*Generated from source. See [ADR-0012](../adr/ADR-0012-dxa040-kernel-public-surface-freeze.md) for governance.*
+*Generated from source. See [ADR-0012](../adr/adr-0012-dxa040-kernel-public-surface-freeze.md) for governance.*
 
