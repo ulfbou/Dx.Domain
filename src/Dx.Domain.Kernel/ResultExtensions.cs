@@ -11,12 +11,13 @@
 // ----------------------------------------------------------------------------------
 
 using Dx.Domain.Errors;
-using Dx.Domain.Kernel;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using static Dx.Domain.Dx;
 
 namespace Dx.Domain
 {
@@ -43,7 +44,7 @@ namespace Dx.Domain
             }
             catch (Exception ex)
             {
-                throw InvariantViolationException.Create("Result.Map.Exception", "An exception occurred while mapping the result.", ex);
+                throw InvariantViolationException.Create("Result.Map.Exception", "An exception occurred while mapping the Result.", ex);
             }
         }
 
@@ -85,7 +86,7 @@ namespace Dx.Domain
             }
             catch (Exception ex)
             {
-                throw InvariantViolationException.Create("Result.Bind.Exception", "An exception occurred while binding the result.", ex);
+                throw InvariantViolationException.Create("Result.Bind.Exception", "An exception occurred while binding the Result.", ex);
             }
         }
 

@@ -10,9 +10,9 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Kernel;
-
 using System;
+
+using static Dx.Domain.Dx;
 
 namespace Dx.Domain
 {

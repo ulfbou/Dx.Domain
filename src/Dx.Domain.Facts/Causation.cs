@@ -10,7 +10,6 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using Dx.Domain.Kernel;
 using Dx.Domain.Primitives;
 
 using System;
