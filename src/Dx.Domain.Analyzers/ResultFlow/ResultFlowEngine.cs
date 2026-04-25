@@ -14,7 +14,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -25,83 +24,24 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Dx.Domain.Analyzers.ResultFlow
 {
-    public enum ResultState
-    {
-        Created = 0,
-        Checked = 1,
-        Propagated = 2,
-        Terminated = 3,
-        Ignored = 4
-    }
-    [DebuggerDisplay("{Id} {Type.Name} State={State}")]
-    public sealed class ResultNode : IEquatable<ResultNode>
-    {
-        public ResultNode(int id, IOperation producer, ITypeSymbol type)
-        {
-            Id = id;
-            Producer = producer ?? throw new ArgumentNullException(nameof(producer));
-            Type = type ?? throw new ArgumentNullException(nameof(type));
-        }
-        public int Id { get; }
-        public IOperation Producer { get; }
-        public ITypeSymbol Type { get; }
-        internal ResultState State { get; set; }
-        public bool Equals(ResultNode? other)
-        {
-            if (ReferenceEquals(this, other))
-                return true;
-            if (other is null)
-                return false;
-            return Id == other.Id;
-        }
-        public override bool Equals(object? obj) => Equals(obj as ResultNode);
-        public override int GetHashCode() => Id;
-        public override string ToString() => $"ResultNode#{Id} Type={Type.ToDisplayString()} State={State}";
-    }
-    [DebuggerDisplay("{Message}")]
-    public sealed class FlowDiagnostic
-    {
-        public FlowDiagnostic(string message, IOperation? operation = null)
-        {
-            Message = message ?? throw new ArgumentNullException(nameof(message));
-            Operation = operation;
-        }
-        public string Message { get; }
-        public IOperation? Operation { get; }
-    }
-    public sealed class FlowGraph
-    {
-        public FlowGraph(
-        ImmutableArray<ResultNode> resultNodes,
-        ImmutableDictionary<ResultNode, ResultState> nodeStates,
-        ImmutableArray<FlowDiagnostic> diagnostics,
-        bool isValid = true)
-        {
-            ResultNodes = resultNodes;
-            NodeStates = nodeStates;
-            Diagnostics = diagnostics;
-            IsValid = isValid;
-        }
-        public ImmutableArray<ResultNode> ResultNodes { get; }
-        public ImmutableDictionary<ResultNode, ResultState> NodeStates { get; }
-        public ImmutableArray<FlowDiagnostic> Diagnostics { get; }
-        public bool IsValid { get; }
-    }
-    public interface IResultFlowEngine
-    {
-        FlowGraph Analyze(
-        IMethodSymbol method,
-        Compilation compilation,
-        AnalyzerConfigOptions options,
-        CancellationToken cancellationToken);
-    }
+    /// <summary>
+    /// Performs control-flow-based analysis of Result values within methods.
+    /// </summary>
+    /// <remarks>
+    /// Discovers Result producers, tracks propagation through locals and parameters, and promotes states based on inspection, return, and handler usage. Analysis is fail-open and returns an empty graph on error.
+    /// </remarks>
     public sealed class ResultFlowEngine : IResultFlowEngine
     {
         private readonly ResultFlowEngineOptions _options;
+
+        /// <summary>Initializes a new instance of the <see cref="ResultFlowEngine"/> class.</summary>
+        /// <param name="options">Optional engine options. Defaults are used when null.</param>
         public ResultFlowEngine(ResultFlowEngineOptions? options = null)
         {
             _options = options ?? ResultFlowEngineOptions.Default;
         }
+
+        /// <inheritdoc/>
         public FlowGraph Analyze(
             IMethodSymbol method,
             Compilation compilation,
@@ -112,10 +52,12 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 throw new ArgumentNullException(nameof(method));
             if (compilation is null)
                 throw new ArgumentNullException(nameof(compilation));
+
             cancellationToken.ThrowIfCancellationRequested();
             var model = compilation.GetSemanticModel(method.DeclaringSyntaxReferences.First().SyntaxTree);
             var body = method.DeclaringSyntaxReferences.First().GetSyntax(cancellationToken);
             var operation = model.GetOperation(body, cancellationToken) as IBlockOperation;
+
             if (operation is null)
             {
                 return new FlowGraph(
@@ -123,18 +65,22 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 ImmutableDictionary<ResultNode, ResultState>.Empty,
                 ImmutableArray<FlowDiagnostic>.Empty);
             }
+
             var cfg = ControlFlowGraph.Create(operation, CancellationToken.None);
+
             if (cfg is null)
             {
                 return new FlowGraph(
-                ImmutableArray<ResultNode>.Empty,
-                ImmutableDictionary<ResultNode, ResultState>.Empty,
-                ImmutableArray<FlowDiagnostic>.Empty);
+                    ImmutableArray<ResultNode>.Empty,
+                    ImmutableDictionary<ResultNode, ResultState>.Empty,
+                    ImmutableArray<FlowDiagnostic>.Empty);
             }
+
             var context = new AnalysisContext(method, compilation, model, options, _options, cancellationToken);
             var analyzer = new MethodFlowAnalyzer(context, cfg);
             return analyzer.Run();
         }
+
         private sealed class AnalysisContext
         {
             public AnalysisContext(
@@ -418,132 +364,28 @@ namespace Dx.Domain.Analyzers.ResultFlow
             }
         }
     }
+    /// <summary>
+    /// Provides configuration for the Result flow engine.
+    /// </summary>
     public sealed class ResultFlowEngineOptions
     {
+        /// <summary>Gets the default options.</summary>
         public static ResultFlowEngineOptions Default { get; } = new();
+
+        /// <summary>Gets the metadata names recognized as Result types.</summary>
         public ImmutableHashSet<string> ResultTypeMetadataNames { get; init; } =
-        ImmutableHashSet.Create(
-        "Dx.Domain.Result",
-        "Dx.Domain.Result`1");
+            ImmutableHashSet.Create(
+            "Dx.Domain.Result",
+            "Dx.Domain.Result`1");
+
+        /// <summary>Gets the member names considered inspections.</summary>
         public ImmutableHashSet<string> InspectionMemberNames { get; init; } =
-        ImmutableHashSet.Create("IsSuccess", "IsFailure", "Match", "Map", "Bind");
+            ImmutableHashSet.Create("IsSuccess", "IsFailure", "Match", "Map", "Bind");
+
+        /// <summary>Gets the configuration key for handlers.</summary>
         public string HandlerConfigKey { get; init; } = "dx.result.handlers";
+
+        /// <summary>Gets the configuration key for terminalizers.</summary>
         public string TerminalizerConfigKey { get; init; } = "dx.result.terminalizers";
-    }
-    internal sealed class ResultTypeResolver
-    {
-        private readonly Compilation _compilation;
-        private readonly AnalyzerConfigOptions _options;
-        private readonly ResultFlowEngineOptions _engineOptions;
-        private ImmutableHashSet<INamedTypeSymbol>? _resultTypesCache;
-        public ResultTypeResolver(Compilation compilation, AnalyzerConfigOptions options, ResultFlowEngineOptions engineOptions)
-        {
-            _compilation = compilation;
-            _options = options;
-            _engineOptions = engineOptions;
-        }
-        private ImmutableHashSet<INamedTypeSymbol> GetResultTypes()
-        {
-            if (_resultTypesCache is not null)
-                return _resultTypesCache;
-            var builder = ImmutableHashSet.CreateBuilder<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-            foreach (var metadataName in _engineOptions.ResultTypeMetadataNames)
-            {
-                if (_compilation.GetTypeByMetadataName(metadataName) is { } symbol)
-                {
-                    builder.Add(symbol);
-                }
-            }
-            _resultTypesCache = builder.ToImmutable();
-            return _resultTypesCache;
-        }
-        public bool IsResultType(ITypeSymbol? type)
-        {
-            if (type is null)
-                return false;
-            if (type is IErrorTypeSymbol)
-                return false;
-            if (type is not INamedTypeSymbol named)
-                return false;
-            var resultTypes = GetResultTypes();
-            foreach (var result in resultTypes)
-            {
-                if (SymbolEqualityComparer.Default.Equals(named.OriginalDefinition, result))
-                    return true;
-            }
-            return false;
-        }
-        public bool IsResultLikeInstance(IOperation instance)
-        {
-            return IsResultType(instance.Type);
-        }
-    }
-    internal sealed class HandlerRegistry
-    {
-        private readonly ImmutableHashSet<HandlerKey> _handlers;
-        private readonly ImmutableHashSet<HandlerKey> _terminalizers;
-        private static readonly char[] HandlerSeparator = { ';' };
-        public HandlerRegistry(Compilation compilation, AnalyzerConfigOptions options, ResultFlowEngineOptions engineOptions)
-        {
-            _handlers = ParseConfig(compilation, options, engineOptions.HandlerConfigKey);
-            _terminalizers = ParseConfig(compilation, options, engineOptions.TerminalizerConfigKey);
-        }
-        public bool IsHandler(IMethodSymbol method) => IsInSet(method, _handlers);
-        public bool IsTerminalizer(IMethodSymbol method) => IsInSet(method, _terminalizers);
-        private static ImmutableHashSet<HandlerKey> ParseConfig(
-        Compilation compilation,
-        AnalyzerConfigOptions options,
-        string key)
-        {
-            if (!options.TryGetValue(key, out var value) || string.IsNullOrWhiteSpace(value))
-                return ImmutableHashSet<HandlerKey>.Empty;
-            var builder = ImmutableHashSet.CreateBuilder<HandlerKey>();
-            foreach (var token in value.Split(HandlerSeparator, StringSplitOptions.RemoveEmptyEntries))
-            {
-                var trimmed = token.Trim();
-                if (trimmed.Length == 0)
-                    continue;
-                var lastDot = trimmed.LastIndexOf('.');
-                if (lastDot <= 0 || lastDot == trimmed.Length - 1)
-                    continue;
-                var containingTypeName = trimmed.Substring(0, lastDot);
-                var methodName = trimmed.Substring(lastDot + 1);
-                builder.Add(new HandlerKey(containingTypeName, methodName));
-            }
-            return builder.ToImmutable();
-        }
-        private static bool IsInSet(IMethodSymbol method, ImmutableHashSet<HandlerKey> set)
-        {
-            if (set.IsEmpty)
-                return false;
-            var containingTypeName = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-            .Replace("global::", string.Empty);
-            var key = new HandlerKey(containingTypeName, method.Name);
-            return set.Contains(key);
-        }
-        private readonly struct HandlerKey : IEquatable<HandlerKey>
-        {
-            public HandlerKey(string containingType, string methodName)
-            {
-                ContainingType = containingType;
-                MethodName = methodName;
-            }
-            public string ContainingType { get; }
-            public string MethodName { get; }
-            public bool Equals(HandlerKey other)
-            => string.Equals(ContainingType, other.ContainingType, StringComparison.Ordinal) &&
-            string.Equals(MethodName, other.MethodName, StringComparison.Ordinal);
-            public override bool Equals(object? obj) => obj is HandlerKey other && Equals(other);
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    var hash = 17;
-                    hash = (hash * 31) + StringComparer.Ordinal.GetHashCode(ContainingType);
-                    hash = (hash * 31) + StringComparer.Ordinal.GetHashCode(MethodName);
-                    return hash;
-                }
-            }
-        }
     }
 }

@@ -44,19 +44,19 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
     }
 
     /// <summary>
-    /// Default implementation that reflects over the <c>Dx</c> root facade in <c>Dx.Domain</c>
-    /// (or a configured alternative) and collects public static factory methods.
+    /// Default implementation that discovers Dx Facade factories by reflecting over the configured root Facade type.
     /// </summary>
+    /// <remarks>
+    /// Resolves the root Facade from configuration key dx_facade_root, defaulting to Dx.Dx. Collects all public static methods on public nested types. Implementation is immutable after construction and thread-safe.
+    /// </remarks>
     public sealed class DxFacadeResolver : IDxFacadeResolver
     {
         private readonly HashSet<IMethodSymbol> _methods =
             new(SymbolEqualityComparer.Default);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DxFacadeResolver"/> class.
-        /// </summary>
-        /// <param name="compilation">The compilation used to resolve the facade type.</param>
-        /// <param name="config">Analyzer configuration options used to locate the root facade.</param>
+        /// <summary>Initializes a new instance of the <see cref="DxFacadeResolver"/> class.</summary>
+        /// <param name="compilation">The compilation used to resolve the Facade type.</param>
+        /// <param name="config">Analyzer configuration options used to locate the root Facade.</param>
         public DxFacadeResolver(Compilation compilation, AnalyzerConfigOptionsProvider config)
         {
             // Allow the root facade type to be overridden via EditorConfig, falling back to the

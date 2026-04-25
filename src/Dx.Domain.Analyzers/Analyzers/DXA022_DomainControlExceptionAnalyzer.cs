@@ -14,8 +14,9 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 using Dx.Domain.Analyzers.Infrastructure;
+using Dx.Domain.Analyzers.Infrastructure.Exceptions;
 using Dx.Domain.Analyzers.Infrastructure.Facades;
-using Dx.Domain.Analyzers.Infrastructure.Flow;
+
 using Dx.Domain.Analyzers.Infrastructure.Generated;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
@@ -112,7 +113,7 @@ namespace Dx.Domain.Analyzers.Analyzers
                 new ScopeResolver(config),
                 new DxFacadeResolver(context.Compilation, config),
                 new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
+                new ExceptionIntentClassifier(context.Compilation, config),
                 new ResultFlowEngineWrapper(),
                 new GeneratedCodeDetector(config));
         }

@@ -62,23 +62,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="bin\Debug\netstandard2.0\Dx.Domain.Analyzers.dll" />
+  </ItemGroup>
+
   <!-- Analyzer packaging layout -->
   <ItemGroup>
-    <None Include="$(OutputPath)Dx.Domain.Analyzers.dll"
-          Pack="true"
-          PackagePath="analyzers/dotnet/cs" />
+    <None Include="$(OutputPath)Dx.Domain.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
 
-    <None Include="$(OutputPath)Dx.Domain.Analyzers.resources.dll"
-          Pack="true"
-          PackagePath="analyzers/dotnet/cs"
-          Condition="Exists('$(OutputPath)Dx.Domain.Analyzers.resources.dll')" />
+    <None Include="$(OutputPath)Dx.Domain.Analyzers.resources.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Condition="Exists('$(OutputPath)Dx.Domain.Analyzers.resources.dll')" />
   </ItemGroup>
 
   <!-- CRITICAL: REMOVE ALL Directory.* imports -->
