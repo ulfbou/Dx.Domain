@@ -129,6 +129,9 @@ namespace Dx.Domain.Analyzers.Analyzers
             if (!services.Semantic.IsDomainType(type))
                 return;
 
+            bool hasPublicConstructor = false;
+            bool hasPublicFactory = false;
+
             // Check public constructors
             foreach (var constructor in type.Constructors)
             {
@@ -136,11 +139,14 @@ namespace Dx.Domain.Analyzers.Analyzers
                 if (constructor.IsStatic)
                     continue;
 
-                if (constructor.DeclaredAccessibility == Accessibility.Public &&
-                    constructor.Locations.Any())
+                if (constructor.DeclaredAccessibility == Accessibility.Public)
                 {
-                    var location = constructor.Locations.First();
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, location));
+                    hasPublicConstructor = true;
+                    if (constructor.Locations.Any())
+                    {
+                        var location = constructor.Locations.First();
+                        context.ReportDiagnostic(Diagnostic.Create(Rule, location));
+                    }
                 }
             }
 
@@ -150,10 +156,24 @@ namespace Dx.Domain.Analyzers.Analyzers
                 if (method.DeclaredAccessibility == Accessibility.Public &&
                     method.IsStatic &&
                     !method.IsExtensionMethod &&
-                    IsFactoryMethod(method, type) &&
-                    method.Locations.Any())
+                    IsFactoryMethod(method, type))
                 {
-                    var location = method.Locations.First();
+                    hasPublicFactory = true;
+                    if (method.Locations.Any())
+                    {
+                        var location = method.Locations.First();
+                        context.ReportDiagnostic(Diagnostic.Create(Rule, location));
+                    }
+                }
+            }
+
+            // Check for orphaned domain types (no public creation path and no facade)
+            if (!hasPublicConstructor && !hasPublicFactory)
+            {
+                var hasFacade = services.Dx.FindFacadeFactoryForType(type) != null;
+                if (!hasFacade && type.Locations.Any())
+                {
+                    var location = type.Locations.First();
                     context.ReportDiagnostic(Diagnostic.Create(Rule, location));
                 }
             }

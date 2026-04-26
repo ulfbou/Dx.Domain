@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" Label="Dx.Domain.Analyzers">
+<Project Sdk="Microsoft.NET.Sdk" Label="Dx.Domain.Analyzers">
 
   <PropertyGroup>
     <!-- Core project metadata -->

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Dx.Domain.Analyzers.Tests.Infrastructure;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+
 
 using Xunit;
 
@@ -14,7 +14,7 @@ namespace Dx.Domain.Analyzers.Tests.IntegrationTests
         [Fact]
         public async Task Kernel_With_Minimal_Config_Produces_No_Diagnostics()
         {
-            var test = new CSharpAnalyzerTest<MyAnalyzer, XUnitVerifier>
+            var test = new CSharpAnalyzerTest<MyAnalyzer, DefaultVerifier>
             {
                 TestCode = "namespace Dx.Domain { public class Foo {} }",
             };
@@ -25,7 +25,7 @@ namespace Dx.Domain.Analyzers.Tests.IntegrationTests
         [Fact]
         public async Task Kernel_With_Dx_Scope_Map_Produces_No_Diagnostics()
         {
-            var test = new CSharpAnalyzerTest<MyAnalyzer, XUnitVerifier>
+            var test = new CSharpAnalyzerTest<MyAnalyzer, DefaultVerifier>
             {
                 TestCode = "namespace Dx.Domain { public class Foo {} }",
             };
@@ -45,7 +45,7 @@ namespace Dx.Domain.Analyzers.Tests.IntegrationTests
         [Fact]
         public async Task Application_Code_With_Root_Namespaces_Produces_No_Diagnostics()
         {
-            var test = new CSharpAnalyzerTest<MyAnalyzer, XUnitVerifier>
+            var test = new CSharpAnalyzerTest<MyAnalyzer, DefaultVerifier>
             {
                 TestCode = "namespace MyApp.Domain { public class Foo {} }",
             };
@@ -65,7 +65,7 @@ namespace Dx.Domain.Analyzers.Tests.IntegrationTests
         [Fact]
         public async Task Full_Config_With_S0_And_S3_Produces_No_Diagnostics()
         {
-            var test = new CSharpAnalyzerTest<MyAnalyzer, XUnitVerifier>
+            var test = new CSharpAnalyzerTest<MyAnalyzer, DefaultVerifier>
             {
                 TestCode = """
                 namespace Dx.Domain 
@@ -96,7 +96,7 @@ namespace Dx.Domain.Analyzers.Tests.IntegrationTests
         [Fact]
         public async Task Multiple_Scope_Mappings_Produce_No_Diagnostics()
         {
-            var test = new CSharpAnalyzerTest<MyAnalyzer, XUnitVerifier>
+            var test = new CSharpAnalyzerTest<MyAnalyzer, DefaultVerifier>
             {
                 TestCode = """
                 namespace Dx.Domain { public class KernelClass {} }
