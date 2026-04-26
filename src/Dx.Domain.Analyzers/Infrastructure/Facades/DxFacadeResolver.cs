@@ -1,92 +1,112 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="DxFacadeResolver.cs" company="Dx.Domain Team">
-//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
-//     This software is licensed under the MIT License.
-//     See the project's root <c>LICENSE</c> file for details.
-//     Contributions are welcome, subject to the terms of the project's license.
-//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// This software is licensed under the MIT License.
+// See the project's root <c>LICENSE</c> file for details.
+// Contributions are welcome, subject to the terms of the project's license.
+// See the repository root <c>CONTRIBUTING.md</c> file for details.
 // </license>
 // ----------------------------------------------------------------------------------
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+using System.Linq;
+
 namespace Dx.Domain.Analyzers.Infrastructure.Facades
 {
     /// <summary>
     /// Default implementation that reflects over the <c>Dx</c> root facade in <c>Dx.Domain</c>
     /// (or a configured alternative) and collects public static factory methods.
+    /// Also supports types marked with [DxFacade] attribute per AC3.
     /// </summary>
     public sealed class DxFacadeResolver : IDxFacadeResolver
     {
         private readonly HashSet<IMethodSymbol> _methods =
             new(SymbolEqualityComparer.Default);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DxFacadeResolver"/> class.
-        /// </summary>
-        /// <param name="compilation">The compilation used to resolve the facade type.</param>
-        /// <param name="config">Analyzer configuration options used to locate the root facade.</param>
         public DxFacadeResolver(Compilation compilation, AnalyzerConfigOptionsProvider config)
         {
-            // Allow the root facade type to be overridden via EditorConfig, falling back to the
-            // fully qualified metadata name of the canonical root facade type "Dx.Dx".
+            // 1. Configured root facade (AC3 - config path)
             var rootTypeName = GetRootFacadeTypeName(config) ?? "Dx.Dx";
-
-            // First, try to bind the configured or default root facade type directly.
             var dx = compilation.GetTypeByMetadataName(rootTypeName);
-
-            // As a resilience measure for older configurations that might still use the short
-            // type name "Dx", fall back to that if the fully qualified lookup fails.
             dx ??= compilation.GetTypeByMetadataName("Dx");
 
-            if (dx == null)
-                return;
+            if (dx != null)
+            {
+                AddMethodsFromRoot(dx);
+            }
 
-            // We treat all public nested types of the root facade as logical namespaces
-            // containing public static factory methods.
-            foreach (var nested in dx.GetTypeMembers())
+            // 2. Attribute-based facades (AC3 - attribute path)
+            AddMethodsFromAttributedTypes(compilation);
+        }
+
+        public IReadOnlyCollection<IMethodSymbol> FacadeFactories => _methods;
+
+        public bool IsDxFacadeFactory(IMethodSymbol method) =>
+            _methods.Contains(method);
+
+        public IMethodSymbol? FindFacadeFactoryForType(ITypeSymbol type) =>
+            _methods.FirstOrDefault(m =>
+                SymbolEqualityComparer.Default.Equals(m.ReturnType, type));
+
+        private void AddMethodsFromRoot(INamedTypeSymbol root)
+        {
+            foreach (var nested in root.GetTypeMembers())
             {
                 if (nested.DeclaredAccessibility != Accessibility.Public)
                     continue;
 
-                foreach (var method in nested.GetMembers().OfType<IMethodSymbol>())
-                {
-                    if (method.DeclaredAccessibility != Accessibility.Public ||
-                        !method.IsStatic)
-                    {
-                        continue;
-                    }
+                AddPublicStaticMethods(nested);
+            }
+        }
 
-                    // Future extension point: filter to methods returning Dx.Domain kernel types
-                    // or Result<T>. For now, record all public static methods and let
-                    // individual rules apply additional constraints.
+        private void AddMethodsFromAttributedTypes(Compilation compilation)
+        {
+            // Correct namespace from Dx.Domain.Annotations
+            var facadeAttr = compilation.GetTypeByMetadataName(
+                "Dx.Domain.Annotations.DxFacadeAttribute");
+
+            if (facadeAttr == null)
+                return;
+
+            foreach (var tree in compilation.SyntaxTrees)
+            {
+                var model = compilation.GetSemanticModel(tree);
+                var types = tree.GetRoot().DescendantNodes()
+                   .Where(n => n is Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax)
+                   .Select(n => model.GetDeclaredSymbol(n) as INamedTypeSymbol)
+                   .Where(s => s != null);
+
+                foreach (var type in types!)
+                {
+                    if (type!.GetAttributes().Any(a =>
+                        SymbolEqualityComparer.Default.Equals(a.AttributeClass, facadeAttr)))
+                    {
+                        AddPublicStaticMethods(type);
+                    }
+                }
+            }
+        }
+
+        private void AddPublicStaticMethods(INamedTypeSymbol type)
+        {
+            foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
+            {
+                if (method.DeclaredAccessibility == Accessibility.Public && method.IsStatic)
+                {
                     _methods.Add(method);
                 }
             }
         }
 
-        /// <inheritdoc />
-        public IReadOnlyCollection<IMethodSymbol> FacadeFactories => _methods;
-
-        /// <inheritdoc />
-        public bool IsDxFacadeFactory(IMethodSymbol method) =>
-            _methods.Contains(method);
-
-        /// <inheritdoc />
-        public IMethodSymbol? FindFacadeFactoryForType(ITypeSymbol type) =>
-            _methods.FirstOrDefault(m =>
-                SymbolEqualityComparer.Default.Equals(m.ReturnType, type));
-
         private static string? GetRootFacadeTypeName(AnalyzerConfigOptionsProvider config)
         {
-            // Config key aligned with docs: "dx_facade_root". When not present, callers fall
-            // back to the conventional root type name "Dx.Dx".
             var global = config.GlobalOptions;
             return global.TryGetValue("dx_facade_root", out var value) && !string.IsNullOrWhiteSpace(value)
-                ? value.Trim()
+               ? value.Trim()
                 : null;
         }
     }

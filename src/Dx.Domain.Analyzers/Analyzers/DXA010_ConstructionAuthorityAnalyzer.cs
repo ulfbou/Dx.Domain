@@ -145,7 +145,7 @@ public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
             return;
 
         // Skip if not a domain type
-        if (!IsDomainType(operation.Type, services))
+        if (operation.Type == null || !services.Semantic.IsDomainType(operation.Type))
             return;
 
         // Get the scope of the call site
@@ -157,6 +157,10 @@ public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
 
         // Check if we're inside a type constructor of the type itself
         if (IsWithinTypeConstructor(context.ContainingSymbol, operation.Type))
+            return;
+
+        // Check if we're inside a facade method
+        if (IsWithinFacadeMethod(context.ContainingSymbol, services))
             return;
 
         // Report diagnostic
@@ -177,7 +181,7 @@ public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
             return;
 
         var returnType = operation.TargetMethod.ReturnType;
-        if (!IsDomainType(returnType, services))
+        if (!services.Semantic.IsDomainType(returnType))
             return;
 
         // Get the scope of the call site
@@ -191,23 +195,13 @@ public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
         if (services.Dx.IsDxFacadeFactory(operation.TargetMethod))
             return;
 
+        // Check if we're inside a facade method
+        if (IsWithinFacadeMethod(context.ContainingSymbol, services))
+            return;
+
         // Report diagnostic
         var diagnostic = Diagnostic.Create(Rule, operation.Syntax.GetLocation());
         context.ReportDiagnostic(diagnostic);
-    }
-
-    private static bool IsDomainType(ITypeSymbol? type, AnalyzerServices services)
-    {
-        if (type == null)
-            return false;
-
-        // Check if it's a `Result` type (domain types return Result)
-        if (services.Semantic.IsKernelResultType(type))
-            return false;
-
-        // Check if it's in Dx.Domain namespace
-        var ns = type.ContainingNamespace?.ToDisplayString();
-        return ns != null && ns.StartsWith("Dx.Domain", System.StringComparison.Ordinal);
     }
 
     private static bool IsWithinTypeConstructor(ISymbol containingSymbol, ITypeSymbol? createdType)
@@ -222,6 +216,17 @@ public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
             {
                 return SymbolEqualityComparer.Default.Equals(method.ContainingType, createdType);
             }
+        }
+
+        return false;
+    }
+
+    private static bool IsWithinFacadeMethod(ISymbol containingSymbol, AnalyzerServices services)
+    {
+        // Check if the containing method is a facade factory
+        if (containingSymbol is IMethodSymbol method)
+        {
+            return services.Dx.IsDxFacadeFactory(method);
         }
 
         return false;
