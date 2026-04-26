@@ -1,12 +1,12 @@
 // <authors>Ulf Bourelius (Original Author)</authors>
 // <copyright file="SemanticClassifier.cs" company="Dx.Domain Team">
-//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// Copyright (c) 2025 Dx.Domain Team. All rights reserved.
 // </copyright>
 // <license>
-//     This software is licensed under the MIT License.
-//     See the project's root <c>LICENSE</c> file for details.
-//     Contributions are welcome, subject to the terms of the project's license.
-//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// This software is licensed under the MIT License.
+// See the project's root <c>LICENSE</c> file for details.
+// Contributions are welcome, subject to the terms of the project's license.
+// See the repository root <c>CONTRIBUTING.md</c> file for details.
 // </license>
 // ----------------------------------------------------------------------------------
 
@@ -65,6 +65,14 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             if (type is not INamedTypeSymbol named)
                 return false;
 
+            // Exclude kernel Result types
+            if (IsKernelResultType(type))
+                return false;
+
+            // Exclude framework types (annotations, attributes, etc.)
+            if (IsFrameworkType(named))
+                return false;
+
             if (HasDomainMarker(named))
                 return true;
 
@@ -106,6 +114,31 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             return false;
         }
 
+        private static bool IsFrameworkType(INamedTypeSymbol type)
+        {
+            var ns = type.ContainingNamespace?.ToDisplayString();
+            if (ns == null)
+                return false;
+
+            // Exclude Dx framework types
+            if (ns == "Dx.Domain.Annotations" ||
+                ns == "Dx.Domain.Attributes" ||
+                ns.StartsWith("Dx.Domain.Annotations.", System.StringComparison.Ordinal) ||
+                ns.StartsWith("Dx.Domain.Attributes.", System.StringComparison.Ordinal))
+                return true;
+
+            // Exclude types that inherit from System.Attribute
+            var current = type.BaseType;
+            while (current != null)
+            {
+                if (current.ToDisplayString() == "System.Attribute")
+                    return true;
+                current = current.BaseType;
+            }
+
+            return false;
+        }
+
         private static ImmutableHashSet<INamedTypeSymbol> LoadResultTypes(Compilation c)
         {
             var builder = ImmutableHashSet.CreateBuilder<INamedTypeSymbol>(
@@ -121,6 +154,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             TryAdd("Dx.Domain.Result");
             TryAdd("Dx.Domain.Result`1");
             TryAdd("Dx.Domain.Result`2");
+            TryAdd("Dx.Domain.Unit"); // AC5
 
             return builder.ToImmutable();
         }
