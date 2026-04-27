@@ -28,8 +28,9 @@ namespace Dx.Domain.Annotations
     /// Semantic marker interface for Dx.Domain identity vocabulary (pure metadata).
     /// </summary>
     /// <remarks>
-    /// Caries no members or default implementations; used by analyzers and Kernel to classify
-    /// identity intent. SEE: Kernel Specification → Identity Primitives.
+    /// This interface imposes no runtime semantics. It carries no members or default implementations;
+    /// used by analyzers and Kernel to classify identity intent.
+    /// SEE: Kernel Specification → Identity Primitives.
     /// </remarks>
     public interface IIdentity { }
 }

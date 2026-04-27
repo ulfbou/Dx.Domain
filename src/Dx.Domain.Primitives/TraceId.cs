@@ -159,17 +159,17 @@ namespace Dx.Domain.Primitives
         }
 
         /// <summary>
-        /// General-purpose span formatting implementation used by composite formatting APIs.
+        /// Tries to format this identifier into the destination span.
         /// </summary>
-        /// <remarks>
-        /// If <paramref name="format"/> is null or empty, defaults to the canonical 32-character hex format.
-        /// The <paramref name="provider"/> parameter is currently ignored.
-        /// </remarks>
         /// <param name="destination">The span to write the formatted value into.</param>
         /// <param name="charsWritten">When this method returns, contains the number of characters written to the destination.</param>
         /// <param name="format">The format specifier. This parameter is currently ignored.</param>
         /// <param name="provider">The format provider. This parameter is currently ignored.</param>
         /// <returns><see langword="true"/> if formatting succeeded; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// If <paramref name="format"/> is null or empty, defaults to the canonical 32-character hex format.
+        /// The <paramref name="provider"/> parameter is currently ignored.
+        /// </remarks>
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
         {
             // 32 hex characters are required for the combined 128-bit value.
