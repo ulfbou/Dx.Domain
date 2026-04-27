@@ -6,7 +6,7 @@ using System;
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Documents a deviation from standard patterns with a DPI‑aligned justification (pure marker).
+/// Documents a deviation from standard patterns with a DPI‑aligned justification (pure metadata marker).
 /// </summary>
 /// <remarks>
 /// This attribute imposes no runtime semantics; it records rationale for code review

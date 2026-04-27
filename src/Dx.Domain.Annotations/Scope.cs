@@ -7,7 +7,7 @@ namespace Dx.Domain.Annotations;
 /// Defines scope vocabulary for Dx.Domain enforcement (pure metadata).
 /// </summary>
 /// <remarks>
-/// This enum imposes no runtime semantics. Analyzers interpret these values according
+/// This enumeration imposes no runtime semantics. Analyzers interpret these values according
 /// to authority modes. See the refactoring spec for scope resolution and authority modes.
 /// <para><b>S0 (Kernel)</b>: Kernel implementation.</para>
 /// <para><b>S1 (Domain Facades)</b>: Public domain API layer.</para>
