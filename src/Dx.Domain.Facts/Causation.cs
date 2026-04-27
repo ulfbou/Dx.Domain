@@ -66,13 +66,13 @@ namespace Dx.Domain.Facts
         /// <param name="traceId">The trace identifier. Must not be empty.</param>
         /// <param name="actorId">The optional actor responsible for the action.</param>
         /// <returns>A new <see cref="Causation"/> instance whose <see cref="UtcTimestamp"/> is set to <see cref="DateTimeOffset.UtcNow"/>.</returns>
+        /// <exception cref="InvariantViolationException">
+        /// Thrown if <paramref name="correlationId"/> or <paramref name="traceId"/> is empty.
+        /// </exception>
         /// <remarks>
         /// This method enforces the invariant that both <paramref name="correlationId"/> and <paramref name="traceId"/>
         /// are non-empty. If either identifier is empty, an invariant violation is raised.
         /// </remarks>
-        /// <exception cref="InvariantViolationException">
-        /// Thrown if <paramref name="correlationId"/> or <paramref name="traceId"/> is empty.
-        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Causation Create(CorrelationId correlationId, TraceId traceId, UserId? actorId = null)
         {

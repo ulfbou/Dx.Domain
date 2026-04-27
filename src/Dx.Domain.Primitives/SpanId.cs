@@ -119,17 +119,17 @@ namespace Dx.Domain.Primitives
             => Value.TryFormat(destination, out charsWritten, "x16", CultureInfo.InvariantCulture);
 
         /// <summary>
-        /// General-purpose span formatting implementation used by composite formatting APIs.
+        /// Tries to format this identifier into the destination span.
         /// </summary>
-        /// <remarks>
-        /// If <paramref name="format"/> is null or empty, defaults to canonical format (<c>"x16"</c>).
-        /// If <paramref name="provider"/> is null, uses <see cref="CultureInfo.InvariantCulture"/>.
-        /// </remarks>
         /// <param name="destination">The span to write the formatted value into.</param>
         /// <param name="charsWritten">The number of characters written to the destination.</param>
-        /// <param name="format">The format specifier. If null or empty, defaults to <c>"x16"</c>.</param>
-        /// <param name="provider">The format provider. If null, uses <see cref="CultureInfo.InvariantCulture"/>.</param>
+        /// <param name="format">The format specifier. If <see langword="null"/> or empty, defaults to <c>"x16"</c>.</param>
+        /// <param name="provider">The format provider. If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.</param>
         /// <returns><see langword="true"/> if formatting succeeded; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to canonical format (<c>"x16"</c>).
+        /// If <paramref name="provider"/> is <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
+        /// </remarks>
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
         {
             var normalizedFormat = format.IsEmpty ? "x16" : format;
@@ -145,10 +145,10 @@ namespace Dx.Domain.Primitives
         /// Formats this identifier as a string using the specified format and culture.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="format"/> is null or empty, defaults to canonical format (<c>"x16"</c>).
-        /// If <paramref name="formatProvider"/> is null, uses <see cref="CultureInfo.InvariantCulture"/>.
+        /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to canonical format (<c>"x16"</c>).
+        /// If <paramref name="formatProvider"/> is <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
         /// </remarks>
-        /// <param name="format">The format specifier. If null or empty, defaults to <c>"x16"</c>.</param>
+        /// <param name="format">The format specifier. If <see langword="null"/> or empty, defaults to <c>"x16"</c>.</param>
         /// <param name="formatProvider">
         /// The format provider. If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
         /// </param>

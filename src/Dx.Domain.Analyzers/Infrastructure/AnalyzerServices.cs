@@ -28,6 +28,10 @@ namespace Dx.Domain.Analyzers.Infrastructure
     /// <summary>
     /// Represents the intent behind an exception being thrown.
     /// </summary>
+    /// <remarks>
+    /// This enumeration imposes no runtime semantics. It is pure analyzer vocabulary used for static classification.
+    /// Values are interpreted conservatively by analyzers.
+    /// </remarks>
     public enum ExceptionIntent
     {
         /// <summary>

@@ -16,10 +16,8 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
     /// Defines architectural scope classification vocabulary for analyzers.
     /// </summary>
     /// <remarks>
-    /// This enumeration is pure analyzer metadata.
-    /// It imposes no runtime semantics and is interpreted exclusively
-    /// by Dx.Domain analyzers.
-    /// Values are part of the public analyzer contract and must remain stable.
+    /// This enumeration imposes no runtime semantics. It is pure analyzer metadata interpreted exclusively
+    /// by Dx.Domain analyzers. Values are part of the public analyzer contract and must remain stable.
     /// </remarks>
     public enum Scope
     {

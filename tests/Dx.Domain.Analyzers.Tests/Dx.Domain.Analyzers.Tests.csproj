@@ -65,6 +65,7 @@
 
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\..\src\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
     <ProjectReference Include="..\..\src\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" />
     <ProjectReference Include="..\..\src\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
   </ItemGroup>
