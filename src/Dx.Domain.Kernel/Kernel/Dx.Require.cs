@@ -33,27 +33,26 @@ using Dx.Domain.Errors;
 
 namespace Dx.Domain
 {
+    /// <summary>
+    /// Represents the primary entry point for Dx.Domain kernel operations.
+    /// </summary>
+    /// <remarks>
+    /// This type provides factory and guard methods for domain construction. It imposes no mutable state and is thread-safe.
+    /// </remarks>
     public static partial class Dx
     {
         /// <summary>
-        /// Provides validation‑style invariant checks that return failed Results
-        /// instead of throwing exceptions.
+        /// Represents validation-style invariant checks that return failed Results instead of throwing exceptions.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// <c>Require</c> represents <em>recoverable domain validation</em>.
-        /// A failed requirement indicates that an operation cannot proceed,
-        /// but does not represent a corrupted program state or programming error.
+        /// <c>Require</c> represents <em>recoverable domain validation</em>. A failed requirement indicates that an operation cannot proceed, but does not represent a corrupted program state or programming error.
         /// </para>
         /// <para>
-        /// In contrast to <see cref="Invariant"/>, methods on this class
-        /// <strong>never throw</strong> as a result of validation failure.
-        /// All outcomes are expressed as <see cref="Result"/> values and are therefore
-        /// composable, inspectable, and analyzable.
+        /// In contrast to <see cref="Invariant"/>, methods on this class <strong>never throw</strong> as a result of validation failure. All outcomes are expressed as <see cref="Result"/> values and are therefore composable, inspectable, and analyzable.
         /// </para>
         /// <para>
-        /// This class is the primary validation surface intended for third‑party,
-        /// application‑level, and flow‑oriented domain logic.
+        /// This class is the primary validation surface intended for third-party, application-level, and flow-oriented domain logic.
         /// </para>
         /// </remarks>
         /// <seealso cref="Invariant"/>
@@ -65,24 +64,14 @@ namespace Dx.Domain
             // -----------------------------------------------------------------
 
             /// <summary>
-            /// Validates that the specified condition holds using an eagerly supplied
-            /// <see cref="InvariantError"/>.
+            /// Validates that the specified condition holds using an eagerly supplied <see cref="InvariantError"/>.
             /// </summary>
-            /// <param name="condition">
-            /// The condition to evaluate.
-            /// </param>
-            /// <param name="error">
-            /// The invariant error describing the validation failure.
-            /// The error value is captured eagerly.
-            /// </param>
-            /// <returns>
-            /// A successful <see cref="Result{Unit}"/> if the condition holds;
-            /// otherwise a failed Result containing <paramref name="error"/>.
-            /// </returns>
+            /// <param name="condition">The condition to evaluate.</param>
+            /// <param name="error">The invariant error describing the validation failure. The error value is captured eagerly.</param>
+            /// <returns>A successful <see cref="Result{Unit}"/> if the condition holds; otherwise a failed Result containing <paramref name="error"/>.</returns>
             /// <remarks>
             /// <para>
-            /// This overload should be used when error construction is inexpensive
-            /// and independent of runtime context.
+            /// This overload should be used when error construction is inexpensive and independent of runtime context.
             /// </para>
             /// </remarks>
             public static Result<Unit> That(
@@ -96,25 +85,14 @@ namespace Dx.Domain
             }
 
             /// <summary>
-            /// Validates that the specified condition holds using lazy
-            /// <see cref="DomainError"/> construction.
+            /// Validates that the specified condition holds using lazy <see cref="DomainError"/> construction.
             /// </summary>
-            /// <param name="condition">
-            /// The condition to evaluate.
-            /// </param>
-            /// <param name="errorFactory">
-            /// A factory that lazily produces the domain error.
-            /// The factory is invoked only when the condition fails.
-            /// </param>
-            /// <returns>
-            /// A successful <see cref="Result{Unit}"/> if the condition holds;
-            /// otherwise a failed Result containing the produced error.
-            /// </returns>
+            /// <param name="condition">The condition to evaluate.</param>
+            /// <param name="errorFactory">A factory that lazily produces the domain error. The factory is invoked only when the condition fails.</param>
+            /// <returns>A successful <see cref="Result{Unit}"/> if the condition holds; otherwise a failed Result containing the produced error.</returns>
             /// <remarks>
             /// <para>
-            /// This overload avoids unnecessary allocations on successful code paths
-            /// and allows richer contextual information to be captured at the point
-            /// of failure.
+            /// This overload avoids unnecessary allocations on successful code paths and allows richer contextual information to be captured at the point of failure.
             /// </para>
             /// </remarks>
             public static Result<Unit> That(
@@ -132,26 +110,15 @@ namespace Dx.Domain
             // -----------------------------------------------------------------
 
             /// <summary>
-            /// Validates that the specified condition holds using an eagerly supplied
-            /// <see cref="DomainError"/>.
+            /// Validates that the specified condition holds using an eagerly supplied <see cref="DomainError"/>.
             /// </summary>
-            /// <param name="condition">
-            /// The condition to evaluate.
-            /// </param>
-            /// <param name="value">
-            /// The value to wrap in the result if the condition holds.
-            /// </param>
-            /// <param name="error">
-            /// The domain error describing the validation failure.
-            /// </param>
-            /// <returns>
-            /// A successful <see cref="Result{Unit}"/> if the condition holds;
-            /// otherwise a failed Result containing <paramref name="error"/>.
-            /// </returns>
+            /// <param name="condition">The condition to evaluate.</param>
+            /// <param name="value">The value to wrap in the result if the condition holds.</param>
+            /// <param name="error">The domain error describing the validation failure.</param>
+            /// <returns>A successful <see cref="Result{TValue}"/> if the condition holds; otherwise a failed Result containing <paramref name="error"/>.</returns>
             /// <remarks>
             /// <para>
-            /// Domain errors typically represent business-rule violations
-            /// or invalid user input rather than structural domain corruption.
+            /// Domain errors typically represent business-rule violations or invalid user input rather than structural domain corruption.
             /// </para>
             /// </remarks>
             public static Result<TValue> That<TValue>(
@@ -160,31 +127,19 @@ namespace Dx.Domain
                 DomainError error)
                 where TValue : notnull
                 => condition
-                    ? Result.Success<TValue>(value)
+                   ? Result.Success<TValue>(value)
                     : Result.Failure<TValue>(error);
 
             /// <summary>
-            /// Validates that the specified condition holds using lazy
-            /// <see cref="DomainError"/> construction.
+            /// Validates that the specified condition holds using lazy <see cref="DomainError"/> construction.
             /// </summary>
-            /// <param name="condition">
-            /// The condition to evaluate.
-            /// </param>
-            /// <param name="value">
-            /// The value to wrap in the result if the condition holds.
-            /// </param>
-            /// <param name="errorFactory">
-            /// A factory that lazily produces the domain error.
-            /// The factory is invoked only when the condition fails.
-            /// </param>
-            /// <returns>
-            /// A successful <see cref="Result{TValue}"/> if the condition holds;
-            /// otherwise a failed Result containing the produced error.
-            /// </returns>
+            /// <param name="condition">The condition to evaluate.</param>
+            /// <param name="value">The value to wrap in the result if the condition holds.</param>
+            /// <param name="errorFactory">A factory that lazily produces the domain error. The factory is invoked only when the condition fails.</param>
+            /// <returns>A successful <see cref="Result{TValue}"/> if the condition holds; otherwise a failed Result containing the produced error.</returns>
             /// <remarks>
             /// <para>
-            /// This overload should be preferred when error construction depends
-            /// on runtime state or diagnostic context.
+            /// This overload should be preferred when error construction depends on runtime state or diagnostic context.
             /// </para>
             /// </remarks>
             public static Result<TValue> That<TValue>(
@@ -201,29 +156,17 @@ namespace Dx.Domain
             // -----------------------------------------------------------------
 
             /// <summary>
-            /// Validates that the specified condition holds using an eagerly supplied
-            /// strongly typed error value.
+            /// Validates that the specified condition holds using an eagerly supplied strongly typed error value.
             /// </summary>
-            /// <typeparam name="TError">
-            /// The type of the error value.
-            /// </typeparam>
-            /// <param name="condition">
-            /// The condition to evaluate.
-            /// </param>
-            /// <param name="error">
-            /// The error value describing the validation failure.
-            /// </param>
-            /// <returns>
-            /// A successful <see cref="Result{Unit, TError}"/> if the condition holds;
-            /// otherwise a failed Result containing <paramref name="error"/>.
-            /// </returns>
+            /// <typeparam name="TError">The type of the error value.</typeparam>
+            /// <param name="condition">The condition to evaluate.</param>
+            /// <param name="error">The error value describing the validation failure.</param>
+            /// <returns>A successful <see cref="Result{Unit, TError}"/> if the condition holds; otherwise a failed Result containing <paramref name="error"/>.</returns>
             /// <remarks>
             /// <para>
-            /// This overload enables domain‑specific error models while preserving
-            /// Result‑based control flow.
+            /// This overload enables domain-specific error models while preserving Result-based control flow.
             /// </para>
             /// </remarks>
-
             public static Result<Unit, TError> That<TError>(
                 bool condition,
                 TError error)
@@ -233,26 +176,15 @@ namespace Dx.Domain
                     : Dx.Result.Failure<Unit, TError>(error);
 
             /// <summary>
-            /// Validates that the specified condition holds using lazy construction
-            /// of a strongly typed error value.
+            /// Validates that the specified condition holds using lazy construction of a strongly typed error value.
             /// </summary>
-            /// <typeparam name="TError">
-            /// The type of the error value.
-            /// </typeparam>
-            /// <param name="condition">
-            /// The condition to evaluate.
-            /// </param>
-            /// <param name="errorFactory">
-            /// A factory that lazily produces the error value.
-            /// </param>
-            /// <returns>
-            /// A successful <see cref="Result{Unit, TError}"/> if the condition holds;
-            /// otherwise a failed Result containing the produced error.
-            /// </returns>
+            /// <typeparam name="TError">The type of the error value.</typeparam>
+            /// <param name="condition">The condition to evaluate.</param>
+            /// <param name="errorFactory">A factory that lazily produces the error value.</param>
+            /// <returns>A successful <see cref="Result{Unit, TError}"/> if the condition holds; otherwise a failed Result containing the produced error.</returns>
             /// <remarks>
             /// <para>
-            /// This overload maximizes composability while avoiding premature
-            /// allocation or capture of error data.
+            /// This overload maximizes composability while avoiding premature allocation or capture of error data.
             /// </para>
             /// </remarks>
             public static Result<Unit, TError> That<TError>(
@@ -263,7 +195,15 @@ namespace Dx.Domain
                     ? Dx.Result.Success<Unit, TError>(Unit.Value)
                     : Dx.Result.Failure<Unit, TError>(errorFactory);
 
-
+            /// <summary>
+            /// Determines whether the specified condition holds and returns the specified value.
+            /// </summary>
+            /// <typeparam name="TValue">The type of the value.</typeparam>
+            /// <typeparam name="TError">The type of the error.</typeparam>
+            /// <param name="condition">The condition to evaluate.</param>
+            /// <param name="value">The value to return when <paramref name="condition"/> is <see langword="true"/>.</param>
+            /// <param name="error">The error to use when <paramref name="condition"/> is <see langword="false"/>.</param>
+            /// <returns>A successful <see cref="Result{TValue, TError}"/> containing <paramref name="value"/> if the condition holds; otherwise a failed result containing <paramref name="error"/>.</returns>
             public static Result<TValue, TError> That<TValue, TError>(
                 bool condition,
                 TValue value,
@@ -274,7 +214,15 @@ namespace Dx.Domain
                     ? Dx.Result.Success<TValue, TError>(value)
                     : Dx.Result.Failure<TValue, TError>(error);
 
-
+            /// <summary>
+            /// Determines whether the specified condition holds and returns the specified value.
+            /// </summary>
+            /// <typeparam name="TValue">The type of the value.</typeparam>
+            /// <typeparam name="TError">The type of the error.</typeparam>
+            /// <param name="condition">The condition to evaluate.</param>
+            /// <param name="value">The value to return when <paramref name="condition"/> is <see langword="true"/>.</param>
+            /// <param name="errorFactory">The factory that creates the error when <paramref name="condition"/> is <see langword="false"/>.</param>
+            /// <returns>A successful <see cref="Result{TValue, TError}"/> containing <paramref name="value"/> if the condition holds; otherwise a failed result containing the produced error.</returns>
             public static Result<TValue, TError> That<TValue, TError>(
                 bool condition,
                 TValue value,
@@ -282,7 +230,7 @@ namespace Dx.Domain
                 where TValue : notnull
                 where TError : notnull
                 => condition
-                    ? Dx.Result.Success<TValue, TError>(value)
+                   ? Dx.Result.Success<TValue, TError>(value)
                     : Dx.Result.Failure<TValue, TError>(errorFactory);
         }
     }

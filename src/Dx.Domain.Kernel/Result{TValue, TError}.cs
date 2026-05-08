@@ -73,7 +73,7 @@ namespace Dx.Domain
         /// <summary>
         /// Initializes a new instance of the Result class that represents a failed result with the specified error.
         /// </summary>
-        /// <param name="error">The error value associated with the failed Result. Cannot be null if TError is a reference type.</param>
+        /// <param name="error">The error value associated with the failed Result. Cannot be <see langword="null"/> if TError is a reference type.</param>
         private Result(TError error) => _error = error;
 
         /// <summary>

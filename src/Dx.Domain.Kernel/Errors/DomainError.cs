@@ -49,9 +49,9 @@ namespace Dx.Domain.Errors
         /// <summary>
         /// Creates a new instance of the DomainError class with the specified error code and message.
         /// </summary>
-        /// <param name="code">The unique code that identifies the type of domain error. Cannot be null or empty.</param>
-        /// <param name="message">The descriptive message that explains the error. Cannot be null.</param>
-        /// <param name="metadata">Metadata associated with the error. Cannot be null.</param>
+        /// <param name="code">The unique code that identifies the type of domain error. Cannot be <see langword="null"/> or empty.</param>
+        /// <param name="message">The descriptive message that explains the error. Cannot be <see langword="null"/>.</param>
+        /// <param name="metadata">Metadata associated with the error. Cannot be <see langword="null"/>.</param>
         /// <returns>A new DomainError instance initialized with the specified code and message.</returns>
         public static DomainError Create(string code, string message, ImmutableArray<KeyValuePair<string, object>>? metadata = null)
             => new(code, message, metadata: metadata ?? ImmutableArray<KeyValuePair<string, object>>.Empty);
@@ -59,8 +59,8 @@ namespace Dx.Domain.Errors
         /// <summary>
         /// Returns a new instance of the current error with the specified metadata key and value added or updated.
         /// </summary>
-        /// <param name="key">The metadata key to add or update. Cannot be null.</param>
-        /// <param name="value">The value to associate with the specified metadata key. Cannot be null.</param>
+        /// <param name="key">The metadata key to add or update. Cannot be <see langword="null"/>.</param>
+        /// <param name="value">The value to associate with the specified metadata key. Cannot be <see langword="null"/>.</param>
         /// <returns>A new <see cref="DomainError"/> instance that includes the specified metadata key and value.</returns>
         public DomainError Enrich(string key, string value)
             => this with { Metadata = Metadata.SetItem(key, value) };

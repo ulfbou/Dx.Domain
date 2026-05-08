@@ -1,5 +1,14 @@
-// Copyright (c) Dx.Domain Contributors. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
+// <authors>Ulf Bourelius (Original Author)</authors>
+// <copyright file="PolicyAttribute.cs" company="Dx.Domain Team">
+//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
 
 using System;
 
