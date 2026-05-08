@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk" Label="Dx.Domain.Analyzers">
 
-  <PropertyGroup>
+  <PropertyGroup Label="Dx.Domain.Analyzers">
     <!-- Core project metadata -->
     <ProjectName>Dx.Domain.Analyzers</ProjectName>
     <Authors>Ulf Bourelius;Dx.Domain Team</Authors>
