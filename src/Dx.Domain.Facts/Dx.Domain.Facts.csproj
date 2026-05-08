@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+  <PropertyGroup Label="Dx.Domain.Facts">
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Authority</DxLayer>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <Description>The Dx.Domain.Facts package provides immutable, append-only facts for domain knowledge.</Description>
+        <Description>The Dx.Domain.Facts package provides immutable types for modeling domain facts.</Description>
         <PackageTags>dx;ddd;facts;events;immutability</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
@@ -24,9 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" />
     <ProjectReference Include="..\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
   </ItemGroup>
 </Project>

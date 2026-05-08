@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+  <PropertyGroup Label="Dx.Domain.Kernel">
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Kernel</DxLayer>
     <RootNamespace>Dx.Domain</RootNamespace>

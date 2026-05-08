@@ -1,9 +1,10 @@
 // Copyright (c) Dx.Domain Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Dx.Domain;
 using Dx.Domain.Errors;
 using Dx.Domain.Primitives;
-using Dx.Domain;
+
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
