@@ -1,16 +1,24 @@
-// Copyright (c) Dx.Domain Contributors. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
+// <authors>Ulf Bourelius (Original Author)</authors>
+// <copyright file="DpiJustifiedAttribute.cs" company="Dx.Domain Team">
+//     Copyright (c) 2025 Dx.Domain Team. All rights reserved.
+// </copyright>
+// <license>
+//     This software is licensed under the MIT License.
+//     See the project's root <c>LICENSE</c> file for details.
+//     Contributions are welcome, subject to the terms of the project's license.
+//     See the repository root <c>CONTRIBUTING.md</c> file for details.
+// </license>
+// ----------------------------------------------------------------------------------
 
 using System;
 
 namespace Dx.Domain.Annotations;
 
 /// <summary>
-/// Documents a deviation from standard patterns with a DPI‑aligned justification (pure metadata marker).
+/// Documents a deviation from standard patterns with a DPI-aligned justification (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// This attribute imposes no runtime semantics; it records rationale for code review
-/// and audit trails. SEE: Governance Docs → DPI / ADR Process.
+/// This attribute imposes no runtime semantics. It records rationale for code review and audit trails. See Governance Docs → DPI / ADR Process.
 ///
 /// <para><b>Example (non‑prescriptive):</b></para>
 /// <code><![CDATA[

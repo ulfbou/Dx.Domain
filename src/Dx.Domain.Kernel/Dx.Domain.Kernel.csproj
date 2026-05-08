@@ -8,7 +8,8 @@
     <Description>The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.</Description>
     <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!--<NoWarn>$(NoWarn);CS1591</NoWarn>-->
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -53,8 +54,8 @@
 
   <ItemGroup>
     <None Include="buildTransitive\Dx.Domain.Kernel.targets" Pack="true" PackagePath="buildTransitive" />
-    <None Update="..\..\CHANGELOG.md" Link="docs/CHANGELOG.md" />
-    <None Update="..\..\README.md" Link="docs/README.md" />
+    <None Include="CHANGELOG.md" Pack="true" PackagePath="/" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
     <None Update="..\..\LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
 </Project>
