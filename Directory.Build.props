@@ -1,27 +1,16 @@
-<Project>
+<Project Label="Directory.Build.props">
+
+  <!-- Directory.Build.props -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Common properties for all projects -->
   <PropertyGroup>
-    <!-- Packaging off by default -->
-    <IsPackable>false</IsPackable>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-
-    <!-- Versions: numeric for CLR, suffix only for informational -->
-    <VersionPrefix>0.0.0</VersionPrefix>
-    <VersionSuffix Condition="'$(Configuration)' == 'Debug'">local</VersionSuffix>
-    <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
-    <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
-
-    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
-    <FileVersion>$(VersionPrefix).0</FileVersion>
-    <InformationalVersion>$(Version)</InformationalVersion>
-
-    <!-- Common metadata -->
-    <Authors>Ulf Bourelius</Authors>
-    <Deterministic>true</Deterministic>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-
-    <!-- Docs metadata -->
-    <GenerateDocumentationFile Condition="'$(DxIsTest)' != 'true'">true</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
+
 </Project>
