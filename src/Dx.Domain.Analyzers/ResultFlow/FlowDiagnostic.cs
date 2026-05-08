@@ -10,21 +10,43 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
-using System.Diagnostics;
-
 using Microsoft.CodeAnalysis;
+
+using System;
+using System.Diagnostics;
 
 namespace Dx.Domain.Analyzers.ResultFlow
 {
+    /// <summary>
+    /// Represents a diagnostic message produced during result-flow analysis.
+    /// </summary>
+    /// <remarks>
+    /// This type is immutable and is used exclusively by analyzers to report flow analysis findings.
+    /// It carries analysis data only and imposes no runtime semantics outside compilation analysis.
+    /// </remarks>
     [DebuggerDisplay("{Message}")]
     public sealed class FlowDiagnostic
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FlowDiagnostic"/> class with the specified message and optional operation.
+        /// </summary>
+        /// <param name="message">The diagnostic message. Must not be null.</param>
+        /// <param name="operation">The operation associated with the diagnostic, or null if not applicable.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="message"/> is null.</exception>
         public FlowDiagnostic(string message, IOperation? operation = null)
         {
             Message = message ?? throw new ArgumentNullException(nameof(message));
             Operation = operation;
         }
+
+        /// <summary>
+        /// Gets the diagnostic message.
+        /// </summary>
         public string Message { get; }
+
+        /// <summary>
+        /// Gets the operation associated with the diagnostic, or null if not applicable.
+        /// </summary>
         public IOperation? Operation { get; }
     }
 }

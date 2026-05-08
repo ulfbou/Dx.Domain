@@ -13,10 +13,18 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+using System;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Scopes
 {
+    /// <summary>
+    /// Represents a resolver for architectural scopes.
+    /// </summary>
+    /// <remarks>
+    /// This type is used exclusively by analyzers. It carries analysis configuration only and imposes no runtime semantics outside compilation analysis.
+    /// </remarks>
     public sealed class ScopeResolver : IScopeResolver
     {
         private static readonly char[] ScopeSeparator = { ';' };
@@ -24,12 +32,17 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
         private readonly ImmutableDictionary<string, Scope> _assemblyMap;
         private readonly ImmutableArray<string> _rootNamespaces;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScopeResolver"/> class with the specified configuration.
+        /// </summary>
+        /// <param name="config">The analyzer configuration provider. Must not be <see langword="null"/>.</param>
         public ScopeResolver(AnalyzerConfigOptionsProvider config)
         {
             _assemblyMap = ParseAssemblyMap(config);
             _rootNamespaces = ParseRootNamespaces(config);
         }
 
+        /// <inheritdoc />
         public Scope ResolveAssembly(IAssemblySymbol assembly)
         {
             if (IsKernelInternal(assembly))
@@ -47,9 +60,11 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
             return Scope.S3;
         }
 
+        /// <inheritdoc />
         public Scope ResolveSymbol(ISymbol symbol) =>
             ResolveAssembly(symbol.ContainingAssembly);
 
+        /// <inheritdoc />
         public bool IsKernelInternal(IAssemblySymbol assembly)
         {
             // hard architectural boundary, not config
@@ -85,9 +100,9 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
                 return ImmutableArray<string>.Empty;
 
             return raw.Split(ScopeSeparator)
-                     .Select(s => s.Trim())
-                     .Where(s => s.Length != 0)
-                     .ToImmutableArray();
+                .Select(s => s.Trim())
+                .Where(s => s.Length != 0)
+                .ToImmutableArray();
         }
     }
 }

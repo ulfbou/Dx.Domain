@@ -23,11 +23,31 @@ using System.Threading;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Flow
 {
+    /// <summary>
+    /// Provides a cached wrapper around <see cref="ResultFlowEngine"/> for analyzing result-flow graphs during compilation.
+    /// </summary>
+    /// <remarks>
+    /// This type is used exclusively by analyzers. It caches analysis results by method signature and syntax checksum to avoid redundant work.
+    /// Analysis failures are handled fail-open by returning an invalid empty <see cref="FlowGraph"/>.
+    /// This type is thread-safe for concurrent analyzer execution.
+    /// </remarks>
     public sealed class ResultFlowEngineWrapper
     {
         private readonly ResultFlowEngine _engine = new();
         private readonly ConcurrentDictionary<string, FlowGraph> _cache = new();
 
+        /// <summary>
+        /// Analyzes the result flow for the specified method, returning a cached graph when available.
+        /// </summary>
+        /// <param name="method">The method symbol to analyze.</param>
+        /// <param name="compilation">The compilation containing the method.</param>
+        /// <param name="options">The analyzer configuration options.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <returns>The <see cref="FlowGraph"/> for <paramref name="method"/>. If analysis fails, returns an invalid empty graph.</returns>
+        /// <remarks>
+        /// Results are cached using a key composed of the fully qualified method display string and the syntax tree checksum.
+        /// The method never throws; exceptions during analysis result in a fail-open invalid graph with <c>isValid: false</c>.
+        /// </remarks>
         public FlowGraph Analyze(
             IMethodSymbol method,
             Compilation compilation,
@@ -63,4 +83,5 @@ namespace Dx.Domain.Analyzers.Infrastructure.Flow
             return $"{symbolId}::{checksum}";
         }
     }
+
 }

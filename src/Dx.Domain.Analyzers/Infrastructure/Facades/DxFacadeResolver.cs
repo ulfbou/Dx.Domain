@@ -13,6 +13,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Facades
@@ -27,6 +28,11 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
         private readonly HashSet<IMethodSymbol> _methods =
             new(SymbolEqualityComparer.Default);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DxFacadeResolver"/> class with the specified compilation and configuration.
+        /// </summary>
+        /// <param name="compilation">The compilation to analyze. Must not be <see langword="null"/>.</param>
+        /// <param name="config">The analyzer configuration provider. Must not be <see langword="null"/>.</param>
         public DxFacadeResolver(Compilation compilation, AnalyzerConfigOptionsProvider config)
         {
             // 1. Configured root facade (AC3 - config path)
@@ -43,14 +49,16 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             AddMethodsFromAttributedTypes(compilation);
         }
 
+        /// <inheritdoc/>
         public IReadOnlyCollection<IMethodSymbol> FacadeFactories => _methods;
 
+        /// <inheritdoc/>
         public bool IsDxFacadeFactory(IMethodSymbol method) =>
             _methods.Contains(method);
 
+        /// <inheritdoc/>
         public IMethodSymbol? FindFacadeFactoryForType(ITypeSymbol type) =>
-            _methods.FirstOrDefault(m =>
-                SymbolEqualityComparer.Default.Equals(m.ReturnType, type));
+            _methods.FirstOrDefault(m => SymbolEqualityComparer.Default.Equals(m.ReturnType, type));
 
         private void AddMethodsFromRoot(INamedTypeSymbol root)
         {

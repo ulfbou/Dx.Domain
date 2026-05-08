@@ -24,13 +24,27 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Dx.Domain.Analyzers.ResultFlow
 {
+    /// <summary>
+    /// Provides the default implementation of <see cref="IResultFlowEngine"/> for analyzing result-flow graphs.
+    /// </summary>
+    /// <remarks>
+    /// This type is used exclusively by analyzers. It evaluates control flow and data flow to produce a <see cref="FlowGraph"/> for a given method.
+    /// It carries analysis data only and imposes no runtime semantics outside compilation analysis.
+    /// </remarks>
     public sealed class ResultFlowEngine : IResultFlowEngine
     {
         private readonly ResultFlowEngineOptions _options;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ResultFlowEngine"/> class with the specified options.
+        /// </summary>
+        /// <param name="options">The engine options to use, or null to use the default options.</param>
         public ResultFlowEngine(ResultFlowEngineOptions? options = null)
         {
             _options = options ?? ResultFlowEngineOptions.Default;
         }
+
+        /// <inheritdoc/>
         public FlowGraph Analyze(
             IMethodSymbol method,
             Compilation compilation,
@@ -39,8 +53,10 @@ namespace Dx.Domain.Analyzers.ResultFlow
         {
             if (method is null)
                 throw new ArgumentNullException(nameof(method));
+
             if (compilation is null)
                 throw new ArgumentNullException(nameof(compilation));
+
             cancellationToken.ThrowIfCancellationRequested();
             var model = compilation.GetSemanticModel(method.DeclaringSyntaxReferences.First().SyntaxTree);
             var body = method.DeclaringSyntaxReferences.First().GetSyntax(cancellationToken);
@@ -346,18 +362,6 @@ namespace Dx.Domain.Analyzers.ResultFlow
                 node.State = newState;
             }
         }
-    }
-    public sealed class ResultFlowEngineOptions
-    {
-        public static ResultFlowEngineOptions Default { get; } = new();
-        public ImmutableHashSet<string> ResultTypeMetadataNames { get; init; } =
-        ImmutableHashSet.Create(
-        "Dx.Domain.Result",
-        "Dx.Domain.Result`1");
-        public ImmutableHashSet<string> InspectionMemberNames { get; init; } =
-        ImmutableHashSet.Create("IsSuccess", "IsFailure", "Match", "Map", "Bind");
-        public string HandlerConfigKey { get; init; } = "Result.handlers";
-        public string TerminalizerConfigKey { get; init; } = "Result.terminalizers";
     }
     internal sealed class ResultTypeResolver
     {

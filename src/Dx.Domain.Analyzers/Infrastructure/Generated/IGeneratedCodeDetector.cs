@@ -18,8 +18,20 @@ using System.Linq;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Generated
 {
+    /// <summary>
+    /// Defines a contract for detecting symbols that originate from generated code.
+    /// </summary>
+    /// <remarks>
+    /// This interface is used exclusively by analyzers to suppress diagnostics on generated sources.
+    /// It carries analysis configuration only and imposes no runtime semantics outside compilation analysis.
+    /// </remarks>
     public interface IGeneratedCodeDetector
     {
+        /// <summary>
+        /// Determines whether the specified symbol originates from generated code.
+        /// </summary>
+        /// <param name="symbol">The symbol to examine.</param>
+        /// <returns><see langword="true"/> if the symbol is marked with a generated code attribute or matches a configured namespace marker; otherwise, <see langword="false"/>.</returns>
         bool IsGenerated(ISymbol symbol);
     }
 }
