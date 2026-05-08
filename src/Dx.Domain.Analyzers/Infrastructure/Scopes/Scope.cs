@@ -16,14 +16,28 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
     /// Defines architectural scope classification vocabulary for analyzers.
     /// </summary>
     /// <remarks>
-    /// This enumeration imposes no runtime semantics. It is pure analyzer metadata interpreted exclusively
-    /// by Dx.Domain analyzers. Values are part of the public analyzer contract and must remain stable.
+    /// This enumeration imposes no runtime semantics. It is pure analyzer metadata interpreted exclusively by Dx.Domain analyzers. Values are part of the public analyzer contract and must remain stable.
     /// </remarks>
     public enum Scope
     {
-        S0, // Kernel
-        S1, // Shared
-        S2, // Domain
-        S3  // Application
+        /// <summary>
+        /// Represents the kernel layer (S0).
+        /// </summary>
+        S0 = 0,
+
+        /// <summary>
+        /// Represents the shared layer (S1).
+        /// </summary>
+        S1 = 1,
+
+        /// <summary>
+        /// Represents the domain layer (S2).
+        /// </summary>
+        S2 = 2,
+
+        /// <summary>
+        /// Represents the application layer (S3).
+        /// </summary>
+        S3 = 3
     }
 }

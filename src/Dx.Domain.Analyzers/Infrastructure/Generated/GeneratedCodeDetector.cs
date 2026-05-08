@@ -13,15 +13,30 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Generated
 {
+    /// <summary>
+    /// Detects whether a symbol originates from generated code.
+    /// </summary>
+    /// <remarks>
+    /// This type is used exclusively by analyzers to suppress diagnostics on generated sources.
+    /// Detection is based on <see cref="GeneratedCodeAttribute"/>, <c>CompilerGeneratedAttribute</c>, and namespace markers configured via the <c>dx_generated_markers</c> analyzer option.
+    /// It carries analysis configuration only and imposes no runtime semantics outside compilation analysis.
+    /// </remarks>
     public sealed class GeneratedCodeDetector : IGeneratedCodeDetector
     {
         private static readonly char[] NamespaceSeparators = { ';' };
         private readonly HashSet<string> _namespaceMarkers;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GeneratedCodeDetector"/> class with the specified configuration.
+        /// </summary>
+        /// <param name="config">The analyzer configuration provider used to read global options.</param>
         public GeneratedCodeDetector(AnalyzerConfigOptionsProvider config)
         {
             if (!config.GlobalOptions.TryGetValue("dx_generated_markers", out var raw))
@@ -36,6 +51,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Generated
 
         }
 
+        /// <inheritdoc/>
         public bool IsGenerated(ISymbol symbol)
         {
             if (symbol.GetAttributes().Any(a =>
