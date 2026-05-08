@@ -49,7 +49,7 @@ namespace Dx.Domain.Facts
         /// </summary>
         /// <param name="correlationId">The unique identifier that correlates related operations or events.</param>
         /// <param name="traceId">The identifier used to trace the flow of a request or operation across system boundaries.</param>
-        /// <param name="actorId">The identifier of the actor responsible for the operation, or null if not applicable.</param>
+        /// <param name="actorId">The identifier of the actor responsible for the operation, or <see langword="null"/> if not applicable.</param>
         /// <param name="utcTimestamp">The timestamp, in Coordinated Universal Time (UTC), indicating when the causation event occurred.</param>
         private Causation(CorrelationId correlationId, TraceId traceId, UserId? actorId, DateTimeOffset utcTimestamp)
         {

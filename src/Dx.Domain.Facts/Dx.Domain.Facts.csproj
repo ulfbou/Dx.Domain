@@ -5,6 +5,10 @@
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Description>The Dx.Domain.Facts package provides immutable, append-only facts for domain knowledge.</Description>
+        <PackageTags>dx;ddd;facts;events;immutability</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup>

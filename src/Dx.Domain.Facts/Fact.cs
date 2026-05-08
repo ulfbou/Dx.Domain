@@ -71,15 +71,15 @@ public readonly struct Fact<TPayload> : IDomainFact<TPayload>
     /// <summary>
     /// Creates a new domain fact with the specified type, payload, and causation metadata.
     /// </summary>
-    /// <param name="factType">The logical type or category of the fact. Must not be null or whitespace.</param>
-    /// <param name="payload">The fact payload. Must not be null.</param>
+    /// <param name="factType">The logical type or category of the fact. Must not be <see langword="null"/> or whitespace.</param>
+    /// <param name="payload">The fact payload. Must not be <see langword="null"/>.</param>
     /// <param name="causation">The causation metadata associated with this fact.</param>
     /// <param name="utcTimestamp">
-    /// The UTC timestamp when the fact occurred. If null, the current UTC time is used.
+    /// The UTC timestamp when the fact occurred. If <see langword="null"/>, the current UTC time is used.
     /// </param>
     /// <returns>A new <see cref="Fact{TPayload}"/> instance.</returns>
     /// <exception cref="ArgumentNullException">
-    /// Thrown if <paramref name="factType"/> or <paramref name="payload"/> is null.
+    /// Thrown if <paramref name="factType"/> or <paramref name="payload"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentException">
     /// Thrown if <paramref name="factType"/> is whitespace.
@@ -107,11 +107,11 @@ public readonly struct Fact<TPayload> : IDomainFact<TPayload>
     /// <summary>
     /// Tries to create a new domain fact with the specified type, payload, and causation metadata.
     /// </summary>
-    /// <param name="factType">The logical type or category of the fact. Must not be null or whitespace.</param>
-    /// <param name="payload">The fact payload. Must not be null.</param>
+    /// <param name="factType">The logical type or category of the fact. Must not be <see langword="null"/> or whitespace.</param>
+    /// <param name="payload">The fact payload. Must not be <see langword="null"/>.</param>
     /// <param name="causation">The causation metadata associated with this fact.</param>
     /// <param name="utcTimestamp">
-    /// The UTC timestamp when the fact occurred. If null, the current UTC time is used.
+    /// The UTC timestamp when the fact occurred. If <see langword="null"/>, the current UTC time is used.
     /// </param>
     /// <returns>A <see cref="Result{TValue}"/> containing the new fact or a failure error.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

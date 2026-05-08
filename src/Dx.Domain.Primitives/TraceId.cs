@@ -167,7 +167,7 @@ namespace Dx.Domain.Primitives
         /// <param name="provider">The format provider. This parameter is currently ignored.</param>
         /// <returns><see langword="true"/> if formatting succeeded; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// If <paramref name="format"/> is null or empty, defaults to the canonical 32-character hex format.
+        /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to the canonical 32-character hex format.
         /// The <paramref name="provider"/> parameter is currently ignored.
         /// </remarks>
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)

@@ -1,6 +1,7 @@
 // Copyright (c) Dx.Domain Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Dx.Domain.Annotations;
 using Dx.Domain.Errors;
 
 using System.Runtime.CompilerServices;
@@ -57,7 +58,7 @@ internal static class DxK
         /// <summary>Domain transition violated invariants.</summary>
         public const string Domain_InvalidTransition = "dx.kernel.domain.invalid_transition";
 
-        /// <summary>Fact payload was null when required.</summary>
+        /// <summary>Fact payload was <see langword="null"/> when required.</summary>
         public const string Domain_FactPayloadNull = "dx.kernel.domain.fact_payload_null";
 
         /// <summary>Identity value format is invalid.</summary>
