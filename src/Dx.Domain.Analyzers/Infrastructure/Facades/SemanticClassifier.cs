@@ -13,20 +13,31 @@
 using Microsoft.CodeAnalysis;
 
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Dx.Domain.Analyzers.Infrastructure.Facades
 {
+    /// <summary>
+    /// Represents a semantic classifier for Dx.Domain types.
+    /// </summary>
+    /// <remarks>
+    /// This type is used exclusively by analyzers. It carries analysis data only and imposes no runtime semantics outside compilation analysis.
+    /// </remarks>
     public sealed class SemanticClassifier : ISemanticClassifier
     {
         private readonly ImmutableHashSet<INamedTypeSymbol> _resultTypes;
         private readonly INamedTypeSymbol? _domainError;
         private readonly INamedTypeSymbol? _invariantViolation;
-        private static readonly string[] DomainMarkerAttributes =
+        private static readonly string[] _domainMarkerAttributes =
         {
             "AggregateRootAttribute",
             "ValueObjectAttribute"
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SemanticClassifier"/> class with the specified compilation.
+        /// </summary>
+        /// <param name="compilation">The compilation to analyze. Must not be <see langword="null"/>.</param>
         public SemanticClassifier(Compilation compilation)
         {
             _resultTypes = LoadResultTypes(compilation);
@@ -35,15 +46,17 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
                 compilation.GetTypeByMetadataName("Dx.Domain.InvariantViolationException");
         }
 
+        /// <inheritdoc/>
         public bool IsKernelResultType(ITypeSymbol type) =>
             type is INamedTypeSymbol nt &&
-            _resultTypes.Any(r =>
-                SymbolEqualityComparer.Default.Equals(nt.ConstructedFrom, r));
+            _resultTypes.Any(r => SymbolEqualityComparer.Default.Equals(nt.ConstructedFrom, r));
 
+        /// <inheritdoc/>
         public bool IsDomainErrorType(ITypeSymbol type) =>
             _domainError != null &&
             SymbolEqualityComparer.Default.Equals(type, _domainError);
 
+        /// <inheritdoc/>
         public bool IsInvariantException(ITypeSymbol type)
         {
             if (_invariantViolation == null)
@@ -54,12 +67,14 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             {
                 if (SymbolEqualityComparer.Default.Equals(current, _invariantViolation))
                     return true;
+
                 current = current.BaseType;
             }
 
             return false;
         }
 
+        /// <inheritdoc/>
         public bool IsDomainType(ITypeSymbol type)
         {
             if (type is not INamedTypeSymbol named)
@@ -96,7 +111,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
                 if (name == null)
                     continue;
 
-                if (DomainMarkerAttributes.Contains(name, System.StringComparer.Ordinal))
+                if (_domainMarkerAttributes.Contains(name, System.StringComparer.Ordinal))
                     return true;
             }
 
@@ -129,10 +144,12 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
 
             // Exclude types that inherit from System.Attribute
             var current = type.BaseType;
+
             while (current != null)
             {
                 if (current.ToDisplayString() == "System.Attribute")
                     return true;
+
                 current = current.BaseType;
             }
 
@@ -154,7 +171,7 @@ namespace Dx.Domain.Analyzers.Infrastructure.Facades
             TryAdd("Dx.Domain.Result");
             TryAdd("Dx.Domain.Result`1");
             TryAdd("Dx.Domain.Result`2");
-            TryAdd("Dx.Domain.Unit"); // AC5
+            TryAdd("Dx.Domain.Unit");
 
             return builder.ToImmutable();
         }

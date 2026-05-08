@@ -14,22 +14,45 @@ using System.Collections.Immutable;
 
 namespace Dx.Domain.Analyzers.ResultFlow
 {
+    /// <summary>
+    /// Represents the result-flow graph produced by analyzing a method.
+    /// </summary>
+    /// <remarks>
+    /// This type is immutable and is used exclusively by analyzers to represent data-flow state for Result values.
+    /// It carries analysis data only and imposes no runtime semantics outside compilation analysis.
+    /// </remarks>
     public sealed class FlowGraph
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FlowGraph"/> class with the specified nodes, states, diagnostics, and validity flag.
+        /// </summary>
+        /// <param name="resultNodes">The collection of result nodes in the graph.</param>
+        /// <param name="nodeStates">The mapping of nodes to their analyzed states.</param>
+        /// <param name="diagnostics">The diagnostics produced during analysis.</param>
+        /// <param name="isValid">A value indicating whether the graph represents a successful analysis. The default is <see langword="true"/>.</param>
         public FlowGraph(
-        ImmutableArray<ResultNode> resultNodes,
-        ImmutableDictionary<ResultNode, ResultState> nodeStates,
-        ImmutableArray<FlowDiagnostic> diagnostics,
-        bool isValid = true)
+            ImmutableArray<ResultNode> resultNodes,
+            ImmutableDictionary<ResultNode, ResultState> nodeStates,
+            ImmutableArray<FlowDiagnostic> diagnostics,
+            bool isValid = true)
         {
             ResultNodes = resultNodes;
             NodeStates = nodeStates;
             Diagnostics = diagnostics;
             IsValid = isValid;
         }
+
+        /// <summary>Gets the collection of result nodes in the graph.</summary>
         public ImmutableArray<ResultNode> ResultNodes { get; }
+
+        /// <summary>Gets the mapping of nodes to their analyzed states.</summary>
         public ImmutableDictionary<ResultNode, ResultState> NodeStates { get; }
+
+        /// <summary>Gets the diagnostics produced during analysis.</summary>
         public ImmutableArray<FlowDiagnostic> Diagnostics { get; }
+
+        /// <summary>Gets a value indicating whether the graph represents a successful analysis.</summary>
         public bool IsValid { get; }
     }
 }
+
