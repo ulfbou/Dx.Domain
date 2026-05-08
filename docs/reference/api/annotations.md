@@ -1,27 +1,22 @@
 # Dx.Domain.Annotations
 
-**Package**: `Dx.Domain.Annotations`  
-**Role**: Semantic vocabulary and contracts
+**Package**: `Dx.Domain.Annotations`
+**Version**: 0.1.0-alpha
+**Role**: Semantic vocabulary
 
-## Purpose
-Pure vocabulary and metadata for marking domain types. **No runtime logic.**
-
-Annotations provide the semantic contracts that analyzers enforce and the Kernel trusts. They define scope, authority, and structural roles without implementing behavior.
+Pure metadata vocabulary for domain modeling. Provides attributes and supporting types for compile-time analysis.
 
 ## Key Attributes
-- **Scope** - S0 Kernel, S1 Domain Facades, S2 Application, S3 Infrastructure/Consumer
-- **DxAssemblyRole** - Declares package role in the substrate
-- **AggregateRootAttribute** - Marks aggregate roots
-- **ValueObjectAttribute** - Marks immutable value objects
 
-## Dependency Rules
-- Kernel **must** depend on Annotations
-- Analyzers depend on Annotations; never on Kernel at runtime
-- All packages may reference Annotations
+**Domain Modeling**: `AggregateRoot`, `Entity`, `ValueObject`, `DomainEvent`, `Identity`
+**Construction**: `Factory`, `Invariant`
+**Scope**: `DxScope`, `DxLayer`, `DxAssemblyRole`
+**Analyzer**: `DxFacade`, `DxApprovedHandler`, `ApprovedKernelApi`, `DxGenerated`
+**Governance**: `DpiJustified`, `Policy`
 
-## Guarantees
-- Zero runtime overhead
-- Compile-time metadata only
-- Analyzer-enforced usage patterns
+## Characteristics
 
-See: [`public/packages/annotations.md`](../../public/packages/annotations.md)
+- No dependencies on Kernel
+- Designed for compile-time analysis
+
+See package [README](../../../src/Dx.Domain.Annotations/README.md) for complete catalog.

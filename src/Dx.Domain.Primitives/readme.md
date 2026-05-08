@@ -1,30 +1,42 @@
 # Dx.Domain.Primitives
 
-Strongly typed domain building blocks.
+Strongly-typed identity and tracing primitives.
 
 ## Purpose
 
-Provide invariant-safe value representations used by the kernel.
+Provide value types for correlation, tracing, and identity.
 
 ## Guarantees
 
-- immutability
-- explicit construction
-- structural equality
-- no invalid states
+- Public types expose immutable state
+- Structural equality
 
 ## Constraints
 
-- no implicit conversions
-- no empty identity values
-- no runtime-dependent behavior
+- No implicit conversions
+- No dependencies on Kernel
 
 ## Role in System
 
-- consumed by Kernel
-- not responsible for domain orchestration
+- Consumed by Kernel and Facts
+- Provides foundational value types
 
-See:
+## Public API Surface
 
-- `docs/public/packages/primitives.md`
+### Identity and Tracing
 
+- `CorrelationId` — Correlation identifier
+- `TraceId` — Trace identifier
+- `SpanId` — Span identifier
+- `UserId` — User identifier
+- `FactId` — Fact identifier
+
+## Versioning
+
+0.1.0-alpha — API surface subject to change. No compatibility guarantees.
+
+## See Also
+
+- [Dx.Domain.Kernel](../Dx.Domain.Kernel/readme.md) — Functional core types
+- [Dx.Domain.Facts](../Dx.Domain.Facts/readme.md) — Immutable facts
+- [Architecture Decision Records](../../docs/adr/index.md) — Design rationale
