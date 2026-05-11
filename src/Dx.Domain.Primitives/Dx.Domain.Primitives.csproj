@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Dx.Domain.Primitives">
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Primitives</DxLayer>
@@ -16,7 +16,7 @@
     <!--<NoWarn>$(NoWarn);CS1591;DX1001</NoWarn>-->
     <Nullable>enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/ulfbou/dx.domain</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
   </PropertyGroup>
