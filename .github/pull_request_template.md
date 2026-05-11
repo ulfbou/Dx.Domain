@@ -34,9 +34,9 @@ Closes #
 
 <!-- List the key changes in bullet points -->
 
-- 
-- 
-- 
+-
+-
+-
 
 ## Testing
 
@@ -44,9 +44,9 @@ Closes #
 
 ### Test Configuration
 
-- **OS**: 
-- **.NET Version**: 
-- **Branch**: 
+- **OS**:
+- **.NET Version**:
+- **Branch**:
 
 ### Test Results
 

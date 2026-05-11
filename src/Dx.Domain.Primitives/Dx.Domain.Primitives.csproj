@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Dx.Domain.Primitives">
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Primitives</DxLayer>
@@ -34,14 +34,9 @@
     <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll"
-          Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')"
-          Pack="true"
-          PackagePath="analyzers/dotnet/cs" />
+    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll" Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')" Pack="true" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CHANGELOG.md" Pack="true" PackagePath="/" />
-    <None Include="README.md" Pack="true" PackagePath="/" />
     <None Update="..\..\LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
 

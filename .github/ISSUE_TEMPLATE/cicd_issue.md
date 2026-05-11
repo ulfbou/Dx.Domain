@@ -2,7 +2,7 @@
 name: CI/CD Issue
 about: Report a CI/CD pipeline or workflow issue
 title: '[CI/CD] '
-labels: ci-cd, infrastructure
+labels: area:ci, type:chore, status:needs-triage
 assignees: ''
 
 ---
@@ -17,7 +17,7 @@ assignees: ''
 - [ ] DocFX Documentation
 - [ ] Drift Protection
 - [ ] Security Scanning
-- [ ] Other: 
+- [ ] Other:
 
 ## Issue Description
 
@@ -27,7 +27,7 @@ assignees: ''
 
 <!-- Link to the failed workflow run -->
 
-Workflow URL: https://github.com/ulfbou/Notes/actions/runs/XXXXX
+Workflow URL: https://github.com/ulfbou/Dx.Domain/actions/runs/XXXXX
 
 ## Error Output
 
@@ -43,17 +43,17 @@ Paste error logs here
 
 ## Environment
 
-- **Branch**: 
-- **Commit**: 
+- **Branch**:
+- **Commit**:
 - **Trigger**: [e.g., PR, push, schedule, manual]
 
 ## Steps Taken
 
 <!-- What have you tried to fix this? -->
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Configuration Files
 
@@ -62,7 +62,7 @@ Paste error logs here
 - [ ] Workflow YAML files
 - [ ] GitVersion.yml
 - [ ] Directory.Build.props
-- [ ] Other: 
+- [ ] Other:
 
 ## Impact
 
