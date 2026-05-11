@@ -10,7 +10,7 @@
       and construction/result discipline.
     </Description>
     <Tags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</Tags>
-    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
 
     <!-- Build -->
     <TargetFramework>netstandard2.0</TargetFramework>

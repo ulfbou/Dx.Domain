@@ -2,7 +2,7 @@
 name: Test Failure
 about: Report a failing analyzer test or AC regression
 title: '[TEST] '
-labels: bug, area:analyzers, type:bug
+labels: type:bug, area:analyzers, status:needs-triage
 assignees: ''
 ---
 
@@ -20,7 +20,7 @@ Expected diagnostic: DXA010 at line X
 **Actual:**
 ```
 Actual diagnostics:
-```[list]
+```
 
 ## Reproduction
 ```bash

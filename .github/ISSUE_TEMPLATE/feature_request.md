@@ -2,7 +2,7 @@
 name: Feature Request
 about: Suggest an idea for this project
 title: '[FEATURE] '
-labels: enhancement
+labels: type:feat, status:needs-triage
 assignees: ''
 
 ---
@@ -27,9 +27,9 @@ assignees: ''
 
 <!-- Describe specific use cases for this feature -->
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Example Code
 

@@ -16,7 +16,7 @@
     <!--<NoWarn>$(NoWarn);CS1591;DX1001</NoWarn>-->
     <Nullable>enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/ulfbou/dx.domain</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
   </PropertyGroup>
@@ -34,14 +34,9 @@
     <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll"
-          Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')"
-          Pack="true"
-          PackagePath="analyzers/dotnet/cs" />
+    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll" Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')" Pack="true" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CHANGELOG.md" Pack="true" PackagePath="/" />
-    <None Include="README.md" Pack="true" PackagePath="/" />
     <None Update="..\..\LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
 
