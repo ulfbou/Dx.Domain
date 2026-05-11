@@ -2,7 +2,7 @@
 name: Bug Report
 about: Create a report to help us improve
 title: '[BUG] '
-labels: bug
+labels: type:bug, status:needs-triage
 assignees: ''
 
 ---
@@ -15,10 +15,10 @@ assignees: ''
 
 Steps to reproduce the behavior:
 
-1. 
-2. 
-3. 
-4. 
+1.
+2.
+3.
+4.
 
 ## Expected Behavior
 

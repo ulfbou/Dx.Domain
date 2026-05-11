@@ -4,9 +4,9 @@
 
 Dx.Domain turns domain correctness into compile-time constraints enforced by analyzers and a minimal runtime kernel.
 
-Dx.Domain is a compile-time enforced domain modeling system. If it compiles, passes analyzers, and the Kernel accepts it — the state satisfies all enforced constraints.
+Dx.Domain is an architectural modeling system using compile-time analyzers as a partial enforcement mechanism. During alpha, enforcement is incomplete, analyzers may be suppressible, and APIs continue to evolve.
 
-Enforcement applies only within statically analyzable scope and declared analyzer coverage.
+Enforcement applies only within statically analyzable scope and declared analyzer coverage. Invalid states are not mechanically impossible—analyzers provide warnings, not absolute correctness.
 
 **System model:** [SYSTEM.md](docs/system.md) · **Normative spec:** [SPEC.md](docs/spec.md) · **Enforcement model:** [ENFORCEMENT_MODEL.md](docs/enforcement_model.md) · **Limitations:** [LIMITATIONS.md](docs/limitations.md)
 
@@ -44,15 +44,21 @@ Rationale: [Manifesto](docs/manifesto.md) · [Non-Goals](docs/non_goals.md) · [
 
 ---
 
-## What is guaranteed
+## What is guaranteed (Alpha Limitations Apply)
 
-| Guarantee | Enforcement | Strength |
-|-----------|-------------|----------|
-| Result<T> must be handled | DXA020 | Strong |
-| No direct construction in S1–S3 | DXA010/DXA011/DXA080 | Heuristic |
-| UTC-only time | DXA050 | Strong |
-| Kernel surface frozen | DXA040 | Strong |
-| Result factories public in S0 | ADR-0018 exemption | Strong |
+During the 0.1.0-alpha phase:
+- Enforcement is **partial** and may evolve
+- Analyzers can be suppressed; violations are warnings, not errors
+- Public API surface may change
+- Not all invalid states are mechanically impossible
+
+| Guarantee | Enforcement | Strength | Alpha Status |
+|-----------|-------------|----------|--------------|
+| Result<T> must be handled | DXA020 | Strong | Warning-level |
+| No direct construction in S1–S3 | DXA010/DXA011/DXA080 | Heuristic | Warning-level |
+| UTC-only time | DXA050 | Strong | Warning-level |
+| Kernel surface frozen | DXA040 | Strong | Frozen for alpha |
+| Result factories public in S0 | ADR-0018 exemption | Strong | Frozen for alpha |
 
 Strength is bounded by static analysis scope and declared coverage. See [ENFORCEMENT_MODEL.md](docs/enforcement_model.md).
 
@@ -77,7 +83,7 @@ Analyzers apply to S1–S3 only. S0 is exempt per ADR-0018.
 
 ## Stability
 
-**Current:** `0.1.0-alpha.4`
+**Current:** `0.1.0-alpha` (Pre-release — API surface evolving)
 
 | Area | Stability |
 |------|-----------|

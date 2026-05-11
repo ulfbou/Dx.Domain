@@ -19,6 +19,12 @@ Provide pure metadata markers that classify domain concepts. Attributes express 
 - Must not alter program behavior
 - Dx.Domain runtime packages do not depend on annotation discovery
 
+## Alpha Limitations
+
+- Attribute coverage by analyzers may vary
+- Classification semantics may evolve during alpha
+- No compatibility guarantees for attribute interpretation rules
+
 ## Role in System
 
 - Consumed by Dx.Domain.Analyzers as part of classification where applicable
