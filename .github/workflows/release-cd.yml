@@ -1,0 +1,112 @@
+name: Release CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: 'SemVer bump'
+        required: true
+        type: choice
+        options: [patch, minor, major]
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options: [staging, canary, production]
+      skip-tests:
+        description: 'Skip tests (not recommended)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Validate branch
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "Release must run from main"; exit 1; fi
+      - name: GitVersion
+        uses: gittools/actions/gitversion/setup@v0
+        with: { versionSpec: '5.x' }
+      - id: gv
+        uses: gittools/actions/gitversion/execute@v0
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - run: dotnet restore
+      - if: ${{ !inputs.skip-tests }}
+        run: dotnet test -c Release --no-restore
+      - name: Pack
+        run: dotnet pack -c Release -o ./artifacts /p:ContinuousIntegrationBuild=true
+      - name: Sign packages
+        if: ${{ env.SIGNING_CERTIFICATE != '' }}
+        env:
+          SIGNING_CERTIFICATE: ${{ secrets.SIGNING_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$SIGNING_CERTIFICATE" | base64 -d > cert.pfx
+          for nupkg in ./artifacts/*.nupkg; do
+            dotnet nuget sign "$nupkg" --certificate-path cert.pfx --timestamper http://timestamp.digicert.com -p "$CERTIFICATE_PASSWORD" || true
+          done
+      - uses: actions/upload-artifact@v4
+        with: { name: packages, path: ./artifacts/*.nupkg }
+
+  deploy-staging:
+    needs: build
+    if: ${{ inputs.environment == 'staging' || inputs.environment == 'canary' || inputs.environment == 'production' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: packages, path: ./artifacts }
+      - name: Push to staging feed
+        run: echo "Deploy to staging – replace with your feed"
+
+  deploy-canary:
+    needs: deploy-staging
+    if: ${{ inputs.environment == 'canary' || inputs.environment == 'production' }}
+    runs-on: ubuntu-latest
+    environment: canary
+    steps:
+      - run: echo "Canary 10% traffic – replace with deployment"
+
+  deploy-production:
+    needs: deploy-canary
+    if: ${{ inputs.environment == 'production' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: packages, path: ./artifacts }
+      - name: Push to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          for nupkg in ./artifacts/*.nupkg; do
+            dotnet nuget push "$nupkg" -k "$NUGET_API_KEY" -s https://api.nuget.org/v3/index.json --skip-duplicate
+          done
+
+  create-release:
+    needs: deploy-production
+    if: ${{ always() && inputs.environment == 'production' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate changelog
+        run: |
+          git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0)..HEAD > CHANGELOG.md || true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          body_path: CHANGELOG.md
+          files: ./artifacts/*.nupkg
