@@ -13,6 +13,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Commit lint
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: .commitlintrc.json
+          commitDepth: 1
+          failOnWarnings: false
 
       - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v4

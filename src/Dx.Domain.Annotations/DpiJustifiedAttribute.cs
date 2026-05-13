@@ -18,7 +18,8 @@ namespace Dx.Domain.Annotations;
 /// Documents a deviation from standard patterns with a DPI-aligned justification (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// This attribute imposes no runtime semantics. It records rationale for code review and audit trails. See Governance Docs → DPI / ADR Process.
+/// This attribute imposes no runtime semantics. It records rationale for code review and audit trails.
+/// See Governance Docs → DPI / ADR Process.
 ///
 /// <para><b>Example (non‑prescriptive):</b></para>
 /// <code><![CDATA[

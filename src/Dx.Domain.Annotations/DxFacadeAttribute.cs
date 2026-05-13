@@ -18,7 +18,8 @@ namespace Dx.Domain.Annotations;
 /// Marks a class as an approved domain facade boundary (pure metadata marker).
 /// </summary>
 /// <remarks>
-/// This attribute imposes no runtime semantics. Analyzers classify construction boundaries per DXA010/011/080. See Rule Charter → DXA010 Construction Discipline.
+/// This attribute imposes no runtime semantics. Analyzers classify construction boundaries
+/// per DXA010/011/080. See Rule Charter → DXA010 Construction Discipline.
 ///
 /// <para><b>Example (Kernel realization, non‑prescriptive):</b></para>
 /// <code><![CDATA[

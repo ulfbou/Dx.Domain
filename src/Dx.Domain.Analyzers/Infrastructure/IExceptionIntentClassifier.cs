@@ -18,7 +18,8 @@ namespace Dx.Domain.Analyzers.Infrastructure
     /// Defines a contract for classifying exception throw operations by their intent.
     /// </summary>
     /// <remarks>
-    /// This interface is used exclusively by analyzers to distinguish guard failures from domain faults. It carries analysis data only and imposes no runtime semantics outside compilation analysis.
+    /// This interface is used exclusively by analyzers to distinguish guard failures from domain faults.
+    /// It carries analysis data only and imposes no runtime semantics outside compilation analysis.
     /// </remarks>
     public interface IExceptionIntentClassifier
     {
