@@ -20,6 +20,27 @@ on:
         default: false
 
 jobs:
+  debug-info:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Debug info
+        run: |
+          echo "Release type: ${{ github.event.inputs.release-type }}"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Skip tests: ${{ github.event.inputs.skip-tests }}"
+
+      - name: Debug - list analyzer files
+        run: |
+          echo "=== Checking readme.md existence ==="
+          ls -la src/Dx.Domain.Analyzers/readme.md
+          echo "=== File content head ==="
+          head -5 src/Dx.Domain.Analyzers/readme.md
+          echo "=== Csproj PackageReadmeFile ==="
+          grep -i "PackageReadmeFile" src/Dx.Domain.Analyzers/Dx.Domain.Analyzers.csproj
+          echo "=== IncludeContentInPack ==="
+          grep -i "IncludeContentInPack" src/Dx.Domain.Analyzers/Dx.Domain.Analyzers.csproj
+
   validate:
     runs-on: ubuntu-latest
     steps:

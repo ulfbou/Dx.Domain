@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Dx.Domain.Primitives">
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Primitives</DxLayer>
@@ -12,7 +12,7 @@
     <Authors>Dx.Domain Team</Authors>
     <Company>Dx.Domain Team</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
     <!--<NoWarn>$(NoWarn);CS1591;DX1001</NoWarn>-->
     <Nullable>enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

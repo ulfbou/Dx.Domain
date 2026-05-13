@@ -5,10 +5,10 @@
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <Description>The Dx.Domain.Facts package provides immutable types for modeling domain facts.</Description>
-        <PackageTags>dx;ddd;facts;events;immutability</PackageTags>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>The Dx.Domain.Facts package provides immutable types for modeling domain facts.</Description>
+    <PackageTags>dx;ddd;facts;events;immutability</PackageTags>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup>
