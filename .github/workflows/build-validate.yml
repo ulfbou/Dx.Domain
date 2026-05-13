@@ -20,6 +20,7 @@ jobs:
         uses: wagoid/commitlint-github-action@v5
         with:
           configFile: .commitlintrc.json
+          commitDepth: true
 
       - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v4
