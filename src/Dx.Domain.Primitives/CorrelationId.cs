@@ -76,15 +76,15 @@ namespace Dx.Domain.Primitives
         /// <summary>
         /// General-purpose span formatting implementation used by composite formatting APIs.
         /// </summary>
-        /// <remarks>
-        /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to canonical format (<c>"N"</c>).
-        /// If <paramref name="provider"/> is <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
-        /// </remarks>
         /// <param name="destination">The span to write the formatted value into.</param>
         /// <param name="charsWritten">When this method returns, contains the number of characters written to the destination.</param>
         /// <param name="format">The format specifier. If <see langword="null"/> or empty, defaults to <c>"N"</c>.</param>
         /// <param name="provider">The format provider. If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.</param>
         /// <returns><see langword="true"/> if formatting succeeded; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to canonical format (<c>"N"</c>).
+        /// If <paramref name="provider"/> is <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
+        /// </remarks>
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
         {
             var normalizedFormat = format.IsEmpty ? "N" : format;
@@ -108,13 +108,13 @@ namespace Dx.Domain.Primitives
         /// <summary>
         /// Formats this identifier as a string using the specified format and culture.
         /// </summary>
+        /// <param name="format">The format specifier. If <see langword="null"/> or empty, defaults to <c>"N"</c>.</param>
+        /// <param name="formatProvider">The format provider. If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.</param>
+        /// <returns>A string representation of this correlation identifier.</returns>
         /// <remarks>
         /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to canonical format (<c>"N"</c>).
         /// If <paramref name="formatProvider"/> is <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
         /// </remarks>
-        /// <param name="format">The format specifier. If <see langword="null"/> or empty, defaults to <c>"N"</c>.</param>
-        /// <param name="formatProvider">The format provider. If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.</param>
-        /// <returns>A string representation of this correlation identifier.</returns>
         public string ToString(string? format, IFormatProvider? formatProvider)
             => Value.ToString(string.IsNullOrEmpty(format) ? "N" : format!, formatProvider ?? CultureInfo.InvariantCulture);
 

@@ -22,13 +22,14 @@ namespace Dx.Domain
     /// Represents the immutable result of an operation that can succeed with a value of type <typeparamref name="TValue"/> or fail
     /// with an error of type <typeparamref name="TError"/>.
     /// </summary>
+    /// <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
+    /// <typeparam name="TError">The type of the error returned when the operation fails.</typeparam>
     /// <remarks>
     /// This is the canonical functional result type, a discriminated union that explicitly models success and failure paths.
     /// Use <see cref="Result{TValue}"/> for the common case where <typeparamref name="TError"/> is fixed to <see cref="DomainError"/>.
     /// </remarks>
-    /// <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
-    /// <typeparam name="TError">The type of the error returned when the operation fails.</typeparam>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [ApprovedKernelApi("Generic Result<T,E> type for advanced functional patterns")]
     public readonly struct Result<TValue, TError> where TValue : notnull where TError : notnull
     {
         private readonly TValue? _value;
@@ -104,14 +105,14 @@ namespace Dx.Domain
         /// <summary>
         /// Deconstructs the result into its success status, value, and error information.
         /// </summary>
-        /// <remarks>This method enables deconstruction of the result into separate variables for pattern
-        /// matching or tuple assignment.</remarks>
         /// <param name="isSuccess">When this method returns, contains <see langword="true"/> if the result represents a success; otherwise,
         /// <see langword="false"/>.</param>
         /// <param name="value">When this method returns, contains the value of the result if it is successful; otherwise, the default value
         /// for the type.</param>
         /// <param name="error">When this method returns, contains the error information if the result represents a failure; otherwise, <see
         /// langword="null"/>.</param>
+        /// <remarks>This method enables deconstruction of the result into separate variables for pattern
+        /// matching or tuple assignment.</remarks>
         public void Deconstruct(out bool isSuccess, out TValue? value, out TError? error)
         {
             isSuccess = IsSuccess;
@@ -122,13 +123,13 @@ namespace Dx.Domain
         /// <summary>
         /// Deconstructs the result into its failure status, error, and value components.
         /// </summary>
-        /// <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into
-        /// separate variables for failure status, error, and value.</remarks>
         /// <param name="isFailure">When this method returns, contains <see langword="true"/> if the result represents a failure; otherwise,
         /// <see langword="false"/>.</param>
         /// <param name="error">When this method returns, contains the associated <see cref="DomainError"/> if the result is a failure;
         /// otherwise, <see langword="null"/>.</param>
         /// <param name="value">When this method returns, contains the value if the result is successful; otherwise, <see langword="null"/>.</param>
+        /// <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into
+        /// separate variables for failure status, error, and value.</remarks>
         public void Deconstruct(out bool isFailure, out TError? error, out TValue? value)
         {
             isFailure = IsFailure;
@@ -139,10 +140,10 @@ namespace Dx.Domain
         /// <summary>
         /// Deconstructs the result into its value component.
         /// </summary>
-        /// <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into its value
-        /// component using tuple deconstruction.</remarks>
         /// <param name="value">When this method returns, contains the value if the operation was successful; otherwise, the default value for the
         /// type.</param>
+        /// <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into its value
+        /// component using tuple deconstruction.</remarks>
         public void Deconstruct(out TValue? value)
         {
             value = _value;
@@ -153,6 +154,8 @@ namespace Dx.Domain
         /// </summary>
         /// <param name="error">When this method returns, contains the associated error if the result is a failure; otherwise, <see
         /// langword="null"/>.</param>
+        /// <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into its error
+        /// component using tuple deconstruction.</remarks>
         public void Deconstruct(out TError? error)
         {
             error = _error;

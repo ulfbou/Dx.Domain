@@ -18,6 +18,7 @@ namespace Dx.Domain
     /// Unit type used for Result operations that return no value.
     /// </summary>
     [DebuggerDisplay("Unit")]
+    [ApprovedKernelApi("Void-like type for operations with no return value")]
     public readonly record struct Unit
     {
         /// <summary>Gets the singleton value of the Unit type.</summary>

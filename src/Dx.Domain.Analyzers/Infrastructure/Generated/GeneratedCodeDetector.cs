@@ -25,7 +25,8 @@ namespace Dx.Domain.Analyzers.Infrastructure.Generated
     /// </summary>
     /// <remarks>
     /// This type is used exclusively by analyzers to suppress diagnostics on generated sources.
-    /// Detection is based on <see cref="GeneratedCodeAttribute"/>, <c>CompilerGeneratedAttribute</c>, and namespace markers configured via the <c>dx_generated_markers</c> analyzer option.
+    /// Detection is based on <see cref="GeneratedCodeAttribute"/>, <c>CompilerGeneratedAttribute</c>,
+    /// and namespace markers configured via the <c>dx_generated_markers</c> analyzer option.
     /// It carries analysis configuration only and imposes no runtime semantics outside compilation analysis.
     /// </remarks>
     public sealed class GeneratedCodeDetector : IGeneratedCodeDetector
