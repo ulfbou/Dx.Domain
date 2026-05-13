@@ -53,4 +53,7 @@
     <None Include="buildTransitive\Dx.Domain.Kernel.targets" Pack="true" PackagePath="buildTransitive" />
     <None Update="..\..\LICENSE" Link="docs/LICENSE" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>
