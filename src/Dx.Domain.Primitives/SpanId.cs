@@ -144,15 +144,15 @@ namespace Dx.Domain.Primitives
         /// <summary>
         /// Formats this identifier as a string using the specified format and culture.
         /// </summary>
-        /// <remarks>
-        /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to canonical format (<c>"x16"</c>).
-        /// If <paramref name="formatProvider"/> is <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
-        /// </remarks>
         /// <param name="format">The format specifier. If <see langword="null"/> or empty, defaults to <c>"x16"</c>.</param>
         /// <param name="formatProvider">
         /// The format provider. If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
         /// </param>
         /// <returns>A formatted string representation of this identifier.</returns>
+        /// <remarks>
+        /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to canonical format (<c>"x16"</c>).
+        /// If <paramref name="formatProvider"/> is <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
+        /// </remarks>
         public string ToString(string? format, IFormatProvider? formatProvider)
             => Value.ToString(string.IsNullOrEmpty(format) ? "x16" : format!, formatProvider ?? CultureInfo.InvariantCulture);
 

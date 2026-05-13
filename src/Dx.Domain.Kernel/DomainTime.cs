@@ -30,6 +30,7 @@ namespace Dx.Domain
     /// The <see cref="Utc"/> value is always normalized to UTC with an offset of zero.
     /// </para>
     /// </remarks>
+    [ApprovedKernelApi("UTC timestamp primitive for deterministic time invariants")]
     public readonly record struct DomainTime
     {
         /// <summary>

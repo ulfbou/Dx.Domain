@@ -25,6 +25,7 @@ namespace Dx.Domain
     /// </summary>
     /// <typeparam name="TValue">Successful value type.</typeparam>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [ApprovedKernelApi("Canonical Result<T> type for functional error handling")]
     public readonly struct Result<TValue> where TValue : notnull
     {
         private readonly TValue? _value;

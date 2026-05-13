@@ -22,6 +22,7 @@ namespace Dx.Domain.Errors
     /// Errors are value objects: immutable, explicit, and non-exceptional by default.
     /// </summary>
     [DebuggerDisplay("{Code,nq}")]
+    [ApprovedKernelApi("Error value object for explicit result propagation")]
     public readonly struct DomainError : IEquatable<DomainError>
     {
         /// <summary>

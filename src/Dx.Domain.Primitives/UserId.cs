@@ -114,13 +114,13 @@ namespace Dx.Domain.Primitives
         /// <summary>
         /// Formats this identifier as a string using the specified format and culture.
         /// </summary>
+        /// <param name="format">The format specifier. If <see langword="null"/> or empty, defaults to <c>"N"</c>.</param>
+        /// <param name="formatProvider">The format provider. If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.</param>
+        /// <returns>A string representation of this actor identifier.</returns>
         /// <remarks>
         /// If <paramref name="format"/> is <see langword="null"/> or empty, defaults to canonical format (<c>"N"</c>).
         /// If <paramref name="formatProvider"/> is <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
         /// </remarks>
-        /// <param name="format">The format specifier. If <see langword="null"/> or empty, defaults to <c>"N"</c>.</param>
-        /// <param name="formatProvider">The format provider. If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.</param>
-        /// <returns>A string representation of this actor identifier.</returns>
         public string ToString(string? format, IFormatProvider? formatProvider)
             => Value.ToString(string.IsNullOrEmpty(format) ? "N" : format!, formatProvider ?? CultureInfo.InvariantCulture);
 

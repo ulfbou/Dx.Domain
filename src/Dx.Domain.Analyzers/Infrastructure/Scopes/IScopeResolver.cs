@@ -18,7 +18,8 @@ namespace Dx.Domain.Analyzers.Infrastructure.Scopes
     /// Defines a contract for resolving architectural scope for assemblies and symbols.
     /// </summary>
     /// <remarks>
-    /// This interface is used exclusively by analyzers to enforce layering rules. It carries analysis configuration only and imposes no runtime semantics outside compilation analysis.
+    /// This interface is used exclusively by analyzers to enforce layering rules. It carries analysis configuration
+    /// only and imposes no runtime semantics outside compilation analysis.
     /// </remarks>
     public interface IScopeResolver
     {
