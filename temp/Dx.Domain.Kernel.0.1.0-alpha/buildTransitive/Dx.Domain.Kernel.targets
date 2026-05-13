@@ -1,0 +1,3 @@
+<Project>
+  <Import Project="Dx.Domain.targets" Condition="Exists('$(MSBuildThisFileDirectory)Dx.Domain.targets')" />
+</Project>

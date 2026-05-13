@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Dx.Domain.Annotations</id>
+    <version>0.1.0-alpha</version>
+    <authors>Dx.Domain Team</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <readme>readme.md</readme>
+    <projectUrl>https://github.com/ulfbou/dx.domain</projectUrl>
+    <description>Semantic vocabulary for Dx.Domain (pure metadata: markers, attributes, canon).</description>
+    <tags>dx ddd annotations attributes domain-model</tags>
+    <repository type="git" url="https://github.com/ulfbou/Dx.Domain" commit="3e16b6d7e6ee3ba7a8e1546ba325c8eedcda0fba" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+</package>

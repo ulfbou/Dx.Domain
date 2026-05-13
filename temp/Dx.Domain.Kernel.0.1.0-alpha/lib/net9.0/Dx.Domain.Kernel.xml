@@ -1,0 +1,1506 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Dx.Domain.Kernel</name>
+    </assembly>
+    <members>
+        <member name="T:Dx.Domain.DomainTime">
+            <summary>
+            Represents a UTC timestamp used by the kernel.
+            </summary>
+            <remarks>
+            <para>
+            This type is immutable and thread-safe. It carries no mutable state.
+            </para>
+            <para>
+            Kernel policy: only monotonic checks are performed; no clock correction is applied.
+            </para>
+            <para>
+            The <see cref="P:Dx.Domain.DomainTime.Utc"/> value is always normalized to UTC with an offset of zero.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Dx.Domain.DomainTime.Utc">
+            <summary>
+            Gets the UTC timestamp.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.DomainTime.Now">
+            <summary>
+            Gets the current timestamp.
+            </summary>
+            <returns>A new <see cref="T:Dx.Domain.DomainTime"/> representing the current UTC time.</returns>
+        </member>
+        <member name="M:Dx.Domain.DomainTime.From(System.DateTimeOffset)">
+            <summary>
+            Creates a <see cref="T:Dx.Domain.DomainTime"/> from the specified UTC value.
+            </summary>
+            <param name="utc">The UTC value. Must have an offset of zero.</param>
+            <returns>A new <see cref="T:Dx.Domain.DomainTime"/> instance.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="utc"/> does not have an offset of zero.</exception>
+        </member>
+        <member name="T:Dx.Domain.DxK">
+            <summary>
+            Internal kernel facade providing mechanical support for canonical patterns.
+            </summary>
+            <remarks>
+            <para>
+            <b>Purpose:</b> Centralize mechanical, non-semantic kernel utilities:
+            <list type="bullet">
+            <item>Canonical error code constants</item>
+            <item>Error construction helpers</item>
+            <item>Invariant hook centralization</item>
+            <item>Internal factory funnels (if needed)</item>
+            </list>
+            </para>
+            <para>
+            <b>Constraints:</b>
+            <list type="number">
+            <item>Internal only (never public)</item>
+            <item>No ambient context (no static state, ThreadLocal, HttpContext)</item>
+            <item>No business semantics</item>
+            <item>No time/policy opinions</item>
+            <item>Mechanical support only</item>
+            </list>
+            </para>
+            <para>
+            This facade is consistent with "kernel forbids semantic expansion, not mechanical support."
+            It does NOT violate the kernel minimization principle because it provides infrastructure
+            for the structural spine, not domain-specific behavior.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Dx.Domain.DxK.Codes">
+            <summary>
+            Canonical error code constants.
+            </summary>
+            <remarks>
+            Error codes are:
+            <list type="bullet">
+            <item>Namespaced with "dx.kernel.*" prefix</item>
+            <item>Never reused for unrelated semantics</item>
+            <item>Append-only (never remove or change meaning)</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="F:Dx.Domain.DxK.Codes.Domain_InvalidTransition">
+            <summary>Domain transition violated invariants.</summary>
+        </member>
+        <member name="F:Dx.Domain.DxK.Codes.Domain_FactPayloadNull">
+            <summary>Fact payload was <see langword="null"/> when required.</summary>
+        </member>
+        <member name="F:Dx.Domain.DxK.Codes.Identity_InvalidFormat">
+            <summary>Identity value format is invalid.</summary>
+        </member>
+        <member name="F:Dx.Domain.DxK.Codes.Identity_Empty">
+            <summary>Identity value is empty when required.</summary>
+        </member>
+        <member name="F:Dx.Domain.DxK.Codes.Result_OperationOnFailure">
+            <summary>Result operation attempted on failed Result.</summary>
+        </member>
+        <member name="F:Dx.Domain.DxK.Codes.Invariant_Violation">
+            <summary>Invariant violation (structural constraint broken).</summary>
+        </member>
+        <member name="M:Dx.Domain.DxK.Err(System.String,System.String)">
+            <summary>
+            Canonical error constructor (mechanical only, no side effects).
+            </summary>
+            <param name="code">Error code from <see cref="T:Dx.Domain.DxK.Codes"/>.</param>
+            <param name="message">Human-readable error message.</param>
+            <returns>A <see cref="T:Dx.Domain.Errors.DomainError"/> instance.</returns>
+            <remarks>
+            This is a convenience helper to ensure consistent error construction.
+            It has no ambient context, no logging, no side effects.
+            </remarks>
+        </member>
+        <member name="T:Dx.Domain.Errors.DomainError">
+            <summary>
+            Represents a stable, comparable domain error.
+            Errors are value objects: immutable, explicit, and non-exceptional by default.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.DomainError.Code">
+            <summary>
+            Gets a stable, machine-readable error code.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.DomainError.Message">
+            <summary>
+            Gets a human-readable description of the error.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.DomainError.Metadata">
+            <summary>
+            Gets a collection of metadata associated with the current instance.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.Errors.DomainError.Create(System.String,System.String,System.Nullable{System.Collections.Immutable.ImmutableArray{System.Collections.Generic.KeyValuePair{System.String,System.Object}}})">
+            <summary>
+            Creates a new instance of the DomainError class with the specified error code and message.
+            </summary>
+            <param name="code">The unique code that identifies the type of domain error. Cannot be <see langword="null"/> or empty.</param>
+            <param name="message">The descriptive message that explains the error. Cannot be <see langword="null"/>.</param>
+            <param name="metadata">Metadata associated with the error. Cannot be <see langword="null"/>.</param>
+            <returns>A new DomainError instance initialized with the specified code and message.</returns>
+        </member>
+        <member name="M:Dx.Domain.Errors.DomainError.Enrich(System.String,System.String)">
+            <summary>
+            Returns a new instance of the current error with the specified metadata key and value added or updated.
+            </summary>
+            <param name="key">The metadata key to add or update. Cannot be <see langword="null"/>.</param>
+            <param name="value">The value to associate with the specified metadata key. Cannot be <see langword="null"/>.</param>
+            <returns>A new <see cref="T:Dx.Domain.Errors.DomainError"/> instance that includes the specified metadata key and value.</returns>
+        </member>
+        <member name="M:Dx.Domain.Errors.DomainError.Equals(Dx.Domain.Errors.DomainError)">
+            <inheritdoc />
+        </member>
+        <member name="M:Dx.Domain.Errors.DomainError.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Dx.Domain.Errors.DomainError.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Dx.Domain.Errors.DomainError.op_Equality(Dx.Domain.Errors.DomainError,Dx.Domain.Errors.DomainError)">
+            <inheritdoc />
+        </member>
+        <member name="M:Dx.Domain.Errors.DomainError.op_Inequality(Dx.Domain.Errors.DomainError,Dx.Domain.Errors.DomainError)">
+            <inheritdoc />
+        </member>
+        <member name="M:Dx.Domain.Errors.DomainError.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Dx.Domain.Errors.InvariantError">
+            <summary>
+            Represents detailed diagnostic information for a violated invariant.
+            </summary>
+            <remarks>
+            <para>
+            <see cref="T:Dx.Domain.Errors.InvariantError"/> captures structural diagnostic context for invariant violations
+            (domain error, caller info, soft correlation, timestamp) without depending on typed identity primitives.
+            </para>
+            <para>
+            This preserves Kernel Law 3 ("Diagnostics as Data") while avoiding Primitives dependencies.
+            Correlation metadata is provided as strings or Guids by the caller, not typed identity structs.
+            </para>
+            <para>
+            For domain failures crossing boundaries without diagnostic context, use <see cref="P:Dx.Domain.Errors.InvariantError.DomainError"/> instead.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Dx.Domain.Errors.InvariantError.DomainError">
+            <summary>
+            Gets the domain error associated with the invariant violation.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.InvariantError.MessageOverride">
+            <summary>
+            Gets an optional message override to use instead of <see cref="P:Dx.Domain.Errors.DomainError.Message"/>.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.InvariantError.Member">
+            <summary>
+            Gets the member name where the invariant was violated (via CallerMemberName).
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.InvariantError.FileName">
+            <summary>
+            Gets the source file name where the invariant was violated (via CallerFilePath).
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.InvariantError.Line">
+            <summary>
+            Gets the line number where the invariant was violated (via CallerLineNumber).
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.InvariantError.UtcTimestamp">
+            <summary>
+            Gets the UTC timestamp when the invariant violation was recorded.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.Errors.InvariantError.Create(Dx.Domain.Errors.DomainError,System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Creates a new <see cref="T:Dx.Domain.Errors.InvariantError"/> with diagnostic context.
+            </summary>
+            <param name="domainError">The domain error describing the invariant violation.</param>
+            <param name="messageOverride">Optional message to override the domain error's default message.</param>
+            <param name="member">Caller member name (auto-populated via CallerMemberName).</param>
+            <param name="file">Caller file path (auto-populated via CallerFilePath).</param>
+            <param name="line">Caller line number (auto-populated via CallerLineNumber).</param>
+            <returns>A new <see cref="T:Dx.Domain.Errors.InvariantError"/> instance.</returns>
+            <remarks>
+            This method is intended for internal use to capture detailed context about where and
+            why an invariant violation occurred. Caller information is automatically populated by
+            the compiler and should not be set manually.
+            </remarks>
+        </member>
+        <member name="P:Dx.Domain.Errors.InvariantError.EffectiveMessage">
+            <summary>
+            Gets the effective message for the invariant violation, using <see cref="P:Dx.Domain.Errors.InvariantError.MessageOverride"/>
+            when present and falling back to <see cref="P:Dx.Domain.Errors.DomainError.Message"/> otherwise.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Errors.InvariantError.Code">
+            <summary>
+            Gets the effective error code from the wrapped <see cref="P:Dx.Domain.Errors.InvariantError.DomainError"/>.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.Errors.InvariantError.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Dx.Domain.InvariantViolationException">
+            <summary>
+            Represents an exception that is thrown when an invariant condition is violated.
+            </summary>
+            <remarks>This exception is typically used to signal that a program invariant has been broken,
+            indicating a serious error in program logic. The associated diagnostic information provides details about the
+            specific invariant that was violated.</remarks>
+        </member>
+        <member name="P:Dx.Domain.InvariantViolationException.Diagnostic">
+            <summary>Gets the diagnostic information describing the violated invariant.</summary>
+        </member>
+        <member name="P:Dx.Domain.InvariantViolationException.Message">
+            <inheritdoc />
+        </member>
+        <member name="M:Dx.Domain.InvariantViolationException.#ctor(Dx.Domain.Errors.InvariantError,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Dx.Domain.InvariantViolationException"/> class.
+            </summary>
+            <param name="diagnostic">The diagnostic information for the violated invariant.</param>
+            <param name="ex">The inner exception that caused this exception, if any.</param>
+        </member>
+        <member name="T:Dx.Domain.Invariant">
+            <summary>
+            Provides assertion‑style invariant enforcement.
+            </summary>
+            <remarks>
+            <para>
+            Invariants represent <em>structural truths</em> of the domain model.
+            Violating an invariant indicates either a programmer error or a corrupt
+            internal state.
+            </para>
+            <para>
+            <strong>Invariant methods throw exceptions on failure.</strong>
+            They are intended for kernel, infrastructure, or otherwise trusted code
+            paths where recovery is neither meaningful nor expected.
+            </para>
+            <para>
+            For recoverable, flow‑oriented validation that should not throw,
+            use <see cref="T:Dx.Domain.Dx.Require"/> instead.
+            </para>
+            </remarks>
+            <seealso cref="T:Dx.Domain.Dx.Require"/>
+        </member>
+        <member name="M:Dx.Domain.Invariant.That(System.Boolean,System.String,System.String)">
+            <summary>
+            Asserts that the specified condition holds.
+            </summary>
+            <param name="condition">
+            The condition to evaluate. If <see langword="false"/>, the invariant is violated.
+            </param>
+            <param name="code">
+            A stable, machine‑readable error code identifying the invariant.
+            </param>
+            <param name="message">
+            A human‑readable description of the invariant violation.
+            </param>
+            <exception cref="T:Dx.Domain.InvariantViolationException">
+            Thrown when <paramref name="condition"/> evaluates to <see langword="false"/>.
+            </exception>
+            <remarks>
+            <para>
+            This overload is appropriate when the invariant cost is trivial and
+            no contextual data must be computed lazily.
+            </para>
+            <para>
+            If error construction is expensive or context‑dependent, use the
+            factory‑based overload instead.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Dx.Domain.Invariant.That(System.Boolean,System.Func{System.ValueTuple{System.String,System.String}})">
+            <summary>
+            Asserts that the specified condition holds, using lazy error construction.
+            </summary>
+            <param name="condition">
+            The condition to evaluate. If <see langword="false"/>, the invariant is violated.
+            </param>
+            <param name="errorFactory">
+            A factory that produces the invariant error code and message.
+            The factory is invoked only if the condition fails.
+            </param>
+            <exception cref="T:Dx.Domain.InvariantViolationException">
+            Thrown when <paramref name="condition"/> evaluates to <see langword="false"/>.
+            </exception>
+            <remarks>
+            <para>
+            This overload avoids allocating error data on successful code paths
+            and enables richer context capture at the point of failure.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Dx.Domain.Dx">
+            <summary>
+            Represents the primary entry point for Dx.Domain kernel operations.
+            </summary>
+            <remarks>
+            This type provides factory and guard methods for domain construction. It imposes no mutable state and is thread-safe.
+            </remarks>
+        </member>
+        <member name="T:Dx.Domain.Dx.Require">
+            <summary>
+            Represents validation-style invariant checks that return failed Results instead of throwing exceptions.
+            </summary>
+            <remarks>
+            <para>
+            <c>Require</c> represents <em>recoverable domain validation</em>. A failed requirement indicates that an operation cannot proceed, but does not represent a corrupted program state or programming error.
+            </para>
+            <para>
+            In contrast to <see cref="T:Dx.Domain.Invariant"/>, methods on this class <strong>never throw</strong> as a result of validation failure. All outcomes are expressed as <see cref="T:Dx.Domain.Dx.Result"/> values and are therefore composable, inspectable, and analyzable.
+            </para>
+            <para>
+            This class is the primary validation surface intended for third-party, application-level, and flow-oriented domain logic.
+            </para>
+            </remarks>
+            <seealso cref="T:Dx.Domain.Invariant"/>
+            <seealso cref="T:Dx.Domain.Dx.Result"/>
+        </member>
+        <member name="M:Dx.Domain.Dx.Require.That(System.Boolean,Dx.Domain.Errors.DomainError)">
+            <summary>
+            Validates that the specified condition holds using an eagerly supplied <see cref="T:Dx.Domain.Errors.InvariantError"/>.
+            </summary>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="error">The invariant error describing the validation failure. The error value is captured eagerly.</param>
+            <returns>A successful <see cref="T:Dx.Domain.Result`1"/> if the condition holds; otherwise a failed Result containing <paramref name="error"/>.</returns>
+            <remarks>
+            <para>
+            This overload should be used when error construction is inexpensive and independent of runtime context.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Dx.Domain.Dx.Require.That(System.Boolean,System.Func{Dx.Domain.Errors.DomainError})">
+            <summary>
+            Validates that the specified condition holds using lazy <see cref="T:Dx.Domain.Errors.DomainError"/> construction.
+            </summary>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="errorFactory">A factory that lazily produces the domain error. The factory is invoked only when the condition fails.</param>
+            <returns>A successful <see cref="T:Dx.Domain.Result`1"/> if the condition holds; otherwise a failed Result containing the produced error.</returns>
+            <remarks>
+            <para>
+            This overload avoids unnecessary allocations on successful code paths and allows richer contextual information to be captured at the point of failure.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Dx.Domain.Dx.Require.That``1(System.Boolean,``0,Dx.Domain.Errors.DomainError)">
+            <summary>
+            Validates that the specified condition holds using an eagerly supplied <see cref="T:Dx.Domain.Errors.DomainError"/>.
+            </summary>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="value">The value to wrap in the result if the condition holds.</param>
+            <param name="error">The domain error describing the validation failure.</param>
+            <returns>A successful <see cref="T:Dx.Domain.Result`1"/> if the condition holds; otherwise a failed Result containing <paramref name="error"/>.</returns>
+            <remarks>
+            <para>
+            Domain errors typically represent business-rule violations or invalid user input rather than structural domain corruption.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Dx.Domain.Dx.Require.That``1(System.Boolean,``0,System.Func{Dx.Domain.Errors.DomainError})">
+            <summary>
+            Validates that the specified condition holds using lazy <see cref="T:Dx.Domain.Errors.DomainError"/> construction.
+            </summary>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="value">The value to wrap in the result if the condition holds.</param>
+            <param name="errorFactory">A factory that lazily produces the domain error. The factory is invoked only when the condition fails.</param>
+            <returns>A successful <see cref="T:Dx.Domain.Result`1"/> if the condition holds; otherwise a failed Result containing the produced error.</returns>
+            <remarks>
+            <para>
+            This overload should be preferred when error construction depends on runtime state or diagnostic context.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Dx.Domain.Dx.Require.That``1(System.Boolean,``0)">
+            <summary>
+            Validates that the specified condition holds using an eagerly supplied strongly typed error value.
+            </summary>
+            <typeparam name="TError">The type of the error value.</typeparam>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="error">The error value describing the validation failure.</param>
+            <returns>A successful <see cref="T:Dx.Domain.Result`2"/> if the condition holds; otherwise a failed Result containing <paramref name="error"/>.</returns>
+            <remarks>
+            <para>
+            This overload enables domain-specific error models while preserving Result-based control flow.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Dx.Domain.Dx.Require.That``1(System.Boolean,System.Func{``0})">
+            <summary>
+            Validates that the specified condition holds using lazy construction of a strongly typed error value.
+            </summary>
+            <typeparam name="TError">The type of the error value.</typeparam>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="errorFactory">A factory that lazily produces the error value.</param>
+            <returns>A successful <see cref="T:Dx.Domain.Result`2"/> if the condition holds; otherwise a failed Result containing the produced error.</returns>
+            <remarks>
+            <para>
+            This overload maximizes composability while avoiding premature allocation or capture of error data.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Dx.Domain.Dx.Require.That``2(System.Boolean,``0,``1)">
+            <summary>
+            Determines whether the specified condition holds and returns the specified value.
+            </summary>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <typeparam name="TError">The type of the error.</typeparam>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="value">The value to return when <paramref name="condition"/> is <see langword="true"/>.</param>
+            <param name="error">The error to use when <paramref name="condition"/> is <see langword="false"/>.</param>
+            <returns>A successful <see cref="T:Dx.Domain.Result`2"/> containing <paramref name="value"/> if the condition holds; otherwise a failed result containing <paramref name="error"/>.</returns>
+        </member>
+        <member name="M:Dx.Domain.Dx.Require.That``2(System.Boolean,``0,System.Func{``1})">
+            <summary>
+            Determines whether the specified condition holds and returns the specified value.
+            </summary>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <typeparam name="TError">The type of the error.</typeparam>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="value">The value to return when <paramref name="condition"/> is <see langword="true"/>.</param>
+            <param name="errorFactory">The factory that creates the error when <paramref name="condition"/> is <see langword="false"/>.</param>
+            <returns>A successful <see cref="T:Dx.Domain.Result`2"/> containing <paramref name="value"/> if the condition holds; otherwise a failed result containing the produced error.</returns>
+        </member>
+        <member name="T:Dx.Domain.Dx.Result">
+            <summary>
+            Provides canonical factory methods for constructing <see cref="T:Dx.Domain.Dx.Result"/> values.
+            </summary>
+            <remarks>
+            <para>
+            This class defines the <strong>single authoritative construction surface</strong>
+            for all <see cref="T:Dx.Domain.Dx.Result"/> instances.
+            </para>
+            <para>
+            Direct instantiation, alternative factories, or ad‑hoc construction
+            mechanisms are intentionally prohibited and analyzer‑enforced.
+            </para>
+            <para>
+            All methods on this class are pure, side‑effect free, and deterministic.
+            They perform no logging, IO, or policy evaluation.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Dx.Domain.Dx.Result.Success">
+            <summary>
+            Creates a successful Result with no value.
+            </summary>
+            <returns>
+            A successful <see cref="T:Dx.Domain.Result`1"/>.
+            </returns>
+        </member>
+        <member name="M:Dx.Domain.Dx.Result.Success``1(``0)">
+            <summary>
+            Creates a successful Result containing the specified value.
+            </summary>
+            <typeparam name="TValue">
+            The type of the success value.
+            </typeparam>
+            <param name="value">
+            The value to wrap in a successful Result.
+            </param>
+            <returns>
+            A successful <see cref="T:Dx.Domain.Result`1"/> containing <paramref name="value"/>.
+            </returns>
+        </member>
+        <member name="M:Dx.Domain.Dx.Result.Success``2(``0)">
+            <summary>
+            Creates a successful result containing the specified value.
+            </summary>
+            <typeparam name="TValue">The type of the success value.</typeparam>
+            <typeparam name="TError">The type of the error value.</typeparam>
+            <param name="value">The success value to wrap in the result.</param>
+            <returns>A successful result containing the specified value.</returns>
+        </member>
+        <member name="M:Dx.Domain.Dx.Result.Failure``1(Dx.Domain.Errors.DomainError)">
+            <summary>
+            Creates a failed Result using an eagerly supplied domain error.
+            </summary>
+            <typeparam name="TValue">
+            The type of the success value.
+            </typeparam>
+            <param name="error">
+            The domain error describing the failure.
+            </param>
+            <returns>
+            A failed <see cref="T:Dx.Domain.Result`1"/> containing <paramref name="error"/>.
+            </returns>
+        </member>
+        <member name="M:Dx.Domain.Dx.Result.Failure``1(System.Func{Dx.Domain.Errors.DomainError})">
+            <summary>
+            Creates a failed Result using lazy domain error construction.
+            </summary>
+            <typeparam name="TValue">
+            The type of the success value.
+            </typeparam>
+            <param name="errorFactory">
+            A factory that lazily produces the domain error.
+            The factory is evaluated only on failure.
+            </param>
+            <returns>
+            A failed <see cref="T:Dx.Domain.Result`1"/> containing the produced error.
+            </returns>
+        </member>
+        <member name="M:Dx.Domain.Dx.Result.Failure``2(``1)">
+            <summary>
+            Creates a failed Result with a strongly typed error value.
+            </summary>
+            <typeparam name="TValue">
+            The type of the success value.
+            </typeparam>
+            <typeparam name="TError">
+            The type of the error value.
+            </typeparam>
+            <param name="error">
+            The error value describing the failure.
+            </param>
+            <returns>
+            A failed <see cref="T:Dx.Domain.Result`2"/> containing <paramref name="error"/>.
+            </returns>
+        </member>
+        <member name="M:Dx.Domain.Dx.Result.Failure``2(System.Func{``1})">
+            <summary>
+            Creates a failed Result with a lazily produced error value.
+            </summary>
+            <typeparam name="TValue">
+            The type of the success value.
+            </typeparam>
+            <typeparam name="TError">
+            The type of the error value.
+            </typeparam>
+            <param name="errorFactory">
+            A factory that lazily produces the error value.
+            </param>
+            <returns>
+            A failed <see cref="T:Dx.Domain.Result`2"/> containing the produced error.
+            </returns>
+        </member>
+        <member name="T:Dx.Domain.ResultExtensions">
+            <summary>
+            Provides extension methods for composing, transforming, and handling results in a functional style.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Map``2(Dx.Domain.Result{``0},System.Func{``0,``1})">
+            <summary>
+            Transforms the success value of a <see cref="T:Dx.Domain.Result`1"/> using the specified mapping function.
+            </summary>
+            <typeparam name="TIn">The type of the source value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the mapped value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="mapFunc">The mapping function to apply to the success value. Must not be <see langword="null"/>.</param>
+            <returns>A new <see cref="T:Dx.Domain.Result`1"/> containing the mapped value if <paramref name="result"/> is successful; otherwise, a failure result containing the original error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="mapFunc"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="mapFunc"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.MapAsync``2(Dx.Domain.Result{``0},System.Func{``0,System.Threading.Tasks.Task{``1}})">
+            <summary>
+            Transforms the success value of a <see cref="T:Dx.Domain.Result`1"/> asynchronously using the specified mapping function.
+            </summary>
+            <typeparam name="TIn">The type of the source value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the mapped value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="map">The asynchronous mapping function to apply to the success value. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains a new <see cref="T:Dx.Domain.Result`1"/> with the mapped value if successful; otherwise, the original error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="map"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="map"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Bind``2(Dx.Domain.Result{``0},System.Func{``0,Dx.Domain.Result{``1}})">
+            <summary>
+            Binds the success value of a <see cref="T:Dx.Domain.Result`1"/> to a new result using the specified binding function.
+            </summary>
+            <typeparam name="TIn">The type of the source value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the bound value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="bindFunc">The binding function to apply to the success value. Must not be <see langword="null"/>.</param>
+            <returns>The result produced by <paramref name="bindFunc"/> if <paramref name="result"/> is successful; otherwise, a failure result containing the original error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="bindFunc"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="bindFunc"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.BindAsync``2(Dx.Domain.Result{``0},System.Func{``0,System.Threading.Tasks.Task{Dx.Domain.Result{``1}}})">
+            <summary>
+            Binds the success value of a <see cref="T:Dx.Domain.Result`1"/> to a new result asynchronously using the specified binding function.
+            </summary>
+            <typeparam name="TIn">The type of the source value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the bound value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="bindFunc">The asynchronous binding function to apply to the success value. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains the bound result if successful; otherwise, the original error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="bindFunc"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="bindFunc"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Tap``1(Dx.Domain.Result{``0},System.Action{``0})">
+            <summary>
+            Executes the specified action if the result is successful, returning the original result unchanged.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="action">The action to execute on the success value. Must not be <see langword="null"/>.</param>
+            <returns>The original <paramref name="result"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.TapAsync``1(Dx.Domain.Result{``0},System.Func{``0,System.Threading.Tasks.Task})">
+            <summary>
+            Executes the specified asynchronous action if the result is successful, returning the original result unchanged.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="action">The asynchronous action to execute on the success value. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains the original <paramref name="result"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Ensure``1(Dx.Domain.Result{``0},System.Func{``0,System.Boolean},Dx.Domain.Errors.DomainError)">
+            <summary>
+            Ensures the success value satisfies the specified predicate, otherwise returns a failure with the provided error.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="predicate">The predicate to evaluate against the success value. Must not be <see langword="null"/>.</param>
+            <param name="error">The error to return if <paramref name="predicate"/> returns <see langword="false"/>.</param>
+            <returns>The original result if the predicate is satisfied; otherwise, a failure result containing <paramref name="error"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> throws an exception. The original
+            exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Ensure``1(Dx.Domain.Result{``0},System.Func{``0,System.Boolean},System.Func{Dx.Domain.Errors.DomainError})">
+            <summary>
+            Ensures the success value satisfies the specified predicate, otherwise returns a failure with an error produced by the factory.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="predicate">The predicate to evaluate against the success value. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory function that produces the error when the predicate fails. Must not be <see langword="null"/>.</param>
+            <returns>The original result if the predicate is satisfied; otherwise, a failure result containing the produced error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.EnsureAsync``1(Dx.Domain.Result{``0},System.Func{``0,System.Threading.Tasks.Task{System.Boolean}},Dx.Domain.Errors.DomainError)">
+            <summary>
+            Ensures the success value satisfies the specified asynchronous predicate, otherwise returns a failure with the provided error.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="predicate">The asynchronous predicate to evaluate against the success value. Must not be <see langword="null"/>.</param>
+            <param name="error">The error to return if <paramref name="predicate"/> returns <see langword="false"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains the original result if satisfied; otherwise, a failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.EnsureAsync``1(Dx.Domain.Result{``0},System.Func{``0,System.Threading.Tasks.Task{System.Boolean}},System.Func{System.Threading.Tasks.Task{Dx.Domain.Errors.DomainError}})">
+            <summary>
+            Ensures the success value satisfies the specified asynchronous predicate, otherwise returns a failure with an error produced asynchronously.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="predicate">The asynchronous predicate to evaluate against the success value. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The asynchronous factory that produces the error when the predicate fails. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains the original result if satisfied; otherwise, a failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Recover``1(Dx.Domain.Result{``0},System.Func{Dx.Domain.Errors.DomainError,``0})">
+            <summary>
+            Recovers from a failure by transforming the error into a success value using the specified recovery function.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="recoveryFunc">The recovery function that produces a value from the error. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing the recovered value if <paramref name="result"/> is a failure; otherwise, the original result.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recoveryFunc"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recoveryFunc"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Recover``1(Dx.Domain.Result{``0},System.Func{Dx.Domain.Errors.DomainError,Dx.Domain.Result{``0}})">
+            <summary>
+            Recovers from a failure by producing a new result using the specified recovery function.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="recoveryFunc">The recovery function that produces a result from the error. Must not be <see langword="null"/>.</param>
+            <returns>The result produced by <paramref name="recoveryFunc"/> if <paramref name="result"/> is a failure; otherwise, the original result.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recoveryFunc"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recoveryFunc"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.RecoverAsync``1(Dx.Domain.Result{``0},System.Func{Dx.Domain.Errors.DomainError,System.Threading.Tasks.Task{``0}})">
+            <summary>
+            Recovers from a failure asynchronously by transforming the error into a success value.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="recoveryFunc">The asynchronous recovery function that produces a value from the error. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains the recovered success if applicable.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recoveryFunc"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recoveryFunc"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.RecoverAsync``1(Dx.Domain.Result{``0},System.Func{Dx.Domain.Errors.DomainError,System.Threading.Tasks.Task{Dx.Domain.Result{``0}}})">
+            <summary>
+            Recovers from a failure asynchronously by producing a new result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="recovery">The asynchronous recovery function that produces a result from the error. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains the recovered result if applicable.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Match``2(Dx.Domain.Result{``1},System.Func{``1,``0},System.Func{Dx.Domain.Errors.DomainError,``0})">
+            <summary>
+            Projects a <see cref="T:Dx.Domain.Result`1"/> into a value by invoking the appropriate handler.
+            </summary>
+            <typeparam name="TOut">The type of the projected value. Must be non-nullable.</typeparam>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="onSuccess">The handler invoked when <paramref name="result"/> is successful. Must not be <see langword="null"/>.</param>
+            <param name="onFailure">The handler invoked when <paramref name="result"/> is a failure. Must not be <see langword="null"/>.</param>
+            <returns>The value produced by the invoked handler.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onSuccess"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onFailure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when either handler throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Match``1(Dx.Domain.Result{``0},System.Action{``0},System.Action{Dx.Domain.Errors.DomainError})">
+            <summary>
+            Invokes the appropriate action based on the state of the result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="onSuccess">The action invoked when <paramref name="result"/> is successful. Must not be <see langword="null"/>.</param>
+            <param name="onFailure">The action invoked when <paramref name="result"/> is a failure. Must not be <see langword="null"/>.</param>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onSuccess"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onFailure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when either action throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.MatchAsync``2(Dx.Domain.Result{``0},System.Func{``0,System.Threading.Tasks.Task{``1}},System.Func{Dx.Domain.Errors.DomainError,System.Threading.Tasks.Task{``1}})">
+            <summary>
+            Projects a <see cref="T:Dx.Domain.Result`1"/> into a value asynchronously by invoking the appropriate handler.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the projected value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="onSuccess">The asynchronous handler invoked when <paramref name="result"/> is successful. Must not be <see langword="null"/>.</param>
+            <param name="onFailure">The asynchronous handler invoked when <paramref name="result"/> is a failure. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains the value produced by the invoked handler.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onSuccess"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onFailure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when either handler throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.MatchAsync``1(Dx.Domain.Result{``0},System.Func{``0,System.Threading.Tasks.Task},System.Func{Dx.Domain.Errors.DomainError,System.Threading.Tasks.Task})">
+            <summary>
+            Invokes the appropriate asynchronous action based on the state of the result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="onSuccess">The asynchronous action invoked when <paramref name="result"/> is successful. Must not be <see langword="null"/>.</param>
+            <param name="onFailure">The asynchronous action invoked when <paramref name="result"/> is a failure. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onSuccess"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onFailure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when either action throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Flatten``1(Dx.Domain.Result{Dx.Domain.Result{``0}})">
+            <summary>
+            Flattens a nested <see cref="T:Dx.Domain.Result`1"/> that contains another <see cref="T:Dx.Domain.Result`1"/> into a single-level result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The nested result to flatten.</param>
+            <returns>The inner result if <paramref name="result"/> is successful; otherwise, a failure containing the outer error.</returns>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.FlattenAsync``1(System.Threading.Tasks.ValueTask{Dx.Domain.Result{Dx.Domain.Result{``0}}})">
+            <summary>
+            Flattens a nested result asynchronously.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="resultTask">The task producing the nested <see cref="T:Dx.Domain.Result`1"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains the flattened result.</returns>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Sequence``1(System.Collections.Generic.IEnumerable{Dx.Domain.Result{``0}})">
+            <summary>
+            Converts a sequence of results into a result containing a read-only list, failing fast on the first error.
+            </summary>
+            <typeparam name="TValue">The type of the values. Must be non-nullable.</typeparam>
+            <param name="results">The sequence of results to evaluate. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing all values if all results succeed; otherwise, the first encountered failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="results"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.SequenceAsync``1(System.Collections.Generic.IEnumerable{System.Threading.Tasks.Task{Dx.Domain.Result{``0}}})">
+            <summary>
+            Converts a sequence of result tasks into a result containing a read-only list, failing fast on the first error.
+            </summary>
+            <typeparam name="TValue">The type of the values. Must be non-nullable.</typeparam>
+            <param name="resultTasks">The sequence of result tasks to evaluate. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains aggregated values or the first failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="resultTasks"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Traverse``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,Dx.Domain.Result{``1}})">
+            <summary>
+            Projects each element of a sequence into a result and aggregates successful values, failing fast on the first error.
+            </summary>
+            <typeparam name="TIn">The type of the source elements. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the projected values. Must be non-nullable.</typeparam>
+            <param name="source">The source sequence. Must not be <see langword="null"/>.</param>
+            <param name="selector">The projection function that produces a result for each element. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing all projected values if all succeed; otherwise, the first encountered failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="source"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="selector"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="selector"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.TraverseAsync``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Threading.Tasks.Task{Dx.Domain.Result{``1}}})">
+            <summary>
+            Projects each element of a sequence into a result asynchronously and aggregates successful values, failing fast on the first error.
+            </summary>
+            <typeparam name="TIn">The type of the source elements. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the projected values. Must be non-nullable.</typeparam>
+            <param name="source">The source sequence. Must not be <see langword="null"/>.</param>
+            <param name="selector">The asynchronous projection function that produces a result for each element. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains aggregated values or the first failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="source"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="selector"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="selector"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.TryCatch``1(System.Func{``0},System.Func{System.Exception,Dx.Domain.Errors.DomainError})">
+            <summary>
+            Executes the specified function and captures any thrown exception as a failure result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="func">The function to execute. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory that produces an error from the caught exception. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing the function value if no exception occurs; otherwise, a failure result.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="func"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.TryCatch(System.Action,System.Func{System.Exception,Dx.Domain.Errors.DomainError})">
+            <summary>
+            Executes the specified action and captures any thrown exception as a failure result.
+            </summary>
+            <param name="action">The action to execute. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory that produces an error from the caught exception. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing <see cref="T:Dx.Domain.Unit"/> if no exception occurs; otherwise, a failure result.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.TryCatchAsync``1(System.Func{System.Threading.Tasks.Task{``0}},System.Func{System.Exception,Dx.Domain.Errors.DomainError})">
+            <summary>
+            Executes the specified asynchronous function and captures any thrown exception as a failure result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="func">The asynchronous function to execute. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory that produces an error from the caught exception. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains success or captured failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="func"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.TryCatchAsync(System.Func{System.Threading.Tasks.Task},System.Func{System.Exception,Dx.Domain.Errors.DomainError})">
+            <summary>
+            Executes the specified asynchronous action and captures any thrown exception as a failure result.
+            </summary>
+            <param name="action">The asynchronous action to execute. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory that produces an error from the caught exception. Must not be <see langword="null"/>.</param>
+            <returns>A value task that represents the asynchronous operation. The result contains success or captured failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.AsTask``1(Dx.Domain.Result{``0})">
+            <summary>
+            Wraps the result in a completed <see cref="T:System.Threading.Tasks.Task`1"/>.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <returns>A completed task containing <paramref name="result"/>.</returns>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.AsValueTask``1(Dx.Domain.Result{``0})">
+            <summary>
+            Wraps the result in a completed <see cref="T:System.Threading.Tasks.ValueTask`1"/>.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <returns>A completed value task containing <paramref name="result"/>.</returns>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.ToGenericError``2(Dx.Domain.Result{``0},System.Func{Dx.Domain.Errors.DomainError,``1})">
+            <summary>
+            Converts a result using <see cref="T:Dx.Domain.Errors.DomainError"/> to a result with a generic error type by mapping the error.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the target error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="mapError">The function that maps the <see cref="T:Dx.Domain.Errors.DomainError"/> to <typeparamref name="TError"/>. Must not be <see langword="null"/>.</param>
+            <returns>A success result if <paramref name="result"/> is successful; otherwise, a failure containing the mapped error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="mapError"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensions.Unwrap``1(Dx.Domain.Result{``0})">
+            <summary>
+            Returns the success value of the result, throwing if the result is a failure.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <returns>The success value contained in <paramref name="result"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="result"/> is in a failure state.</exception>
+        </member>
+        <member name="T:Dx.Domain.ResultExtensionsGeneric">
+            <summary>
+            Provides extension methods for composing, transforming, and handling <see cref="T:Dx.Domain.Result`2"/> instances
+            with a generic error type.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Map``3(Dx.Domain.Result{``0,``2},System.Func{``0,``1})">
+            <summary>
+            Transforms the success value of a <see cref="T:Dx.Domain.Result`2"/> using the specified mapping function.
+            </summary>
+            <typeparam name="TIn">The type of the source value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the mapped value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="map">The mapping function to apply to the success value. Must not be <see langword="null"/>.</param>
+            <returns>A new <see cref="T:Dx.Domain.Result`2"/> containing the mapped value if <paramref name="result"/> is successful; otherwise, a failure result containing the original error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="map"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.MapAsync``3(Dx.Domain.Result{``0,``2},System.Func{``0,System.Threading.Tasks.Task{``1}})">
+            <summary>
+            Transforms the success value of a <see cref="T:Dx.Domain.Result`2"/> asynchronously using the specified mapping function.
+            </summary>
+            <typeparam name="TIn">The type of the source value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the mapped value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="map">The asynchronous mapping function to apply to the success value. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains a new <see cref="T:Dx.Domain.Result`2"/> with the mapped value if successful; otherwise, the original error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="map"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="map"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Bind``3(Dx.Domain.Result{``0,``2},System.Func{``0,Dx.Domain.Result{``1,``2}})">
+            <summary>
+            Binds the success value of a <see cref="T:Dx.Domain.Result`2"/> to a new result using the specified binding function.
+            </summary>
+            <typeparam name="TIn">The type of the source value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the bound value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="bind">The binding function to apply to the success value. Must not be <see langword="null"/>.</param>
+            <returns>The result produced by <paramref name="bind"/> if <paramref name="result"/> is successful; otherwise, a failure result containing the original error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="bind"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="bind"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.BindAsync``3(Dx.Domain.Result{``0,``2},System.Func{``0,System.Threading.Tasks.Task{Dx.Domain.Result{``1,``2}}})">
+            <summary>
+            Binds the success value of a <see cref="T:Dx.Domain.Result`2"/> to a new result asynchronously using the specified binding function.
+            </summary>
+            <typeparam name="TIn">The type of the source value. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the bound value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="bind">The asynchronous binding function to apply to the success value. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the bound result if successful; otherwise, the original error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="bind"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="bind"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Tap``2(Dx.Domain.Result{``0,``1},System.Action{``0})">
+            <summary>
+            Executes the specified action if the result is successful, returning the original result unchanged.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="action">The action to execute on the success value. Must not be <see langword="null"/>.</param>
+            <returns>The original <paramref name="result"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.TapAsync``2(Dx.Domain.Result{``0,``1},System.Func{``0,System.Threading.Tasks.Task})">
+            <summary>
+            Executes the specified asynchronous action if the result is successful, returning the original result unchanged.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="action">The asynchronous action to execute on the success value. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the original <paramref name="result"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Ensure``2(Dx.Domain.Result{``0,``1},System.Func{``0,System.Boolean},``1)">
+            <summary>
+            Ensures the success value satisfies the specified predicate, otherwise returns a failure with the provided error.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="predicate">The predicate to evaluate against the success value. Must not be <see langword="null"/>.</param>
+            <param name="error">The error to return if <paramref name="predicate"/> returns <see langword="false"/>.</param>
+            <returns>The original result if the predicate is satisfied; otherwise, a failure result containing <paramref name="error"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Ensure``2(Dx.Domain.Result{``0,``1},System.Func{``0,System.Boolean},System.Func{``1})">
+            <summary>
+            Ensures the success value satisfies the specified predicate, otherwise returns a failure with an error produced by the factory.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="predicate">The predicate to evaluate against the success value. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory function that produces the error when the predicate fails. Must not be <see langword="null"/>.</param>
+            <returns>The original result if the predicate is satisfied; otherwise, a failure result containing the produced error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.EnsureAsync``2(Dx.Domain.Result{``0,``1},System.Func{``0,System.Threading.Tasks.Task{System.Boolean}},``1)">
+            <summary>
+            Ensures the success value satisfies the specified asynchronous predicate, otherwise returns a failure with the provided error.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="predicate">The asynchronous predicate to evaluate against the success value. Must not be <see langword="null"/>.</param>
+            <param name="error">The error to return if <paramref name="predicate"/> returns <see langword="false"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the original result if satisfied; otherwise, a failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.EnsureAsync``2(Dx.Domain.Result{``0,``1},System.Func{``0,System.Threading.Tasks.Task{System.Boolean}},System.Func{System.Threading.Tasks.Task{``1}})">
+            <summary>
+            Ensures the success value satisfies the specified asynchronous predicate, otherwise returns a failure with an error produced asynchronously.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="predicate">The asynchronous predicate to evaluate against the success value. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The asynchronous factory that produces the error when the predicate fails. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the original result if satisfied; otherwise, a failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="predicate"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Recover``2(Dx.Domain.Result{``0,``1},System.Func{``1,``0})">
+            <summary>
+            Recovers from a failure by transforming the error into a success value using the specified recovery function.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="recovery">The recovery function that produces a value from the error. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing the recovered value if <paramref name="result"/> is a failure; otherwise, the original result.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Recover``2(Dx.Domain.Result{``0,``1},System.Func{``1,Dx.Domain.Result{``0,``1}})">
+            <summary>
+            Recovers from a failure by producing a new result using the specified recovery function.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="recovery">The recovery function that produces a result from the error. Must not be <see langword="null"/>.</param>
+            <returns>The result produced by <paramref name="recovery"/> if <paramref name="result"/> is a failure; otherwise, the original result.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.RecoverAsync``2(Dx.Domain.Result{``0,``1},System.Func{``1,System.Threading.Tasks.Task{``0}})">
+            <summary>
+            Recovers from a failure asynchronously by transforming the error into a success value.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="recovery">The asynchronous recovery function that produces a value from the error. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the recovered success if applicable.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.RecoverAsync``2(Dx.Domain.Result{``0,``1},System.Func{``1,System.Threading.Tasks.Task{Dx.Domain.Result{``0,``1}}})">
+            <summary>
+            Recovers from a failure asynchronously by producing a new result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="recovery">The asynchronous recovery function that produces a result from the error. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the recovered result if applicable.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="recovery"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Match``3(Dx.Domain.Result{``0,``1},System.Func{``0,``2},System.Func{``1,``2})">
+            <summary>
+            Projects a <see cref="T:Dx.Domain.Result`2"/> into a value by invoking the appropriate handler.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the projected value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="onSuccess">The handler invoked when <paramref name="result"/> is successful. Must not be <see langword="null"/>.</param>
+            <param name="onFailure">The handler invoked when <paramref name="result"/> is a failure. Must not be <see langword="null"/>.</param>
+            <returns>The value produced by the invoked handler.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onSuccess"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onFailure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when either handler throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Match``2(Dx.Domain.Result{``0,``1},System.Action{``0},System.Action{``1})">
+            <summary>
+            Invokes the appropriate action based on the state of the result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="onSuccess">The action invoked when <paramref name="result"/> is successful. Must not be <see langword="null"/>.</param>
+            <param name="onFailure">The action invoked when <paramref name="result"/> is a failure. Must not be <see langword="null"/>.</param>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onSuccess"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onFailure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when either action throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.MatchAsync``3(Dx.Domain.Result{``0,``1},System.Func{``0,System.Threading.Tasks.Task{``2}},System.Func{``1,System.Threading.Tasks.Task{``2}})">
+            <summary>
+            Projects a <see cref="T:Dx.Domain.Result`2"/> into a value asynchronously by invoking the appropriate handler.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the projected value. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="onSuccess">The asynchronous handler invoked when <paramref name="result"/> is successful. Must not be <see langword="null"/>.</param>
+            <param name="onFailure">The asynchronous handler invoked when <paramref name="result"/> is a failure. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains the value produced by the invoked handler.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onSuccess"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onFailure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when either handler throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.MatchAsync``2(Dx.Domain.Result{``0,``1},System.Func{``0,System.Threading.Tasks.Task},System.Func{``1,System.Threading.Tasks.Task})">
+            <summary>
+            Invokes the appropriate asynchronous action based on the state of the result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="onSuccess">The asynchronous action invoked when <paramref name="result"/> is successful. Must not be <see langword="null"/>.</param>
+            <param name="onFailure">The asynchronous action invoked when <paramref name="result"/> is a failure. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onSuccess"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="onFailure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when either action throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Flatten``2(Dx.Domain.Result{Dx.Domain.Result{``0,``1},``1})">
+            <summary>
+            Flattens a nested <see cref="T:Dx.Domain.Result`2"/> into a single-level result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The nested result to flatten.</param>
+            <returns>The inner result if <paramref name="result"/> is successful; otherwise, a failure containing the outer error.</returns>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Sequence``2(System.Collections.Generic.IEnumerable{Dx.Domain.Result{``0,``1}})">
+            <summary>
+            Converts a sequence of results into a result containing a read-only list, failing fast on the first error.
+            </summary>
+            <typeparam name="TValue">The type of the values. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="results">The sequence of results to evaluate. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing all values if all results succeed; otherwise, the first encountered failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="results"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Traverse``3(System.Collections.Generic.IEnumerable{``0},System.Func{``0,Dx.Domain.Result{``1,``2}})">
+            <summary>
+            Projects each element of a sequence into a result and aggregates successful values, failing fast on the first error.
+            </summary>
+            <typeparam name="TIn">The type of the source elements. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the projected values. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="source">The source sequence. Must not be <see langword="null"/>.</param>
+            <param name="selector">The projection function that produces a result for each element. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing all projected values if all succeed; otherwise, the first encountered failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="source"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="selector"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="selector"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.TraverseAsync``3(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Threading.Tasks.Task{Dx.Domain.Result{``1,``2}}})">
+            <summary>
+            Projects each element of a sequence into a result asynchronously and aggregates successful values, failing fast on the first error.
+            </summary>
+            <typeparam name="TIn">The type of the source elements. Must be non-nullable.</typeparam>
+            <typeparam name="TOut">The type of the projected values. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="source">The source sequence. Must not be <see langword="null"/>.</param>
+            <param name="selector">The asynchronous projection function that produces a result for each element. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains aggregated values or the first failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="source"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="selector"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="selector"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.TryCatch``2(System.Func{``0},System.Func{System.Exception,``1})">
+            <summary>
+            Executes the specified function and captures any thrown exception as a failure result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="func">The function to execute. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory that produces an error from the caught exception. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing the function value if no exception occurs; otherwise, a failure result.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="func"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.TryCatch``1(System.Action,System.Func{System.Exception,``0})">
+            <summary>
+            Executes the specified action and captures any thrown exception as a failure result.
+            </summary>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="action">The action to execute. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory that produces an error from the caught exception. Must not be <see langword="null"/>.</param>
+            <returns>A success result containing <see cref="T:Dx.Domain.Unit"/> if no exception occurs; otherwise, a failure result.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.TryCatchAsync``2(System.Func{System.Threading.Tasks.Task{``0}},System.Func{System.Exception,``1})">
+            <summary>
+            Executes the specified asynchronous function and captures any thrown exception as a failure result.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="func">The asynchronous function to execute. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory that produces an error from the caught exception. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains success or captured failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="func"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.TryCatchAsync``1(System.Func{System.Threading.Tasks.Task},System.Func{System.Exception,``0})">
+            <summary>
+            Executes the specified asynchronous action and captures any thrown exception as a failure result.
+            </summary>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="action">The asynchronous action to execute. Must not be <see langword="null"/>.</param>
+            <param name="errorFactory">The factory that produces an error from the caught exception. Must not be <see langword="null"/>.</param>
+            <returns>A task that represents the asynchronous operation. The task result contains success or captured failure.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="action"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="errorFactory"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.Unwrap``2(Dx.Domain.Result{``0,``1})">
+            <summary>
+            Returns the success value of the result, throwing if the result is a failure.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <returns>The success value contained in <paramref name="result"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="result"/> is in a failure state.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.AsTask``2(Dx.Domain.Result{``0,``1})">
+            <summary>
+            Wraps the result in a completed <see cref="T:System.Threading.Tasks.Task`1"/>.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <returns>A completed task containing <paramref name="result"/>.</returns>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.AsValueTask``2(Dx.Domain.Result{``0,``1})">
+            <summary>
+            Wraps the result in a completed <see cref="T:System.Threading.Tasks.ValueTask`1"/>.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <returns>A completed value task containing <paramref name="result"/>.</returns>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.ToDomainError``2(Dx.Domain.Result{``0,``1},System.Func{``1,Dx.Domain.Errors.DomainError})">
+            <summary>
+            Converts a result with a generic error type to a result using <see cref="T:Dx.Domain.Errors.DomainError"/> by mapping the error.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TError">The type of the source error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="mapError">The function that maps the source error to a <see cref="T:Dx.Domain.Errors.DomainError"/>. Must not be <see langword="null"/>.</param>
+            <returns>A success result if <paramref name="result"/> is successful; otherwise, a failure containing the mapped <see cref="T:Dx.Domain.Errors.DomainError"/>.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="mapError"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="mapError"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="M:Dx.Domain.ResultExtensionsGeneric.MapError``3(Dx.Domain.Result{``0,``1},System.Func{``1,``2})">
+            <summary>
+            Transforms the error of a failure result using the specified mapping function.
+            </summary>
+            <typeparam name="TValue">The type of the value. Must be non-nullable.</typeparam>
+            <typeparam name="TErrorIn">The type of the source error. Must be non-nullable.</typeparam>
+            <typeparam name="TErrorOut">The type of the mapped error. Must be non-nullable.</typeparam>
+            <param name="result">The source result.</param>
+            <param name="mapError">The function that maps the error to a new error type. Must not be <see langword="null"/>.</param>
+            <returns>A success result if <paramref name="result"/> is successful; otherwise, a failure containing the mapped error.</returns>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="mapError"/> is <see langword="null"/>.</exception>
+            <exception cref="T:Dx.Domain.InvariantViolationException">Thrown when <paramref name="mapError"/> throws an exception. The original exception is included as the inner exception.</exception>
+        </member>
+        <member name="T:Dx.Domain.Result`2">
+            <summary>
+            Represents the immutable result of an operation that can succeed with a value of type <typeparamref name="TValue"/> or fail
+            with an error of type <typeparamref name="TError"/>.
+            </summary>
+            <typeparam name="TValue">The type of the value returned when the operation succeeds.</typeparam>
+            <typeparam name="TError">The type of the error returned when the operation fails.</typeparam>
+            <remarks>
+            This is the canonical functional result type, a discriminated union that explicitly models success and failure paths.
+            Use <see cref="T:Dx.Domain.Result`1"/> for the common case where <typeparamref name="TError"/> is fixed to <see cref="T:Dx.Domain.Errors.DomainError"/>.
+            </remarks>
+        </member>
+        <member name="P:Dx.Domain.Result`2.IsSuccess">
+            <summary>
+            Gets a value indicating whether the operation completed successfully.
+            </summary> 
+        </member>
+        <member name="P:Dx.Domain.Result`2.IsFailure">
+            <summary>
+            Gets a value indicating whether the result represents a failure state.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Result`2.Value">
+            <summary>
+            Gets the value contained in the current instance, if one is present.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Result`2.Error">
+            <summary>
+            Gets the error value associated with the result, if any.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.Result`2.#ctor(`1)">
+            <summary>
+            Initializes a new instance of the Result class that represents a failed result with the specified error.
+            </summary>
+            <param name="error">The error value associated with the failed Result. Cannot be <see langword="null"/> if TError is a reference type.</param>
+        </member>
+        <member name="M:Dx.Domain.Result`2.#ctor(`0)">
+            <summary>
+            Initializes a new instance of the Result class with the specified value.
+            </summary>
+            <param name="value">The value to be encapsulated by the Result instance.</param>
+        </member>
+        <member name="M:Dx.Domain.Result`2.Success(`0)">
+            <summary>
+            Creates a successful result containing the specified value.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.Result`2.Failure(`1)">
+            <summary>
+            Creates a failed result containing the specified error value.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.Result`2.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:Dx.Domain.Result`2.Deconstruct(System.Boolean@,`0@,`1@)">
+            <summary>
+            Deconstructs the result into its success status, value, and error information.
+            </summary>
+            <param name="isSuccess">When this method returns, contains <see langword="true"/> if the result represents a success; otherwise,
+            <see langword="false"/>.</param>
+            <param name="value">When this method returns, contains the value of the result if it is successful; otherwise, the default value
+            for the type.</param>
+            <param name="error">When this method returns, contains the error information if the result represents a failure; otherwise, <see
+            langword="null"/>.</param>
+            <remarks>This method enables deconstruction of the result into separate variables for pattern
+            matching or tuple assignment.</remarks>
+        </member>
+        <member name="M:Dx.Domain.Result`2.Deconstruct(System.Boolean@,`1@,`0@)">
+            <summary>
+            Deconstructs the result into its failure status, error, and value components.
+            </summary>
+            <param name="isFailure">When this method returns, contains <see langword="true"/> if the result represents a failure; otherwise,
+            <see langword="false"/>.</param>
+            <param name="error">When this method returns, contains the associated <see cref="T:Dx.Domain.Errors.DomainError"/> if the result is a failure;
+            otherwise, <see langword="null"/>.</param>
+            <param name="value">When this method returns, contains the value if the result is successful; otherwise, <see langword="null"/>.</param>
+            <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into
+            separate variables for failure status, error, and value.</remarks>
+        </member>
+        <member name="M:Dx.Domain.Result`2.Deconstruct(`0@)">
+            <summary>
+            Deconstructs the result into its value component.
+            </summary>
+            <param name="value">When this method returns, contains the value if the operation was successful; otherwise, the default value for the
+            type.</param>
+            <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into its value
+            component using tuple deconstruction.</remarks>
+        </member>
+        <member name="M:Dx.Domain.Result`2.Deconstruct(`1@)">
+            <summary>
+            Deconstructs the result into its error component, if the result represents a failure.
+            </summary>
+            <param name="error">When this method returns, contains the associated error if the result is a failure; otherwise, <see
+            langword="null"/>.</param>
+            <remarks>This method enables deconstruction syntax, allowing the result to be unpacked into its error
+            component using tuple deconstruction.</remarks>
+        </member>
+        <member name="T:Dx.Domain.Result`1">
+            <summary>
+            Represents the outcome of a computation that may fail.
+            </summary>
+            <typeparam name="TValue">Successful value type.</typeparam>
+        </member>
+        <member name="P:Dx.Domain.Result`1.IsSuccess">
+            <summary>
+            Indicates whether the result represents success.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Result`1.IsFailure">
+            <summary>
+            Indicates whether the result represents failure.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Result`1.Value">
+            <summary>
+            Gets the successful value or throws if accessed on failure.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Result`1.Error">
+            <summary>
+            Gets the failure error or throws if accessed on success.
+            </summary>
+        </member>
+        <member name="M:Dx.Domain.Result`1.Success(`0)">
+            <summary>
+            Creates a successful Result.
+            </summary>
+            <param name="value">The value to wrap in a successful Result.</param>
+            <returns>A successful result containing the provided value.</returns>
+        </member>
+        <member name="M:Dx.Domain.Result`1.Success">
+            <summary>
+            Creates a successful result for <see cref="T:Dx.Domain.Unit"/> type.
+            </summary>
+            <returns>A successful result containing <see cref="P:Dx.Domain.Unit.Value"/>.</returns>
+        </member>
+        <member name="M:Dx.Domain.Result`1.Failure(Dx.Domain.Errors.DomainError)">
+            <summary>
+            Creates a failed Result.
+            </summary>
+            <param name="error">The domain error describing the failure.</param>
+            <returns>A failed result containing the provided error.</returns>
+        </member>
+        <member name="M:Dx.Domain.Result`1.From(Dx.Domain.Result{`0,Dx.Domain.Errors.DomainError})">
+            <summary>
+            Creates a result from an inner result with <see cref="T:Dx.Domain.Errors.DomainError" /> as the error type.
+            </summary>
+            <param name="inner">The inner result to convert.</param>
+            <returns>A result containing the value and error from the inner Result.</returns>
+        </member>
+        <member name="M:Dx.Domain.Result`1.Deconstruct(System.Boolean@,`0@,System.Nullable{Dx.Domain.Errors.DomainError}@)">
+            <summary>
+            Deconstructs the result into its failure status, error, and value components.
+            </summary>
+            <param name="isSuccess">When this method returns, contains <see langword="true"/> if the result represents a failure; otherwise,
+            <see langword="false"/>.</param>
+            <param name="error">When this method returns, contains the associated <see cref="T:Dx.Domain.Errors.DomainError"/> if the result is a failure;
+            otherwise, <see langword="null"/>.</param>
+            <param name="value">When this method returns, contains the value if the result is successful; otherwise, <see langword="null"/>.</param>
+        </member>
+        <member name="T:Dx.Domain.Unit">
+            <summary>
+            Unit type used for Result operations that return no value.
+            </summary>
+        </member>
+        <member name="P:Dx.Domain.Unit.Value">
+            <summary>Gets the singleton value of the Unit type.</summary>
+        </member>
+    </members>
+</doc>
