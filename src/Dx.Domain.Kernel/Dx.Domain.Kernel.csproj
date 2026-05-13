@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Dx.Domain.Kernel">
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Kernel</DxLayer>
@@ -8,7 +8,7 @@
     <Description>The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.</Description>
     <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
     <!--<NoWarn>$(NoWarn);CS1591</NoWarn>-->
     <Nullable>enable</Nullable>
   </PropertyGroup>

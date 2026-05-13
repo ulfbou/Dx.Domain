@@ -28,8 +28,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Dx.Domain.Analyzers</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <!-- Disable readme for PR1 
-    <PackageReadmeFile>README.md</PackageReadmeFile>-->
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
     <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>
     <IncludeContentInPack>false</IncludeContentInPack>
     <NoDefaultExcludes>false</NoDefaultExcludes>
