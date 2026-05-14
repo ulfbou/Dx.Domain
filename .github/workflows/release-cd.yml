@@ -90,13 +90,16 @@ jobs:
         run: dotnet pack -c Release -o./artifacts /p:ContinuousIntegrationBuild=true /p:Version=$VERSION /p:PackageVersion=$VERSION
 
       - name: Sign packages
-        if: ${{ secrets.SIGNING_CERTIFICATE!= '' }}
         env:
           SIGNING_CERTIFICATE: ${{ secrets.SIGNING_CERTIFICATE }}
           CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
         run: |
+          if [ -z "$SIGNING_CERTIFICATE" ]; then
+            echo "SIGNING_CERTIFICATE not set – skipping NuGet signing"
+            exit 0
+          fi
           echo "$SIGNING_CERTIFICATE" | base64 -d > cert.pfx
-          for nupkg in./artifacts/*.nupkg; do
+          for nupkg in ./artifacts/*.nupkg; do
             dotnet nuget sign "$nupkg" --certificate-path cert.pfx --timestamper http://timestamp.digicert.com -p "$CERTIFICATE_PASSWORD"
           done
           shred -u cert.pfx
