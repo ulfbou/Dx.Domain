@@ -104,23 +104,17 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static void AnalyzeThrow(OperationAnalysisContext context, AnalyzerServices services)
         {
             var throwOperation = (IThrowOperation)context.Operation;
 
             // Skip if generated code
-            if (throwOperation.Exception?.Type != null &&
+            if (throwOperation.Exception?.Type!= null &&
                 services.Generated.IsGenerated(throwOperation.Exception.Type))
                 return;
 

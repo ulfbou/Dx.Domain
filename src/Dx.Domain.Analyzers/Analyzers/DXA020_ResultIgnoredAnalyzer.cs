@@ -109,27 +109,21 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static void AnalyzeResultUsage(OperationAnalysisContext context, AnalyzerServices services)
         {
             var expression = context.Operation;
 
             // Skip if generated code
-            if (expression.Type != null && services.Generated.IsGenerated(expression.Type))
+            if (expression.Type!= null && services.Generated.IsGenerated(expression.Type))
                 return;
 
             // Check if expression type is a Result type
-            if (expression.Type == null || !services.Semantic.IsKernelResultType(expression.Type))
+            if (expression.Type == null ||!services.Semantic.IsKernelResultType(expression.Type))
                 return;
 
             // Get the scope - only enforce in S1, S2 (not S0 kernel)

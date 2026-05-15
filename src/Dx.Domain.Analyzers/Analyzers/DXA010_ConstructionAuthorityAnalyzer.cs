@@ -127,13 +127,7 @@ public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
     private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
     {
         var config = context.Options.AnalyzerConfigOptionsProvider;
-        return new AnalyzerServices(
-            new ScopeResolver(config),
-            new DxFacadeResolver(context.Compilation, config),
-            new SemanticClassifier(context.Compilation),
-            new ExceptionIntentClassifier(context.Compilation, config),
-            new ResultFlowEngineWrapper(),
-            new GeneratedCodeDetector(config));
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
     }
 
     private static void AnalyzeObjectCreation(OperationAnalysisContext context, AnalyzerServices services)
@@ -141,11 +135,11 @@ public sealed class DXA010_ConstructionAuthorityAnalyzer : DiagnosticAnalyzer
         var operation = (IObjectCreationOperation)context.Operation;
 
         // Skip if generated code
-        if (operation.Type != null && services.Generated.IsGenerated(operation.Type))
+        if (operation.Type!= null && services.Generated.IsGenerated(operation.Type))
             return;
 
         // Skip if not a domain type
-        if (operation.Type == null || !services.Semantic.IsDomainType(operation.Type))
+        if (operation.Type == null ||!services.Semantic.IsDomainType(operation.Type))
             return;
 
         // Get the scope of the call site

@@ -103,32 +103,26 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new Infrastructure.Flow.ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static void AnalyzeInvocation(OperationAnalysisContext context, AnalyzerServices services)
         {
             var invocation = (IInvocationOperation)context.Operation;
 
             // Skip if generated code
-            if (invocation.TargetMethod != null && services.Generated.IsGenerated(invocation.TargetMethod))
+            if (invocation.TargetMethod!= null && services.Generated.IsGenerated(invocation.TargetMethod))
                 return;
 
             // Only analyze S0 scope (kernel) - also flag in S1 when used in kernel contexts
             var scope = services.Scope.ResolveSymbol(context.ContainingSymbol);
-            if (scope != Scope.S0 && scope != Scope.S1)
+            if (scope!= Scope.S0 && scope!= Scope.S1)
                 return;
 
             // Check if it's a temporal helper method
-            if (invocation.TargetMethod == null || !IsTemporalHelper(invocation.TargetMethod))
+            if (invocation.TargetMethod == null ||!IsTemporalHelper(invocation.TargetMethod))
                 return;
 
             context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));
@@ -140,7 +134,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             var methodName = method.Name;
 
             // Check for Require.Temporal helpers
-            if (containingType != null &&
+            if (containingType!= null &&
                 containingType.Contains("Require") &&
                 (methodName == "NotInFuture" || methodName == "NotInPast" ||
                  methodName == "InRange" || methodName == "BeforeNow" ||

@@ -124,16 +124,10 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new Infrastructure.Flow.ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static void AnalyzeSymbol(SymbolAnalysisContext context, AnalyzerServices services)
         {
@@ -145,13 +139,13 @@ namespace Dx.Domain.Analyzers.Analyzers
 
             // Only analyze S0 and S1 scopes (kernel and domain)
             var scope = services.Scope.ResolveSymbol(symbol);
-            if (scope != Scope.S0 && scope != Scope.S1)
+            if (scope!= Scope.S0 && scope!= Scope.S1)
                 return;
 
             // Check if symbol name contains forbidden vocabulary
             var symbolName = symbol.Name;
             var forbiddenTerm = ForbiddenTerms.FirstOrDefault(term => symbolName.Contains(term));
-            if (forbiddenTerm != null)
+            if (forbiddenTerm!= null)
             {
                 if (symbol.Locations.Any())
                 {
