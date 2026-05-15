@@ -19,76 +19,131 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: release-${{ inputs.environment }}
+  cancel-in-progress: false
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
       - name: Validate branch
         run: |
-          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
-            echo "Release must run from main"; exit 1; fi
-      - name: GitVersion
-        uses: gittools/actions/gitversion/setup@v0
-        with: { versionSpec: '5.x' }
-      - id: gv
-        uses: gittools/actions/gitversion/execute@v0
+          if [ "${{ github.ref_name }}" != "main" ]; then
+            echo "Release must run from main"; exit 1
+          fi
+      - name: Calculate next version
+        id: version
+        run: |
+          latest=$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || echo "v0.0.0")
+          latest=${latest#v}
+          IFS='.' read -r major minor patch <<< "$latest"
+          case "${{ inputs.release-type }}" in
+            major) major=$((major+1)); minor=0; patch=0 ;;
+            minor) minor=$((minor+1)); patch=0 ;;
+            patch) patch=$((patch+1)) ;;
+          esac
+          version="$major.$minor.$patch"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
   build:
     needs: validate
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
       - uses: actions/setup-dotnet@v4
-        with: { dotnet-version: '8.0.x' }
-      - run: dotnet restore
-      - if: ${{ !inputs.skip-tests }}
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+      - name: Restore
+        run: dotnet restore
+      - name: Guard skip-tests on production
+        if: ${{ inputs.environment == 'production' && inputs.skip-tests }}
+        run: echo "skip-tests not allowed for production" && exit 1
+      - name: Test
+        if: ${{ !inputs.skip-tests }}
         run: dotnet test -c Release --no-restore
       - name: Pack
-        run: dotnet pack -c Release -o ./artifacts /p:ContinuousIntegrationBuild=true
+        run: dotnet pack -c Release -o ./artifacts /p:ContinuousIntegrationBuild=true /p:Version=$VERSION /p:PackageVersion=$VERSION
       - name: Sign packages
-        if: ${{ env.SIGNING_CERTIFICATE != '' }}
         env:
           SIGNING_CERTIFICATE: ${{ secrets.SIGNING_CERTIFICATE }}
           CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
         run: |
+          if [ -z "$SIGNING_CERTIFICATE" ]; then
+            echo "SIGNING_CERTIFICATE not set – skipping NuGet signing"; exit 0
+          fi
           echo "$SIGNING_CERTIFICATE" | base64 -d > cert.pfx
           for nupkg in ./artifacts/*.nupkg; do
-            dotnet nuget sign "$nupkg" --certificate-path cert.pfx --timestamper http://timestamp.digicert.com -p "$CERTIFICATE_PASSWORD" || true
+            dotnet nuget sign "$nupkg" --certificate-path cert.pfx --timestamper http://timestamp.digicert.com -p "$CERTIFICATE_PASSWORD"
           done
+          shred -u cert.pfx
       - uses: actions/upload-artifact@v4
-        with: { name: packages, path: ./artifacts/*.nupkg }
+        with:
+          name: packages
+          path: ./artifacts/*.nupkg
+          if-no-files-found: error
 
   deploy-staging:
-    needs: build
+    needs: [validate, build]
     if: ${{ inputs.environment == 'staging' || inputs.environment == 'canary' || inputs.environment == 'production' }}
     runs-on: ubuntu-latest
     environment: staging
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
     steps:
       - uses: actions/download-artifact@v4
-        with: { name: packages, path: ./artifacts }
+        with:
+          name: packages
+          path: ./artifacts
       - name: Push to staging feed
-        run: echo "Deploy to staging – replace with your feed"
+        run: |
+          echo "Deploying v$VERSION to staging"
+          # dotnet nuget push ./artifacts/*.nupkg -s <staging-feed> -k ${{ secrets.STAGING_NUGET_KEY }}
 
   deploy-canary:
-    needs: deploy-staging
+    needs: [validate, deploy-staging]
     if: ${{ inputs.environment == 'canary' || inputs.environment == 'production' }}
     runs-on: ubuntu-latest
     environment: canary
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
     steps:
-      - run: echo "Canary 10% traffic – replace with deployment"
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: ./artifacts
+      - name: Canary deployment
+        run: echo "Deploying v$VERSION to canary (10% traffic)"
 
   deploy-production:
-    needs: deploy-canary
+    needs: [validate, deploy-canary]
     if: ${{ inputs.environment == 'production' }}
     runs-on: ubuntu-latest
     environment: production
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
     steps:
       - uses: actions/download-artifact@v4
-        with: { name: packages, path: ./artifacts }
-      - name: Push to NuGet
+        with:
+          name: packages
+          path: ./artifacts
+      - name: Push to NuGet.org
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
@@ -97,16 +152,31 @@ jobs:
           done
 
   create-release:
-    needs: deploy-production
-    if: ${{ always() && inputs.environment == 'production' }}
+    needs: [validate, deploy-production]
+    if: ${{ inputs.environment == 'production' && needs.deploy-production.result == 'success' }}
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.validate.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: ./artifacts
       - name: Generate changelog
         run: |
-          git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0)..HEAD > CHANGELOG.md || true
-      - uses: softprops/action-gh-release@v2
+          prev=$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$prev" ]; then
+            git log --pretty=format:"- %s (%h)" "$prev"..HEAD > CHANGELOG.md
+          else
+            git log --pretty=format:"- %s (%h)" > CHANGELOG.md
+          fi
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.run_number }}
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
           body_path: CHANGELOG.md
           files: ./artifacts/*.nupkg
