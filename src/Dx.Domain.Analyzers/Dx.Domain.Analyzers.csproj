@@ -22,18 +22,17 @@
     <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
     <WarningsAsErrors>RS1038;CS8600;CS8601;CS8602;CS8603;CS8604</WarningsAsErrors>
     <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
+    
     <!-- Packaging -->
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Dx.Domain.Analyzers</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <!-- Disable readme for PR1 
-    <PackageReadmeFile>README.md</PackageReadmeFile>-->
     <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>
     <IncludeContentInPack>false</IncludeContentInPack>
     <NoDefaultExcludes>false</NoDefaultExcludes>
-
+    
     <!-- Output -->
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
