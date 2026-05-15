@@ -1,0 +1,198 @@
+{
+  "source_base_path": "/home/runner/work/Dx.Domain/Dx.Domain",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/architecture-overview.md",
+      "output": {
+        ".html": {
+          "relative_path": "architecture-overview.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/changelog.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/changelog/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "changelog/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "docs/public/changelog/toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "changelog/toc.json"
+        },
+        ".html": {
+          "relative_path": "changelog/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/examples/basic-result.md",
+      "output": {
+        ".html": {
+          "relative_path": "examples/basic-result.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/examples/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "examples/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/examples/readme.md",
+      "output": {
+        ".html": {
+          "relative_path": "examples/readme.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/getting-started.md",
+      "output": {
+        ".html": {
+          "relative_path": "getting-started.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/overview.md",
+      "output": {
+        ".html": {
+          "relative_path": "overview.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/readme.md",
+      "output": {
+        ".html": {
+          "relative_path": "readme.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/release-notes/0.1.0.md",
+      "output": {
+        ".html": {
+          "relative_path": "release-notes/0.1.0.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/release-notes/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "release-notes/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "docs/public/release-notes/toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "release-notes/toc.json"
+        },
+        ".html": {
+          "relative_path": "release-notes/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/specification/core-platform.md",
+      "output": {
+        ".html": {
+          "relative_path": "specification/core-platform.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "docs/public/specification/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "specification/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "docs/public/toc.yml",
+      "output": {
+        ".json": {
+          "relative_path": "toc.json"
+        },
+        ".html": {
+          "relative_path": "toc.html"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

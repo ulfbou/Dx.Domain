@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Getting Started | Dx.Domain </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Getting Started | Dx.Domain ">
+    
+    
+      <link rel="shortcut icon" href="favicon.ico">
+      <link rel="stylesheet" href="styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="styles/docfx.css">
+      <link rel="stylesheet" href="styles/main.css">
+      <meta property="docfx:navrel" content="toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="logo.svg" alt="Dx.Domain">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="getting-started">Getting Started</h1>
+
+<h2 id="1-install-packages">1. Install packages</h2>
+<pre><code class="lang-bash">dotnet add package Dx.Domain.Primitives
+dotnet add package Dx.Domain.Kernel
+dotnet add package Dx.Domain.Annotations
+dotnet add package Dx.Domain.Facts
+dotnet add package Dx.Domain.Analyzers
+</code></pre>
+<p>Package roles: <a href="packages/primitives.md">Primitives</a>, <a href="packages/kernel.md">Kernel</a>, <a href="packages/annotations.md">Annotations</a>, <a href="packages/facts.md">Facts</a>.</p>
+<h2 id="2-understand-the-three-constraints">2. Understand the three constraints</h2>
+<p>Before writing code, read <a href="specification/core-platform.html#4-construction-authority">Core Specification §4-5</a>:</p>
+<ul>
+<li><strong>Construction is restricted</strong> — see <a href="packages/analyzers.md#dxa010">DXA010</a></li>
+<li><strong>All operations return Result</strong> — see <a href="specification/core-platform.html#5-result-semantics">Result Semantics</a></li>
+<li><strong>Exceptions are not control flow</strong> — see <a href="packages/analyzers.md#dxa022">DXA022</a></li>
+</ul>
+<h2 id="3-write-your-first-domain-type">3. Write your first domain type</h2>
+<p>Use value objects from <a href="packages/primitives.md">Primitives</a> and annotate with <a href="packages/annotations.md">Annotations</a>.</p>
+<p>Example: <a href="examples/basic-result.html">basic-result.md</a></p>
+<h2 id="4-compile">4. Compile</h2>
+<p>Analyzers enforce correctness. You will see these first:</p>
+<ul>
+<li><a href="packages/analyzers.md#dxa010">DXA010</a> – if you use <code>new</code> instead of Dx facade</li>
+<li><a href="packages/analyzers.md#dxa011">DXA011</a> – if you leave a constructor public</li>
+<li><a href="packages/analyzers.md#dxa020">DXA020</a> – if you ignore a Result (Error)</li>
+<li><a href="packages/analyzers.md#dxa022">DXA022</a> – if you throw in a Result method</li>
+<li><a href="packages/analyzers.md#dxa030">DXA030</a> – if you pass Result to an unregistered handler</li>
+</ul>
+<p>Full list: <a href="packages/analyzers.md">Analyzer Reference</a></p>
+<p><strong>Next:</strong> <a href="architecture-overview.html">Architecture Overview</a> → <a href="specification/core-platform.html">Specification</a></p>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/ulfbou/dx.domain/blob/main/docs/public/getting-started.md/#L1" class="contribution-link">Edit this page</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

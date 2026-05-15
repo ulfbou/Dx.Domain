@@ -1,0 +1,72 @@
+{
+  "architecture-overview.html": {
+    "href": "architecture-overview.html",
+    "title": "Dx.Domain — Architecture Overview | Dx.Domain",
+    "summary": "Dx.Domain — Architecture Overview What Dx.Domain Is A substrate for invariants, results, errors, identities, and structural history. If it compiles, passes analyzers, and the Kernel accepts it, the state is valid. It is intentionally small. Everything else belongs at the edges. The Four Packages Annotations: pure vocabulary, no runtime logic Primitives: immutable value types for IDs and tracing Kernel: Result , DomainError, Invariant. No I/O. Facts: immutable, append-only history. Not domain events. Dependency Rules Kernel depends on Annotations only Primitives depends on Annotations only Facts depends on Annotations, Primitives, Kernel Analyzers depends on Annotations only Scopes S0–S3 S0 Kernel — Dx.Domain itself. Trusted, exempt from DXA010/DXA011 per ADR-0018 S1 Domain Facades — construction boundary S2 Application — orchestration S3 Infrastructure — I/O and adapters Configure in .editorconfig: dx.scope.map = S0:Dx.Domain;S1:MyApp.Domain;S2:MyApp.Application;S3:MyApp.Api Analyzer Governance Analyzers apply to S1–S3 only: DXA010 Construction Authority — ADR-0003 DXA011 Public Factory Exposure — ADR-0008 DXA020 Result Ignored DXA022 No throw in Result methods DXA030 Unapproved Handler DXA040 Kernel Surface Freeze DXA050 No temporal helpers DXA060 Forbidden vocabulary DXA070 Generated code tagging DXA080 Facade Invariant Enforcement Navigation Up: Overview Next: Core Platform Specification Learn: Dx.Domain in 90 seconds Packages: Annotations | Primitives | Kernel | Facts | Analyzers"
+  },
+  "changelog.html": {
+    "href": "changelog.html",
+    "title": "Changelog | Dx.Domain",
+    "summary": "Changelog All notable changes to Dx.Domain are documented here. [0.x] — Pre-release Added Core platform specification (core-platform.md) Normative package documentation: Annotations Kernel Primitives Facts Analyzer-enforced invariants: construction authority Result handling discipline exception usage constraints Changed Documentation rewritten to reflect enforced invariants Public surface aligned with analyzer behavior Notes This is a pre-release API surface may change Core invariants are considered stable"
+  },
+  "changelog/index.html": {
+    "href": "changelog/index.html",
+    "title": "Changelog | Dx.Domain",
+    "summary": "Changelog See CHANGELOG"
+  },
+  "examples/basic-result.html": {
+    "href": "examples/basic-result.html",
+    "title": "Basic Result Usage | Dx.Domain",
+    "summary": "Basic Result Usage var result = Order.Create(customerId); if (result.IsFailure) return result; return result.Value; Violations: Ignoring result triggers DXA020 Throwing instead of returning triggers DXA022"
+  },
+  "examples/index.html": {
+    "href": "examples/index.html",
+    "title": "Examples | Dx.Domain",
+    "summary": "Examples Documents Examples Overview Basic Result"
+  },
+  "examples/readme.html": {
+    "href": "examples/readme.html",
+    "title": "Examples | Dx.Domain",
+    "summary": "Examples Minimal examples demonstrating enforced invariants. Goals show construction constraints show Result usage show analyzer violations Non-Goals tutorials full applications architectural patterns See specification for rules: ../specification/core-platform.md"
+  },
+  "getting-started.html": {
+    "href": "getting-started.html",
+    "title": "Getting Started | Dx.Domain",
+    "summary": "Getting Started 1. Install packages dotnet add package Dx.Domain.Primitives dotnet add package Dx.Domain.Kernel dotnet add package Dx.Domain.Annotations dotnet add package Dx.Domain.Facts dotnet add package Dx.Domain.Analyzers Package roles: Primitives, Kernel, Annotations, Facts. 2. Understand the three constraints Before writing code, read Core Specification §4-5: Construction is restricted — see DXA010 All operations return Result — see Result Semantics Exceptions are not control flow — see DXA022 3. Write your first domain type Use value objects from Primitives and annotate with Annotations. Example: basic-result.md 4. Compile Analyzers enforce correctness. You will see these first: DXA010 – if you use new instead of Dx facade DXA011 – if you leave a constructor public DXA020 – if you ignore a Result (Error) DXA022 – if you throw in a Result method DXA030 – if you pass Result to an unregistered handler Full list: Analyzer Reference Next: Architecture Overview → Specification"
+  },
+  "index.html": {
+    "href": "index.html",
+    "title": "Dx.Domain | Dx.Domain",
+    "summary": "Dx.Domain Deterministic domain modeling for .NET. If it compiles, passes analyzers, and the Kernel accepts it, the state is valid. Enforcement scope: Static analysis only. Applies to S1–S3. Not enforced at runtime. Bypassable via reflection, serialization, dynamic, and suppression. Start here (2 minutes) Overview — what it is and why Getting Started — install packages and write your first type Core Specification — the normative rules Architecture Architecture Overview — the four-package substrate Packages Annotations Primitives Kernel Facts Analyzers Analyzer Enforcement All rules are enforced at compile time. See the complete reference: DXA010 Construction Authority DXA011 Public Factory DXA020 Result Ignored DXA022 No Throw in Result DXA030 Unapproved Handler DXA040 Kernel Freeze DXA050 Temporal Helper DXA060 Forbidden Vocabulary DXA070 Generated Code Tag DXA080 Facade Invariants Contract All behavior is governed by the Core Platform Specification and enforced by analyzers. See Analyzer Rules. Additional README CHANGELOG Examples Release Notes Changelog"
+  },
+  "overview.html": {
+    "href": "overview.html",
+    "title": "Dx.Domain — Overview | Dx.Domain",
+    "summary": "Dx.Domain — Overview Dx.Domain is a small, opinionated substrate providing invariants, results, errors, identities, and structural history — designed so that incorrect domain modeling is difficult or impossible to express. If code compiles, passes analyzers, and the Kernel accepts it, the state is valid. This document is the high-level public overview. Internal governance documents (Manifesto, Non-Goals, DPI, ADRs, Spec) live under docs/ and are published. Philosophy Dx.Domain enforces a strict architectural separation: Annotations: semantic vocabulary, attributes, markers Primitives: immutable identity/value types Kernel: runtime judge of invariants, results, errors, facts Facts: structural lineage, meaning-agnostic history The Kernel is intentionally minimal, explicit, and highly disciplined. Enforcement Correctness is not optional. Ten analyzers (DXA010–DXA080) run on every build in S1–S3 and treat violations as warnings or errors. S0 is exempt per ADR-0018. See Architecture Overview. Rationale This repository's governance establishes: Clear layer boundaries Mandatory analyzers enforcing correctness in S1–S3 Result-based error semantics with public factories Explicit invariants Frozen Kernel surface Navigation Public: Overview Architecture"
+  },
+  "readme.html": {
+    "href": "readme.html",
+    "title": "Dx.Domain Documentation | Dx.Domain",
+    "summary": "Dx.Domain Documentation This documentation describes the Dx.Domain platform. Entry Points Architecture overview: architecture-overview.md Core specification: specification/core-platform.md Package documentation: packages/annotations.md packages/kernel.md packages/primitives.md packages/facts.md Documentation Model Specification defines invariants Package docs define roles and boundaries Analyzers enforce correctness Public documentation is a projection of: ADRs DPI enforced analyzer rules"
+  },
+  "release-notes/0.1.0.html": {
+    "href": "release-notes/0.1.0.html",
+    "title": "0.1.0 — Pre-release | Dx.Domain",
+    "summary": "0.1.0 — Pre-release Summary First pre-release of Dx.Domain core platform. Includes Core platform specification Four-package substrate Analyzer-enforced invariants Guarantees Core invariants are stable Deterministic behavior enforced Limitations API surface may change Tooling may evolve"
+  },
+  "release-notes/index.html": {
+    "href": "release-notes/index.html",
+    "title": "Release Notes | Dx.Domain",
+    "summary": "Release Notes 0.1.0 — Initial pre-release 0.1.0"
+  },
+  "specification/core-platform.html": {
+    "href": "specification/core-platform.html",
+    "title": "Core Platform Specification | Dx.Domain",
+    "summary": "Core Platform Specification Scope S0 Kernel — Dx.Domain — trusted S1 Domain Facades — construction boundary S2 Application — orchestration S3 Infrastructure — I/O and adapters Package Map Kernel: Result , DomainError, Invariant, Unit Primitives: CorrelationId, TraceId, ActorId, FactId, SpanId, UserId Facts: Fact , Causation, TransitionResult Annotations: Scope, DxAssemblyRole, AggregateRootAttribute, ValueObjectAttribute Analyzers: DXA010-DXA080 Navigation Up: Architecture Overview Packages: Annotations | Kernel"
+  },
+  "specification/index.html": {
+    "href": "specification/index.html",
+    "title": "Specification | Dx.Domain",
+    "summary": "Specification Documents Core Platform"
+  }
+}

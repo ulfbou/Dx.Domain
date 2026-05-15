@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Dx.Domain — Architecture Overview | Dx.Domain </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Dx.Domain — Architecture Overview | Dx.Domain ">
+    
+    
+      <link rel="shortcut icon" href="favicon.ico">
+      <link rel="stylesheet" href="styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="styles/docfx.css">
+      <link rel="stylesheet" href="styles/main.css">
+      <meta property="docfx:navrel" content="toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="logo.svg" alt="Dx.Domain">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="dxdomain--architecture-overview">Dx.Domain — Architecture Overview</h1>
+
+<h2 id="what-dxdomain-is">What Dx.Domain Is</h2>
+<p>A substrate for invariants, results, errors, identities, and structural history. If it compiles, passes analyzers, and the Kernel accepts it, the state is valid.</p>
+<p>It is intentionally small. Everything else belongs at the edges.</p>
+<h2 id="the-four-packages">The Four Packages</h2>
+<ul>
+<li><strong>Annotations</strong>: pure vocabulary, no runtime logic</li>
+<li><strong>Primitives</strong>: immutable value types for IDs and tracing</li>
+<li><strong>Kernel</strong>: Result<t>, DomainError, Invariant. No I/O.</t></li>
+<li><strong>Facts</strong>: immutable, append-only history. Not domain events.</li>
+</ul>
+<h2 id="dependency-rules">Dependency Rules</h2>
+<ol>
+<li>Kernel depends on Annotations only</li>
+<li>Primitives depends on Annotations only</li>
+<li>Facts depends on Annotations, Primitives, Kernel</li>
+<li>Analyzers depends on Annotations only</li>
+</ol>
+<h2 id="scopes-s0s3">Scopes S0–S3</h2>
+<ul>
+<li><strong>S0 Kernel</strong> — Dx.Domain itself. Trusted, exempt from DXA010/DXA011 per <a href="../adr/adr-0018-kernel-public-surface.md">ADR-0018</a></li>
+<li><strong>S1 Domain Facades</strong> — construction boundary</li>
+<li><strong>S2 Application</strong> — orchestration</li>
+<li><strong>S3 Infrastructure</strong> — I/O and adapters</li>
+</ul>
+<p>Configure in <code>.editorconfig</code>:</p>
+<pre><code>dx.scope.map = S0:Dx.Domain;S1:MyApp.Domain;S2:MyApp.Application;S3:MyApp.Api
+</code></pre>
+<h2 id="analyzer-governance">Analyzer Governance</h2>
+<p>Analyzers apply to S1–S3 only:</p>
+<ul>
+<li><strong>DXA010</strong> Construction Authority — <a href="../adr/adr-0003-dxa010-warning.md">ADR-0003</a></li>
+<li><strong>DXA011</strong> Public Factory Exposure — <a href="../adr/adr-0008-dxa011-public-factory-exposure.md">ADR-0008</a></li>
+<li><strong>DXA020</strong> Result Ignored</li>
+<li><strong>DXA022</strong> No throw in Result methods</li>
+<li><strong>DXA030</strong> Unapproved Handler</li>
+<li><strong>DXA040</strong> Kernel Surface Freeze</li>
+<li><strong>DXA050</strong> No temporal helpers</li>
+<li><strong>DXA060</strong> Forbidden vocabulary</li>
+<li><strong>DXA070</strong> Generated code tagging</li>
+<li><strong>DXA080</strong> Facade Invariant Enforcement</li>
+</ul>
+<h2 id="navigation">Navigation</h2>
+<p><strong>Up:</strong> <a href="overview.html">Overview</a>
+<strong>Next:</strong> <a href="specification/core-platform.html">Core Platform Specification</a>
+<strong>Learn:</strong> <a href="../learn/index.md">Dx.Domain in 90 seconds</a>
+<strong>Packages:</strong> <a href="packages/annotations.md">Annotations</a> | <a href="packages/primitives.md">Primitives</a> | <a href="packages/kernel.md">Kernel</a> | <a href="packages/facts.md">Facts</a> | <a href="packages/analyzers.md">Analyzers</a></p>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/ulfbou/dx.domain/blob/main/docs/public/architecture-overview.md/#L1" class="contribution-link">Edit this page</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>
