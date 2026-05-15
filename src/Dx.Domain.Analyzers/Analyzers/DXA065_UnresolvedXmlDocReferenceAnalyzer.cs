@@ -10,6 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain.Analyzers.Infrastructure;
 using Dx.Domain.Analyzers.Infrastructure.Scopes;
 
 using Microsoft.CodeAnalysis;
@@ -95,7 +96,8 @@ public sealed class DXA065_UnresolvedXmlDocReferenceAnalyzer : DiagnosticAnalyze
 
         context.RegisterCompilationStartAction(startContext =>
         {
-            var scopeResolver = new ScopeResolver(startContext.Options.AnalyzerConfigOptionsProvider);
+            var services = AnalyzerServicesFactory.Create(startContext.Compilation, startContext.Options.AnalyzerConfigOptionsProvider);
+            ScopeResolver? scopeResolver = services.Scope as ScopeResolver ?? throw new InvalidOperationException("ScopeResolver service is required for DXA065 analyzer.");
 
             if (!IsKernelAssembly(startContext.Compilation.Assembly, scopeResolver, startContext.Compilation))
                 return;

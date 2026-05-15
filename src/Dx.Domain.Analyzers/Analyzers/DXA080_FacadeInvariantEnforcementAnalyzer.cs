@@ -103,16 +103,10 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new Infrastructure.Flow.ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static void AnalyzeMethod(SymbolAnalysisContext context, AnalyzerServices services)
         {
@@ -124,7 +118,7 @@ namespace Dx.Domain.Analyzers.Analyzers
 
             // Only analyze S1 and S2 scopes (domain and application)
             var scope = services.Scope.ResolveSymbol(method);
-            if (scope != Scope.S1 && scope != Scope.S2)
+            if (scope!= Scope.S1 && scope!= Scope.S2)
                 return;
 
             // Check if this is a Dx facade factory method

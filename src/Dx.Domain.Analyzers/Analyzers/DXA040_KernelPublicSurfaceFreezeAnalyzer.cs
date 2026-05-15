@@ -103,16 +103,10 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new Infrastructure.Flow.ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static void AnalyzeSymbol(SymbolAnalysisContext context, AnalyzerServices services)
         {
@@ -124,22 +118,22 @@ namespace Dx.Domain.Analyzers.Analyzers
 
             // Only analyze S0 scope (kernel)
             var scope = services.Scope.ResolveSymbol(symbol);
-            if (scope != Scope.S0)
+            if (scope!= Scope.S0)
                 return;
 
             // Only care about public symbols
-            if (symbol.DeclaredAccessibility != Accessibility.Public)
+            if (symbol.DeclaredAccessibility!= Accessibility.Public)
                 return;
 
             // Check if symbol has DPI justification attribute
-            // In a real implementation, this would check for a custom attribute like [DpiJustified]
+            // In a real implementation, this would check for a custom attribute like
             // or check for metadata in PR/commit messages
             if (HasDpiJustification(symbol))
                 return;
 
             // For now, we'll do a simple heuristic: flag new public APIs
             // In production, this would integrate with API diff tooling in CI
-            if (symbol.Locations.Any() && !IsLegacyApi(symbol))
+            if (symbol.Locations.Any() &&!IsLegacyApi(symbol))
             {
                 var location = symbol.Locations.First();
                 context.ReportDiagnostic(Diagnostic.Create(Rule, location));
@@ -160,7 +154,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             // Heuristic: consider symbols from core types as legacy
             // In production, this would check against a baseline API surface snapshot
             var containingType = symbol.ContainingType?.Name;
-            
+
             // Common kernel types that are grandfathered in
             if (containingType == "Result" || containingType == "DomainError" ||
                 containingType == "InvariantViolationException" || containingType == "Dx" ||

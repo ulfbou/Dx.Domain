@@ -95,16 +95,10 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new Infrastructure.Flow.ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static void AnalyzeNamedType(SymbolAnalysisContext context, AnalyzerServices services)
         {
@@ -122,7 +116,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             // S0 (kernel) is WHERE factories are typically defined and should be checked
             // S1 (domain) also needs to be checked for domain types
             var scope = services.Scope.ResolveSymbol(type);
-            if (scope != Scope.S0 && scope != Scope.S1)
+            if (scope!= Scope.S0 && scope!= Scope.S1)
                 return;
 
             // Use centralized semantic classifier for domain type detection
@@ -155,7 +149,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             {
                 if (method.DeclaredAccessibility == Accessibility.Public &&
                     method.IsStatic &&
-                    !method.IsExtensionMethod &&
+                   !method.IsExtensionMethod &&
                     IsFactoryMethod(method, type))
                 {
                     hasPublicFactory = true;
@@ -168,9 +162,9 @@ namespace Dx.Domain.Analyzers.Analyzers
             }
 
             // Check for orphaned domain types (no public creation path and no facade)
-            if (!hasPublicConstructor && !hasPublicFactory)
+            if (!hasPublicConstructor &&!hasPublicFactory)
             {
-                var hasFacade = services.Dx.FindFacadeFactoryForType(type) != null;
+                var hasFacade = services.Dx.FindFacadeFactoryForType(type)!= null;
                 if (!hasFacade && type.Locations.Any())
                 {
                     var location = type.Locations.First();

@@ -56,9 +56,9 @@ namespace Dx.Domain.Analyzers.Analyzers
         private static readonly LocalizableString Title =
             "Generated Code Tagging";
         private static readonly LocalizableString MessageFormat =
-            "Generated code missing required generator tag. Add [GeneratedCode] attribute or configured marker.";
+            "Generated code missing required generator tag. Add attribute or configured marker.";
         private static readonly LocalizableString Description =
-            "Generated code should be tagged with [GeneratedCode] attribute to prevent false positives from analyzers.";
+            "Generated code should be tagged with attribute to prevent false positives from analyzers.";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
@@ -103,16 +103,10 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new Infrastructure.Flow.ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static void AnalyzeNamedType(SymbolAnalysisContext context, AnalyzerServices services)
         {
@@ -124,7 +118,7 @@ namespace Dx.Domain.Analyzers.Analyzers
 
             // Only analyze S1 and S2 scopes (domain and application)
             var scope = services.Scope.ResolveSymbol(type);
-            if (scope != Scope.S1 && scope != Scope.S2)
+            if (scope!= Scope.S1 && scope!= Scope.S2)
                 return;
 
             // Check if type looks like generated code (heuristic)
@@ -161,7 +155,7 @@ namespace Dx.Domain.Analyzers.Analyzers
             if (type.Locations.Any())
             {
                 var location = type.Locations.First();
-                if (location.SourceTree != null)
+                if (location.SourceTree!= null)
                 {
                     var path = location.SourceTree.FilePath;
                     if (path.Contains("Generated") || path.Contains("\\obj\\") || path.Contains("/obj/"))
@@ -171,7 +165,7 @@ namespace Dx.Domain.Analyzers.Analyzers
 
             // Check for namespace hints
             var ns = type.ContainingNamespace?.ToDisplayString();
-            if (ns != null && (ns.Contains("Generated") || ns.Contains(".g.")))
+            if (ns!= null && (ns.Contains("Generated") || ns.Contains(".g.")))
                 return true;
 
             return false;

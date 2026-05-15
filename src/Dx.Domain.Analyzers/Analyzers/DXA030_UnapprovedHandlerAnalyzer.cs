@@ -106,16 +106,10 @@ namespace Dx.Domain.Analyzers.Analyzers
             "RS1012:Start action has no registered actions",
             Justification = "Actions are registered in the enclosing lambda; this helper only builds services.")]
         private static AnalyzerServices CreateServices(CompilationStartAnalysisContext context)
-        {
-            var config = context.Options.AnalyzerConfigOptionsProvider;
-            return new AnalyzerServices(
-                new ScopeResolver(config),
-                new DxFacadeResolver(context.Compilation, config),
-                new SemanticClassifier(context.Compilation),
-                new Infrastructure.Exceptions.ExceptionIntentClassifier(context.Compilation, config),
-                new Infrastructure.Flow.ResultFlowEngineWrapper(),
-                new GeneratedCodeDetector(config));
-        }
+    {
+        var config = context.Options.AnalyzerConfigOptionsProvider;
+        return AnalyzerServicesFactory.Create(context.Compilation, config);
+    }
 
         private static ImmutableHashSet<string> LoadApprovedHandlers(AnalyzerConfigOptionsProvider config)
         {
@@ -124,9 +118,9 @@ namespace Dx.Domain.Analyzers.Analyzers
                 return ImmutableHashSet<string>.Empty;
 
             return raw.Split(';')
-                      .Select(s => s.Trim())
-                      .Where(s => s.Length > 0)
-                      .ToImmutableHashSet();
+                     .Select(s => s.Trim())
+                     .Where(s => s.Length > 0)
+                     .ToImmutableHashSet();
         }
 
         private static void AnalyzeInvocation(
@@ -137,13 +131,13 @@ namespace Dx.Domain.Analyzers.Analyzers
             var invocation = (IInvocationOperation)context.Operation;
 
             // Skip if generated code
-            if (invocation.TargetMethod != null && services.Generated.IsGenerated(invocation.TargetMethod))
+            if (invocation.TargetMethod!= null && services.Generated.IsGenerated(invocation.TargetMethod))
                 return;
 
             // Only analyze S0, S1, S2 scopes
             if (invocation.TargetMethod == null)
                 return;
-            
+
             var scope = services.Scope.ResolveSymbol(invocation.TargetMethod);
             if (scope == Scope.S3)
                 return;
@@ -151,11 +145,11 @@ namespace Dx.Domain.Analyzers.Analyzers
             // Check if any argument is a Result type
             foreach (var argument in invocation.Arguments)
             {
-                if (argument.Value.Type != null && services.Semantic.IsKernelResultType(argument.Value.Type))
+                if (argument.Value.Type!= null && services.Semantic.IsKernelResultType(argument.Value.Type))
                 {
                     // Check if the target method is approved
                     var methodName = invocation.TargetMethod.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                    
+
                     if (!IsApprovedHandler(methodName, approvedHandlers, invocation.TargetMethod))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));
@@ -176,7 +170,7 @@ namespace Dx.Domain.Analyzers.Analyzers
 
             // Check for common Result extension methods
             var name = method.Name;
-            if (name == "Match" || name == "Map" || name == "Bind" || 
+            if (name == "Match" || name == "Map" || name == "Bind" ||
                 name == "OnSuccess" || name == "OnFailure" || name == "Tap" ||
                 name == "Ensure" || name == "ThenAsync" || name == "Finally")
                 return true;
