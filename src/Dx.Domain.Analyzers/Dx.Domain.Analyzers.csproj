@@ -76,6 +76,7 @@
 
   <!-- Analyzer packaging layout -->
   <ItemGroup>
+    <None Include="readme.md" Pack="true" PackagePath="/" />
     <None Include="$(OutputPath)Dx.Domain.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
 
     <None Include="$(OutputPath)Dx.Domain.Analyzers.resources.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Condition="Exists('$(OutputPath)Dx.Domain.Analyzers.resources.dll')" />
