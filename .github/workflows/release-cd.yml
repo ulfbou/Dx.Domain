@@ -3,11 +3,6 @@ name: Release CD
 on:
   workflow_dispatch:
     inputs:
-      release-type:
-        description: 'SemVer bump'
-        required: true
-        type: choice
-        options: [patch, minor, major]
       environment:
         description: 'Target environment'
         required: true
@@ -31,29 +26,31 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      version: ${{ steps.nbgv.outputs.NuGetPackageVersion }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
       - name: Validate branch
         run: |
-          if [ "${{ github.ref_name }}" != "main" ]; then
-            echo "Release must run from main"; exit 1
+          if [ "${{ github.ref_name }}" != "master" ]; then
+            echo "Release must run from master"; exit 1
           fi
-      - name: Calculate next version
-        id: version
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Get version from nbgv
+        id: nbgv
         run: |
-          latest=$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || echo "v0.0.0")
-          latest=${latest#v}
-          IFS='.' read -r major minor patch <<< "$latest"
-          case "${{ inputs.release-type }}" in
-            major) major=$((major+1)); minor=0; patch=0 ;;
-            minor) minor=$((minor+1)); patch=0 ;;
-            patch) patch=$((patch+1)) ;;
-          esac
-          version="$major.$minor.$patch"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "NuGetPackageVersion=$(nbgv get-version -v NuGetPackageVersion)" >> $GITHUB_OUTPUT
+          echo "Version: $(nbgv get-version -v NuGetPackageVersion)"
 
   build:
     needs: validate
@@ -64,22 +61,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             8.0.x
             9.0.x
             10.0.x
+            
+      - name: Restore tools
+        run: dotnet tool restore
+        
       - name: Restore
         run: dotnet restore
+        
       - name: Guard skip-tests on production
         if: ${{ inputs.environment == 'production' && inputs.skip-tests }}
         run: echo "skip-tests not allowed for production" && exit 1
+        
       - name: Test
         if: ${{ !inputs.skip-tests }}
         run: dotnet test -c Release --no-restore
+        
       - name: Pack
-        run: dotnet pack -c Release -o ./artifacts /p:ContinuousIntegrationBuild=true /p:Version=$VERSION /p:PackageVersion=$VERSION
+        run: |
+          dotnet pack -c Release -o ./artifacts /p:ContinuousIntegrationBuild=true
+          echo "Packed version: $VERSION"
+          ls -lh ./artifacts/
+        
       - name: Sign packages
         env:
           SIGNING_CERTIFICATE: ${{ secrets.SIGNING_CERTIFICATE }}
@@ -93,6 +102,7 @@ jobs:
             dotnet nuget sign "$nupkg" --certificate-path cert.pfx --timestamper http://timestamp.digicert.com -p "$CERTIFICATE_PASSWORD"
           done
           shred -u cert.pfx
+          
       - uses: actions/upload-artifact@v4
         with:
           name: packages
@@ -161,22 +171,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
       - uses: actions/download-artifact@v4
         with:
           name: packages
           path: ./artifacts
-      - name: Generate changelog
-        run: |
-          prev=$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null || echo "")
-          if [ -n "$prev" ]; then
-            git log --pretty=format:"- %s (%h)" "$prev"..HEAD > CHANGELOG.md
-          else
-            git log --pretty=format:"- %s (%h)" > CHANGELOG.md
-          fi
+          
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
           name: Release v${{ env.VERSION }}
-          body_path: CHANGELOG.md
+          generate_release_notes: true
           files: ./artifacts/*.nupkg
