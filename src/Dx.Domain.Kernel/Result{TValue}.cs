@@ -12,7 +12,6 @@
 
 using Dx.Domain.Errors;
 
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -75,7 +74,7 @@ namespace Dx.Domain
         /// <summary>
         /// Gets the failure error or throws if accessed on success.
         /// </summary>
-        internal DomainError Error
+        public DomainError Error
         {
             get
             {
