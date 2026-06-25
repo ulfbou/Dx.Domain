@@ -56,15 +56,11 @@ Provide Roslyn analyzers that enforce Dx.Domain architectural invariants at buil
 
 ## Configuration
 
-Analyzers respect standard .editorconfig settings:
-
-```ini
-[*.cs]
-dotnet_diagnostic.DXA010.severity = warning
-dotnet_diagnostic.DXA020.severity = error
-```
-
 Scope is determined by the `DxLayer` MSBuild property set by each package (Kernel=S0, Primitives=Shared, etc.).
+
+In repository builds, Dx diagnostic severities are governed centrally. `.editorconfig` entries that override `dotnet_diagnostic.DX*` severities are blocked by build policy.
+
+Supported configuration is limited to non-severity analyzer inputs such as scope mapping, approved handlers, and generated-code markers.
 
 ## Versioning
 
