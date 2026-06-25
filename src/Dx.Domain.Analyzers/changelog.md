@@ -19,5 +19,5 @@
 - This is an alpha release. Diagnostic IDs are stable within the alpha series
 - Analyzers are shipped embedded in Dx.Domain.Kernel, Dx.Domain.Primitives, Dx.Domain.Facts, and Dx.Domain.Annotations packages
 - No separate NuGet package is published for analyzers
-- All diagnostics are reported as warnings by default and can be configured via .editorconfig
+- Dx diagnostic severities are governed centrally in repository builds; `.editorconfig` cannot override `dotnet_diagnostic.DX*` entries
 - No code fixes are provided in this release; diagnostics are guidance only
