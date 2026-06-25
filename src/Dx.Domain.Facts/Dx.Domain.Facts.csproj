@@ -18,7 +18,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <CompilerVisibleProperty Include="DxLayer" />
+  </ItemGroup>
+
+  <ItemGroup>
     <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll" Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')" Pack="true" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
   <ItemGroup>
