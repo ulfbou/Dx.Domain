@@ -46,6 +46,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{02EABD
 		builds\common\Dx.Versions.props = builds\common\Dx.Versions.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Tests", "tests\Dx.Domain.Tests\Dx.Domain.Tests.csproj", "{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,18 @@ Global
 		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|x64.Build.0 = Release|Any CPU
 		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|x86.ActiveCfg = Release|Any CPU
 		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|x86.Build.0 = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|x64.Build.0 = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|x86.Build.0 = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|x64.ActiveCfg = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|x64.Build.0 = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|x86.ActiveCfg = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -139,6 +153,7 @@ Global
 		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A326CE0-DFBE-435C-AD8C-3CA905A96D98}
