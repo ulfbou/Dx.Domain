@@ -48,9 +48,6 @@
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Dx.Domain\Dx.Domain.csproj" />
-  </ItemGroup>
 
   <!-- xUnit Global Usings -->
   <ItemGroup>
