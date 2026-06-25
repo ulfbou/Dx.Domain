@@ -4,7 +4,7 @@ Immutable types used to model domain facts with causation metadata.
 
 ## Purpose
 
-Provide immutable record types for representing domain facts with causation metadata, enabling auditable state transitions without side effects.
+Provide immutable value types and contracts for representing domain facts with causation metadata, enabling auditable state transitions without side effects.
 
 ## Guarantees
 
@@ -29,7 +29,7 @@ Provide immutable record types for representing domain facts with causation meta
 
 ## Role in System
 
-- Provides types for modeling domain facts with causation metadata
+- Provides the sanctioned package for modeling domain facts with causation metadata
 - Consumed by domain and application layers for event sourcing and audit trails
 - No governance or enforcement role; enforcement is provided by Analyzers
 
@@ -37,8 +37,8 @@ Provide immutable record types for representing domain facts with causation meta
 
 ### Core Types
 
-- `Fact<TPayload>` — Immutable fact with payload and causation
-- `Causation` — Correlation, trace, actor, and timestamp for fact provenance
+- `Fact<TPayload>` — Immutable readonly struct with payload, causation, and timestamp
+- `Causation` — Immutable readonly struct for correlation, trace, actor, and timestamp provenance
 - `IDomainFact` — Fact marker interface
 - `FactType` — Strongly-typed fact type identifier
 - `TransitionResult<TState>` — Result of state transition with associated facts
@@ -49,9 +49,19 @@ Provide immutable record types for representing domain facts with causation meta
 
 ### Creation
 
+- `Fact<TPayload>.Create(...)` — Creates a fact and throws for invalid `factType`
+- `Fact<TPayload>.TryCreate(...)` — Returns `Result<Fact<TPayload>>` for validation-friendly creation
+- `Causation.Create(...)` — Creates causation metadata and enforces non-empty correlation/trace identifiers
+
 ```csharp
 var causation = Causation.Create(correlationId, traceId, actorId);
-var fact = Fact.Create("UserRegistered", payload, causation);
+var fact = Fact<string>.Create("UserRegistered", payload, causation);
+
+var attempted = Fact<string>.TryCreate("UserRegistered", payload, causation);
+if (attempted.IsSuccess)
+{
+	var created = attempted.Value;
+}
 ```
 
 ## Non-Goals
