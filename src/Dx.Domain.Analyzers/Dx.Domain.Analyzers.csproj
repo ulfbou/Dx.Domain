@@ -1,60 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk" Label="Dx.Domain.Analyzers">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup Label="Dx.Domain.Analyzers">
-    <!-- Core project metadata -->
-    <ProjectName>Dx.Domain.Analyzers</ProjectName>
-    <Authors>Ulf Bourelius;Dx.Domain Team</Authors>
-    <Company>Dx.Domain Team</Company>
-    <Description>
-      Dx.Domain analyzers enforcing architectural invariants, scope rules, metadata semantics,
-      and construction/result discipline.
-    </Description>
-    <Tags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</Tags>
-    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
-
-    <!-- Build -->
+  <PropertyGroup Label="Dx.Identity">
+    <DxIsAnalyzer>true</DxIsAnalyzer>
+    <DxAnalyzerInternal>true</DxAnalyzerInternal>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!--<NoWarn>1591</NoWarn>-->
-
-    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
-    <WarningsAsErrors>RS1038;CS8600;CS8601;CS8602;CS8603;CS8604</WarningsAsErrors>
-    <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
-    
-    <!-- Packaging -->
-    <IsPackable>false</IsPackable>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <DevelopmentDependency>true</DevelopmentDependency>
-    <PackageId>Dx.Domain.Analyzers</PackageId>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <ProjectName>Dx.Domain.Analyzers</ProjectName>
+    <Description>Dx.Domain analyzers enforcing architectural invariants, scope rules, metadata semantics, and construction/result discipline.</Description>
     <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>
-    <IncludeContentInPack>false</IncludeContentInPack>
-    <NoDefaultExcludes>false</NoDefaultExcludes>
-    
-    <!-- Output -->
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
-    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <PackageId>Dx.Domain.Analyzers</PackageId>
 
-    <!-- Avoid old Directory.* imports entirely -->
-    <EnableSigning>false</EnableSigning>
-    <EnableTesting>false</EnableTesting>
-    <EnableQuality>false</EnableQuality>
-    <EnableSecurity>false</EnableSecurity>
-    <EnableDocumentation>false</EnableDocumentation>
-    <EnablePerformance>false</EnablePerformance>
+    <!-- Temporary fix for extended analyzer rules until a proper solution is implemented -->
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <!-- Version info -->
-    <VersionPrefix Condition="'$(VersionPrefix)' == ''">0.1.0-alpha</VersionPrefix>
-    <Version Condition="'$(Version)' == ''">$(VersionPrefix)</Version>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
-    <InformationalVersion>$(Version)</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -63,29 +19,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
   </ItemGroup>
 
-  <!-- TEMPORARY: Exclude CodeFixes to avoid Workspaces dependency -->
-  <ItemGroup>
-    <Compile Remove="CodeFixes\**" />
-  </ItemGroup>
-
-  <!-- Analyzer packaging layout -->
   <ItemGroup>
     <None Include="readme.md" Pack="true" PackagePath="/" />
-    <None Remove="bin\Debug\netstandard2.0\Dx.Domain.Analyzers.dll" />
     <None Include="$(OutputPath)Dx.Domain.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
-
-    <None Include="$(OutputPath)Dx.Domain.Analyzers.resources.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Condition="Exists('$(OutputPath)Dx.Domain.Analyzers.resources.dll')" />
   </ItemGroup>
-
-  <!-- CRITICAL: REMOVE ALL Directory.* imports -->
-  <ImportGroup>
-    <!-- EMPTY ON PURPOSE -->
-  </ImportGroup>
 
 </Project>

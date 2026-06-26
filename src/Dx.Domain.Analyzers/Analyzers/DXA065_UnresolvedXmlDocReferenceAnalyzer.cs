@@ -39,141 +39,144 @@ namespace Dx.Domain.Analyzers.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class DXA065_UnresolvedXmlDocReferenceAnalyzer : DiagnosticAnalyzer
 {
-    /// <summary>
-    /// Diagnostic contract identifier for DXA065.
-    /// </summary>
-    public const string DiagnosticId = "DXA065";
+/// <summary>
+/// Diagnostic contract identifier for DXA065.
+/// </summary>
+public const string DiagnosticId = "DXA065";
 
-    private const string Category = "Documentation";
+private const string Category = "Documentation";
 
-    private static readonly LocalizableString Title = "Unresolved XML documentation reference";
+private static readonly LocalizableString Title = "Unresolved XML documentation reference";
 
-    private static readonly LocalizableString MessageFormat = "Use <see cref=\"{0}\"/> instead of plain type name '{0}' in XML documentation";
+private static readonly LocalizableString MessageFormat = "Use <see cref=\"{0}\"/> instead of plain type name '{0}' in XML documentation";
 
-    private static readonly LocalizableString Description = "Documentation references to Dx.Domain types should use <see cref=\"T:System.Object\"/> to ensure compile-time verification and rename safety.";
+private static readonly LocalizableString Description = "Documentation references to Dx.Domain types should use <see cref=\"T:System.Object\"/> to ensure compile-time verification and rename safety.";
 
-    private static readonly DiagnosticDescriptor Rule = new(
-        DiagnosticId,
-        Title,
-        MessageFormat,
-        Category,
-        DiagnosticSeverity.Warning,
-        isEnabledByDefault: true,
-        description: Description,
-        helpLinkUri: "https://github.com/ulfbou/dx.domain/blob/main/docs/diagnostics/DXA065.md");
+private static readonly DiagnosticDescriptor Rule = new(
+    DiagnosticId,
+    Title,
+    MessageFormat,
+    Category,
+    DiagnosticSeverity.Warning,
+    isEnabledByDefault: true,
+    description: Description,
+    helpLinkUri: "https://github.com/ulfbou/dx.domain/blob/main/docs/diagnostics/DXA065.md");
 
-    /// <inheritdoc/>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+/// <inheritdoc/>
+public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
-    // Core types frozen for alpha
-    private static readonly ImmutableHashSet<string> CoreTypeNames = ImmutableHashSet.Create(
-        StringComparer.Ordinal,
-        "Result",
-        "DomainError",
-        "InvariantError",
-        "Unit",
-        "UserId",
-        "ActorId",
-        "CorrelationId",
-        "FactId",
-        "TraceId",
-        "SpanId",
-        "CausationId",
-        "Causation",
-        "Fact",
-        "FactType",
-        "FactTypeOf",
-        "IDomainFact",
-        "InvariantViolationException",
-        "TransitionResult"
-    );
+// Core types frozen for alpha.
+private static readonly ImmutableHashSet<string> CoreTypeNames = ImmutableHashSet.Create(
+    StringComparer.Ordinal,
+    "Result",
+    "DomainError",
+    "InvariantError",
+    "Unit",
+    "UserId",
+    "ActorId",
+    "CorrelationId",
+    "FactId",
+    "TraceId",
+    "SpanId",
+    "CausationId",
+    "Causation",
+    "Fact",
+    "FactType",
+    "FactTypeOf",
+    "IDomainFact",
+    "InvariantViolationException",
+    "TransitionResult"
+);
 
-    /// <inheritdoc/>
-    public override void Initialize(AnalysisContext context)
+/// <inheritdoc/>
+public override void Initialize(AnalysisContext context)
+{
+    context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+    context.EnableConcurrentExecution();
+
+    context.RegisterCompilationStartAction(startContext =>
     {
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.EnableConcurrentExecution();
+        var services = AnalyzerServicesFactory.Create(startContext.Compilation, startContext.Options.AnalyzerConfigOptionsProvider);
+        ScopeResolver? scopeResolver = services.Scope as ScopeResolver ?? throw new InvalidOperationException("ScopeResolver service is required for DXA065 analyzer.");
 
-        context.RegisterCompilationStartAction(startContext =>
-        {
-            var services = AnalyzerServicesFactory.Create(startContext.Compilation, startContext.Options.AnalyzerConfigOptionsProvider);
-            ScopeResolver? scopeResolver = services.Scope as ScopeResolver ?? throw new InvalidOperationException("ScopeResolver service is required for DXA065 analyzer.");
-
-            if (!IsKernelAssembly(startContext.Compilation.Assembly, scopeResolver, startContext.Compilation))
-                return;
-
-            startContext.RegisterSyntaxNodeAction(
-                ctx => AnalyzeDocumentation(ctx),
-                SyntaxKind.SingleLineDocumentationCommentTrivia,
-                SyntaxKind.MultiLineDocumentationCommentTrivia);
-        });
-    }
-
-    private static bool IsKernelAssembly(IAssemblySymbol assembly, ScopeResolver resolver, Compilation compilation)
-    {
-        if (resolver.IsKernelInternal(assembly))
-            return true;
-
-        // Test support: check for [assembly: DxLayer("Kernel")]
-        foreach (var attr in assembly.GetAttributes())
-        {
-            var name = attr.AttributeClass?.ToDisplayString();
-            if (name == "Dx.Domain.Annotations.DxLayerAttribute" || name?.EndsWith("DxLayerAttribute") == true)
-            {
-                if (attr.ConstructorArguments.Length > 0 &&
-                    attr.ConstructorArguments[0].Value?.ToString() == "Kernel")
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private static void AnalyzeDocumentation(SyntaxNodeAnalysisContext context)
-    {
-        var trivia = (DocumentationCommentTriviaSyntax)context.Node;
-        var parent = trivia.ParentTrivia.Token.Parent;
-
-        if (!IsPublicApi(parent))
+        if (!IsKernelAssembly(startContext.Compilation.Assembly, scopeResolver, startContext.Compilation))
             return;
 
-        foreach (var xmlText in trivia.DescendantNodes().OfType<XmlTextSyntax>())
+        startContext.RegisterSyntaxNodeAction(
+            ctx => AnalyzeDocumentation(ctx),
+            SyntaxKind.SingleLineDocumentationCommentTrivia,
+            SyntaxKind.MultiLineDocumentationCommentTrivia);
+    });
+}
+
+private static bool IsKernelAssembly(IAssemblySymbol assembly, ScopeResolver resolver, Compilation compilation)
+{
+    if (resolver.IsKernelInternal(assembly))
+        return true;
+
+    // Test support: check for [assembly: DxLayer("Kernel")].
+    foreach (var attr in assembly.GetAttributes())
+    {
+        var name = attr.AttributeClass?.ToDisplayString();
+        if (name == "Dx.Domain.Annotations.DxLayerAttribute" ||
+            name?.EndsWith("DxLayerAttribute", StringComparison.Ordinal) == true)
         {
-            // Skip <see>, <c>, <code>, etc.
-            if (xmlText.Ancestors().Any(a => a is XmlElementSyntax e &&
-                e.StartTag.Name.LocalName.ValueText is "see" or "c" or "code" or "paramref" or "typeparamref"))
-                continue;
-
-            var text = xmlText.ToString();
-            if (string.IsNullOrWhiteSpace(text))
-                continue;
-
-            foreach (var typeName in CoreTypeNames)
+            if (attr.ConstructorArguments.Length > 0 &&
+                attr.ConstructorArguments[0].Value?.ToString() == "Kernel")
             {
-                if (!text.Contains(typeName, StringComparison.Ordinal))
-                    continue;
-
-                var pattern = $@"\b{Regex.Escape(typeName)}\b";
-                foreach (Match match in Regex.Matches(text, pattern))
-                {
-                    var start = xmlText.SpanStart + match.Index;
-                    var location = Location.Create(context.Node.SyntaxTree, new TextSpan(start, match.Length));
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, location, typeName));
-                }
+                return true;
             }
         }
     }
 
-    private static bool IsPublicApi(SyntaxNode? node)
+    return false;
+}
+
+private static void AnalyzeDocumentation(SyntaxNodeAnalysisContext context)
+{
+    var trivia = (DocumentationCommentTriviaSyntax)context.Node;
+    var parent = trivia.ParentTrivia.Token.Parent;
+
+    if (!IsPublicApi(parent))
+        return;
+
+    foreach (var xmlText in trivia.DescendantNodes().OfType<XmlTextSyntax>())
     {
-        return node switch
+        // Skip <see>, <c>, <code>, etc.
+        if (xmlText.Ancestors().Any(a => a is XmlElementSyntax e &&
+            e.StartTag.Name.LocalName.ValueText is "see" or "c" or "code" or "paramref" or "typeparamref"))
+            continue;
+
+        var text = xmlText.ToString();
+        if (string.IsNullOrWhiteSpace(text))
+            continue;
+
+        foreach (var typeName in CoreTypeNames)
         {
-            BaseTypeDeclarationSyntax type => type.Modifiers.Any(SyntaxKind.PublicKeyword),
-            MethodDeclarationSyntax method => method.Modifiers.Any(SyntaxKind.PublicKeyword),
-            PropertyDeclarationSyntax prop => prop.Modifiers.Any(SyntaxKind.PublicKeyword),
-            FieldDeclarationSyntax field => field.Modifiers.Any(SyntaxKind.PublicKeyword),
-            _ => false
-        };
+            if (!text.Contains(typeName, StringComparison.Ordinal))
+                continue;
+
+            var pattern = $@"\b{Regex.Escape(typeName)}\b";
+            foreach (Match match in Regex.Matches(text, pattern))
+            {
+                var start = xmlText.SpanStart + match.Index;
+                var location = Location.Create(context.Node.SyntaxTree, new TextSpan(start, match.Length));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, location, typeName));
+            }
+        }
     }
+}
+
+private static bool IsPublicApi(SyntaxNode? node)
+{
+    return node switch
+    {
+        BaseTypeDeclarationSyntax type => type.Modifiers.Any(SyntaxKind.PublicKeyword),
+        MethodDeclarationSyntax method => method.Modifiers.Any(SyntaxKind.PublicKeyword),
+        PropertyDeclarationSyntax prop => prop.Modifiers.Any(SyntaxKind.PublicKeyword),
+        FieldDeclarationSyntax field => field.Modifiers.Any(SyntaxKind.PublicKeyword),
+        _ => false
+    };
+}
+
 }
