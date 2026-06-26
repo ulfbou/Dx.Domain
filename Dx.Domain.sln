@@ -32,6 +32,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Analyzers.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{02EABD14-4135-4844-8FF4-712F8B0ED546}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		Directory.Quality.targets = Directory.Quality.targets
 		builds\ci\Dx.CI.props = builds\ci\Dx.CI.props
 		builds\common\Dx.Constants.props = builds\common\Dx.Constants.props
 		builds\common\Dx.Defaults.props = builds\common\Dx.Defaults.props
