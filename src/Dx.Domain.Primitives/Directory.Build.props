@@ -1,4 +1,7 @@
 <Project>
+  <Import Project="..\..\Directory.Build.props"
+          Condition="Exists('..\..\Directory.Build.props')" />
+
   <PropertyGroup>
     <DxLayer>Primitives</DxLayer>
   </PropertyGroup>
