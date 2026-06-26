@@ -1,16 +1,9 @@
-<!-- Dx Constants -->
-<Project Label="Dx.Common.Constants">
-  <PropertyGroup Label="Dx.Metadata">
+<Project>
+  <!-- Unconditional repository constants only. No conditions, no policy logic, no role logic. -->
+  <PropertyGroup Label="Dx.RepositoryMetadata">
     <DxCompany>Dx.Domain Team</DxCompany>
     <DxAuthors>Ulf Bourelius (Original Author);$(DxCompany)</DxAuthors>
     <DxRepositoryUrl>https://github.com/ulfbou/Dx.Domain.git</DxRepositoryUrl>
-    <DxCopyright>Copyright © $([System.DateTime]::Now.ToString("yyyy")) $(DxCompany). All rights reserved.</DxCopyright>
-  </PropertyGroup>
-  <PropertyGroup Label="Dx.Global">
-    <Deterministic>true</Deterministic>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DxIdentityFrozen>false</DxIdentityFrozen>
+    <DxCopyright>Copyright © $([System.DateTime]::UtcNow.ToString('yyyy')) $(DxCompany). All rights reserved.</DxCopyright>
   </PropertyGroup>
 </Project>

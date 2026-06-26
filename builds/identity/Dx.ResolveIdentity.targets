@@ -1,13 +1,25 @@
-<Project Label="Dx.Identity.Resolve">
-  <Target Name="DxResolveIdentity" BeforeTargets="DxValidateProjectIntent" Condition="'$(DxIdentityFrozen)' != 'true'">
+<Project>
+  <!-- Resolves and freezes the declared architectural role before governance executes. -->
+  <Target Name="DxResolveIdentity"
+          BeforeTargets="DxValidateProjectIntent"
+          Condition="'$(DxIdentityFrozen)' != 'true'">
     <PropertyGroup>
-      <DxResolvedRole Condition="'$(DxIsLibrary)' == 'true'">Library</DxResolvedRole>
-      <DxResolvedRole Condition="'$(DxIsAbstractions)' == 'true'">Abstractions</DxResolvedRole>
-      <DxResolvedRole Condition="'$(DxIsAnalyzer)' == 'true'">Analyzer</DxResolvedRole>
+      <DxResolvedRole Condition="'$(DxIsLibrary)' == 'true'">RuntimeSubstrate</DxResolvedRole>
+      <DxResolvedRole Condition="'$(DxIsAnalyzer)' == 'true'">CompileTimeGovernance</DxResolvedRole>
+      <DxResolvedRole Condition="'$(DxIsAnnotations)' == 'true'">SemanticMetadata</DxResolvedRole>
       <DxResolvedRole Condition="'$(DxIsTest)' == 'true'">Test</DxResolvedRole>
-      <DxResolvedRole Condition="'$(DxIsTool)' == 'true'">Tool</DxResolvedRole>
       <DxIdentityFrozen>true</DxIdentityFrozen>
     </PropertyGroup>
-    <Message Importance="High" Text="[Dx Identity] Resolved project role: $(DxResolvedRole)" Condition="'$(DxResolvedRole)' != ''" />
+
+    <ItemGroup>
+      <DxProjectKind Include="DxIsLibrary" Condition="'$(DxIsLibrary)' == 'true'" />
+      <DxProjectKind Include="DxIsAnalyzer" Condition="'$(DxIsAnalyzer)' == 'true'" />
+      <DxProjectKind Include="DxIsAnnotations" Condition="'$(DxIsAnnotations)' == 'true'" />
+      <DxProjectKind Include="DxIsTest" Condition="'$(DxIsTest)' == 'true'" />
+    </ItemGroup>
+    
+    <Message Importance="High"
+             Condition="'$(DxResolvedRole)' != ''"
+             Text="[Dx Identity] Resolved project role: $(DxResolvedRole)" />
   </Target>
 </Project>

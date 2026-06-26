@@ -1,12 +1,16 @@
-<Project Label="Dx.Policy.Forbidden">
+<Project>
+  <!-- Documentation inventory for centrally governed properties that must not be leaf-authored. -->
   <ItemGroup>
     <DxForbiddenProperty Include="Version" />
     <DxForbiddenProperty Include="PackageVersion" />
+    <DxForbiddenProperty Include="TargetFramework" />
+    <DxForbiddenProperty Include="TargetFrameworks" />
+    <DxForbiddenProperty Include="IsPackable" />
+    <DxForbiddenProperty Include="IncludeBuildOutput" />
+    <DxForbiddenProperty Include="TreatWarningsAsErrors" />
+    <DxForbiddenProperty Include="GenerateDocumentationFile" />
     <DxForbiddenProperty Include="Authors" />
     <DxForbiddenProperty Include="Company" />
     <DxForbiddenProperty Include="Copyright" />
-    <DxForbiddenProperty Include="SignAssembly" />
-    <DxForbiddenProperty Include="TreatWarningsAsErrors" />
-    <DxForbiddenProperty Include="GenerateDocumentationFile" />
   </ItemGroup>
 </Project>

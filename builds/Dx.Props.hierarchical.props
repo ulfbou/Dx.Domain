@@ -4,13 +4,10 @@
   </PropertyGroup>
 
   <ImportGroup Label="Dx.Internal.Discovery">
-    <Import Project="common/Dx.Constants.props"
-            Condition="Exists('common/Dx.Constants.props')" />
-    <Import Project="common/Dx.Versions.props"
-            Condition="Exists('common/Dx.Versions.props')" />
-    <Import Project="policy/Dx.Forbidden.props"
-            Condition="Exists('policy/Dx.Forbidden.props')" />
-    <Import Project="ci/Dx.CI.props"
-            Condition="('$(CI)' != '' OR '$(TF_BUILD)' != '') AND Exists('ci/Dx.CI.props')" />
+    <Import Project="common/Dx.Constants.props" Condition="Exists('common/Dx.Constants.props')" />
+    <Import Project="common/Dx.Versions.props" Condition="Exists('common/Dx.Versions.props')" />
+    <Import Project="policy/Dx.Forbidden.props" Condition="Exists('policy/Dx.Forbidden.props')" />
+    <Import Project="common/Dx.Defaults.props" Condition="Exists('common/Dx.Defaults.props')" />
+    <Import Project="ci/Dx.CI.props" Condition="('$(CI)' != '' OR '$(TF_BUILD)' != '') AND Exists('ci/Dx.CI.props')" />
   </ImportGroup>
 </Project>
