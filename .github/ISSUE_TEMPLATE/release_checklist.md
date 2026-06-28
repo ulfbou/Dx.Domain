@@ -1,38 +1,40 @@
 ---
-name: Release Checklist
-about: Track a version release and final verification steps
-title: '[RELEASE] '
-labels: area:governance, type:chore, prio:P0, status:needs-triage
+name: Release
+about: Release readiness and publication
+title: "[RELEASE] "
+labels:
+  - area:release
+  - type:release
+  - prio:P0
 assignees: ulfbou
+
 ---
 
-## Release
-**Version:**
-**Milestone:**
+## Version
 
-## Context
-<!-- Link to previous checklist or related issues -->
-Continues #
+## Scope
 
-## Automated Validation
-- [ ] All ACs have automated tests
-- [ ] `dotnet build` succeeds on all TFMs
-- [ ] All tests passing
-- [ ] Diagnostic severities correct
+## Release Criteria
 
-## Manual Verification
-- [ ] Update docs/todo.md Phase 0 checklist
-- [ ] Add CHANGELOG entry
-- [ ] Verify no new public types in Dx.Domain.Kernel
-- [ ] Run: `git grep -n "new ScopeResolver\|new DxFacadeResolver" src/Dx.Domain.Analyzers`
-- [ ] Tag release
-- [ ] Publish API docs to gh-pages
+### Validation
 
-## Documentation
-- [ ] README updated with release status
-- [ ] Package readmes aligned with precision model
-- [ ] DocFX published
+- [ ] Build succeeds
+- [ ] Tests pass
+- [ ] Packaging succeeds
+- [ ] Documentation updated
 
-## Related
-- PRs:
-- Issues:
+### API
+
+- [ ] Public API reviewed
+- [ ] Breaking changes documented
+
+### Release
+
+- [ ] Changelog completed
+- [ ] Release notes completed
+- [ ] Milestone closed
+- [ ] Tag created
+
+## Related Issues
+
+## Related PRs
