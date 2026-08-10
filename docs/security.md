@@ -9,8 +9,8 @@ Only the latest alpha is supported for security updates. Given the pre-release s
 
 | Version | Supported |
 | --- | --- |
-| 0.1.0-alpha.1 | Yes |
-| < 0.1.0-alpha.1 | No |
+| 0.1.0-alpha | Yes |
+| < 0.1.0-alpha | No |
 
 ## Reporting vulnerabilities
 

@@ -46,7 +46,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{02EABD
 		builds\Dx.Props.hierarchical.props = builds\Dx.Props.hierarchical.props
 		builds\Dx.Props.hierarchical.targets = builds\Dx.Props.hierarchical.targets
 		builds\identity\Dx.ResolveIdentity.targets = builds\identity\Dx.ResolveIdentity.targets
-		builds\common\Dx.Versions.props = builds\common\Dx.Versions.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Tests", "tests\Dx.Domain.Tests\Dx.Domain.Tests.csproj", "{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}"
