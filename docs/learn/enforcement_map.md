@@ -1,7 +1,7 @@
 # Enforcement Map
 
 **Status:** Pre-release alpha  
-**Applies to:** Dx.Domain v0.1.0-alpha.1
+**Applies to:** Dx.Domain v0.1.0-alpha
 **Last reviewed:** 2026-04-22
 
 > Philosophy in this repository is not aspirational. It is mechanically enforced. This map connects each principle to its implementation mechanism and its enforcement tool.

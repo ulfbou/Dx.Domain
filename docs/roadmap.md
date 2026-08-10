@@ -1,7 +1,7 @@
 # Roadmap
 
 **Last reviewed:** 2026-04-22  
-**Current version:** 0.1.0-alpha.1
+**Current version:** 0.1.0-alpha
 
 ## Philosophy
 
