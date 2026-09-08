@@ -1,41 +1,59 @@
 # Getting Started
 
-## 1. Install packages
+**Audience:** .NET developers evaluating `0.1.0-alpha`
+**Outcome:** install the minimum packages, enable analyzers, and build a Result-returning method.
+
+## Prerequisites
+
+- A project targeting .NET 8, .NET 9, or .NET 10
+- An SDK compatible with the selected target framework
+- NuGet access to the feed containing the alpha packages
+
+## Install the minimum set
 
 ```bash
-dotnet add package Dx.Domain.Primitives
-dotnet add package Dx.Domain.Kernel
-dotnet add package Dx.Domain.Annotations
-dotnet add package Dx.Domain.Facts
-dotnet add package Dx.Domain.Analyzers
+dotnet add package Dx.Domain.Kernel --version 0.1.0-alpha
+dotnet add package Dx.Domain.Primitives --version 0.1.0-alpha
+dotnet add package Dx.Domain.Analyzers --version 0.1.0-alpha
 ```
 
-Package roles: [Primitives](packages/primitives.md), [Kernel](packages/kernel.md), [Annotations](packages/annotations.md), [Facts](packages/facts.md).
+Install analyzers explicitly during alpha. Add `Dx.Domain.Facts` when you need structural facts and `Dx.Domain.Annotations` when you need semantic metadata directly.
 
-## 2. Understand the three constraints
+## Configure analyzer facts
 
-Before writing code, read [Core Specification §4-5](specification/core-platform.md#4-construction-authority):
+Create or update `.editorconfig`:
 
-- **Construction is restricted** — see [DXA010](packages/analyzers.md#dxa010)
-- **All operations return Result** — see [Result Semantics](specification/core-platform.md#5-result-semantics)
-- **Exceptions are not control flow** — see [DXA022](packages/analyzers.md#dxa022)
+```ini
+root = true
 
-## 3. Write your first domain type
+[*.cs]
+dx.scope.map = S0:Dx.Domain;S1:MyApp.Domain;S2:MyApp.Application;S3:MyApp.Infrastructure
+dx.facade.root = MyApp.Domain.DomainFactory
+```
 
-Use value objects from [Primitives](packages/primitives.md) and annotate with [Annotations](packages/annotations.md).
+Configuration supplies classification facts. It does not expand runtime guarantees.
 
-Example: [basic-result.md](examples/basic-result.md)
+## First Result
 
-## 4. Compile
+```csharp
+using Dx.Domain;
+using Dx.Domain.Errors;
+using Dx.Domain.Primitives;
 
-Analyzers enforce correctness. You will see these first:
+static Result<UserId> ParseUserId(string text)
+{
+    if (UserId.TryParse(text, provider: null, out var id))
+        return Dx.Result.Success(id);
 
-- [DXA010](packages/analyzers.md#dxa010) – if you use `new` instead of Dx facade
-- [DXA011](packages/analyzers.md#dxa011) – if you leave a constructor public
-- [DXA020](packages/analyzers.md#dxa020) – if you ignore a Result (Error)
-- [DXA022](packages/analyzers.md#dxa022) – if you throw in a Result method
-- [DXA030](packages/analyzers.md#dxa030) – if you pass Result to an unregistered handler
+    return Dx.Result.Failure<UserId>(
+        DomainError.Create("user.id.invalid", "Expected a non-empty GUID in N format."));
+}
+```
 
-Full list: [Analyzer Reference](packages/analyzers.md)
+Build the project:
 
-**Next:** [Architecture Overview](architecture-overview.md) → [Specification](specification/core-platform.md)
+```bash
+dotnet build
+```
+
+Next, follow the [Quickstart](quickstart.md) and review [Result handling](guides/handle-results.md).

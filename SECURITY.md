@@ -1,33 +1,20 @@
 # Security Policy
 
-## Reporting a Vulnerability
+## Supported versions
 
-Dx.Domain is an alpha-stage project. If you discover a security vulnerability, please report it responsibly:
+Dx.Domain is pre-release software. Only the latest published alpha receives best-effort security fixes.
 
-**Email:** [Create an issue](https://github.com/ulfbou/Dx.Domain/security/advisories) using GitHub Security Advisories
+## Report a vulnerability
 
-**Do not** disclose the vulnerability publicly until a patch is available.
+Use the repository's **GitHub Security Advisories** reporting form:
 
-## Security Considerations for Alpha
+<https://github.com/ulfbou/Dx.Domain/security/advisories/new>
 
-This is a pre-release (`0.1.0-alpha`). Security guarantees are limited:
+Do not report security vulnerabilities in a public issue. Include the affected package and version, impact, reproduction steps, and any suggested mitigation. No response-time or remediation-time guarantee is made during alpha.
 
-- API surface may change
-- Security best practices may evolve
-- No long-term stability commitments
+## Alpha considerations
 
-Users should:
-- Treat alpha releases as experimental
-- Not use in production without understanding the limitations
-- Keep dependencies updated
-- Report security issues promptly
-
-## Supported Versions
-
-Only the latest alpha release receives security updates.
-
-| Version | Status | Security Updates |
-|---------|--------|------------------|
-| 0.1.0-alpha | Active | Yes |
-| Earlier | Unsupported | No |
-
+- Do not assume analyzers provide runtime protection.
+- Reflection, serialization, dynamic invocation, and `default` struct values can bypass intended construction paths.
+- Validate external input before creating domain values.
+- Review the public [limitations](docs/public/limitations.md) before production use.
