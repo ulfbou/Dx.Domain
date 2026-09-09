@@ -64,5 +64,4 @@ Functional wrappers like `Option`, `Either`, `NonEmpty` are excluded from the Ke
 
 ## What Success Looks Like
 - Kernel/Primitives/Annotations build clean under analyzers.  
-- Consumer misuse **fails deterministically** at build time. 
-
+- Consumer misuse **fails deterministically** at build time.
