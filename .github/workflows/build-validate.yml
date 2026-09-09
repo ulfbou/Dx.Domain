@@ -2,7 +2,7 @@ name: Build & Validate
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ master, release/0.1.0-alpha ]
 
 permissions:
   contents: read
@@ -79,5 +79,8 @@ jobs:
       - name: Run tests
         run: dotnet test -c Release --no-build --verbosity normal
 
-      - name: Docs lint (placeholder)
-        run: echo "Docs lint not yet implemented"
+      - name: Docs lint
+        run: scripts/docs-lint.sh
+
+      - name: Snippet structure validation
+        run: scripts/docs-snippets-compile.sh docs/public net8.0
