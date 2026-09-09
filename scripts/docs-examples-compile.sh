@@ -2,7 +2,11 @@
 set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 cd "$root"
-dotnet build samples/Documentation.Quickstart/Documentation.Quickstart.csproj \
+project="samples/Documentation.Quickstart/Documentation.Quickstart.csproj"
+
+dotnet restore "$project"
+
+dotnet build "$project" \
   -c Release \
   --no-restore \
   -p:TreatWarningsAsErrors=false
