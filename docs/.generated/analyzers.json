@@ -48,6 +48,16 @@
     "Description": "Kernel code should use mechanical terminology. Pattern-based terms like 'Repository', 'Saga', 'Apply' belong in adapters."
   },
   {
+    "Id": "DXA065",
+    "Title": "Unresolved XML documentation reference",
+    "Message": "Use <see cref=\"{0}\"/> instead of plain type name '{0}' in XML documentation",
+    "Category": "Documentation",
+    "DefaultSeverity": "Warning",
+    "EnabledByDefault": true,
+    "Description": "Documentation references to Dx.Domain types should use cref references so the compiler can verify symbols and renames.",
+    "HelpLinkUri": "https://github.com/ulfbou/dx.domain/blob/main/docs/public/reference/diagnostics/DXA065.md"
+  },
+  {
     "Id": "DXA070",
     "Title": "Generated Code Tagging",
     "Message": "Generated code missing required generator tag. Add [GeneratedCode] attribute or configured marker.",
