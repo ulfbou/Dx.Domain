@@ -35,6 +35,9 @@ jobs:
         # Governance decides DX*, not CLI
         run: dotnet build -c Release --no-restore -p:TreatWarningsAsErrors=false
 
+      - name: Verify diagnostic metadata conformance
+        run: python3 scripts/verify-diagnostic-conformance.py
+
       - name: Run analyzer tests
         env:
           FA_DISABLE_STARTUP_MESSAGE: "1"
