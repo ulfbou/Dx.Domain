@@ -416,4 +416,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-.dx/
+*~
+*#
+/diff
+_site/*
+.dx/*
