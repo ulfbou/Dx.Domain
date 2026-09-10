@@ -1,38 +1,38 @@
 # Dx.Domain System Model
 
+> **Classification:** Retained repository summary. Canonical consumer documentation is under [`docs/public`](public/index.md), and conflicting claims must defer to the repository's [documentation authority](internal/documentation-authority.md).
+
 ## Purpose
-A small, opinionated substrate for invariants, results, errors, identities, and structural history — designed so incorrect domain models are hard to express. If it compiles, passes analyzers, and the Kernel accepts it, the state is valid.
 
-*Source: docs/learn/architecture-overview.md*
+Dx.Domain is a small, compiler-assisted substrate for explicit invariants, results, errors, identities, and structural facts.
 
-## The Four Packages
-- **Annotations** — pure vocabulary and metadata; no runtime logic
-- **Primitives** — immutable, side-effect-free value types
-- **Kernel** — the runtime judge of invariants, results, errors, facts; no I/O/infrastructure
-- **Facts** — structural, lineage-aware, meaning-agnostic history; not domain events
+*Canonical source: [Public architecture](public/architecture.md)*
 
-*Source: docs/public/architecture-overview.md*
+## Packages
 
-## Dependency Rules
-1. Kernel depends on Annotations only
-2. Primitives depends on Annotations only
-3. Facts depends on Annotations, Primitives, Kernel
-4. Analyzers depends on Annotations only
+- **Annotations:** semantic vocabulary and metadata
+- **Primitives:** immutable identity and value types
+- **Kernel:** results, errors, invariants, and requirements
+- **Facts:** structural fact and causation values, not a domain-event bus
+- **Analyzers:** compile-time diagnostics installed explicitly by consumers during alpha
 
-*Source: docs/public/architecture-overview.md*
+*Canonical source: [Public architecture](public/architecture.md)*
 
-## Scopes S0–S3
-- **S0 Kernel** — Dx.Domain itself. Trusted, exempt from DXA010/DXA011 per ADR-0018
-- **S1 Domain Facades** — construction boundary
-- **S2 Application** — orchestration
-- **S3 Infrastructure** — I/O and adapters
+## Dependency rules
 
-*Source: docs/public/architecture-overview.md*
+Facts depends on Primitives, Kernel, and Annotations. Kernel and Primitives depend on Annotations. Repository runtime projects reference analyzers as compiler analyzers; that repository configuration does not establish transitive NuGet behavior.
 
-## Construction Authority
-All domain objects in S1, S2, and S3 must be created through controlled facade or factory entry points. S0 Kernel is explicitly excluded.
+*Canonical source: [Public architecture](public/architecture.md)*
 
-S0 types exempt from DXA010/DXA011/DXA080:
-- Result<T>, Result<TSuccess,TFailure>, DomainError, Invariant, Unit
+## Scopes S0-S3
 
-*Source: ADR-0003, ADR-0018*
+- **S0:** substrate assemblies owned by Dx.Domain
+- **S1:** consumer domain and construction boundaries
+- **S2:** application orchestration
+- **S3:** infrastructure and adapters
+
+Analyzer behavior is scope-aware. Rule-specific applicability belongs in the [canonical diagnostic reference](public/reference/diagnostics/index.md) and must agree with implementation and tests.
+
+## Stability and enforcement
+
+Runtime APIs and analyzer behavior are provisional for `0.1.0-alpha`. Architectural principles may be stable, but a surface is not described as frozen without a verified API baseline. Standard compiler suppression mechanisms remain technically available; repository policy may separately govern their use.

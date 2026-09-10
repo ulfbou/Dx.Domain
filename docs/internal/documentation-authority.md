@@ -7,6 +7,19 @@
 
 Dx.Domain is a small, compiler-assisted substrate for explicit invariants, results, errors, identities, and structural facts.
 
+## Documentation-tree classification
+
+- **`docs/public`:** canonical public documentation and the only source used to build the public site.
+- **`docs/internal`:** active maintainer, governance, release-process, and audit documentation. It is repository-visible but excluded from the public site.
+- **`docs/adr`:** retained historical architectural decision records. ADRs explain past decisions but do not override current implementation, specifications, or public documentation.
+- **`docs/specifications`:** normative specifications where the specification is applicable and consistent with demonstrated implementation behavior.
+- **`docs/learn`:** retained legacy entry points only. These pages are not authoritative and must route readers to `docs/public`.
+- **`docs/analyzers`:** retained legacy diagnostic routes subordinate to the canonical public diagnostic reference.
+- **`docs/reference`:** retained legacy reference routes subordinate to `docs/public/reference`.
+- **Root-level documentation:** `readme.md` defines the product entry point, `CHANGELOG.md` records release history, `SECURITY.md` defines security reporting, and `CONTRIBUTING.md` defines contribution guidance. Other root documents are classified individually by their stated purpose.
+
+No retained or historical page may present itself as an alternative public authority.
+
 ## Sources of truth
 
 - **Product definition:** this document and the root README.
