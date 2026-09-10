@@ -60,7 +60,7 @@ private static readonly DiagnosticDescriptor Rule = new(
     DiagnosticSeverity.Warning,
     isEnabledByDefault: true,
     description: Description,
-    helpLinkUri: "https://github.com/ulfbou/dx.domain/blob/main/docs/diagnostics/DXA065.md");
+    helpLinkUri: "https://github.com/ulfbou/dx.domain/blob/master/docs/diagnostics/DXA065.md");
 
 /// <inheritdoc/>
 public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);

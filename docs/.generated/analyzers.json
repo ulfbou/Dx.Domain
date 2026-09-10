@@ -55,7 +55,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Documentation references to Dx.Domain types should use cref references so the compiler can verify symbols and renames.",
-    "HelpLinkUri": "https://github.com/ulfbou/dx.domain/blob/main/docs/public/reference/diagnostics/DXA065.md"
+    "HelpLinkUri": "https://github.com/ulfbou/dx.domain/blob/master/docs/public/reference/diagnostics/DXA065.md"
   },
   {
     "Id": "DXA070",
