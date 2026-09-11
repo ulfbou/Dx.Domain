@@ -60,7 +60,7 @@ This audit is the mandatory first implementation artifact. A criterion marked `p
 | --- | --- | --- |
 | Public diagnostic IDs equal packaged descriptors | met | Executable descriptor comparison proves the same 11 shipped IDs across generated and public inventories. |
 | Default severities equal descriptors | met | Executable comparison validates every public page and index severity against its descriptor. |
-| S0-S3 applicability matches tested behavior | met | The Phase 4 scope matrix records implemented scope and the verifier guards the source-derived scope contract; analyzer tests pass. |
+| S0-S3 applicability matches tested behavior | partially met | The Phase 4 matrix records implemented guards, but focused positive and negative scope tests remain required for every shipped diagnostic. |
 | DXA065 is documented as shipped | met | DXA065 appears in every applicable shipped inventory and route. |
 | DXA090 is planned and unshipped | met | Documentation authority and public reference separate it from shipped diagnostics. |
 | Every shipped diagnostic has actionable remediation | met | Public diagnostic pages include remediation sections. |

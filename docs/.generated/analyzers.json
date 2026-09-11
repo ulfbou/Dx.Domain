@@ -7,12 +7,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Domain types should be constructed through the Dx facade to centralize invariant enforcement and make creation auditable.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S1",
-      "S2",
-      "S3"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA011",
@@ -22,11 +17,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Domain types should not expose public constructors or factories to prevent consumers from bypassing the Dx facade.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S0",
-      "S1"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA020",
@@ -36,11 +27,7 @@
     "DefaultSeverity": "Error",
     "EnabledByDefault": true,
     "Description": "Result instances must be explicitly handled to prevent silent failures and lost domain errors.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S1",
-      "S2"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA022",
@@ -50,11 +37,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Methods that return Result should use Result.Failure instead of throwing exceptions for domain control flow.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S1",
-      "S2"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA030",
@@ -64,12 +47,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Result values should only be passed to approved handlers to ensure explicit and analyzable result handling.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S0",
-      "S1",
-      "S2"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA040",
@@ -79,10 +57,7 @@
     "DefaultSeverity": "Error",
     "EnabledByDefault": true,
     "Description": "Kernel API surface should remain minimal. New public types or members require DPI justification to prevent kernel drift.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S0"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA050",
@@ -92,11 +67,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Kernel code should remain mechanical, not prescriptive. Temporal helpers encode business time semantics and belong at the edges.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S0",
-      "S1"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA060",
@@ -106,11 +77,7 @@
     "DefaultSeverity": "Error",
     "EnabledByDefault": true,
     "Description": "Kernel code should use mechanical terminology. Pattern-based terms like 'Repository', 'Saga', 'Apply' belong in adapters.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S0",
-      "S1"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA065",
@@ -120,10 +87,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Documentation references to Dx.Domain types should use <see cref=\"T:System.Object\"/> to ensure compile-time verification and rename safety.",
-    "HelpLinkUri": "https://github.com/ulfbou/Dx.Domain/blob/master/docs/public/reference/diagnostics/DXA065.md",
-    "Scope": [
-      "S0 public API"
-    ]
+    "HelpLinkUri": "https://github.com/ulfbou/Dx.Domain/blob/master/docs/public/reference/diagnostics/DXA065.md"
   },
   {
     "Id": "DXA070",
@@ -133,11 +97,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Generated code should be tagged with attribute to prevent false positives from analyzers.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S1",
-      "S2"
-    ]
+    "HelpLinkUri": null
   },
   {
     "Id": "DXA080",
@@ -147,10 +107,6 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Dx facade factory methods must enforce invariants to guarantee creation boundary correctness.",
-    "HelpLinkUri": null,
-    "Scope": [
-      "S1",
-      "S2"
-    ]
+    "HelpLinkUri": null
   }
 ]
