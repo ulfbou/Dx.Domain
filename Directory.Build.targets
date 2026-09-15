@@ -1,7 +1,9 @@
 <Project>
-  <!-- Root targets conductor. Imports only targets-stage assets after project evaluation. -->
-  <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets"
-          Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
-  <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets"
-          Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
+    <!-- Root targets conductor. Imports only targets-stage assets after project evaluation. -->
+    <Import Project="$(DxBuildRoot)identity/Dx.ResolveIdentity.targets"
+            Condition="Exists('$(DxBuildRoot)identity/Dx.ResolveIdentity.targets')" />
+    <Import Project="$(DxBuildRoot)policy/Dx.Governance.targets"
+            Condition="Exists('$(DxBuildRoot)policy/Dx.Governance.targets')" />
+    <Import Project="$(DxBuildRoot)release/Dx.AnalyzerPackaging.targets"
+            Condition="Exists('$(DxBuildRoot)release/Dx.AnalyzerPackaging.targets')" />
 </Project>

@@ -1,31 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup Label="Dx.Identity">
-    <DxIsAnalyzer>true</DxIsAnalyzer>
-    <DxAnalyzerInternal>true</DxAnalyzerInternal>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <ProjectName>Dx.Domain.Analyzers</ProjectName>
-    <Description>Dx.Domain analyzers enforcing architectural invariants, scope rules, metadata semantics, and construction/result discipline.</Description>
-    <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>
-    <PackageId>Dx.Domain.Analyzers</PackageId>
+    <PropertyGroup Label="Dx.Identity">
+        <DxIsAnalyzer>true</DxIsAnalyzer>
+        <DxAnalyzerInternal>true</DxAnalyzerInternal>
+        <!-- The pinned Microsoft.Net.Compilers.Toolset is incompatible with the SDK-bundled NET analyzers. -->
+        <!-- Analyzer-authoring validation remains supplied by Microsoft.CodeAnalysis.Analyzers. -->
+        <EnableNETAnalyzers>false</EnableNETAnalyzers>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ProjectName>Dx.Domain.Analyzers</ProjectName>
+        <Description>Dx.Domain analyzers enforcing architectural invariants, scope rules, metadata semantics, and construction/result discipline.</Description>
+        <PackageTags>dx;domain-driven-design;ddd;functional;analyzers;invariants;result-pattern</PackageTags>
+        <PackageId>Dx.Domain.Analyzers</PackageId>
 
-    <!-- Temporary fix for extended analyzer rules until a proper solution is implemented -->
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-  </PropertyGroup>
+        <!-- Temporary fix for extended analyzer rules until a proper solution is implemented -->
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <InternalsVisibleTo Include="Dx.Domain.Analyzers.Tests" />
-  </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Dx.Domain.Analyzers.Tests" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" PrivateAssets="all" />
-
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="readme.md" Pack="true" PackagePath="/" />
-    <None Include="$(OutputPath)Dx.Domain.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
+    </ItemGroup>
 
 </Project>
