@@ -1,0 +1,21 @@
+<Project Label="Dx.ReleaseTopology">
+  <PropertyGroup Label="Dx.ReleaseProjectIdentity">
+    <DxReleaseProjectName>$(MSBuildProjectName)</DxReleaseProjectName>
+    <DxIsApprovedReleasePackage Condition="'$(DxReleaseProjectName)' == 'Dx.Domain.Annotations' Or '$(DxReleaseProjectName)' == 'Dx.Domain.Kernel' Or '$(DxReleaseProjectName)' == 'Dx.Domain.Primitives' Or '$(DxReleaseProjectName)' == 'Dx.Domain.Facts'">true</DxIsApprovedReleasePackage>
+    <DxIsApprovedReleasePackage Condition="'$(DxIsApprovedReleasePackage)' == ''">false</DxIsApprovedReleasePackage>
+    <DxIsStandaloneCompileTimePackage Condition="'$(DxReleaseProjectName)' == 'Dx.Domain.Analyzers' Or '$(DxReleaseProjectName)' == 'Dx.Domain.Generators'">true</DxIsStandaloneCompileTimePackage>
+    <DxIsStandaloneCompileTimePackage Condition="'$(DxIsStandaloneCompileTimePackage)' == ''">false</DxIsStandaloneCompileTimePackage>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DxIsStandaloneCompileTimePackage)' == 'true'" Label="Dx.NonPackableCompileTimeProject">
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup Label="Dx.ApprovedReleasePackages">
+    <DxApprovedReleasePackage Include="$(MSBuildThisFileDirectory)..\..\src\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" PackageId="Dx.Domain.Annotations" BuildOrder="20" />
+    <DxApprovedReleasePackage Include="$(MSBuildThisFileDirectory)..\..\src\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj" PackageId="Dx.Domain.Kernel" BuildOrder="30" />
+    <DxApprovedReleasePackage Include="$(MSBuildThisFileDirectory)..\..\src\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj" PackageId="Dx.Domain.Primitives" BuildOrder="30" />
+    <DxApprovedReleasePackage Include="$(MSBuildThisFileDirectory)..\..\src\Dx.Domain.Facts\Dx.Domain.Facts.csproj" PackageId="Dx.Domain.Facts" BuildOrder="40" />
+  </ItemGroup>
+</Project>

@@ -115,8 +115,10 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
             var mockOptions = new Moq.Mock<AnalyzerConfigOptions>();
             if (markers != null)
             {
+                #pragma warning disable CS8601 // Moq initializes the out value in the callback.
                 mockOptions.Setup(o => o.TryGetValue("dx_generated_markers", out It.Ref<string>.IsAny))
                     .Returns((string k, out string v) => { v = markers; return true; });
+                #pragma warning restore CS8601
             }
             mockConfig.Setup(c => c.GlobalOptions).Returns(mockOptions.Object);
             return new GeneratedCodeDetector(mockConfig.Object);

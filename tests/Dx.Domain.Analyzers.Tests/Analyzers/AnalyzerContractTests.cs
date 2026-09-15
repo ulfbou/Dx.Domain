@@ -91,18 +91,30 @@ public sealed class AnalyzerContractTests
         var dxLayer = root.Descendants("DxLayer").Select(element => element.Value).SingleOrDefault();
         var compilerVisibleDxLayer = root.Descendants("CompilerVisibleProperty")
             .Any(element => string.Equals((string?)element.Attribute("Include"), "DxLayer", StringComparison.Ordinal));
-        var embeddedAnalyzer = root.Descendants("None")
+        var repositoryRoot = FindRepositoryRoot();
+        var topologyPath = Path.Combine(repositoryRoot, "builds", "release", "Dx.ReleaseTopology.props");
+        var packagingPath = Path.Combine(repositoryRoot, "builds", "release", "Dx.AnalyzerPackaging.targets");
+        var topology = XDocument.Load(topologyPath);
+        var packaging = XDocument.Load(packagingPath);
+
+        var approvedFactsPackage = topology.Descendants("DxApprovedReleasePackage")
+            .Any(element =>
+                string.Equals((string?)element.Attribute("PackageId"), "Dx.Domain.Facts", StringComparison.Ordinal)
+                && string.Equals((string?)element.Attribute("BuildOrder"), "40", StringComparison.Ordinal));
+        var embeddedAnalyzer = packaging.Descendants("None")
             .Any(element =>
                 string.Equals((string?)element.Attribute("Pack"), "true", StringComparison.OrdinalIgnoreCase)
-                && string.Equals((string?)element.Attribute("PackagePath"), "analyzers/dotnet/cs", StringComparison.Ordinal)
-                && string.Equals(
-                    (string?)element.Attribute("Include"),
-                    @"..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll",
-                    StringComparison.Ordinal));
+                && string.Equals((string?)element.Attribute("PackagePath"), "$(DxAnalyzerPackagePath)", StringComparison.Ordinal)
+                && string.Equals((string?)element.Attribute("Include"), "$(DxAnalyzerOutput)", StringComparison.Ordinal));
+        var analyzerPackagePath = packaging.Descendants("DxAnalyzerPackagePath")
+            .Select(element => element.Value)
+            .SingleOrDefault();
 
         Assert.Equal("Authority", dxLayer);
         Assert.True(compilerVisibleDxLayer);
+        Assert.True(approvedFactsPackage);
         Assert.True(embeddedAnalyzer);
+        Assert.Equal("analyzers/dotnet/cs/Dx.Domain.Analyzers.dll", analyzerPackagePath);
     }
 
     private static string FindRepositoryRoot()

@@ -69,8 +69,10 @@ namespace Dx.Domain.Analyzers.Tests.UnitTests
 
             var mockConfig = new Mock<AnalyzerConfigOptionsProvider>();
             var mockOptions = new Mock<AnalyzerConfigOptions>();
+            #pragma warning disable CS8601 // Moq initializes the out value in the callback.
             mockOptions.Setup(o => o.TryGetValue("dx_facade_root", out It.Ref<string>.IsAny))
                .Returns((string key, out string value) => { value = "MyCompany.Facades.MyDx"; return true; });
+            #pragma warning restore CS8601
             mockConfig.Setup(c => c.GlobalOptions).Returns(mockOptions.Object);
 
             var resolver = new DxFacadeResolver(compilation, mockConfig.Object);
