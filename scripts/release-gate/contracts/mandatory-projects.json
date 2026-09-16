@@ -1,0 +1,27 @@
+{
+  "schema": "dx-domain.mandatory-projects.v1",
+  "projects": [
+    {
+      "id": "runtime-tests",
+      "path": "tests/Dx.Domain.Tests/Dx.Domain.Tests.csproj",
+      "project_type": "runtime-tests",
+      "target_frameworks": [
+        "net10.0"
+      ],
+      "minimum_discovered_tests": 1,
+      "allow_skipped": false,
+      "result_format": "trx"
+    },
+    {
+      "id": "analyzer-tests",
+      "path": "tests/Dx.Domain.Analyzers.Tests/Dx.Domain.Analyzers.Tests.csproj",
+      "project_type": "analyzer-tests",
+      "target_frameworks": [
+        "net10.0"
+      ],
+      "minimum_discovered_tests": 1,
+      "allow_skipped": false,
+      "result_format": "trx"
+    }
+  ]
+}
