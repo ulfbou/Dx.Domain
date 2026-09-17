@@ -8,7 +8,14 @@ PROPERTIES=("PackageId","Version","PackageVersion","IsPackable","TargetFramework
 
 def _json_output(result):
     if result.classification is not ExecutionClassification.SUCCESS:
-        raise RuntimeError(f"MSBuild evaluation failed: {result.classification.value}")
+        stdout = Path(result.stdout_path).read_text(encoding="utf-8", errors="replace")
+        stderr = Path(result.stderr_path).read_text(encoding="utf-8", errors="replace")
+        raise RuntimeError(
+            "MSBuild evaluation failed: "
+            f"{result.classification.value}; exit_code={result.exit_code}; "
+            f"stdout={result.stdout_path}; stderr={result.stderr_path}; "
+            f"detail={(stderr or stdout).strip()}"
+        )
     text=Path(result.stdout_path).read_text(encoding="utf-8",errors="replace")
     try: return json.loads(text)
     except json.JSONDecodeError as exc: raise RuntimeError(f"Invalid MSBuild JSON output: {exc}") from exc

@@ -239,48 +239,77 @@ def execute_candidate_profile(repository_root, script_root, evidence_base=None, 
 def compute_sha256_bytes(value): return hashlib.sha256(value).hexdigest()
 
 
-def _consumer_result(identifier, passed, expected, observed, evidence, status=None):
-    return CriterionResult(identifier, identifier, status or (CriterionStatus.PASS if passed else CriterionStatus.FAIL), "Consumer evidence matched the contract." if passed else "Consumer evidence did not match the contract.", "release_gate.orchestrator.execute_consumers_profile", evidence, expected, observed, None if passed else "Correct the consumer mechanism and rerun.")
 
-def _discover_candidate(repository_root, candidate_dir=None):
-    if candidate_dir:
-        directory = Path(candidate_dir).resolve(); manifest = directory.parent / "candidate-manifest.json"
-        if not manifest.is_file(): manifest = directory / "candidate-manifest.json"
-        return manifest, directory
-    manifests = sorted((repository_root / ".dx/verification/release-gate").glob("*/candidate-manifest.json"), key=lambda path:path.stat().st_mtime, reverse=True)
-    return (None, None) if not manifests else (manifests[0], manifests[0].parent / "packages")
+def execute_accept_ready_profile(repository_root, script_root, evidence_base=None, timeout_seconds=1800, candidate_dir=None):
+    """Execute WS-003, WS-004, and WS-005 in dependency order and aggregate evidence."""
+    repository_root = Path(repository_root).resolve()
+    script_root = Path(script_root).resolve()
+    initial = capture_git_state(repository_root)
+    run_id = make_run_id(initial["head"])
+    root = Path(evidence_base or repository_root / ".dx/verification/release-gate").resolve() / run_id
+    root.mkdir(parents=True, exist_ok=False)
+    write_json_atomic(root / "run.json", {
+        "schema": "dx-domain.release-gate-run.v1", "run_id": run_id,
+        "profile": "accept-ready", "phase": "ACCEPT_READY", "created_utc": utc_now(),
+        "repository_root": repository_root.as_posix(), "head": initial["head"],
+        "branch": initial["branch"],
+    })
+    write_json_atomic(root / "git-before.json", initial)
+    stages = []
 
-def execute_consumers_profile(repository_root, script_root, evidence_base=None, timeout_seconds=1800, candidate_dir=None):
-    from .configuration import load_consumer_contracts
-    from .consumers import create_isolated_workspace, restore_workspace, build_workspace, run_workspace, assert_no_project_references, assert_no_repo_props_import
-    from .diagnostics import parse_diagnostics_from_build_output, validate_analyzer_activation
-    from .manifests import verify_manifest
-    repository_root = Path(repository_root).resolve(); script_root = Path(script_root).resolve(); initial = capture_git_state(repository_root)
-    run_id = make_run_id(initial["head"]); root = Path(evidence_base or repository_root/".dx/verification/release-gate").resolve()/run_id; root.mkdir(parents=True, exist_ok=False)
-    matrix, behaviors = load_consumer_contracts(script_root); manifest_path, packages = _discover_candidate(repository_root, candidate_dir); criteria=[]; commands=[]
-    write_json_atomic(root/"run.json", {"schema":"dx-domain.release-gate-run.v1","run_id":run_id,"profile":"consumers","phase":"ACCEPT_READY","created_utc":utc_now(),"repository_root":repository_root.as_posix(),"head":initial["head"],"contracts":{"consumer_matrix_sha256":matrix.sha256,"required_behaviors_sha256":behaviors.sha256}})
-    write_json_atomic(root/"environment.json", {"platform":platform.platform(),"python":sys.version}); write_json_atomic(root/"git-before.json", initial)
-    if manifest_path is None or not packages.is_dir():
-        criteria.append(_consumer_result("consumer-manifest-correlation", False, "verified retained candidate", None, [], CriterionStatus.NOT_PROVEN))
+    def record(name, outcome):
+        decision, evidence, report = outcome
+        stages.append({"name": name, "decision": decision.value,
+                       "evidence_directory": evidence.as_posix(), "report": report})
+        return decision
+
+    ci = record("strict-ci", execute_gate(repository_root, script_root, profile="ci",
+                                           evidence_base=root / "stages" / "strict-ci",
+                                           timeout_seconds=timeout_seconds))
+    if ci is GateDecision.PASS:
+        candidate = record("candidate", execute_candidate_profile(
+            repository_root, script_root, evidence_base=root / "stages" / "candidate",
+            timeout_seconds=timeout_seconds))
     else:
-        verified=verify_manifest(manifest_path, packages); verified_ok=bool(verified) and all(item.status is CriterionStatus.PASS for item in verified)
-        criteria.append(_consumer_result("consumer-manifest-correlation", verified_ok, "all entries verified", [x.to_dict() for x in verified], [str(manifest_path),str(packages)], None if verified_ok else CriterionStatus.NOT_PROVEN))
-        if verified_ok:
-            manifest=json.loads(manifest_path.read_text(encoding="utf-8")); baseline=None
-            for case in matrix.value["cases"]:
-                try:
-                    ws=create_isolated_workspace(root,case,packages,manifest); content=ws.csproj_path.read_text(encoding="utf-8"); isolated=assert_no_project_references(content) and assert_no_repo_props_import(content)
-                    criteria.append(_consumer_result("consumer-isolation", isolated, True, isolated, [str(ws.csproj_path),str(ws.nuget_config_path)]))
-                    restore=restore_workspace(ws,timeout_seconds); commands.append(restore); criteria.append(process_criterion("consumer-restore",case["id"]+" restore",restore))
-                    if restore.classification is not ExecutionClassification.SUCCESS: continue
-                    build=build_workspace(ws,timeout_seconds); commands.append(build); text=read_output(build.stdout_path)+read_output(build.stderr_path); diagnostics=parse_diagnostics_from_build_output(text,ws.path/"build.binlog"); write_json_atomic(ws.path/"diagnostics.json",[x.to_dict() for x in diagnostics])
-                    criteria.append(process_criterion("consumer-build",case["id"]+" build",build))
-                    if case.get("expects",{}).get("analyzer") == "must_report":
-                        criteria.extend(validate_analyzer_activation(case,diagnostics,build,baseline if case["carrier"]=="combined" else None,text)); baseline=baseline or diagnostics
-                    if case["action"]=="run" and build.classification is ExecutionClassification.SUCCESS:
-                        run=run_workspace(ws,timeout_seconds); commands.append(run); criteria.append(process_criterion("consumer-run",case["id"]+" run",run))
-                except Exception as exc:
-                    criteria.append(_consumer_result("consumer-isolation",False,True,str(exc),[],CriterionStatus.ERROR))
-    final=capture_git_state(repository_root); write_json_atomic(root/"git-after.json",final); criteria.append(_consumer_result("consumer-source-immutability",initial["head"]==final["head"] and initial["tracked_diff"]==final["tracked_diff"],initial["tracked_diff"],final["tracked_diff"],["git-before.json","git-after.json"]))
-    decision=aggregate(criteria); report={"schema":"dx-domain.release-gate-report.v1","run_id":run_id,"profile":"consumers","head":initial["head"],"decision":decision.value,"commands":[command_record(x,repository_root) for x in commands],"criteria":[x.to_dict() for x in criteria]}
-    write_json_atomic(root/"criteria.json",report["criteria"]); write_json_atomic(root/"report.json",report); write_text_atomic(root/"report.md","# Dx.Domain Consumer Gate\n\n- Decision: **"+decision.value+"**\n"+"".join(f"- **{x.status.value}** `{x.criterion_id}`: {x.motivation}\n" for x in criteria)); return decision,root,report
+        candidate = None
+        stages.append({"name": "candidate", "decision": "NOT_PROVEN",
+                       "blocked_by": "strict-ci", "report": None})
+    if candidate is GateDecision.PASS:
+        candidate_report = stages[-1]["report"]
+        generated = Path(stages[-1]["evidence_directory"])
+        consumers = record("consumers", execute_consumers_profile(
+            repository_root, script_root, evidence_base=root / "stages" / "consumers",
+            timeout_seconds=timeout_seconds, candidate_dir=generated / "packages"))
+    else:
+        consumers = None
+        stages.append({"name": "consumers", "decision": "NOT_PROVEN",
+                       "blocked_by": "candidate", "report": None})
+
+    stage_values = [item["decision"] for item in stages]
+    if "ERROR" in stage_values:
+        decision = GateDecision.ERROR
+    elif "FAIL" in stage_values:
+        decision = GateDecision.NOT_ACCEPT_READY
+    elif stage_values == ["PASS", "PASS", "PASS"]:
+        decision = GateDecision.ACCEPT_READY
+    else:
+        decision = GateDecision.ACCEPT_READY_NOT_PROVEN
+    final = capture_git_state(repository_root)
+    write_json_atomic(root / "git-after.json", final)
+    report = {"schema": "dx-domain.release-gate-report.v1", "run_id": run_id,
+              "profile": "accept-ready", "head": initial["head"],
+              "decision": decision.value, "stages": stages,
+              "source_unchanged": initial["head"] == final["head"] and
+                                  initial["tracked_diff"] == final["tracked_diff"]}
+    write_json_atomic(root / "criteria.json", [
+        {"criterion_id": "accept-ready-stage-" + item["name"],
+         "status": "PASS" if item["decision"] == "PASS" else item["decision"],
+         "observed": item["decision"], "evidence": [item.get("evidence_directory", "")],
+         "blocked_by": item.get("blocked_by")}
+        for item in stages
+    ])
+    write_json_atomic(root / "report.json", report)
+    write_text_atomic(root / "report.md", "# Dx.Domain ACCEPT READY Gate\n\n" +
+                      f"- Decision: **{decision.value}**\n" +
+                      "".join(f"- {item['name']}: **{item['decision']}**\n" for item in stages))
+    return decision, root, report
