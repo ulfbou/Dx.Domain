@@ -1,15 +1,11 @@
-from __future__ import annotations
-
 import subprocess
-from pathlib import Path
-from typing import Any
 
 
 class GitStateError(RuntimeError):
     pass
 
 
-def git(repository_root: Path, *args: str) -> str:
+def git(repository_root, *args):
     try:
         completed = subprocess.run(
             ("git", *args),
@@ -22,29 +18,40 @@ def git(repository_root: Path, *args: str) -> str:
             check=False,
         )
     except OSError as exc:
-        raise GitStateError(f"Could not execute Git: {exc}") from exc
+        raise GitStateError(
+            f"Could not execute Git: {exc}"
+        ) from exc
+
     if completed.returncode != 0:
         detail = completed.stderr.strip() or completed.stdout.strip()
         raise GitStateError(
             f"git {' '.join(args)} failed with "
             f"{completed.returncode}: {detail}"
         )
+
     return completed.stdout
 
 
-def capture_git_state(repository_root: Path) -> dict[str, Any]:
-    head = git(repository_root, "rev-parse", "HEAD").strip()
+def capture_git_state(repository_root):
+    head = git(
+        repository_root,
+        "rev-parse",
+        "HEAD",
+    ).strip()
+
     branch = git(
         repository_root,
         "branch",
         "--show-current",
     ).strip()
+
     status = git(
         repository_root,
         "status",
         "--porcelain=v1",
         "-uall",
     ).splitlines()
+
     tracked_diff = git(
         repository_root,
         "diff",
@@ -54,6 +61,7 @@ def capture_git_state(repository_root: Path) -> dict[str, Any]:
         "--",
         ".",
     )
+
     return {
         "head": head,
         "branch": branch,
@@ -63,7 +71,7 @@ def capture_git_state(repository_root: Path) -> dict[str, Any]:
     }
 
 
-def tracked_source_status(repository_root: Path) -> list[str]:
+def tracked_source_status(repository_root):
     return git(
         repository_root,
         "status",

@@ -1,26 +1,23 @@
-from __future__ import annotations
-
 import os
 import signal
 import subprocess
 import time
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Mapping, Sequence
+
 
 from .model import ExecutionClassification, ProcessResult
 
 
-def utc_now() -> str:
+def utc_now():
     return datetime.now(timezone.utc).isoformat()
 
 
-def _terminate_process_tree(
-    process: subprocess.Popen[bytes],
-) -> list[str]:
-    actions: list[str] = []
+def terminate_process_tree(process):
+    actions = []
+
     if process.poll() is not None:
         return actions
+
     if os.name == "nt":
         completed = subprocess.run(
             ("taskkill", "/PID", str(process.pid), "/T"),
@@ -29,6 +26,7 @@ def _terminate_process_tree(
             check=False,
         )
         actions.append(f"taskkill:{completed.returncode}")
+
         if process.poll() is None:
             completed = subprocess.run(
                 (
@@ -42,74 +40,96 @@ def _terminate_process_tree(
                 stderr=subprocess.DEVNULL,
                 check=False,
             )
-            actions.append(f"taskkill-force:{completed.returncode}")
-    else:
+            actions.append(
+                f"taskkill-force:{completed.returncode}"
+            )
+
+        return actions
+
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+        actions.append("sigterm-process-group")
+    except ProcessLookupError:
+        return actions
+
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
         try:
-            os.killpg(process.pid, signal.SIGTERM)
-            actions.append("sigterm-process-group")
+            os.killpg(process.pid, signal.SIGKILL)
+            actions.append("sigkill-process-group")
         except ProcessLookupError:
-            return actions
-        try:
-            process.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-                actions.append("sigkill-process-group")
-            except ProcessLookupError:
-                pass
+            pass
+
     return actions
 
 
 def run_process(
     *,
-    command_id: str,
-    argv: Sequence[str],
-    cwd: Path,
-    evidence_directory: Path,
-    timeout_seconds: int,
-    environment: Mapping[str, str] | None = None,
-) -> ProcessResult:
-    command_directory = evidence_directory / "commands" / command_id
+    command_id,
+    argv,
+    cwd,
+    evidence_directory,
+    timeout_seconds,
+    environment=None,
+):
+    command_directory = (
+        evidence_directory / "commands" / command_id
+    )
     command_directory.mkdir(parents=True, exist_ok=True)
+
     stdout_path = command_directory / "stdout.txt"
     stderr_path = command_directory / "stderr.txt"
+
     started = utc_now()
     monotonic_start = time.monotonic()
-    termination_actions: list[str] = []
+    termination_actions = []
     timed_out = False
+
     merged_environment = os.environ.copy()
     if environment:
         merged_environment.update(environment)
-    popen_options: dict[str, object] = {}
+
+    popen_options = {}
     if os.name == "nt":
-        popen_options["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+        popen_options["creationflags"] = (
+            subprocess.CREATE_NEW_PROCESS_GROUP
+        )
     else:
         popen_options["start_new_session"] = True
+
     try:
-        with (
-            stdout_path.open("wb") as stdout_stream,
-            stderr_path.open("wb") as stderr_stream,
-        ):
-            process = subprocess.Popen(
-                list(argv),
-                cwd=cwd,
-                env=merged_environment,
-                stdout=stdout_stream,
-                stderr=stderr_stream,
-                **popen_options,
-            )
-            try:
-                exit_code = process.wait(timeout=timeout_seconds)
-            except subprocess.TimeoutExpired:
-                timed_out = True
-                termination_actions.extend(_terminate_process_tree(process))
+        with stdout_path.open("wb") as stdout_stream:
+            with stderr_path.open("wb") as stderr_stream:
+                process = subprocess.Popen(
+                    list(argv),
+                    cwd=cwd,
+                    env=merged_environment,
+                    stdout=stdout_stream,
+                    stderr=stderr_stream,
+                    **popen_options,
+                )
+
                 try:
-                    exit_code = process.wait(timeout=10)
+                    exit_code = process.wait(
+                        timeout=timeout_seconds
+                    )
                 except subprocess.TimeoutExpired:
-                    exit_code = None
+                    timed_out = True
+                    termination_actions.extend(
+                        terminate_process_tree(process)
+                    )
+
+                    try:
+                        exit_code = process.wait(timeout=10)
+                    except subprocess.TimeoutExpired:
+                        exit_code = None
+
     except FileNotFoundError:
         exit_code = None
-        classification = ExecutionClassification.EXECUTABLE_NOT_FOUND
+        classification = (
+            ExecutionClassification.EXECUTABLE_NOT_FOUND
+        )
     except OSError:
         exit_code = None
         classification = ExecutionClassification.START_FAILURE
@@ -120,8 +140,10 @@ def run_process(
             classification = ExecutionClassification.SUCCESS
         else:
             classification = ExecutionClassification.NONZERO_EXIT
+
     finished = utc_now()
     duration = time.monotonic() - monotonic_start
+
     return ProcessResult(
         command_id=command_id,
         argv=list(argv),

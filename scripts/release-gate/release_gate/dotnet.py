@@ -1,9 +1,8 @@
-from __future__ import annotations
-
 from pathlib import Path
 
 from .model import ExecutionClassification, ProcessResult
 from .process import run_process
+
 
 STRICT_PROPERTIES = (
     "-p:TreatWarningsAsErrors=true",
@@ -11,7 +10,7 @@ STRICT_PROPERTIES = (
 )
 
 
-def restore_command(solution: str) -> list[str]:
+def restore_command(solution):
     return [
         "dotnet",
         "restore",
@@ -21,7 +20,7 @@ def restore_command(solution: str) -> list[str]:
     ]
 
 
-def build_command(solution: str) -> list[str]:
+def build_command(solution):
     return [
         "dotnet",
         "build",
@@ -35,11 +34,11 @@ def build_command(solution: str) -> list[str]:
 
 
 def test_command(
-    project: str,
-    target_framework: str,
-    results_directory: Path,
-    log_file_name: str,
-) -> list[str]:
+    project,
+    target_framework,
+    results_directory,
+    log_file_name,
+):
     return [
         "dotnet",
         "test",
@@ -60,10 +59,10 @@ def test_command(
 
 
 def sdk_inventory(
-    repository_root: Path,
-    evidence_directory: Path,
-    timeout_seconds: int,
-) -> ProcessResult:
+    repository_root,
+    evidence_directory,
+    timeout_seconds,
+):
     return run_process(
         command_id="dotnet-list-sdks",
         argv=("dotnet", "--list-sdks"),
@@ -74,12 +73,13 @@ def sdk_inventory(
 
 
 def has_required_sdk(
-    inventory_result: ProcessResult,
-    stdout: str,
-    required_major: int,
-) -> bool:
+    inventory_result,
+    stdout,
+    required_major,
+):
     if inventory_result.classification is not ExecutionClassification.SUCCESS:
         return False
+
     prefix = f"{required_major}."
     return any(
         line.strip().startswith(prefix)
