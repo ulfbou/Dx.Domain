@@ -98,3 +98,14 @@ def validate_contracts(
             raise ConfigurationError(
                 f"Mandatory project must require at least one test: {path}"
             )
+
+
+CONSUMER_MATRIX_PATH = Path("contracts/consumer-matrix.json")
+REQUIRED_BEHAVIORS_PATH = Path("contracts/required-behaviors.json")
+def load_consumer_contracts(script_root):
+    matrix = load_contract(Path(script_root) / CONSUMER_MATRIX_PATH)
+    behaviors = load_contract(Path(script_root) / REQUIRED_BEHAVIORS_PATH)
+    if matrix.value.get("schema") != "dx-domain.consumer-matrix.v1": raise ConfigurationError("Unsupported consumer-matrix schema")
+    if behaviors.value.get("schema") != "dx-domain.required-behaviors.v1": raise ConfigurationError("Unsupported required-behaviors schema")
+    if not matrix.value.get("cases"): raise ConfigurationError("Consumer matrix contains no cases")
+    return matrix, behaviors

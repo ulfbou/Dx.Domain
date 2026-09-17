@@ -67,6 +67,16 @@ jobs:
             .dx/verification/release-gate/**/packages/*.nupkg
           if-no-files-found: error
           retention-days: 30
+      - name: Run WS-005 consumers gate
+        run: python3 scripts/release-gate/run.py --profile consumers
+      - name: Upload WS-005 consumer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ws-005-consumers-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .dx/verification/release-gate/
+          if-no-files-found: error
+          retention-days: 30
       - name: Verify diagnostic metadata conformance
         run: python3 scripts/verify-diagnostic-conformance.py
 
