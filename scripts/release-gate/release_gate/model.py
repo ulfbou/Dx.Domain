@@ -108,3 +108,32 @@ class RunContext:
     branch: str
     initial_status: list[str]
     contracts: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class Diagnostic:
+    id: str
+    severity: str
+    message: str
+    file: str | None = None
+    line: int | None = None
+    def to_dict(self): return asdict(self)
+
+@dataclass(frozen=True)
+class ConsumerCase:
+    id: str
+    tfm: str
+    carrier: str
+    action: str
+    fixture: str
+
+@dataclass(frozen=True)
+class ConsumerResult:
+    id: str
+    tfm: str
+    carrier: str
+    restore: Any
+    build: Any
+    run: Any
+    diagnostics: list[Diagnostic]
+    evidence_path: str

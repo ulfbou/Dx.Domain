@@ -1,0 +1,256 @@
+{
+  "schema": "dx-domain.consumer-matrix.v1",
+  "candidate_source": "manifest",
+  "isolated_cache": true,
+  "cases": [
+    {
+      "id": "annotations-netstandard2.0",
+      "carrier": "Dx.Domain.Annotations",
+      "targetFramework": "netstandard2.0",
+      "action": "build",
+      "fixture": "annotations_valid",
+      "expects": {
+        "build": "success",
+        "run": "not_applicable",
+        "analyzer": "none"
+      }
+    },
+    {
+      "id": "kernel-net8.0",
+      "carrier": "Dx.Domain.Kernel",
+      "targetFramework": "net8.0",
+      "action": "run",
+      "fixture": "kernel_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "primitives-net8.0",
+      "carrier": "Dx.Domain.Primitives",
+      "targetFramework": "net8.0",
+      "action": "run",
+      "fixture": "primitives_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "facts-net8.0",
+      "carrier": "Dx.Domain.Facts",
+      "targetFramework": "net8.0",
+      "action": "run",
+      "fixture": "facts_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "combined-net8.0",
+      "carrier": "combined",
+      "packages": [
+        "Dx.Domain.Annotations",
+        "Dx.Domain.Kernel",
+        "Dx.Domain.Primitives",
+        "Dx.Domain.Facts"
+      ],
+      "targetFramework": "net8.0",
+      "action": "run",
+      "fixture": "combined_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "kernel-net9.0",
+      "carrier": "Dx.Domain.Kernel",
+      "targetFramework": "net9.0",
+      "action": "run",
+      "fixture": "kernel_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "primitives-net9.0",
+      "carrier": "Dx.Domain.Primitives",
+      "targetFramework": "net9.0",
+      "action": "run",
+      "fixture": "primitives_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "facts-net9.0",
+      "carrier": "Dx.Domain.Facts",
+      "targetFramework": "net9.0",
+      "action": "run",
+      "fixture": "facts_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "combined-net9.0",
+      "carrier": "combined",
+      "packages": [
+        "Dx.Domain.Annotations",
+        "Dx.Domain.Kernel",
+        "Dx.Domain.Primitives",
+        "Dx.Domain.Facts"
+      ],
+      "targetFramework": "net9.0",
+      "action": "run",
+      "fixture": "combined_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "kernel-net10.0",
+      "carrier": "Dx.Domain.Kernel",
+      "targetFramework": "net10.0",
+      "action": "run",
+      "fixture": "kernel_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "primitives-net10.0",
+      "carrier": "Dx.Domain.Primitives",
+      "targetFramework": "net10.0",
+      "action": "run",
+      "fixture": "primitives_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "facts-net10.0",
+      "carrier": "Dx.Domain.Facts",
+      "targetFramework": "net10.0",
+      "action": "run",
+      "fixture": "facts_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "combined-net10.0",
+      "carrier": "combined",
+      "packages": [
+        "Dx.Domain.Annotations",
+        "Dx.Domain.Kernel",
+        "Dx.Domain.Primitives",
+        "Dx.Domain.Facts"
+      ],
+      "targetFramework": "net10.0",
+      "action": "run",
+      "fixture": "combined_valid",
+      "expects": {
+        "build": "success",
+        "run": "success"
+      }
+    },
+    {
+      "id": "analyzer-annotations-net8.0",
+      "carrier": "Dx.Domain.Annotations",
+      "targetFramework": "net8.0",
+      "action": "build",
+      "fixture": "analyzer_invalid_usage",
+      "expects": {
+        "build": "success",
+        "analyzer": "must_report",
+        "diagnosticIds": [
+          "DXA065"
+        ],
+        "load_failure": false,
+        "duplicate": false
+      }
+    },
+    {
+      "id": "analyzer-kernel-net8.0",
+      "carrier": "Dx.Domain.Kernel",
+      "targetFramework": "net8.0",
+      "action": "build",
+      "fixture": "analyzer_invalid_usage",
+      "expects": {
+        "build": "success",
+        "analyzer": "must_report",
+        "diagnosticIds": [
+          "DXA065"
+        ],
+        "load_failure": false,
+        "duplicate": false
+      }
+    },
+    {
+      "id": "analyzer-primitives-net8.0",
+      "carrier": "Dx.Domain.Primitives",
+      "targetFramework": "net8.0",
+      "action": "build",
+      "fixture": "analyzer_invalid_usage",
+      "expects": {
+        "build": "success",
+        "analyzer": "must_report",
+        "diagnosticIds": [
+          "DXA065"
+        ],
+        "load_failure": false,
+        "duplicate": false
+      }
+    },
+    {
+      "id": "analyzer-facts-net8.0",
+      "carrier": "Dx.Domain.Facts",
+      "targetFramework": "net8.0",
+      "action": "build",
+      "fixture": "analyzer_invalid_usage",
+      "expects": {
+        "build": "success",
+        "analyzer": "must_report",
+        "diagnosticIds": [
+          "DXA065"
+        ],
+        "load_failure": false,
+        "duplicate": false
+      }
+    },
+    {
+      "id": "analyzer-combined-net8.0",
+      "carrier": "combined",
+      "packages": [
+        "Dx.Domain.Annotations",
+        "Dx.Domain.Kernel",
+        "Dx.Domain.Primitives",
+        "Dx.Domain.Facts"
+      ],
+      "targetFramework": "net8.0",
+      "action": "build",
+      "fixture": "analyzer_invalid_usage",
+      "expects": {
+        "build": "success",
+        "analyzer": "must_report",
+        "diagnosticIds": [
+          "DXA065"
+        ],
+        "load_failure": false,
+        "duplicate_boundary": "unique",
+        "analyzer_load": "once"
+      }
+    }
+  ]
+}
