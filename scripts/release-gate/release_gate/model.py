@@ -10,6 +10,7 @@ class Profile(str, Enum):
     LOCAL = "local"
     CI = "ci"
     ACCEPT_READY = "accept-ready"
+    CANDIDATE = "candidate"
 
 
 class CriterionStatus(str, Enum):

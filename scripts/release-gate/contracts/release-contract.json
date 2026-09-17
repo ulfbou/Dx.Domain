@@ -32,5 +32,17 @@
     "TestResults",
     "artifacts",
     "_site"
-  ]
+  ],
+  "candidate": {
+    "clean_tree_required": true,
+    "cleanup_directories": [
+      "bin",
+      "obj",
+      "TestResults",
+      "artifacts",
+      "_site"
+    ],
+    "signing_disposition": "unsigned",
+    "candidate_directory": "artifacts/candidate"
+  }
 }

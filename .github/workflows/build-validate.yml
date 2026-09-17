@@ -55,6 +55,18 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Run WS-004 candidate gate
+        run: python3 scripts/release-gate/run.py --profile candidate
+      - name: Upload candidate artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate-${{ github.sha }}
+          path: |
+            .dx/verification/release-gate/**/candidate-manifest.json
+            .dx/verification/release-gate/**/packages/*.nupkg
+          if-no-files-found: error
+          retention-days: 30
       - name: Verify diagnostic metadata conformance
         run: python3 scripts/verify-diagnostic-conformance.py
 
