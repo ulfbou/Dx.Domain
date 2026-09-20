@@ -243,8 +243,18 @@ def validate_feedback(dossier: dict[str, Any]) -> list[str]:
     for finding in findings:
         status = finding.get("status")
         if status in MANDATORY_ATTENTION:
-            for field in ("expected", "observed", "impact", "next_action", "next_action_code"):
-                if finding.get(field) in (None, "", [], {}): errors.append(f"{finding.get('criterion_id')}: material non-success lacks {field}")
+            for field in ("expected", "observed"):
+                if field not in finding or finding[field] is None:
+                    errors.append(
+                        f"{finding.get('criterion_id')}: "
+                        f"material non-success lacks {field}"
+                    )
+            for field in ("impact", "next_action", "next_action_code"):
+                if finding.get(field) in (None, ""):
+                    errors.append(
+                        f"{finding.get('criterion_id')}: "
+                        f"material non-success lacks {field}"
+                    )
         if finding.get("kind") == "CONSEQUENTIAL" and not finding.get("blocked_by"):
             errors.append(f"{finding.get('criterion_id')}: consequential finding lacks blocker")
     repo = dossier.get("repository", {})
