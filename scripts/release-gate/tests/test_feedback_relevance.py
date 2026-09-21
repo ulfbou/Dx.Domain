@@ -17,6 +17,7 @@ from release_gate.feedback import (
     FeedbackResult,
     _collector_command,
     build_error_feedback,
+    cli_feedback,
     transport_feedback,
 )
 
@@ -350,6 +351,213 @@ class FeedbackRelevanceTests(unittest.TestCase):
             self.assertEqual(
                 "NOT_REQUESTED",
                 envelope["transport_status"],
+            )
+
+    def test_cli_feedback_emits_validated_self_contained_dossier(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repository = Path(temporary)
+            evidence = self.make_error_evidence(repository)
+            dossier = build_error_feedback(
+                profile="consumers",
+                repository_root=repository,
+                evidence_root=evidence,
+                error=RuntimeError(
+                    "expected DXA065 but observed no diagnostics"
+                ),
+            )
+            feedback_path = evidence / "feedback.json"
+            feedback_path.write_text(
+                json.dumps(dossier) + "\n",
+                encoding="utf-8",
+            )
+
+            line = cli_feedback(feedback_path)
+
+            self.assertTrue(
+                line.startswith("DX_RELEASE_GATE_FEEDBACK=")
+            )
+            self.assertNotIn("\n", line)
+
+            payload = json.loads(line.split("=", 1)[1])
+            self.assertEqual("ERROR", payload["gate"]["decision"])
+            self.assertEqual("PASS", payload["validation"]["status"])
+            self.assertEqual(1, len(payload["findings"]))
+
+            finding = payload["findings"][0]
+            self.assertEqual(
+                "release-gate-operational-error",
+                finding["criterion_id"],
+            )
+            self.assertEqual(
+                {
+                    "error_type": "RuntimeError",
+                    "message": (
+                        "expected DXA065 but observed no diagnostics"
+                    ),
+                },
+                finding["observed"],
+            )
+            self.assertTrue(finding["next_action"])
+            self.assertTrue(finding["next_action_code"])
+            self.assertEqual(["error.json"], finding["provenance"])
+
+    def test_cli_feedback_rejects_unvalidated_dossier(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            feedback_path = Path(temporary) / "feedback.json"
+            feedback_path.write_text(
+                json.dumps(
+                    {
+                        "validation": {
+                            "status": "FAIL",
+                            "errors": ["invalid feedback"],
+                        }
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                RuntimeError,
+                "not validated",
+            ):
+                cli_feedback(feedback_path)
+
+    def test_runner_failure_emits_feedback_before_result(self):
+        runner = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as temporary:
+            repository = Path(temporary) / "repo"
+            repository.mkdir()
+            evidence_base = Path(temporary) / "evidence"
+
+            output = io.StringIO()
+
+            with (
+                patch.object(
+                    runner,
+                    "discover_repository_root",
+                    return_value=repository,
+                ),
+                patch.object(
+                    runner,
+                    "execute",
+                    side_effect=RuntimeError(
+                        "expected DXA065 but observed no diagnostics"
+                    ),
+                ),
+                contextlib.redirect_stdout(output),
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                code = runner.run(
+                    [
+                        "--profile",
+                        "consumers",
+                        "--feedback",
+                        "summary",
+                        "--evidence-dir",
+                        str(evidence_base),
+                    ]
+                )
+
+            self.assertEqual(3, code)
+
+            lines = output.getvalue().splitlines()
+            feedback_lines = [
+                line
+                for line in lines
+                if line.startswith("DX_RELEASE_GATE_FEEDBACK=")
+            ]
+            result_lines = [
+                line
+                for line in lines
+                if line.startswith("DX_RELEASE_GATE_RESULT=")
+            ]
+
+            self.assertEqual(1, len(feedback_lines))
+            self.assertEqual(1, len(result_lines))
+            self.assertLess(
+                lines.index(feedback_lines[0]),
+                lines.index(result_lines[0]),
+            )
+
+            feedback = json.loads(
+                feedback_lines[0].split("=", 1)[1]
+            )
+            result = json.loads(
+                result_lines[0].split("=", 1)[1]
+            )
+
+            finding = feedback["findings"][0]
+            self.assertEqual(
+                "expected DXA065 but observed no diagnostics",
+                finding["observed"]["message"],
+            )
+            self.assertEqual("ERROR", feedback["gate"]["decision"])
+            self.assertEqual("ERROR", result["decision"])
+            self.assertEqual(3, result["process_exit_code"])
+
+    def test_runner_success_does_not_emit_attention_feedback(self):
+        runner = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as temporary:
+            repository = Path(temporary) / "repo"
+            repository.mkdir()
+            evidence = repository / "evidence"
+            evidence.mkdir()
+
+            report = {
+                "run_id": "passing-run",
+                "head": "a" * 40,
+                "branch": "test",
+                "criteria": [],
+            }
+
+            class PassingDecision:
+                value = "PASS"
+
+            output = io.StringIO()
+
+            with (
+                patch.object(
+                    runner,
+                    "discover_repository_root",
+                    return_value=repository,
+                ),
+                patch.object(
+                    runner,
+                    "execute",
+                    return_value=(
+                        PassingDecision(),
+                        evidence,
+                        report,
+                    ),
+                ),
+                patch.object(
+                    runner,
+                    "exit_code",
+                    return_value=0,
+                ),
+                contextlib.redirect_stdout(output),
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                code = runner.run(
+                    [
+                        "--profile",
+                        "local",
+                        "--feedback",
+                        "summary",
+                    ]
+                )
+
+            self.assertEqual(0, code)
+            self.assertNotIn(
+                "DX_RELEASE_GATE_FEEDBACK=",
+                output.getvalue(),
+            )
+            self.assertIn(
+                "DX_RELEASE_GATE_RESULT=",
+                output.getvalue(),
             )
 
     def test_runner_dx_transports_finalized_error_dossier_directly(self):

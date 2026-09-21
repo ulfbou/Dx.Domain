@@ -435,6 +435,46 @@ def build_error_feedback(*, profile: str, repository_root: Path, evidence_root: 
     report = {"run_id": evidence_root.name, "profile": profile, "head": None, "branch": None, "source_unchanged": None, "criteria": [{"criterion_id": "release-gate-operational-error", "title": "Release-gate operational error", "status": "ERROR", "motivation": f"{type(error).__name__}: {error}", "verifier": "release_gate.run", "expected": {"operation": "complete selected profile"}, "observed": {"error_type": type(error).__name__, "message": str(error)}, "evidence": ["error.json"], "corrective_action": "Inspect the embedded error facts and error.json, correct the verifier or environment failure, and rerun."}]}
     return _finalize(build_feedback(profile=profile, decision="ERROR", gate_exit_code=3, repository_root=repository_root, evidence_root=evidence_root, report=report))
 
+def cli_feedback(feedback_path: Path) -> str:
+    try:
+        dossier = json.loads(
+            feedback_path.read_text(encoding="utf-8")
+        )
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise RuntimeError(
+            f"Could not read validated feedback from "
+            f"{feedback_path}: {exc}"
+        ) from exc
+
+    if not isinstance(dossier, dict):
+        raise RuntimeError(
+            f"Validated feedback root must be an object: "
+            f"{feedback_path}"
+        )
+
+    validation = dossier.get("validation")
+    if not isinstance(validation, dict):
+        raise RuntimeError(
+            f"Validated feedback lacks validation metadata: "
+            f"{feedback_path}"
+        )
+    if validation.get("status") != "PASS":
+        raise RuntimeError(
+            f"Feedback is not validated for console transport: "
+            f"{feedback_path}"
+        )
+
+    return (
+        "DX_RELEASE_GATE_FEEDBACK="
+        + json.dumps(
+            dossier,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        )
+    )
+
+
 def cli_result(*, profile: str, decision: str, gate_exit_code: int, process_exit_code: int, evidence_root: Path | None, repository_root: Path | None, result: FeedbackResult) -> str:
     payload = {"schema": CLI_RESULT_SCHEMA, "profile": profile, "decision": decision, "gate_exit_code": gate_exit_code, "process_exit_code": process_exit_code, "feedback": result.mode, "feedback_status": result.feedback_status, "feedback_validation": result.validation_status, "feedback_sha256": result.feedback_sha256, "transport_status": result.transport_status, "evidence_directory": _relative(evidence_root, repository_root) if evidence_root is not None and repository_root is not None else None, "feedback_path": result.feedback_path, "carrier": result.carrier_path, "transport_error": result.transport_error}
     return "DX_RELEASE_GATE_RESULT=" + json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True)

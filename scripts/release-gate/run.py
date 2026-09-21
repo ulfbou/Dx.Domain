@@ -8,7 +8,14 @@ from pathlib import Path
 from release_gate.aggregation import exit_code
 from release_gate.configuration import ConfigurationError
 from release_gate.evidence import write_json_atomic
-from release_gate.feedback import FeedbackResult, build_error_feedback, cli_result, collect_feedback, transport_feedback
+from release_gate.feedback import (
+    FeedbackResult,
+    build_error_feedback,
+    cli_feedback,
+    cli_result,
+    collect_feedback,
+    transport_feedback,
+)
 from release_gate.orchestrator import execute_accept_ready_profile, execute_candidate_profile, execute_consumers_profile, execute_gate
 from release_gate.repository import RepositoryDiscoveryError, discover_repository_root
 
@@ -121,6 +128,22 @@ def run(argv=None):
         else:
             feedback_result = FeedbackResult("none", "NOT_REQUESTED", "NOT_REQUESTED")
         print(f"ERROR: {exc}", file=sys.stderr)
+    if (
+        gate_code != 0
+        and evidence_root is not None
+        and feedback_result.feedback_status == "CREATED"
+    ):
+        feedback_path = evidence_root / "feedback.json"
+        if feedback_path.is_file():
+            try:
+                print(cli_feedback(feedback_path))
+            except RuntimeError as feedback_error:
+                print(
+                    "WARNING: validated feedback could not be emitted "
+                    f"to the console: {feedback_error}",
+                    file=sys.stderr,
+                )
+
     print(cli_result(
         profile=args.profile, decision=decision_value,
         gate_exit_code=gate_code, process_exit_code=gate_code,
