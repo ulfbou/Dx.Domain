@@ -342,6 +342,7 @@ class NormalizedPackOptions:
     only: tuple[str, ...]
     includes: tuple[PatternRule, ...]
     excludes: tuple[PatternRule, ...]
+    force_includes: tuple[PatternRule, ...]
     include_extensions: tuple[ExtensionRule, ...]
     exclude_extensions: tuple[ExtensionRule, ...]
     ignore_files: tuple[Path, ...]
@@ -466,8 +467,6 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
     if a.quiet and a.verbose: raise UsageError("--quiet and --verbose are mutually exclusive")
     if a.path and a.from_git: raise UsageError("--path and --from-git are mutually exclusive")
     if a.only and (a.path or a.from_git): raise UsageError("--only is mutually exclusive with --path and --from-git")
-    if a.only and (a.include or a.exclude or a.include_extension or a.exclude_extension or a.ignore_file or a.no_gitignore or a.no_default_excludes or a.no_ignore):
-        raise UsageError("--only is mutually exclusive with include, exclude, extension, and ignore options")
     if a.unsafe_include_git and not a.force: raise UsageError("--unsafe-include-git requires --force")
     source_arg=a.source or (a.root if a.root else ".")
     source_lex=Path(source_arg)
@@ -482,11 +481,12 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
     mode="only" if a.only else "path" if a.path else "git" if a.from_git else "file" if source_lex.is_file() or source_lex.is_symlink() else "walk"
     inc=tuple(_validate_pattern(x,"include",i,"include") for i,x in enumerate(a.include))
     exc=tuple(_validate_pattern(x,"exclude",i,"exclude") for i,x in enumerate(a.exclude))
+    force_inc=tuple(_validate_pattern(x,"force_include",i,"include") for i,x in enumerate(a.force_include))
     ie=tuple(ExtensionRule("include_extension",normalize_extension(x),"include",i) for i,x in enumerate(dict.fromkeys(a.include_extension)))
     ee=tuple(ExtensionRule("exclude_extension",normalize_extension(x),"exclude",i) for i,x in enumerate(dict.fromkeys(a.exclude_extension)))
     ignores=tuple(_operand(root,x) for x in a.ignore_file)
     explain="json" if a.explain == "json" else ("human" if a.explain else None)
-    return NormalizedPackOptions(source,root,output,mode,tuple(a.path),tuple(a.only),inc,exc,ie,ee,ignores,bool(a.no_gitignore or a.no_ignore),bool(a.no_default_excludes or a.no_ignore),a.unsafe_include_git,a.skip_binary,a.readonly,a.dry_run or explain=="json",a.json or explain=="json",explain,a.quiet,a.verbose,a.force)
+    return NormalizedPackOptions(source,root,output,mode,tuple(a.path),tuple(a.only),inc,exc,force_inc,ie,ee,ignores,bool(a.no_gitignore or a.no_ignore),bool(a.no_default_excludes or a.no_ignore),a.unsafe_include_git,a.skip_binary,a.readonly,a.dry_run or explain=="json",a.json or explain=="json",explain,a.quiet,a.verbose,a.force)
 
 
 def build_selection_context(o: NormalizedPackOptions) -> SelectionContext:
@@ -550,16 +550,16 @@ def discover_candidates(ctx: SelectionContext) -> tuple[Candidate,...]:
                     store,
                     o.root,
                     q,
-                    SourceProvenance(provider, raw, explicit),
+                    SourceProvenance(provider, raw, False),
                 )
-    elif o.source_mode == "file": _contribute(store,o.root,o.source,SourceProvenance("source",str(o.source),True))
+    elif o.source_mode == "file": _contribute(store,o.root,o.source,SourceProvenance("source",str(o.source),False))
     else:
         for p in _walk(o.source,o.root,o.unsafe_include_git): _contribute(store,o.root,p,SourceProvenance("walk",str(o.source),False))
     return tuple(Candidate(path,o.root/Path(*PurePosixPath(path).parts),tuple(store[path])) for path in sorted(store))
 
 
 def _git_ignore(ctx: SelectionContext, candidates: tuple[Candidate,...]) -> dict[str,RuleMatch]:
-    if ctx.options.no_gitignore or ctx.repository_root is None or ctx.options.source_mode=="only": return {}
+    if ctx.options.no_gitignore or ctx.repository_root is None: return {}
     paths=[]; mapping={}
     for c in candidates:
         resolved=c.absolute_path.resolve()
@@ -593,7 +593,7 @@ def _ignore_file_rules(paths: tuple[Path,...]) -> tuple[PatternRule,...]:
 
 def evaluate_paths(ctx: SelectionContext, candidates: tuple[Candidate,...]) -> tuple[PathDecision,...]:
     o=ctx.options; git_ignored=_git_ignore(ctx,candidates); ignore_rules=_ignore_file_rules(o.ignore_files)
-    defaults=tuple(_validate_pattern(x,"default",i,"exclude") for i,x in enumerate(DEFAULT_EXCLUDES)) if not o.no_default_excludes and o.source_mode!="only" else ()
+    defaults=tuple(_validate_pattern(x,"default",i,"exclude") for i,x in enumerate(DEFAULT_EXCLUDES)) if not o.no_default_excludes else ()
     result=[]
     for c in candidates:
         matches=[]; bases=[]
@@ -605,15 +605,17 @@ def evaluate_paths(ctx: SelectionContext, candidates: tuple[Candidate,...]) -> t
         hard += [RuleMatch(r.provider,"exclude",r.suffix) for r in o.exclude_extensions if PurePosixPath(c.path).name.lower().endswith(r.suffix)]
         if hard:
             result.append(PathDecision(c,tuple(hard),bool(o.includes or o.include_extensions),False,(),False,hard[0].provider,hard[0].pattern,"hard_excluded")); continue
+        force_positive=[RuleMatch(r.provider,"include",r.pattern) for r in o.force_includes if pattern_matches(c.path,r)]
         positive=[RuleMatch(r.provider,"include",r.pattern) for r in o.includes if pattern_matches(c.path,r)]
         positive += [RuleMatch(r.provider,"include",r.suffix) for r in o.include_extensions if PurePosixPath(c.path).name.lower().endswith(r.suffix)]
         present=bool(o.includes or o.include_extensions)
         if present and not positive:
             result.append(PathDecision(c,(),True,False,(),False,"positive_filter",None,"positive_filter_missed")); continue
         matches.extend(positive)
+        matches.extend(force_positive)
         for p in c.provenance:
             if p.explicit: bases.append(p.provider)
-        bases.extend(m.provider for m in positive if m.provider not in bases)
+        bases.extend(m.provider for m in force_positive if m.provider not in bases)
         soft=[]
         if c.path in git_ignored and not any(p.git_status and p.git_status != "??" for p in c.provenance): soft.append(git_ignored[c.path])
         current=None
@@ -648,7 +650,7 @@ def load_and_classify(ctx: SelectionContext, decisions: tuple[PathDecision,...])
 
 
 def build_report(ctx: SelectionContext, decisions: tuple[ContentDecision,...]) -> SelectionReport:
-    counts={k:0 for k in TERMINAL_OUTCOMES}; matches={k:0 for k in ("output","protected","exclude","exclude_extension","include","include_extension","gitignore","ignore_file","default")}
+    counts={k:0 for k in TERMINAL_OUTCOMES}; matches={k:0 for k in ("output","protected","exclude","exclude_extension","include","include_extension","force_include","gitignore","ignore_file","default")}
     for d in decisions:
         counts[d.terminal_outcome]+=1
         for m in d.path_decision.matches:
@@ -1105,11 +1107,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('output', nargs='?', metavar='OUTPUT', help=argparse.SUPPRESS)  # deprecated
     p.add_argument('-o', '--output', dest='output_opt', help='Output carrier path, or "-" for stdout')
     p.add_argument('-r', '--root', help='Advanced: path mapping root')
-    p.add_argument('-p', '--path', action='append', default=[], help='Advanced: exact file or folder to pack (repeatable)')
+    p.add_argument('-p', '--path', action='append', default=[], help='Add a file or recursively discovered directory to the candidate set (repeatable)')
     p.add_argument('-g', '--from-git', action='store_true', help='Advanced: pack Git changes')
-    p.add_argument('--only', action='append', default=[], metavar='PATH', help='Isolated explicit file or directory source (repeatable)')
-    p.add_argument('-i', '--include', action='append', default=[], help='Include only paths matching PATTERN (repeatable)')
-    p.add_argument('-I', '--exclude', action='append', default=[], help='Exclude paths matching PATTERN (repeatable)')
+    p.add_argument('--only', action='append', default=[], metavar='PATH', help='Use only files discovered under these operands as candidates (repeatable)')
+    p.add_argument('-i', '--include', action='append', default=[], help='Retain candidates matching PATTERN; does not override ignore rules (repeatable)')
+    p.add_argument('-I', '--exclude', action='append', default=[], help='Unconditionally exclude paths matching PATTERN (repeatable)')
+    p.add_argument('--force-include', action='append', default=[], metavar='PATTERN', help='Override ordinary ignore rules for matching candidates (repeatable)')
     p.add_argument('-x', '--include-extension', action='append', default=[], metavar='EXT', help='Include only files with extension')
     p.add_argument('-X', '--exclude-extension', action='append', default=[], metavar='EXT', help='Exclude files with extension')
     p.add_argument('-b', '--binary', action='store_true', help='Explicitly include non-UTF-8 files (default)')
@@ -1117,7 +1120,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('--readonly', action='store_true', help='Mark all entries as read-only')
     p.add_argument('-G', '--no-gitignore', action='store_true', help='Do not apply Git ignore rules')
     p.add_argument('--no-default-excludes', action='store_true', help='Do not apply default excludes')
-    p.add_argument('--ignore-file', action='append', default=[], metavar='FILE', help='DX ignore rules relative to selection root (repeatable)')
+    p.add_argument('--ignore-file', action='append', default=[], metavar='FILE', help='Apply ordered DX ignore rules relative to selection root (repeatable)')
     p.add_argument('--no-ignore', action='store_true', help='Disable Git-ignore and default excludes')
     p.add_argument('--unsafe-include-git', action='store_true', help='Disable only protected .git exclusion; requires --force')
     p.add_argument('--explain', nargs='?', const='human', choices=('human','json'), help='Explain every candidate; json implies --dry-run --json')
