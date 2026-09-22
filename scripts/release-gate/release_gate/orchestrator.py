@@ -13,7 +13,7 @@ from .criteria import process_criterion, test_criterion
 from .dotnet import build_command, restore_command, test_command
 from .evidence import write_json_atomic, write_text_atomic
 from .git_state import capture_git_state
-from .model import CriterionResult, CriterionStatus, ExecutionClassification
+from .model import CriterionResult, CriterionStatus, ExecutionClassification, GateDecision
 from .process import run_process
 from .trx import TrxError, parse_trx
 
@@ -252,7 +252,7 @@ def _discover_candidate(repository_root, candidate_dir=None):
 
 def execute_consumers_profile(repository_root, script_root, evidence_base=None, timeout_seconds=1800, candidate_dir=None):
     from .configuration import load_consumer_contracts
-    from .consumers import create_isolated_workspace, restore_workspace, build_workspace, run_workspace, assert_no_project_references, assert_no_repo_props_import
+    from .consumers import create_isolated_workspace, restore_workspace, build_workspace, run_workspace, assert_no_project_references, assert_no_repo_props_import, validate_runtime_output
     from .diagnostics import parse_diagnostics_from_build_output, validate_analyzer_activation
     from .manifests import verify_manifest
     repository_root = Path(repository_root).resolve(); script_root = Path(script_root).resolve(); initial = capture_git_state(repository_root)
@@ -266,21 +266,26 @@ def execute_consumers_profile(repository_root, script_root, evidence_base=None, 
         verified=verify_manifest(manifest_path, packages); verified_ok=bool(verified) and all(item.status is CriterionStatus.PASS for item in verified)
         criteria.append(_consumer_result("consumer-manifest-correlation", verified_ok, "all entries verified", [x.to_dict() for x in verified], [str(manifest_path),str(packages)], None if verified_ok else CriterionStatus.NOT_PROVEN))
         if verified_ok:
-            manifest=json.loads(manifest_path.read_text(encoding="utf-8")); baseline=None
+            manifest=json.loads(manifest_path.read_text(encoding="utf-8")); baseline=None; baseline_case=None
+            import shutil
+            shutil.copyfile(manifest_path, root / "candidate-manifest.json")
             for case in matrix.value["cases"]:
                 try:
                     ws=create_isolated_workspace(root,case,packages,manifest); content=ws.csproj_path.read_text(encoding="utf-8"); isolated=assert_no_project_references(content) and assert_no_repo_props_import(content)
-                    criteria.append(_consumer_result("consumer-isolation", isolated, True, isolated, [str(ws.csproj_path),str(ws.nuget_config_path)]))
-                    restore=restore_workspace(ws,timeout_seconds); commands.append(restore); criteria.append(process_criterion("consumer-restore",case["id"]+" restore",restore))
+                    criteria.append(_consumer_result(case["id"]+":consumer-isolation", isolated, True, isolated, [str(ws.csproj_path),str(ws.nuget_config_path)]))
+                    restore=restore_workspace(ws,timeout_seconds); commands.append(restore); criteria.append(process_criterion(case["id"]+":consumer-restore",case["id"]+" restore",restore))
                     if restore.classification is not ExecutionClassification.SUCCESS: continue
-                    build=build_workspace(ws,timeout_seconds); commands.append(build); text=read_output(build.stdout_path)+read_output(build.stderr_path); diagnostics=parse_diagnostics_from_build_output(text,ws.path/"build.binlog"); write_json_atomic(ws.path/"diagnostics.json",[x.to_dict() for x in diagnostics])
-                    criteria.append(process_criterion("consumer-build",case["id"]+" build",build))
+                    build=build_workspace(ws,timeout_seconds); commands.append(build); text=read_output(build.stdout_path)+read_output(build.stderr_path); diagnostics=parse_diagnostics_from_build_output(text,ws.path/"build.diagnostics.log"); write_json_atomic(ws.path/"diagnostics.json",[x.to_dict() for x in diagnostics])
+                    criteria.append(process_criterion(case["id"]+":consumer-build",case["id"]+" build",build))
                     if case.get("expects",{}).get("analyzer") == "must_report":
-                        criteria.extend(validate_analyzer_activation(case,diagnostics,build,baseline if case["carrier"]=="combined" else None,text)); baseline=baseline or diagnostics
+                        criteria.extend(validate_analyzer_activation(case,diagnostics,build,baseline if case["carrier"]=="combined" else None,text));
+                        if case.get("analyzerBaseline") is True: baseline=diagnostics; baseline_case=case["id"]
                     if case["action"]=="run" and build.classification is ExecutionClassification.SUCCESS:
-                        run=run_workspace(ws,timeout_seconds); commands.append(run); criteria.append(process_criterion("consumer-run",case["id"]+" run",run))
+                        run=run_workspace(ws,timeout_seconds); commands.append(run); criteria.append(process_criterion(case["id"]+":consumer-run",case["id"]+" run",run))
+                        output=read_output(run.stdout_path); ok,expected,observed=validate_runtime_output(case,output)
+                        criteria.append(_consumer_result(case["id"]+":consumer-runtime-output",ok,expected,observed,[run.stdout_path]))
                 except Exception as exc:
-                    criteria.append(_consumer_result("consumer-isolation",False,True,str(exc),[],CriterionStatus.ERROR))
+                    criteria.append(_consumer_result(case["id"]+":consumer-isolation",False,True,str(exc),[],CriterionStatus.ERROR))
     final=capture_git_state(repository_root); write_json_atomic(root/"git-after.json",final); criteria.append(_consumer_result("consumer-source-immutability",initial["head"]==final["head"] and initial["tracked_diff"]==final["tracked_diff"],initial["tracked_diff"],final["tracked_diff"],["git-before.json","git-after.json"]))
     decision=aggregate(criteria); report={"schema":"dx-domain.release-gate-report.v1","run_id":run_id,"profile":"consumers","head":initial["head"],"decision":decision.value,"commands":[command_record(x,repository_root) for x in commands],"criteria":[x.to_dict() for x in criteria]}
     write_json_atomic(root/"criteria.json",report["criteria"]); write_json_atomic(root/"report.json",report); write_text_atomic(root/"report.md","# Dx.Domain Consumer Gate\n\n- Decision: **"+decision.value+"**\n"+"".join(f"- **{x.status.value}** `{x.criterion_id}`: {x.motivation}\n" for x in criteria)); return decision,root,report

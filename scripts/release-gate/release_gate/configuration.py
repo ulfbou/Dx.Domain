@@ -107,5 +107,29 @@ def load_consumer_contracts(script_root):
     behaviors = load_contract(Path(script_root) / REQUIRED_BEHAVIORS_PATH)
     if matrix.value.get("schema") != "dx-domain.consumer-matrix.v1": raise ConfigurationError("Unsupported consumer-matrix schema")
     if behaviors.value.get("schema") != "dx-domain.required-behaviors.v1": raise ConfigurationError("Unsupported required-behaviors schema")
-    if not matrix.value.get("cases"): raise ConfigurationError("Consumer matrix contains no cases")
+    cases = matrix.value.get("cases")
+    inventory = behaviors.value.get("behaviors")
+    if not isinstance(cases, list) or not cases: raise ConfigurationError("Consumer matrix contains no cases")
+    if not isinstance(inventory, list) or not inventory: raise ConfigurationError("Required behaviors contains no behaviors")
+    ids = [x.get("id") for x in cases if isinstance(x, dict)]
+    if len(ids) != len(set(ids)) or any(not x for x in ids): raise ConfigurationError("Consumer case IDs must be non-empty and unique")
+    fixtures = {x.get("fixture") for x in inventory if isinstance(x, dict)}
+    allowed_carriers = {"Dx.Domain.Annotations", "Dx.Domain.Kernel", "Dx.Domain.Primitives", "Dx.Domain.Facts", "combined"}
+    allowed_actions = {"build", "run"}
+    for case in cases:
+        cid = case.get("id", "<missing>")
+        if case.get("fixture") not in fixtures: raise ConfigurationError(f"Unknown fixture for {cid}: {case.get('fixture')}")
+        if case.get("carrier") not in allowed_carriers: raise ConfigurationError(f"Unknown carrier for {cid}: {case.get('carrier')}")
+        if case.get("action") not in allowed_actions: raise ConfigurationError(f"Unsupported action for {cid}: {case.get('action')}")
+        expects = case.get("expects")
+        if not isinstance(expects, dict): raise ConfigurationError(f"Missing expectations for {cid}")
+        if case.get("action") == "run" and not (isinstance(expects.get("output"), str) or isinstance(expects.get("outputPattern"), str)):
+            raise ConfigurationError(f"Runnable case lacks expected output: {cid}")
+    required_tfms = {"net8.0", "net9.0", "net10.0"}
+    for carrier in ("Dx.Domain.Kernel", "Dx.Domain.Primitives", "Dx.Domain.Facts", "combined"):
+        observed = {x.get("targetFramework") for x in cases if x.get("carrier") == carrier and x.get("action") == "run"}
+        if observed != required_tfms: raise ConfigurationError(f"Incomplete framework coverage for {carrier}: {sorted(observed)}")
+    baselines = [x for x in cases if x.get("analyzerBaseline") is True]
+    if len(baselines) != 1 or baselines[0].get("expects", {}).get("analyzer") != "must_report":
+        raise ConfigurationError("Exactly one explicit Analyzer baseline is required")
     return matrix, behaviors

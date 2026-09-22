@@ -23,7 +23,8 @@
       "fixture": "kernel_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "output": "kernel-ok"
       }
     },
     {
@@ -34,7 +35,8 @@
       "fixture": "primitives_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "outputPattern": "^[0-9a-fA-F-]{36}$"
       }
     },
     {
@@ -45,7 +47,8 @@
       "fixture": "facts_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "output": "consumer.fact"
       }
     },
     {
@@ -62,7 +65,8 @@
       "fixture": "combined_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "outputPattern": "^[0-9a-fA-F-]{36}$"
       }
     },
     {
@@ -73,7 +77,8 @@
       "fixture": "kernel_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "output": "kernel-ok"
       }
     },
     {
@@ -84,7 +89,8 @@
       "fixture": "primitives_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "outputPattern": "^[0-9a-fA-F-]{36}$"
       }
     },
     {
@@ -95,7 +101,8 @@
       "fixture": "facts_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "output": "consumer.fact"
       }
     },
     {
@@ -112,7 +119,8 @@
       "fixture": "combined_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "outputPattern": "^[0-9a-fA-F-]{36}$"
       }
     },
     {
@@ -123,7 +131,8 @@
       "fixture": "kernel_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "output": "kernel-ok"
       }
     },
     {
@@ -134,7 +143,8 @@
       "fixture": "primitives_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "outputPattern": "^[0-9a-fA-F-]{36}$"
       }
     },
     {
@@ -145,7 +155,8 @@
       "fixture": "facts_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "output": "consumer.fact"
       }
     },
     {
@@ -162,7 +173,8 @@
       "fixture": "combined_valid",
       "expects": {
         "build": "success",
-        "run": "success"
+        "run": "success",
+        "outputPattern": "^[0-9a-fA-F-]{36}$"
       }
     },
     {
@@ -179,7 +191,8 @@
         ],
         "load_failure": false,
         "duplicate": false
-      }
+      },
+      "analyzerBaseline": true
     },
     {
       "id": "analyzer-kernel-net8.0",

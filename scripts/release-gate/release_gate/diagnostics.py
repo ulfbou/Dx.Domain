@@ -9,7 +9,7 @@ PATTERN = re.compile(r'(?:(?P<file>[^\r\n:(]+)\((?P<line>\d+)(?:,\d+)?\):\s*)?(?
 def parse_diagnostics_from_build_output(build_stdout: str, build_binlog_path: Path | None = None) -> list[Diagnostic]:
     text = build_stdout
     if build_binlog_path and Path(build_binlog_path).is_file():
-        text += "\n" + Path(build_binlog_path).read_bytes().decode("utf-8", "ignore")
+        text += "\n" + Path(build_binlog_path).read_text(encoding="utf-8", errors="strict")
     return [Diagnostic(m.group("id").upper(), m.group("severity").lower(), m.group("message").strip(), m.group("file"), int(m.group("line")) if m.group("line") else None) for m in PATTERN.finditer(text)]
 
 def _key(item): return (item.id, item.file or "", item.line or 0, item.message)
@@ -28,11 +28,13 @@ def _result(identifier, passed, expected, observed):
 
 def validate_analyzer_activation(case, diagnostics, build_result, single_diagnostics=None, build_text=""):
     expected = case.get("expects", {}); identifiers = [item.id for item in diagnostics]; results = []
+    prefix = case.get("id", "unknown-case")
+    scoped = lambda value: f"{prefix}:{value}"
     if expected.get("analyzer") == "must_report":
-        wanted = expected.get("diagnosticIds", ["DXA065"]); results.append(_result("consumer-analyzer-activated", all(x in identifiers for x in wanted), wanted, identifiers))
+        wanted = expected.get("diagnosticIds", ["DXA065"]); results.append(_result(scoped("consumer-analyzer-activated"), all(x in identifiers for x in wanted), wanted, identifiers))
     load_failed = "AD0001" in identifiers or ("analyzer assembly" in build_text.lower() and "failed" in build_text.lower())
-    results.append(_result("consumer-analyzer-load-failure-free", not load_failed, False, load_failed))
-    counts = count_effective_diagnostics(diagnostics); results.append(_result("consumer-effective-diagnostic-uniqueness", not counts["duplicates"], {}, counts["duplicates"]))
+    results.append(_result(scoped("consumer-analyzer-load-failure-free"), not load_failed, False, load_failed))
+    counts = count_effective_diagnostics(diagnostics); results.append(_result(scoped("consumer-effective-diagnostic-uniqueness"), not counts["duplicates"], {}, counts["duplicates"]))
     if case.get("carrier") == "combined" and single_diagnostics is not None:
-        results.append(_result("consumer-analyzer-duplicate-boundary", validate_no_duplicate_execution(diagnostics, single_diagnostics), count_effective_diagnostics(single_diagnostics), counts))
+        results.append(_result(scoped("consumer-analyzer-duplicate-boundary"), validate_no_duplicate_execution(diagnostics, single_diagnostics), count_effective_diagnostics(single_diagnostics), counts))
     return results

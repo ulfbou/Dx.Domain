@@ -637,71 +637,10 @@ class FeedbackRelevanceTests(unittest.TestCase):
                 captured["dossier"]["gate"]["decision"],
             )
 
-    def test_windows_collector_command_removes_matching_quotes(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            executable = root / "Python Runtime" / "python.exe"
-            collector = root / "Collector Scripts" / "dx.py"
-            executable.parent.mkdir()
-            collector.parent.mkdir()
-            executable.write_text("", encoding="utf-8")
-            collector.write_text("", encoding="utf-8")
-
-            configured = f'"{executable}" "{collector}"'
-
-            with (
-                patch.dict(
-                    os.environ,
-                    {"DX_RELEASE_GATE_COLLECTOR": configured},
-                    clear=True,
-                ),
-                patch(
-                    "release_gate.feedback.os.name",
-                    "nt",
-                ),
-                patch(
-                    "release_gate.feedback.shutil.which",
-                    return_value=None,
-                ),
-            ):
-                command = _collector_command()
-
-            self.assertEqual(
-                [str(executable), str(collector)],
-                command,
-            )
-            self.assertFalse(command[0].startswith('"'))
-            self.assertFalse(command[0].endswith('"'))
-            self.assertFalse(command[1].startswith('"'))
-            self.assertFalse(command[1].endswith('"'))
-
-    def test_windows_collector_command_preserves_unmatched_quote(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            executable = Path(temporary) / "python.exe"
-            executable.write_text("", encoding="utf-8")
-            configured = f'"{executable}" trailing"'
-
-            with (
-                patch.dict(
-                    os.environ,
-                    {"DX_RELEASE_GATE_COLLECTOR": configured},
-                    clear=True,
-                ),
-                patch(
-                    "release_gate.feedback.os.name",
-                    "nt",
-                ),
-                patch(
-                    "release_gate.feedback.shutil.which",
-                    return_value=None,
-                ),
-            ):
-                command = _collector_command()
-
-            self.assertIsNotNone(command)
-            self.assertEqual(str(executable), command[0])
-            self.assertEqual('trailing"', command[1])
-
+    def test_collector_command_uses_repository_owned_dx(self):
+        command = _collector_command()
+        self.assertEqual(sys.executable, command[0])
+        self.assertEqual(ROOT / "dx.py", Path(command[1]))
 
 if __name__ == "__main__":
     unittest.main()

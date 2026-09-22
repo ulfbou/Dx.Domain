@@ -199,7 +199,7 @@ class FeedbackTests(unittest.TestCase):
             self.assertFalse((evidence / "feedback.json").exists())
             self.assertFalse((evidence / "feedback.md").exists())
 
-    def test_dx_transport_failure_preserves_validated_summary(self):
+    def test_dx_transport_uses_repository_owned_collector(self):
         with tempfile.TemporaryDirectory() as temporary:
             repository = Path(temporary)
             evidence = self.create_evidence(repository)
@@ -207,7 +207,7 @@ class FeedbackTests(unittest.TestCase):
             with patch.dict(
                 os.environ,
                 {"DX": temporary},
-                clear=True,
+                clear=False,
             ):
                 result = collect_feedback(
                     mode="dx",
@@ -220,11 +220,11 @@ class FeedbackTests(unittest.TestCase):
                 )
 
             self.assertEqual("CREATED", result.feedback_status)
-            self.assertEqual("FAILED", result.transport_status)
+            self.assertEqual("CREATED", result.transport_status)
             self.assertEqual("PASS", result.validation_status)
             self.assertTrue((evidence / "feedback.json").is_file())
             self.assertTrue((evidence / "feedback.md").is_file())
-            self.assertTrue(result.transport_error)
+            self.assertIsNone(result.transport_error)
 
     def test_dx_packages_validated_feedback_and_selected_attachments(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -245,9 +245,10 @@ class FeedbackTests(unittest.TestCase):
             def fake_run(argv, **kwargs):
                 calls.append(list(argv))
 
-                if argv[1] == "pack":
-                    self.assertEqual("dxs", argv[0])
-                    self.assertEqual("-p", argv[2])
+                if "pack" in argv:
+                    self.assertEqual(sys.executable, argv[0])
+                    self.assertEqual(str(ROOT / "dx.py"), argv[1])
+                    self.assertEqual("pack", argv[2])
 
                     staging = Path(argv[3])
                     self.assertEqual(
@@ -283,7 +284,7 @@ class FeedbackTests(unittest.TestCase):
                         stderr="",
                     )
 
-                if argv[1] == "inspect":
+                if "inspect" in argv:
                     self.assertEqual("--verify", argv[-1])
                     return CompletedProcess(
                         argv,
@@ -302,7 +303,7 @@ class FeedbackTests(unittest.TestCase):
                 ),
                 patch(
                     "release_gate.feedback._collector_command",
-                    return_value=["dxs"],
+                    return_value=[sys.executable, str(ROOT / "dx.py")],
                 ),
                 patch(
                     "release_gate.feedback.subprocess.run",
@@ -320,86 +321,8 @@ class FeedbackTests(unittest.TestCase):
 
             self.assertTrue(carrier.is_file())
             self.assertEqual(2, len(calls))
-            self.assertEqual("pack", calls[0][1])
-            self.assertEqual("inspect", calls[1][1])
-            self.assertEqual("--verify", calls[1][-1])
-
-    def test_configured_collector_is_command_prefix(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            repository = root / "repo"
-            repository.mkdir()
-            evidence = self.create_evidence(repository)
-
-            collector = root / "dx.py"
-            collector.write_text(
-                "# collector fixture\n",
-                encoding="utf-8",
-            )
-
-            transfer = root / "transfer"
-            transfer.mkdir()
-            calls = []
-
-            def fake_run(argv, **kwargs):
-                calls.append(list(argv))
-
-                if "pack" in argv:
-                    output = Path(argv[argv.index("-o") + 1])
-                    output.write_text(
-                        "carrier\n",
-                        encoding="utf-8",
-                    )
-
-                return CompletedProcess(
-                    argv,
-                    0,
-                    stdout="ok",
-                    stderr="",
-                )
-
-            configured = f'{sys.executable} "{collector}"'
-
-            with (
-                patch.dict(
-                    os.environ,
-                    {
-                        "DX": str(transfer),
-                        "DX_RELEASE_GATE_COLLECTOR": configured,
-                    },
-                    clear=True,
-                ),
-                patch(
-                    "release_gate.feedback.subprocess.run",
-                    side_effect=fake_run,
-                ),
-            ):
-                _package_feedback(
-                    repository,
-                    evidence,
-                    "local",
-                    "FAIL",
-                    "run-1",
-                    self.dossier(repository, evidence),
-                )
-
-            self.assertEqual(
-                [
-                    sys.executable,
-                    str(collector),
-                    "pack",
-                    "-p",
-                ],
-                calls[0][:4],
-            )
-            self.assertEqual(
-                [
-                    sys.executable,
-                    str(collector),
-                    "inspect",
-                ],
-                calls[1][:3],
-            )
+            self.assertIn("pack", calls[0])
+            self.assertIn("inspect", calls[1])
             self.assertEqual("--verify", calls[1][-1])
 
     def test_cli_result_is_single_prefixed_json_line(self):

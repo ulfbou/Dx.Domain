@@ -41,7 +41,7 @@ def create_isolated_workspace(base_evidence_dir: Path, case: dict, candidate_dir
     cache = root / "packages"; cache.mkdir()
     feed = Path(candidate_dir).resolve()
     config = root / "nuget.config"
-    config.write_text('<?xml version="1.0" encoding="utf-8"?>\n<configuration><config><add key="globalPackagesFolder" value="' + html.escape(str(cache.resolve())) + '" /></config><packageSources><clear /><add key="candidate" value="' + html.escape(str(feed)) + '" /><add key="nuget.org" value="https://api.nuget.org/v3/index.json" /></packageSources></configuration>\n', encoding="utf-8")
+    config.write_text('<?xml version="1.0" encoding="utf-8"?>\n<configuration><config><add key="globalPackagesFolder" value="' + html.escape(str(cache.resolve())) + '" /></config><packageSources><clear /><add key="candidate" value="' + html.escape(str(feed)) + '" /><add key="nuget.org" value="https://api.nuget.org/v3/index.json" /></packageSources><packageSourceMapping><packageSource key="candidate"><package pattern="Dx.Domain.*" /></packageSource><packageSource key="nuget.org"><package pattern="*" /></packageSource></packageSourceMapping></configuration>\n', encoding="utf-8")
     props = root / "Directory.Build.props"
     props.write_text("<Project><PropertyGroup><RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot></PropertyGroup></Project>\n", encoding="utf-8")
     versions = {item["packageId"]: item["version"] for item in candidate_manifest["packages"]}
@@ -65,7 +65,15 @@ def restore_workspace(ws, timeout_seconds=1800):
     return _run(ws, "restore", ("dotnet","restore",str(ws.csproj_path),"--configfile",str(ws.nuget_config_path),f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}"), timeout_seconds)
 
 def build_workspace(ws, timeout_seconds=1800):
-    return _run(ws, "build", ("dotnet","build",str(ws.csproj_path),"-c","Release","--no-restore",f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}",f"-bl:{ws.path/'build.binlog'}"), timeout_seconds)
+    return _run(ws, "build", ("dotnet","build",str(ws.csproj_path),"-c","Release","--no-restore",f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}",f"-flp:logfile={ws.path/'build.diagnostics.log'};verbosity=diagnostic"), timeout_seconds)
 
 def run_workspace(ws, timeout_seconds=1800):
     return _run(ws, "run", ("dotnet","run","--project",str(ws.csproj_path),"-c","Release","--no-build",f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}"), timeout_seconds)
+
+def validate_runtime_output(case: dict, stdout_text: str):
+    expected = case.get("expects", {})
+    observed = stdout_text.strip()
+    if "output" in expected:
+        return observed == expected["output"], expected["output"], observed
+    pattern = expected.get("outputPattern")
+    return bool(pattern and re.fullmatch(pattern, observed)), pattern, observed

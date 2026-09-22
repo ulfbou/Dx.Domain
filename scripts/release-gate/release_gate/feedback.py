@@ -4,9 +4,9 @@ import hashlib
 import json
 import mimetypes
 import os
-import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -308,36 +308,12 @@ def _attachment_candidates(evidence_root: Path, dossier: dict[str, Any]) -> list
                 wanted[path] = (f"evidence-{_sha256_bytes(path.as_posix().encode())[:12]}", f"decisive evidence for {finding['criterion_id']}")
     return [(identity, purpose, path) for path, (identity, purpose) in sorted(wanted.items(), key=lambda item: item[0].as_posix())]
 
-def _collector_command() -> list[str] | None:
-    configured = os.environ.get("DX_RELEASE_GATE_COLLECTOR")
-    if configured:
-        parts = shlex.split(configured, posix=os.name != "nt")
-        if not parts:
-            return None
-        if os.name == "nt":
-            parts = [
-                (
-                    part[1:-1]
-                    if (
-                        len(part) >= 2
-                        and part[0] == part[-1]
-                        and part[0] in {'"', "'"}
-                    )
-                    else part
-                )
-                for part in parts
-            ]
-        executable = (
-            shutil.which(parts[0])
-            or (
-                parts[0]
-                if Path(parts[0]).is_file()
-                else None
-            )
-        )
-        return [executable, *parts[1:]] if executable else None
-    dxs = shutil.which("dxs")
-    return [dxs] if dxs else None
+def _collector_command() -> list[str]:
+    """Return the repository-owned DX v2.0 CLI command prefix."""
+    collector = Path(__file__).resolve().parents[1] / "dx.py"
+    if not collector.is_file():
+        raise RuntimeError(f"Repository-owned DX collector is unavailable: {collector}")
+    return [sys.executable, str(collector)]
 
 def _carrier_path(profile: str, decision: str, run_id: str) -> Path:
     transfer = os.environ.get("DX")
@@ -346,7 +322,6 @@ def _carrier_path(profile: str, decision: str, run_id: str) -> Path:
 
 def _package_feedback(repository_root: Path, evidence_root: Path, profile: str, decision: str, run_id: str, dossier: dict[str, Any]) -> Path:
     command = _collector_command()
-    if command is None: raise RuntimeError("No DX collector is available; set DX_RELEASE_GATE_COLLECTOR or install dxs")
     staging = evidence_root / "feedback-transport"
     if staging.exists(): shutil.rmtree(staging)
     attachments_dir = staging / "attachments"; attachments_dir.mkdir(parents=True)
@@ -362,7 +337,7 @@ def _package_feedback(repository_root: Path, evidence_root: Path, profile: str, 
     write_text_atomic(staging / "feedback.md", render_markdown(transported))
     write_json_atomic(staging / "attachment-manifest.json", {"schema": ATTACHMENT_MANIFEST_SCHEMA, "attachments": manifest_entries})
     carrier = _carrier_path(profile, decision, run_id); carrier.parent.mkdir(parents=True, exist_ok=True); carrier.unlink(missing_ok=True)
-    completed = subprocess.run([*command, "pack", "-p", str(staging), "-o", str(carrier)], cwd=repository_root, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False)
+    completed = subprocess.run([*command, "pack", str(staging), "-o", str(carrier)], cwd=repository_root, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False)
     if completed.returncode != 0: raise RuntimeError(f"DX collector exited with {completed.returncode}: {(completed.stderr or completed.stdout).strip()}")
     if not carrier.is_file() or not carrier.stat().st_size: raise RuntimeError(f"DX collector did not create a non-empty carrier: {carrier}")
     inspect = subprocess.run([*command, "inspect", str(carrier), "--verify"], cwd=repository_root, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False)
