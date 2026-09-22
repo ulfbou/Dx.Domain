@@ -331,6 +331,7 @@ class SelectionReport:
     decisions: tuple[ContentDecision, ...]
     filter_counts: dict[str, int]
     rule_match_counts: dict[str, int]
+    providers: dict[str, dict[str, Any]]
 
 @dataclass(frozen=True)
 class NormalizedPackOptions:
@@ -486,7 +487,9 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
     ee=tuple(ExtensionRule("exclude_extension",normalize_extension(x),"exclude",i) for i,x in enumerate(dict.fromkeys(a.exclude_extension)))
     scopes=tuple(a.scope)
     for raw in scopes: _operand(root,raw)
-    ignores=tuple(_operand(root,x) for x in a.ignore_file)
+    automatic_dxignore=root/".dxignore"
+    ignore_paths=([automatic_dxignore] if automatic_dxignore.is_file() else []) + [_operand(root,x) for x in a.ignore_file]
+    ignores=tuple(dict.fromkeys(ignore_paths))
     explain="json" if a.explain == "json" else ("human" if a.explain else None)
     return NormalizedPackOptions(source,root,output,mode,tuple(a.path),scopes,tuple(a.only),inc,exc,force_inc,ie,ee,ignores,bool(a.no_gitignore or a.no_ignore),bool(a.no_default_excludes or a.no_ignore),a.unsafe_include_git,a.skip_binary,a.readonly,a.dry_run or explain=="json",a.json or explain=="json",explain,a.quiet,a.verbose,a.force)
 
@@ -584,20 +587,35 @@ def _git_ignore(ctx: SelectionContext, candidates: tuple[Candidate,...]) -> dict
     return result
 
 
-def _ignore_file_rules(paths: tuple[Path,...]) -> tuple[PatternRule,...]:
+def _parse_dxignore_line(raw: str) -> tuple[str,bool] | None:
+    if not raw: return None
+    escaped_hash=raw.startswith("\\#"); escaped_bang=raw.startswith("\\!")
+    if raw.startswith("#") and not escaped_hash: return None
+    value=raw
+    while value.endswith(" ") and not value.endswith("\\ "): value=value[:-1]
+    if escaped_hash or escaped_bang: value=value[1:]
+    neg=value.startswith("!") and not escaped_bang
+    pattern=value[1:] if neg else value
+    return (pattern,neg) if pattern else None
+
+def _ignore_file_rules(paths: tuple[Path,...], root: Path) -> tuple[PatternRule,...]:
     rules=[]; order=0
     for path in paths:
         try: lines=path.read_text(encoding="utf-8").splitlines()
         except (OSError,UnicodeError) as exc: raise IOErrorDx(f"cannot read ignore file {path}: {exc}") from exc
+        try: base=path.resolve().parent.relative_to(root).as_posix()
+        except ValueError as exc: raise UsageError(f"ignore file is outside selection root: {path}") from exc
         for number,raw in enumerate(lines,1):
-            if not raw or raw.startswith("#"): continue
-            neg=raw.startswith("!"); pattern=raw[1:] if neg else raw
+            parsed=_parse_dxignore_line(raw)
+            if parsed is None: continue
+            pattern,neg=parsed
+            if base != "." and not pattern.startswith("/"):
+                pattern=f"{base}/{pattern}"
             rules.append(_validate_pattern(pattern,"ignore_file",order,"include" if neg else "exclude",str(path),number)); order+=1
     return tuple(rules)
 
-
 def evaluate_paths(ctx: SelectionContext, candidates: tuple[Candidate,...]) -> tuple[PathDecision,...]:
-    o=ctx.options; git_ignored=_git_ignore(ctx,candidates); ignore_rules=_ignore_file_rules(o.ignore_files)
+    o=ctx.options; git_ignored=_git_ignore(ctx,candidates); ignore_rules=_ignore_file_rules(o.ignore_files,o.root)
     defaults=tuple(_validate_pattern(x,"default",i,"exclude") for i,x in enumerate(DEFAULT_EXCLUDES)) if not o.no_default_excludes else ()
     result=[]
     for c in candidates:
@@ -661,7 +679,15 @@ def build_report(ctx: SelectionContext, decisions: tuple[ContentDecision,...]) -
         for m in d.path_decision.matches:
             if m.provider in matches: matches[m.provider]+=1
     assert len(decisions)==sum(counts.values())
-    return SelectionReport(ctx,decisions,counts,matches)
+    git_state="disabled_by_user" if ctx.options.no_gitignore else "unavailable_no_repository" if ctx.repository_root is None else "active"
+    default_state="disabled_by_user" if ctx.options.no_default_excludes else "active"
+    providers={
+        "gitignore":{"state":git_state,"repository_root":str(ctx.repository_root) if ctx.repository_root else None,"matched":matches["gitignore"]},
+        "dxignore":{"state":"active" if (ctx.options.root/".dxignore").is_file() else "not_applicable","path":str(ctx.options.root/".dxignore"),"matched":sum(1 for d in decisions for m in d.path_decision.matches if m.provider=="ignore_file" and m.source==str(ctx.options.root/".dxignore"))},
+        "ignore_files":{"state":"active" if ctx.options.ignore_files else "not_applicable","paths":[str(x) for x in ctx.options.ignore_files],"matched":matches["ignore_file"]},
+        "defaults":{"state":default_state,"version":DEFAULT_EXCLUDES_VERSION,"matched":matches["default"]},
+    }
+    return SelectionReport(ctx,decisions,counts,matches,providers)
 
 
 def select_for_pack(ctx: SelectionContext) -> SelectionReport:
@@ -779,7 +805,7 @@ def pack_command(a) -> int:
             print(f"{p.candidate.path}  {'include' if d.terminal_outcome=='selected' else 'exclude'}  {p.decisive_provider}{' '+p.decisive_pattern if p.decisive_pattern else ''}",file=sys.stderr)
     if o.dry_run:
         if o.json:
-            json.dump({"schema_version":2,"command":"pack","dry_run":True,"selection_root":str(ctx.selection_root),"source_mode":o.source_mode,"candidate_count":len(report.decisions),"filter_counts":report.filter_counts,"rule_match_counts":report.rule_match_counts,"decisions":[_decision_json(d) for d in report.decisions],"selected_files":len(selected),"text_files":sum(d.content_kind=="text" and d.terminal_outcome=="selected" for d in report.decisions),"binary_files":sum(d.content_kind=="binary" and d.terminal_outcome=="selected" for d in report.decisions),"skipped_files":report.filter_counts["binary_skipped"],"files":[{"path":d.path_decision.candidate.path,"type":d.content_kind} for d in selected]},sys.stdout,indent=2);sys.stdout.write("\n")
+            json.dump({"schema_version":2,"command":"pack","dry_run":True,"selection_root":str(ctx.selection_root),"source_mode":o.source_mode,"candidate_count":len(report.decisions),"filter_counts":report.filter_counts,"rule_match_counts":report.rule_match_counts,"providers":report.providers,"decisions":[_decision_json(d) for d in report.decisions],"selected_files":len(selected),"text_files":sum(d.content_kind=="text" and d.terminal_outcome=="selected" for d in report.decisions),"binary_files":sum(d.content_kind=="binary" and d.terminal_outcome=="selected" for d in report.decisions),"skipped_files":report.filter_counts["binary_skipped"],"files":[{"path":d.path_decision.candidate.path,"type":d.content_kind} for d in selected]},sys.stdout,indent=2);sys.stdout.write("\n")
         elif not o.quiet:
             print(f"DX carrier plan\nSource: {o.source}\nRoot: {o.root}\nOutput: {o.output if o.output!=Path('-') else 'stdout'}\n\nSelected files: {len(selected)}\nUTF-8 text files: {sum(d.content_kind=='text' for d in selected)}\nBinary files encoded as base64: {sum(d.content_kind=='binary' for d in selected)}\nGit-ignored files excluded: {report.rule_match_counts['gitignore']}\nDefault-excluded files: {report.rule_match_counts['default']}\nExplicitly excluded files: {report.filter_counts['hard_excluded']}\nUnreadable files: {report.filter_counts['unreadable']}\n\nNo files were written.",file=sys.stderr)
         if not selected: raise IOErrorDx(_empty_message(report))
@@ -1126,7 +1152,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('--readonly', action='store_true', help='Mark all entries as read-only')
     p.add_argument('-G', '--no-gitignore', action='store_true', help='Do not apply Git ignore rules')
     p.add_argument('--no-default-excludes', action='store_true', help='Do not apply default excludes')
-    p.add_argument('--ignore-file', action='append', default=[], metavar='FILE', help='Apply ordered DX ignore rules relative to selection root (repeatable)')
+    p.add_argument('--ignore-file', action='append', default=[], metavar='FILE', help='Apply ordered DX ignore rules; automatic ROOT/.dxignore is evaluated first (repeatable)')
     p.add_argument('--no-ignore', action='store_true', help='Disable Git-ignore and default excludes')
     p.add_argument('--unsafe-include-git', action='store_true', help='Disable only protected .git exclusion; requires --force')
     p.add_argument('--explain', nargs='?', const='human', choices=('human','json'), help='Explain every candidate; json implies --dry-run --json')
