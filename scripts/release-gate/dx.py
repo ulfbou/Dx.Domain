@@ -88,6 +88,8 @@ class WriteConflictError(DxError):
 
 class VerifyError(DxError):
     exit_code = 6
+class EmptySelectionError(DxError):
+    exit_code = 7
 
 
 @dataclass(frozen=True)
@@ -351,7 +353,7 @@ class NormalizedPackOptions:
     no_gitignore: bool
     no_default_excludes: bool
     unsafe_include_git: bool
-    skip_binary: bool
+    binary_policy: str
     readonly: bool
     dry_run: bool
     json: bool
@@ -466,6 +468,7 @@ def _repository_root(start: Path) -> Path | None:
 
 def normalize_pack_options(a) -> NormalizedPackOptions:
     if a.binary and a.skip_binary: raise UsageError("--binary and --skip-binary are mutually exclusive")
+    binary_policy=a.binary_policy or ("skip" if a.skip_binary else "include")
     if a.quiet and a.verbose: raise UsageError("--quiet and --verbose are mutually exclusive")
     if a.only and (a.path or a.from_git): raise UsageError("--only replaces candidate providers and cannot be combined with --path or --from-git")
     if a.unsafe_include_git and not a.force: raise UsageError("--unsafe-include-git requires --force")
@@ -491,7 +494,7 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
     ignore_paths=([automatic_dxignore] if automatic_dxignore.is_file() else []) + [_operand(root,x) for x in a.ignore_file]
     ignores=tuple(dict.fromkeys(ignore_paths))
     explain="json" if a.explain == "json" else ("human" if a.explain else None)
-    return NormalizedPackOptions(source,root,output,mode,tuple(a.path),scopes,tuple(a.only),inc,exc,force_inc,ie,ee,ignores,bool(a.no_gitignore or a.no_ignore),bool(a.no_default_excludes or a.no_ignore),a.unsafe_include_git,a.skip_binary,a.readonly,a.dry_run or explain=="json",a.json or explain=="json",explain,a.quiet,a.verbose,a.force)
+    return NormalizedPackOptions(source,root,output,mode,tuple(a.path),scopes,tuple(a.only),inc,exc,force_inc,ie,ee,ignores,bool(a.no_gitignore or a.no_ignore),bool(a.no_default_excludes or a.no_ignore),a.unsafe_include_git,binary_policy,a.readonly,a.dry_run or explain=="json",a.json or explain=="json",explain,a.quiet,a.verbose,a.force)
 
 
 def build_selection_context(o: NormalizedPackOptions) -> SelectionContext:
@@ -660,17 +663,21 @@ def load_and_classify(ctx: SelectionContext, decisions: tuple[PathDecision,...])
         if not d.included:
             out.append(ContentDecision(d,None,None,None,ctx.options.readonly,d.terminal_outcome)); continue
         p=d.candidate.absolute_path
-        if p.is_symlink() or not p.is_file(): raise IOErrorDx(f"selected path is not a regular non-symlink file: {d.candidate.path}")
+        if p.is_symlink() or not p.is_file():
+            out.append(ContentDecision(d,"invalid",None,None,ctx.options.readonly,"invalid_object")); continue
         try:
             resolved=p.resolve(strict=True)
-            if not _inside(resolved,ctx.selection_root): raise IOErrorDx(f"selected path escaped selection root: {d.candidate.path}")
+            if not _inside(resolved,ctx.selection_root):
+                out.append(ContentDecision(d,"invalid",None,None,ctx.options.readonly,"invalid_object")); continue
             data=p.read_bytes()
-        except OSError as exc: raise IOErrorDx(f"cannot read selected file {d.candidate.path}: {exc}") from exc
+        except OSError:
+            out.append(ContentDecision(d,"regular",None,None,ctx.options.readonly,"unreadable")); continue
         kind=classify_file(data)
-        terminal="binary_skipped" if kind=="binary" and ctx.options.skip_binary else "selected"
-        out.append(ContentDecision(d,"regular",kind,None if terminal!="selected" else data,ctx.options.readonly,terminal))
+        if kind=="binary" and ctx.options.binary_policy=="skip": terminal="binary_skipped"
+        elif kind=="binary" and ctx.options.binary_policy=="fail": terminal="invalid_object"
+        else: terminal="selected"
+        out.append(ContentDecision(d,"regular",kind,data if terminal=="selected" else None,ctx.options.readonly,terminal))
     return tuple(out)
-
 
 def build_report(ctx: SelectionContext, decisions: tuple[ContentDecision,...]) -> SelectionReport:
     counts={k:0 for k in TERMINAL_OUTCOMES}; matches={k:0 for k in ("output","protected","exclude","exclude_extension","include","include_extension","force_include","gitignore","ignore_file","default")}
@@ -805,13 +812,15 @@ def pack_command(a) -> int:
             print(f"{p.candidate.path}  {'include' if d.terminal_outcome=='selected' else 'exclude'}  {p.decisive_provider}{' '+p.decisive_pattern if p.decisive_pattern else ''}",file=sys.stderr)
     if o.dry_run:
         if o.json:
-            json.dump({"schema_version":2,"command":"pack","dry_run":True,"selection_root":str(ctx.selection_root),"source_mode":o.source_mode,"candidate_count":len(report.decisions),"filter_counts":report.filter_counts,"rule_match_counts":report.rule_match_counts,"providers":report.providers,"decisions":[_decision_json(d) for d in report.decisions],"selected_files":len(selected),"text_files":sum(d.content_kind=="text" and d.terminal_outcome=="selected" for d in report.decisions),"binary_files":sum(d.content_kind=="binary" and d.terminal_outcome=="selected" for d in report.decisions),"skipped_files":report.filter_counts["binary_skipped"],"files":[{"path":d.path_decision.candidate.path,"type":d.content_kind} for d in selected]},sys.stdout,indent=2);sys.stdout.write("\n")
+            json.dump({"schema_version":3,"command":"pack","success":bool(selected),"errors":[] if selected else [{"code":"EmptySelectionError","message":_empty_message(report)}],"warnings":[],"empty_reason":None if selected else _empty_reason(report),"dry_run":True,"selection_root":str(ctx.selection_root),"source_mode":o.source_mode,"candidate_count":len(report.decisions),"filter_counts":report.filter_counts,"rule_match_counts":report.rule_match_counts,"providers":report.providers,"decisions":[_decision_json(d) for d in report.decisions],"selected_files":len(selected),"text_files":sum(d.content_kind=="text" and d.terminal_outcome=="selected" for d in report.decisions),"binary_files":sum(d.content_kind=="binary" and d.terminal_outcome=="selected" for d in report.decisions),"skipped_files":report.filter_counts["binary_skipped"],"files":[{"path":d.path_decision.candidate.path,"type":d.content_kind} for d in selected]},sys.stdout,indent=2);sys.stdout.write("\n")
         elif not o.quiet:
             print(f"DX carrier plan\nSource: {o.source}\nRoot: {o.root}\nOutput: {o.output if o.output!=Path('-') else 'stdout'}\n\nSelected files: {len(selected)}\nUTF-8 text files: {sum(d.content_kind=='text' for d in selected)}\nBinary files encoded as base64: {sum(d.content_kind=='binary' for d in selected)}\nGit-ignored files excluded: {report.rule_match_counts['gitignore']}\nDefault-excluded files: {report.rule_match_counts['default']}\nExplicitly excluded files: {report.filter_counts['hard_excluded']}\nUnreadable files: {report.filter_counts['unreadable']}\n\nNo files were written.",file=sys.stderr)
-        if not selected: raise IOErrorDx(_empty_message(report))
+        if not selected:
+            if o.json: return EmptySelectionError.exit_code
+            raise EmptySelectionError(_empty_message(report))
         return 0
-    if not selected: raise IOErrorDx(_empty_message(report))
-    if o.skip_binary and not o.quiet:
+    if not selected: raise EmptySelectionError(_empty_message(report))
+    if o.binary_policy == "skip" and not o.quiet:
         for d in report.decisions:
             if d.terminal_outcome == 'binary_skipped': print(f"Omitted non-UTF-8: {d.path_decision.candidate.path}", file=sys.stderr)
     def writer(h):
@@ -827,10 +836,13 @@ def pack_command(a) -> int:
     return 0
 
 
+def _empty_reason(report: SelectionReport) -> str:
+    if not report.decisions: return "no_candidates"
+    if any(d.path_decision.included for d in report.decisions): return "all_content_excluded"
+    return "all_path_excluded"
+
 def _empty_message(report: SelectionReport) -> str:
-    if not report.decisions: return "no candidates discovered"
-    if any(d.path_decision.included for d in report.decisions): return "all path-selected files were removed by content policy"
-    return "all candidates were excluded by path rules"
+    return _empty_reason(report).replace("_", " ")
 
 def apply_unpack_common(a, is_apply: bool) -> int:
     # read carrier
@@ -1147,7 +1159,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('--force-include', action='append', default=[], metavar='PATTERN', help='Override ordinary ignore rules for matching candidates (repeatable)')
     p.add_argument('-x', '--include-extension', action='append', default=[], metavar='EXT', help='Include only files with extension')
     p.add_argument('-X', '--exclude-extension', action='append', default=[], metavar='EXT', help='Exclude files with extension')
-    p.add_argument('-b', '--binary', action='store_true', help='Explicitly include non-UTF-8 files (default)')
+    p.add_argument('-b', '--binary', action='store_true', help='Deprecated alias for --binary-policy include')
+    p.add_argument('--binary-policy', choices=('include','skip','fail'), help='Policy for non-UTF-8 or non-LF content')
     p.add_argument('-B', '--skip-binary', action='store_true', help='Skip non-UTF-8 files')
     p.add_argument('--readonly', action='store_true', help='Mark all entries as read-only')
     p.add_argument('-G', '--no-gitignore', action='store_true', help='Do not apply Git ignore rules')
@@ -1295,7 +1308,10 @@ def main(argv=None):
             print(f'Run "dx.py {command} -h" for complete help.', file=sys.stderr)
         return e.exit_code
     except DxError as e:
-        print(f"ERROR: {e}", file=sys.stderr)
+        if a is not None and getattr(a, "command", None) in ("pack","p") and getattr(a, "json", False):
+            json.dump({"schema_version":3,"command":"pack","success":False,"errors":[{"code":type(e).__name__,"message":str(e)}],"warnings":[],"dry_run":bool(getattr(a,"dry_run",False)),"empty_reason":str(e).replace(" ","_") if isinstance(e,EmptySelectionError) else None},sys.stdout,indent=2);sys.stdout.write("\n")
+        else:
+            print(f"ERROR: {e}", file=sys.stderr)
         command = a.command if a is not None and hasattr(a, 'command') else None
         usage_map = {
             'pack': 'dx.py pack [SOURCE] [OPTIONS]',
