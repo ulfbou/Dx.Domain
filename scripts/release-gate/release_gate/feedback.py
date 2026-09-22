@@ -60,6 +60,9 @@ class FeedbackResult:
     transport_error: str | None = None
     feedback_sha256: str | None = None
     validation_status: str | None = None
+    carrier_sha256: str | None = None
+    carrier_size: int | None = None
+    carrier_verification: str | None = None
     def to_dict(self) -> dict[str, Any]:
         return self.__dict__.copy()
 
@@ -322,26 +325,34 @@ def _carrier_path(profile: str, decision: str, run_id: str) -> Path:
 
 def _package_feedback(repository_root: Path, evidence_root: Path, profile: str, decision: str, run_id: str, dossier: dict[str, Any]) -> Path:
     command = _collector_command()
-    staging = evidence_root / "feedback-transport"
-    if staging.exists(): shutil.rmtree(staging)
-    attachments_dir = staging / "attachments"; attachments_dir.mkdir(parents=True)
-    manifest_entries = []
-    for identity, purpose, source in _attachment_candidates(evidence_root, dossier):
-        suffix = source.suffix.lower() or ".bin"
-        target = attachments_dir / f"{identity}{suffix}"
-        shutil.copyfile(source, target)
-        manifest_entries.append({"attachment_id": identity, "purpose": purpose, "path": target.relative_to(staging).as_posix(), "media_type": mimetypes.guess_type(target.name)[0] or "application/octet-stream", "byte_size": target.stat().st_size, "sha256": _sha256_file(target)})
-    transported = json.loads(json.dumps(dossier)); transported["attachments"] = manifest_entries
-    transported = _finalize(transported)
-    write_json_atomic(staging / "feedback.json", transported)
-    write_text_atomic(staging / "feedback.md", render_markdown(transported))
-    write_json_atomic(staging / "attachment-manifest.json", {"schema": ATTACHMENT_MANIFEST_SCHEMA, "attachments": manifest_entries})
-    carrier = _carrier_path(profile, decision, run_id); carrier.parent.mkdir(parents=True, exist_ok=True); carrier.unlink(missing_ok=True)
-    completed = subprocess.run([*command, "pack", str(staging), "-o", str(carrier)], cwd=repository_root, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False)
-    if completed.returncode != 0: raise RuntimeError(f"DX collector exited with {completed.returncode}: {(completed.stderr or completed.stdout).strip()}")
-    if not carrier.is_file() or not carrier.stat().st_size: raise RuntimeError(f"DX collector did not create a non-empty carrier: {carrier}")
+    carrier = _carrier_path(profile, decision, run_id)
+    carrier.parent.mkdir(parents=True, exist_ok=True)
+    carrier.unlink(missing_ok=True)
+    with tempfile.TemporaryDirectory(prefix="dx-release-gate-feedback-") as temporary:
+        staging = Path(temporary)
+        attachments_dir = staging / "attachments"
+        attachments_dir.mkdir(parents=True)
+        manifest_entries = []
+        for identity, purpose, source in _attachment_candidates(evidence_root, dossier):
+            suffix = source.suffix.lower() or ".bin"
+            target = attachments_dir / f"{identity}{suffix}"
+            shutil.copyfile(source, target)
+            manifest_entries.append({"attachment_id": identity, "purpose": purpose, "path": target.relative_to(staging).as_posix(), "media_type": mimetypes.guess_type(target.name)[0] or "application/octet-stream", "byte_size": target.stat().st_size, "sha256": _sha256_file(target)})
+        transported = json.loads(json.dumps(dossier))
+        transported["attachments"] = manifest_entries
+        transported = _finalize(transported)
+        write_json_atomic(staging / "feedback.json", transported)
+        write_text_atomic(staging / "feedback.md", render_markdown(transported))
+        write_json_atomic(staging / "attachment-manifest.json", {"schema": ATTACHMENT_MANIFEST_SCHEMA, "attachments": manifest_entries})
+        completed = subprocess.run([*command, "pack", str(staging), "--root", str(staging), "-o", str(carrier)], cwd=repository_root, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False)
+        if completed.returncode != 0:
+            raise RuntimeError(f"DX collector exited with {completed.returncode}: {(completed.stderr or completed.stdout).strip()}")
+    if not carrier.is_file() or not carrier.stat().st_size:
+        raise RuntimeError(f"DX collector did not create a non-empty carrier: {carrier}")
     inspect = subprocess.run([*command, "inspect", str(carrier), "--verify"], cwd=repository_root, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False)
-    if inspect.returncode != 0: carrier.unlink(missing_ok=True); raise RuntimeError(f"DX post-pack verification failed with {inspect.returncode}: {(inspect.stderr or inspect.stdout).strip()}")
+    if inspect.returncode != 0:
+        carrier.unlink(missing_ok=True)
+        raise RuntimeError(f"DX post-pack verification failed with {inspect.returncode}: {(inspect.stderr or inspect.stdout).strip()}")
     return carrier
 
 
@@ -390,6 +401,9 @@ def transport_feedback(
         carrier.as_posix(),
         feedback_sha256=digest,
         validation_status="PASS",
+        carrier_sha256=_sha256_file(carrier),
+        carrier_size=carrier.stat().st_size,
+        carrier_verification="PASS",
     )
 
 
@@ -404,7 +418,7 @@ def collect_feedback(*, mode: str, profile: str, decision: str, gate_exit_code: 
         carrier = _package_feedback(repository_root, evidence_root, profile, decision, str(dossier["run"]["run_id"]), dossier)
     except (OSError, RuntimeError, ValueError) as exc:
         return FeedbackResult(mode, "CREATED", "FAILED", _relative(feedback_path, repository_root), transport_error=str(exc), feedback_sha256=digest, validation_status="PASS")
-    return FeedbackResult(mode, "CREATED", "CREATED", _relative(feedback_path, repository_root), carrier.as_posix(), feedback_sha256=digest, validation_status="PASS")
+    return FeedbackResult(mode, "CREATED", "CREATED", _relative(feedback_path, repository_root), carrier.as_posix(), feedback_sha256=digest, validation_status="PASS", carrier_sha256=_sha256_file(carrier), carrier_size=carrier.stat().st_size, carrier_verification="PASS")
 
 def build_error_feedback(*, profile: str, repository_root: Path, evidence_root: Path, error: BaseException) -> dict[str, Any]:
     report = {"run_id": evidence_root.name, "profile": profile, "head": None, "branch": None, "source_unchanged": None, "criteria": [{"criterion_id": "release-gate-operational-error", "title": "Release-gate operational error", "status": "ERROR", "motivation": f"{type(error).__name__}: {error}", "verifier": "release_gate.run", "expected": {"operation": "complete selected profile"}, "observed": {"error_type": type(error).__name__, "message": str(error)}, "evidence": ["error.json"], "corrective_action": "Inspect the embedded error facts and error.json, correct the verifier or environment failure, and rerun."}]}
@@ -451,5 +465,5 @@ def cli_feedback(feedback_path: Path) -> str:
 
 
 def cli_result(*, profile: str, decision: str, gate_exit_code: int, process_exit_code: int, evidence_root: Path | None, repository_root: Path | None, result: FeedbackResult) -> str:
-    payload = {"schema": CLI_RESULT_SCHEMA, "profile": profile, "decision": decision, "gate_exit_code": gate_exit_code, "process_exit_code": process_exit_code, "feedback": result.mode, "feedback_status": result.feedback_status, "feedback_validation": result.validation_status, "feedback_sha256": result.feedback_sha256, "transport_status": result.transport_status, "evidence_directory": _relative(evidence_root, repository_root) if evidence_root is not None and repository_root is not None else None, "feedback_path": result.feedback_path, "carrier": result.carrier_path, "transport_error": result.transport_error}
+    payload = {"schema": CLI_RESULT_SCHEMA, "profile": profile, "decision": decision, "gate_exit_code": gate_exit_code, "process_exit_code": process_exit_code, "feedback": result.mode, "feedback_status": result.feedback_status, "feedback_validation": result.validation_status, "feedback_sha256": result.feedback_sha256, "transport_status": result.transport_status, "evidence_directory": _relative(evidence_root, repository_root) if evidence_root is not None and repository_root is not None else None, "feedback_path": result.feedback_path, "carrier": result.carrier_path, "carrier_sha256": result.carrier_sha256, "carrier_size": result.carrier_size, "carrier_verification": result.carrier_verification, "transport_error": result.transport_error}
     return "DX_RELEASE_GATE_RESULT=" + json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True)

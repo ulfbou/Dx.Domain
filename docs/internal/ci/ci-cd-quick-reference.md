@@ -64,3 +64,14 @@ Only the public configuration is deployed by `.github/workflows/docfx.yml`.
 - Do not infer the defect from the workflow name alone.
 - Preserve failed-run logs as evidence when the correction affects release readiness.
 - Re-run validation after the correction and record the successful check URL in the pull request.
+
+## Run and inspect the release gate
+
+```bash
+python3 scripts/release-gate/run.py --profile local
+python3 scripts/release-gate/dx.py inspect --verify "$DX_FILE"
+```
+
+Each run attempts exactly one `$DX/release-gate-<profile>-<decision>-<run-id>.dx.txt` carrier. Read the single `DX_RELEASE_GATE_RESULT=` stdout line for the decision, process exit code, carrier path, byte size, SHA-256, and verification result. Open `release-gate/handoff.json` first.
+
+Exit codes with a verified carrier retain the gate outcome: `0` pass, `1` gate failure, `2` required evidence not proven, `5` external evidence required, and `6` human decision required. Carrier creation or verification failure returns `3`.

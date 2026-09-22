@@ -48,3 +48,14 @@ There is no active repository-local `main` or `develop` workflow path.
 ## Authority
 
 Executable workflow files take precedence over this summary. When this document and a workflow disagree, correct this document from the workflow or change the workflow through an explicitly scoped work item.
+
+## Release-gate final carrier
+Every workflow invocation of `scripts/release-gate/run.py` attempts to create exactly one verified DX v2.0 carrier in `$DX`:
+
+```text
+release-gate-<profile>-<decision>-<run-id>.dx.txt
+```
+
+The carrier is the complete handoff for every gate outcome. Upload it whenever it exists. Downstream jobs use the single `DX_RELEASE_GATE_RESULT=` stdout envelope to locate the carrier and verify its byte size and SHA-256. Human-readable output remains on stderr.
+
+Downstream jobs do not reconstruct the handoff from console output, do not require the repository-local evidence tree, do not expect `DX_RELEASE_GATE_FEEDBACK=`, and do not rebuild or repack the carrier. Carrier creation or verification failure is an operational failure with exit code `3`.

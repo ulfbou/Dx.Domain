@@ -1,7 +1,6 @@
 # Documentation Authority
 
 **Status:** Normative for repository documentation
-**Release:** `0.1.0-alpha`
 
 ## Canonical narrative
 
@@ -45,7 +44,7 @@ When sources disagree, use this order:
 
 A lower source must not override a higher source. Contradictions are defects to correct, not alternatives to preserve.
 
-## Resolved alpha decisions
+## Current product documentation rules
 
 - Consumers install `Dx.Domain.Analyzers` explicitly during alpha. Repository project references do not prove transitive NuGet behavior.
 - Analyzer defaults come from descriptors: DXA020, DXA040, and DXA060 are errors; other shipped DXA rules are warnings.
@@ -65,3 +64,10 @@ Technical claims use one of these labels where the enforcement mechanism matters
 - **Process-governed**
 - **Planned**
 - **Not guaranteed**
+
+## Release-gate documentation
+Documentation describing `scripts/release-gate/run.py` presents one current contract: every execution attempts one verified DX v2.0 `.dx.txt` carrier as the complete, self-contained handoff.
+
+The release-gating specification serves implementers and reviewers. The implementation plan serves maintainers changing the gate. The release process serves release operators. CI/CD documents serve workflow maintainers and automation consumers. Public product documentation includes this transport contract only when a public consumer action depends on it.
+
+Release-gate documentation distinguishes the gate decision from carrier production, stderr from the single stdout result envelope, retained local evidence from transported decisive evidence, primary findings from consequential blocked work, and gate-specific outcomes from operational carrier failure.

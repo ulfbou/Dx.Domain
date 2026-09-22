@@ -1,10 +1,6 @@
 # Dx.Domain Release-Gating Specification
 
-**Status:** Proposed
-**Release:** `0.1.0-alpha`
 **Scope:** `ACCEPT READY`, `READY FOR PUBLICATION`, and post-publication `DONE` verification
-**Initial implementation focus:** WS-003, strict CI and mandatory test execution
-**Accepted inputs:** WS-001 and WS-002
 
 ## 1. Purpose
 
@@ -761,6 +757,326 @@ The following are deferred until justified by completed workstreams:
 Dx.Domain release verification shall use a Python verification core shared identically between local execution and GitHub Actions, with thin Bash and PowerShell launchers and machine-readable contracts.
 
 The no-argument local command shall require no credentials and no manual artifact or evidence management. Implementation shall prioritize trustworthy strict execution, minimal local effort, exact local/CI reuse, noninteractive operation, bounded execution, immutable evidence, actionable rejection reasons, no duplicated acceptance logic, no required AI dependency, and incremental delivery aligned with the actual release blockers.
+
+## 26. Final carrier and LLM handoff contract
+
+### 26.1 Required final product
+
+Every completed `run.py` execution shall attempt to produce exactly one final, verified DX v2.0 `.dx.txt` carrier containing all relevant information required for the next actor, especially an LLM, to continue without access to the originating filesystem.
+
+This requirement applies when the selected profile passes, fails, is incomplete, requires external evidence, requires a human decision, or encounters an operational error.
+
+The carrier is the final product. It is not:
+
+- an optional attachment;
+- failure-only feedback;
+- a wrapper around a path to local evidence;
+- a reduced summary that requires the originating repository; or
+- secondary to `feedback.json` or another local report.
+
+Persistent evidence may remain under `.dx/verification/release-gate/<run-id>/` as execution evidence and a retention source. It is not the consumer interface.
+
+The gate decision and carrier-production result are separate facts. A gate decision may be passing or non-passing while the carrier result is created or failed. The process shall not report successful completion unless the required carrier was created and verified.
+
+### 26.2 Unconditional carrier generation
+
+The default invocation generates the carrier. No authoritative profile may complete without attempting carrier generation.
+
+If command-line compatibility is retained:
+
+- `--feedback dx` may remain accepted but is redundant;
+- `--feedback summary` shall be rejected for authoritative profiles; and
+- `--feedback none` shall be rejected for authoritative profiles.
+
+Carrier generation shall also be attempted after an operational error whenever the repository-owned `scripts/release-gate/dx.py` remains executable.
+
+### 26.3 Exactly one final deliverable
+
+The directory identified by `$DX` receives exactly one new final deliverable per execution:
+
+```text
+release-gate-<profile>-<decision>-<run-id>.dx.txt
+```
+
+No separate JSON or Markdown handoff file is required outside the carrier.
+
+### 26.4 Transported handoff tree
+
+The carrier transports a purpose-built `release-gate/` tree containing only material relevant to the actual run:
+
+```text
+release-gate/
+├── handoff.json
+├── summary.md
+├── report.json
+├── criteria.json
+├── run.json
+├── source-state/
+│   ├── git-before.json
+│   └── git-after.json
+├── candidate/
+│   └── candidate-manifest.json
+├── contracts/
+├── findings/
+│   ├── index.json
+│   └── <finding-id>/
+│       ├── finding.json
+│       ├── stdout.txt
+│       ├── stderr.txt
+│       └── diagnostics.log
+└── stages/
+    ├── strict-ci.json
+    ├── candidate.json
+    └── consumers.json
+```
+
+Only applicable files are included. Missing optional sections are omitted and shall not be represented by placeholders.
+
+### 26.5 Authoritative entry point
+
+`release-gate/handoff.json` is the authoritative machine-readable entry point. It shall tell the next actor:
+
+- what was executed;
+- which repository, branch, commit, and run were examined;
+- which profile ran;
+- the final decision and process exit code;
+- whether execution completed normally;
+- whether tracked source remained unchanged;
+- what passed, failed, remained incomplete, or was blocked;
+- which findings are primary and which are consequential;
+- where decisive evidence exists inside the carrier;
+- which exact next actions are permitted;
+- which artifacts must be preserved;
+- whether rerunning is appropriate and which profile applies; and
+- whether the carrier payload and carrier structure were verified.
+
+The handoff shall contain fields equivalent to:
+
+```json
+{
+  "schema": "dx-domain.release-gate-handoff/1.0",
+  "carrier": {
+    "format": "DX v2.0",
+    "filename": "release-gate-accept-ready-not-accept-ready-<run-id>.dx.txt",
+    "payload_manifest_sha256": "<sha256>",
+    "verification": "VERIFIED"
+  },
+  "execution": {
+    "run_id": "<run-id>",
+    "profile": "accept-ready",
+    "operation_status": "COMPLETED",
+    "decision": "NOT_ACCEPT_READY",
+    "exit_code": 1
+  },
+  "repository": {
+    "commit": "<full-sha>",
+    "branch": "<branch>",
+    "source_unchanged": true
+  },
+  "summary": {
+    "objective_achieved": false,
+    "primary_failure_count": 0,
+    "actionable_finding_count": 0,
+    "blocked_operation_count": 0
+  },
+  "findings": [],
+  "blocked_work": [],
+  "next_actions": [],
+  "artifacts": {},
+  "evidence_index": [],
+  "continuation": {
+    "recommended_action": "CORRECT_AND_RERUN",
+    "rerun_profile": "accept-ready",
+    "preserve_candidate": false
+  }
+}
+```
+
+The carrier cannot embed the SHA-256 of the complete carrier containing that value. The whole-carrier SHA-256 belongs in the console result envelope. `handoff.json` may instead contain the SHA-256 of a canonical payload manifest.
+
+### 26.6 Relevant and complete evidence
+
+The carrier includes every fact and evidence file required to:
+
+1. understand the decision;
+2. identify the cause;
+3. distinguish primary from consequential failures;
+4. formulate a correction; and
+5. execute the next scoped step without the originating filesystem.
+
+Include, when applicable:
+
+- complete normalized findings;
+- exact expected and observed values;
+- exact failed command;
+- command working directory;
+- exit classification and exit code;
+- relevant stdout and stderr;
+- relevant diagnostic logs;
+- applicable contract fragments or complete small contract files;
+- candidate manifest and package identities;
+- source-immutability evidence;
+- stage decisions and dependencies;
+- verifier or transport errors; and
+- explicit next actions.
+
+Do not include:
+
+- NuGet caches;
+- `bin/` or `obj/` trees;
+- duplicated successful command logs;
+- complete generated consumer workspaces unless their source is required to reproduce a failure;
+- recursively duplicated stage reports;
+- evidence from unrelated runs; or
+- arbitrary files selected only because they exist beneath the evidence root.
+
+A passing run still includes sufficient run identity, repository identity, criteria and decisions, applicable package identities, source immutability, stage summaries, hashes or manifests, verification statements, and the next authorized operation to establish continuity.
+
+### 26.7 Substantive failure projection
+
+For every non-passing child stage, the final handoff shall:
+
+1. create a top-level stage finding;
+2. project every primary failed child criterion into the final findings;
+3. include consequential findings only when they explain blocked work;
+4. deduplicate repeated evidence;
+5. preserve exact expected and observed values; and
+6. include the decisive evidence files.
+
+Every actionable finding shall contain:
+
+- `finding_id`;
+- `stage`;
+- `criterion_id`;
+- `kind` as `PRIMARY` or `CONSEQUENTIAL`;
+- `status`;
+- `expected`;
+- `observed`;
+- `impact`;
+- a next-action code and instruction; and
+- evidence paths inside the carrier.
+
+Child stage reports shall be normalized instead of recursively embedded.
+
+### 26.8 External staging and repository-owned DX tooling
+
+Persistent execution evidence remains under `.dx/verification/`. The final handoff tree shall be assembled in a purpose-built temporary export directory outside the Git worktree.
+
+The runner shall:
+
+1. select relevant evidence;
+2. assemble the export tree outside the worktree;
+3. pack it with repository-owned `scripts/release-gate/dx.py`;
+4. verify it with the same implementation;
+5. write the verified carrier to `$DX`; and
+6. delete the temporary export directory.
+
+The runner shall not:
+
+- pack `.dx/verification/` directly;
+- bypass ignore semantics;
+- modify `scripts/release-gate/dx.py` to special-case release-gate evidence;
+- track generated verification evidence; or
+- require a second packaging utility.
+
+### 26.9 Console contract
+
+Human-readable progress and the concise summary go to stderr. Stdout contains exactly one machine-readable result line:
+
+```text
+DX_RELEASE_GATE_RESULT={"schema":"dx.release-gate.result-envelope/1.0","profile":"accept-ready","decision":"NOT_ACCEPT_READY","process_exit_code":1,"carrier":"<absolute-carrier-path>","carrier_sha256":"<sha256>","carrier_size":123456,"carrier_verification":"PASS"}
+```
+
+This line is a locator and integrity envelope. It is not the handoff content.
+
+Stdout shall not contain:
+
+- the complete feedback dossier; or
+- `DX_RELEASE_GATE_FEEDBACK=`.
+
+### 26.10 Exit-code precedence
+
+The process exit code represents the gate outcome unless final-carrier production fails:
+
+- `0`: the selected profile passed and the carrier was created and verified;
+- `1`: the gate mechanically established failure and the carrier was created and verified;
+- `2`: required evidence was not proven and the carrier was created and verified;
+- `3`: operational error, including inability to create or verify the required carrier;
+- `5`: external evidence is required and the carrier was created and verified; and
+- `6`: a human decision is required and the carrier was created and verified.
+
+Carrier creation or verification failure takes precedence over every gate outcome and returns `3`.
+
+An operational-error handoff shall contain the exception, traceback, available repository identity, completed observations, and exact resumption action.
+
+### 26.11 Scoped correction
+
+Change only:
+
+```text
+scripts/release-gate/release_gate/feedback.py
+scripts/release-gate/run.py
+scripts/release-gate/release_gate/orchestrator.py
+scripts/release-gate/tests/test_feedback.py
+scripts/release-gate/tests/test_feedback_contract.py
+scripts/release-gate/tests/test_feedback_relevance.py
+```
+
+Do not change:
+
+```text
+scripts/release-gate/dx.py
+scripts/release-gate/contracts/consumer-matrix.json
+scripts/release-gate/release_gate/consumers.py
+scripts/release-gate/release_gate/diagnostics.py
+```
+
+Consumer failures remain a separate correction after the handoff mechanism reports them reliably.
+
+### 26.12 Mandatory acceptance criteria
+
+The correction is accepted only when automated tests prove that:
+
+1. every completed `run.py` invocation attempts one final `.dx.txt` carrier;
+2. passing runs produce the carrier;
+3. failing runs produce the carrier;
+4. incomplete runs produce the carrier;
+5. operational-error runs produce the carrier whenever repository-owned `dx.py` remains executable;
+6. the packing source is outside the Git worktree;
+7. the carrier destination is `$DX`;
+8. the carrier uses DX v2.0;
+9. the carrier passes `dx.py inspect --verify`;
+10. the carrier contains `handoff.json`;
+11. `handoff.json` identifies every actionable finding;
+12. every actionable finding contains expected, observed, impact, next action, and evidence;
+13. decisive evidence is physically transported;
+14. successful criteria are summarized sufficiently to establish continuity;
+15. child stage reports are normalized rather than recursively embedded;
+16. repository and candidate identity prevent cross-run confusion;
+17. stdout contains exactly one `DX_RELEASE_GATE_RESULT=` line;
+18. stdout does not contain the complete handoff dossier;
+19. stdout does not contain `DX_RELEASE_GATE_FEEDBACK=`;
+20. the result envelope contains carrier path, byte size, SHA-256, and verification status;
+21. a failed gate with a valid carrier retains the gate-specific nonzero exit code;
+22. carrier creation or verification failure returns operational exit code `3`;
+23. no external collector or `dxs` dependency is used;
+24. no Git-ignore bypass is required; and
+25. unit tests inspect the real generated carrier inventory and transported content.
+
+### 26.13 Required execution architecture
+
+```text
+run.py
+-> execute gate
+-> normalize success, failure, incomplete, or error evidence
+-> create one self-contained handoff tree
+-> pack with repository-owned dx.py
+-> verify with repository-owned dx.py
+-> emit one compact result envelope
+-> exit according to the gate outcome unless carrier production failed
+```
+
+The final result is one verified DX v2.0 `.dx.txt` carrier containing the complete, relevant, directly actionable LLM handoff.
 
 ## References
 

@@ -1,4 +1,4 @@
-# Alpha Release Process
+# Release Process
 
 ## Branch roles
 
@@ -68,3 +68,10 @@ Before production publication:
 ## Failure and rollback
 
 Stop promotion on any mismatch. NuGet packages are immutable, so publish a corrected prerelease version rather than replacing an artifact. Unlist a defective package only when continued discovery creates material risk, and record the decision in release notes and the changelog.
+
+## Release-gate handoff
+Every release-gate invocation attempts one final verified DX v2.0 carrier in `$DX`. Human-readable output goes to stderr. Stdout contains exactly one `DX_RELEASE_GATE_RESULT=` locator and integrity envelope.
+
+Continue by opening `release-gate/handoff.json` inside the carrier. It identifies the repository and run, decision, source state, normalized findings, blocked work, preservation requirements, decisive evidence, and permitted next actions. The next actor must not require the originating repository to understand and continue the run.
+
+Preserve every artifact named by the handoff. Do not rerun, rebuild, replace, or discard a candidate when the continuation contract prohibits it. Treat an absent or unverified carrier as an operational failure even when the gate decision passed.

@@ -1,7 +1,5 @@
 # Dx.Domain Release-Gating Implementation Plan
 
-**Status:** Proposed
-**Release:** `0.1.0-alpha`
 **Normative design:** [Release-gating specification](release-gating-specification.md)
 
 ## 1. Objective
@@ -205,6 +203,33 @@ Implement:
 Relevant authority:
 
 - Definition of Done post-publication checks (`.dx/dx-domain-v0.1.0-alpha-definition-of-done.md`)
+
+### Release-gate final carrier
+**Goal:** Make one verified DX v2.0 `.dx.txt` carrier the unconditional final product of every `run.py` execution.
+
+Implement outcome normalization, selected evidence export, external temporary staging, packing and verification with repository-owned `scripts/release-gate/dx.py`, authoritative `release-gate/handoff.json`, one stdout `DX_RELEASE_GATE_RESULT=` envelope, operational-error handoffs, and carrier-failure exit-code precedence.
+
+Change only:
+
+```text
+scripts/release-gate/release_gate/feedback.py
+scripts/release-gate/run.py
+scripts/release-gate/release_gate/orchestrator.py
+scripts/release-gate/tests/test_feedback.py
+scripts/release-gate/tests/test_feedback_contract.py
+scripts/release-gate/tests/test_feedback_relevance.py
+```
+
+Do not change:
+
+```text
+scripts/release-gate/dx.py
+scripts/release-gate/contracts/consumer-matrix.json
+scripts/release-gate/release_gate/consumers.py
+scripts/release-gate/release_gate/diagnostics.py
+```
+
+Acceptance requires real carrier generation and inspection for passing, failing, incomplete, and operational-error executions; external staging; `$DX` delivery; DX verification; transported `handoff.json`; actionable normalized findings with decisive evidence; sufficient success evidence; one stdout result envelope; preserved gate-specific exit codes; exit code `3` for carrier failure; and no external collector, `dxs`, ignore bypass, or second packer.
 
 ## 4. Features deferred until after the alpha release
 

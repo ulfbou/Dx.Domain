@@ -199,7 +199,7 @@ class FeedbackTests(unittest.TestCase):
             self.assertFalse((evidence / "feedback.json").exists())
             self.assertFalse((evidence / "feedback.md").exists())
 
-    def test_dx_transport_uses_repository_owned_collector(self):
+    def test_dx_transport_failure_preserves_validated_summary(self):
         with tempfile.TemporaryDirectory() as temporary:
             repository = Path(temporary)
             evidence = self.create_evidence(repository)
@@ -251,11 +251,15 @@ class FeedbackTests(unittest.TestCase):
                     self.assertEqual("pack", argv[2])
 
                     staging = Path(argv[3])
-                    self.assertEqual(
-                        evidence / "feedback-transport",
-                        staging,
+                    self.assertFalse(
+                        staging.is_relative_to(repository)
                     )
-                    self.assertEqual("-o", argv[4])
+                    self.assertFalse(
+                        staging.is_relative_to(evidence)
+                    )
+                    self.assertEqual("--root", argv[4])
+                    self.assertEqual(str(staging), argv[5])
+                    self.assertEqual("-o", argv[6])
 
                     self.assertTrue(
                         (staging / "feedback.json").is_file()
@@ -273,7 +277,7 @@ class FeedbackTests(unittest.TestCase):
                         )
                     )
 
-                    Path(argv[5]).write_text(
+                    Path(argv[7]).write_text(
                         "carrier\n",
                         encoding="utf-8",
                     )
