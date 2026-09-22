@@ -339,6 +339,7 @@ class NormalizedPackOptions:
     output: Path
     source_mode: str
     paths: tuple[str, ...]
+    scopes: tuple[str, ...]
     only: tuple[str, ...]
     includes: tuple[PatternRule, ...]
     excludes: tuple[PatternRule, ...]
@@ -465,8 +466,7 @@ def _repository_root(start: Path) -> Path | None:
 def normalize_pack_options(a) -> NormalizedPackOptions:
     if a.binary and a.skip_binary: raise UsageError("--binary and --skip-binary are mutually exclusive")
     if a.quiet and a.verbose: raise UsageError("--quiet and --verbose are mutually exclusive")
-    if a.path and a.from_git: raise UsageError("--path and --from-git are mutually exclusive")
-    if a.only and (a.path or a.from_git): raise UsageError("--only is mutually exclusive with --path and --from-git")
+    if a.only and (a.path or a.from_git): raise UsageError("--only replaces candidate providers and cannot be combined with --path or --from-git")
     if a.unsafe_include_git and not a.force: raise UsageError("--unsafe-include-git requires --force")
     source_arg=a.source or (a.root if a.root else ".")
     source_lex=Path(source_arg)
@@ -478,15 +478,17 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
     if not _inside(source.resolve(), root): raise UsageError("SOURCE is outside --root")
     output=Path(a.output_opt) if a.output_opt else resolve_default_output(False, source)
     if str(output) != "-" and not output.is_absolute(): output=Path.cwd()/output
-    mode="only" if a.only else "path" if a.path else "git" if a.from_git else "file" if source_lex.is_file() or source_lex.is_symlink() else "walk"
+    mode="only" if a.only else "git" if a.from_git else "path" if a.path else "file" if source_lex.is_file() or source_lex.is_symlink() else "walk"
     inc=tuple(_validate_pattern(x,"include",i,"include") for i,x in enumerate(a.include))
     exc=tuple(_validate_pattern(x,"exclude",i,"exclude") for i,x in enumerate(a.exclude))
     force_inc=tuple(_validate_pattern(x,"force_include",i,"include") for i,x in enumerate(a.force_include))
     ie=tuple(ExtensionRule("include_extension",normalize_extension(x),"include",i) for i,x in enumerate(dict.fromkeys(a.include_extension)))
     ee=tuple(ExtensionRule("exclude_extension",normalize_extension(x),"exclude",i) for i,x in enumerate(dict.fromkeys(a.exclude_extension)))
+    scopes=tuple(a.scope)
+    for raw in scopes: _operand(root,raw)
     ignores=tuple(_operand(root,x) for x in a.ignore_file)
     explain="json" if a.explain == "json" else ("human" if a.explain else None)
-    return NormalizedPackOptions(source,root,output,mode,tuple(a.path),tuple(a.only),inc,exc,force_inc,ie,ee,ignores,bool(a.no_gitignore or a.no_ignore),bool(a.no_default_excludes or a.no_ignore),a.unsafe_include_git,a.skip_binary,a.readonly,a.dry_run or explain=="json",a.json or explain=="json",explain,a.quiet,a.verbose,a.force)
+    return NormalizedPackOptions(source,root,output,mode,tuple(a.path),scopes,tuple(a.only),inc,exc,force_inc,ie,ee,ignores,bool(a.no_gitignore or a.no_ignore),bool(a.no_default_excludes or a.no_ignore),a.unsafe_include_git,a.skip_binary,a.readonly,a.dry_run or explain=="json",a.json or explain=="json",explain,a.quiet,a.verbose,a.force)
 
 
 def build_selection_context(o: NormalizedPackOptions) -> SelectionContext:
@@ -534,29 +536,32 @@ def _git_status_candidates(ctx: SelectionContext, store: dict[str,list[SourcePro
         _contribute(store,ctx.selection_root,absolute,SourceProvenance("git",path,False,status,source_name))
 
 
+def _within_scope(path: Path, scopes: tuple[Path, ...]) -> bool:
+    resolved=path.resolve()
+    return not scopes or any(_inside(resolved,scope.resolve()) for scope in scopes)
+
 def discover_candidates(ctx: SelectionContext) -> tuple[Candidate,...]:
     o=ctx.options; store: dict[str,list[SourceProvenance]]={}
-    if o.source_mode == "git": _git_status_candidates(ctx,store)
-    elif o.source_mode in ("path","only"):
-        provider=o.source_mode
-        for raw in (o.paths if provider=="path" else o.only):
-            p=_operand(o.root,raw)
-            if p.is_symlink(): _contribute(store,o.root,p,SourceProvenance(provider,raw,True)); continue
-            if not p.exists(): raise IOErrorDx(f"selected path does not exist: {raw}")
-            paths=_walk(p,o.root,o.unsafe_include_git) if p.is_dir() else [p]
-            for q in paths:
-                explicit = provider == "only"
-                _contribute(
-                    store,
-                    o.root,
-                    q,
-                    SourceProvenance(provider, raw, False),
-                )
-    elif o.source_mode == "file": _contribute(store,o.root,o.source,SourceProvenance("source",str(o.source),False))
+    scopes=tuple(_operand(o.root,raw) for raw in o.scopes)
+    def add(path: Path, provenance: SourceProvenance) -> None:
+        if _within_scope(path,scopes): _contribute(store,o.root,path,provenance)
+    def add_operand(raw: str, provider: str) -> None:
+        p=_operand(o.root,raw)
+        if p.is_symlink(): add(p,SourceProvenance(provider,raw,False)); return
+        if not p.exists(): raise IOErrorDx(f"selected path does not exist: {raw}")
+        paths=_walk(p,o.root,o.unsafe_include_git) if p.is_dir() else [p]
+        for q in paths: add(q,SourceProvenance(provider,raw,False))
+    if o.source_mode == "only":
+        for raw in o.only: add_operand(raw,"only")
     else:
-        for p in _walk(o.source,o.root,o.unsafe_include_git): _contribute(store,o.root,p,SourceProvenance("walk",str(o.source),False))
+        if o.source_mode == "file": add(o.source,SourceProvenance("source",str(o.source),False))
+        elif o.source_mode == "walk":
+            for q in _walk(o.source,o.root,o.unsafe_include_git): add(q,SourceProvenance("walk",str(o.source),False))
+        if o.source_mode == "git": _git_status_candidates(ctx,store)
+        for raw in o.paths: add_operand(raw,"path")
+        if scopes:
+            store={path: provenance for path,provenance in store.items() if _within_scope(o.root/Path(*PurePosixPath(path).parts),scopes)}
     return tuple(Candidate(path,o.root/Path(*PurePosixPath(path).parts),tuple(store[path])) for path in sorted(store))
-
 
 def _git_ignore(ctx: SelectionContext, candidates: tuple[Candidate,...]) -> dict[str,RuleMatch]:
     if ctx.options.no_gitignore or ctx.repository_root is None: return {}
@@ -1108,7 +1113,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('-o', '--output', dest='output_opt', help='Output carrier path, or "-" for stdout')
     p.add_argument('-r', '--root', help='Advanced: path mapping root')
     p.add_argument('-p', '--path', action='append', default=[], help='Add a file or recursively discovered directory to the candidate set (repeatable)')
-    p.add_argument('-g', '--from-git', action='store_true', help='Advanced: pack Git changes')
+    p.add_argument('-g', '--from-git', action='store_true', help='Add Git worktree changes to the candidate set')
+    p.add_argument('--scope', action='append', default=[], metavar='PATH', help='Restrict all candidate providers to this file or subtree (repeatable)')
     p.add_argument('--only', action='append', default=[], metavar='PATH', help='Use only files discovered under these operands as candidates (repeatable)')
     p.add_argument('-i', '--include', action='append', default=[], help='Retain candidates matching PATTERN; does not override ignore rules (repeatable)')
     p.add_argument('-I', '--exclude', action='append', default=[], help='Unconditionally exclude paths matching PATTERN (repeatable)')
