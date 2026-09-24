@@ -50,6 +50,374 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{02EABD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Tests", "tests\Dx.Domain.Tests\Dx.Domain.Tests.csproj", "{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}"
 EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}"
+	ProjectSection(SolutionItems) = preProject
+		docs\dpi.md = docs\dpi.md
+		docs\enforcement_model.md = docs\enforcement_model.md
+		docs\index.md = docs\index.md
+		docs\limitations.md = docs\limitations.md
+		docs\manifesto.md = docs\manifesto.md
+		docs\non_goals.md = docs\non_goals.md
+		docs\roadmap.md = docs\roadmap.md
+		docs\security.md = docs\security.md
+		docs\spec.md = docs\spec.md
+		docs\system.md = docs\system.md
+		docs\todo.md = docs\todo.md
+		docs\when-the-compiler-fails.md = docs\when-the-compiler-fails.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".generated", "docs\.generated", "{57D3D9D7-F2E0-5376-8982-754540124CB5}"
+	ProjectSection(SolutionItems) = preProject
+		docs\.generated\index.md = docs\.generated\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adr", "docs\adr", "{3610DC3F-C663-5EC4-A896-CBD7B26205DF}"
+	ProjectSection(SolutionItems) = preProject
+		docs\adr\adr-0001-utc-only-domaintime.md = docs\adr\adr-0001-utc-only-domaintime.md
+		docs\adr\adr-0002-empty-correlationid.md = docs\adr\adr-0002-empty-correlationid.md
+		docs\adr\adr-0003-dxa010-warning.md = docs\adr\adr-0003-dxa010-warning.md
+		docs\adr\adr-0004-result-struct.md = docs\adr\adr-0004-result-struct.md
+		docs\adr\adr-0005-no-public-setters.md = docs\adr\adr-0005-no-public-setters.md
+		docs\adr\adr-0006-result-as-failure-model.md = docs\adr\adr-0006-result-as-failure-model.md
+		docs\adr\adr-0007-system-hardening-sequence.md = docs\adr\adr-0007-system-hardening-sequence.md
+		docs\adr\adr-0008-dxa011-public-factory-exposure.md = docs\adr\adr-0008-dxa011-public-factory-exposure.md
+		docs\adr\adr-0009-dxa020-result-ignored.md = docs\adr\adr-0009-dxa020-result-ignored.md
+		docs\adr\adr-0010-dxa022-domain-control-exception.md = docs\adr\adr-0010-dxa022-domain-control-exception.md
+		docs\adr\adr-0011-dxa030-unapproved-handler.md = docs\adr\adr-0011-dxa030-unapproved-handler.md
+		docs\adr\adr-0012-dxa040-kernel-public-surface-freeze.md = docs\adr\adr-0012-dxa040-kernel-public-surface-freeze.md
+		docs\adr\adr-0013-dxa050-temporal-helper-usage.md = docs\adr\adr-0013-dxa050-temporal-helper-usage.md
+		docs\adr\adr-0014-dxa060-forbidden-vocabulary.md = docs\adr\adr-0014-dxa060-forbidden-vocabulary.md
+		docs\adr\adr-0015-dxa070-generated-code-tagging.md = docs\adr\adr-0015-dxa070-generated-code-tagging.md
+		docs\adr\adr-0016-dxa080-facade-invariant-enforcement.md = docs\adr\adr-0016-dxa080-facade-invariant-enforcement.md
+		docs\adr\adr-0017-suppress-governance.md = docs\adr\adr-0017-suppress-governance.md
+		docs\adr\adr-0018-kernel-public-surface.md = docs\adr\adr-0018-kernel-public-surface.md
+		docs\adr\index.md = docs\adr\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "docs\analyzers", "{85C4DF52-68B8-5C6C-8D3A-F11E65510E4F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\analyzers\dxa010.md = docs\analyzers\dxa010.md
+		docs\analyzers\dxa011.md = docs\analyzers\dxa011.md
+		docs\analyzers\dxa020.md = docs\analyzers\dxa020.md
+		docs\analyzers\dxa022.md = docs\analyzers\dxa022.md
+		docs\analyzers\dxa030.md = docs\analyzers\dxa030.md
+		docs\analyzers\dxa040.md = docs\analyzers\dxa040.md
+		docs\analyzers\dxa050.md = docs\analyzers\dxa050.md
+		docs\analyzers\dxa060.md = docs\analyzers\dxa060.md
+		docs\analyzers\dxa065.md = docs\analyzers\dxa065.md
+		docs\analyzers\dxa070.md = docs\analyzers\dxa070.md
+		docs\analyzers\dxa080.md = docs\analyzers\dxa080.md
+		docs\analyzers\dxa090.md = docs\analyzers\dxa090.md
+		docs\analyzers\index.md = docs\analyzers\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "docs\api", "{5BE5027B-9590-534C-BFDC-FC6CE80676B8}"
+	ProjectSection(SolutionItems) = preProject
+		docs\api\index.md = docs\api\index.md
+		docs\api\kernel.md = docs\api\kernel.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "governance", "docs\governance", "{65EFA1FA-FE7A-5733-B328-E2F6503C3A55}"
+	ProjectSection(SolutionItems) = preProject
+		docs\governance\index.md = docs\governance\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "internal", "docs\internal", "{EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB}"
+	ProjectSection(SolutionItems) = preProject
+		docs\internal\analyzer-authoring.md = docs\internal\analyzer-authoring.md
+		docs\internal\api-surface-process.md = docs\internal\api-surface-process.md
+		docs\internal\contributing.md = docs\internal\contributing.md
+		docs\internal\conventional_commits.md = docs\internal\conventional_commits.md
+		docs\internal\documentation-authority.md = docs\internal\documentation-authority.md
+		docs\internal\dpi.md = docs\internal\dpi.md
+		docs\internal\index.md = docs\internal\index.md
+		docs\internal\manifesto.md = docs\internal\manifesto.md
+		docs\internal\non_goals.md = docs\internal\non_goals.md
+		docs\internal\release-gating-implementation-plan.md = docs\internal\release-gating-implementation-plan.md
+		docs\internal\release-gating-specification.md = docs\internal\release-gating-specification.md
+		docs\internal\release-process.md = docs\internal\release-process.md
+		docs\internal\style-guide.md = docs\internal\style-guide.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "learn", "docs\learn", "{5CA5B786-4C9E-5C4A-A8C7-C7A906A6B5E1}"
+	ProjectSection(SolutionItems) = preProject
+		docs\learn\architecture-overview.md = docs\learn\architecture-overview.md
+		docs\learn\changelog.md = docs\learn\changelog.md
+		docs\learn\enforcement_map.md = docs\learn\enforcement_map.md
+		docs\learn\getting-started.md = docs\learn\getting-started.md
+		docs\learn\index.md = docs\learn\index.md
+		docs\learn\overview.md = docs\learn\overview.md
+		docs\learn\quickstart.md = docs\learn\quickstart.md
+		docs\learn\stability.md = docs\learn\stability.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "docs\public", "{929DA54B-D8DE-5131-AE7A-077AD44F86E5}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\architecture.md = docs\public\architecture.md
+		docs\public\getting-started.md = docs\public\getting-started.md
+		docs\public\index.md = docs\public\index.md
+		docs\public\limitations.md = docs\public\limitations.md
+		docs\public\quickstart.md = docs\public\quickstart.md
+		docs\public\security.md = docs\public\security.md
+		docs\public\stability.md = docs\public\stability.md
+		docs\public\troubleshooting.md = docs\public\troubleshooting.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reference", "docs\reference", "{73326733-3E9F-548D-884B-F52228B1C8FE}"
+	ProjectSection(SolutionItems) = preProject
+		docs\reference\configuration.md = docs\reference\configuration.md
+		docs\reference\index.md = docs\reference\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "specifications", "docs\specifications", "{E351F5C0-3C52-51D7-9030-72768485DD92}"
+	ProjectSection(SolutionItems) = preProject
+		docs\specifications\dx.domain-enforcement-specification.md = docs\specifications\dx.domain-enforcement-specification.md
+		docs\specifications\index.md = docs\specifications\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adr", "docs\internal\adr", "{71E1C121-FAD4-507F-82DC-03778A547B03}"
+	ProjectSection(SolutionItems) = preProject
+		docs\internal\adr\adr-0000-record-architecture-decisions.md = docs\internal\adr\adr-0000-record-architecture-decisions.md
+		docs\internal\adr\adr-0001-four-package-substrate.md = docs\internal\adr\adr-0001-four-package-substrate.md
+		docs\internal\adr\adr-0002-non-silence-axiom.md = docs\internal\adr\adr-0002-non-silence-axiom.md
+		docs\internal\adr\adr-0003-scope-resolution-and-authority-modes.md = docs\internal\adr\adr-0003-scope-resolution-and-authority-modes.md
+		docs\internal\adr\adr-0004-dxa010-construction-discipline.md = docs\internal\adr\adr-0004-dxa010-construction-discipline.md
+		docs\internal\adr\adr-0005-dxa022-result-vs-throw-discipline.md = docs\internal\adr\adr-0005-dxa022-result-vs-throw-discipline.md
+		docs\internal\adr\adr-0006-exclude-option-either-nonempty.md = docs\internal\adr\adr-0006-exclude-option-either-nonempty.md
+		docs\internal\adr\adr-0007-facts-split-and-kernel-cleanup.md = docs\internal\adr\adr-0007-facts-split-and-kernel-cleanup.md
+		docs\internal\adr\index.md = docs\internal\adr\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "docs\internal\ci", "{E813968C-CF5C-5D8A-A305-5334F9D1EA70}"
+	ProjectSection(SolutionItems) = preProject
+		docs\internal\ci\ci-cd-pipeline.md = docs\internal\ci\ci-cd-pipeline.md
+		docs\internal\ci\ci-cd-quick-reference.md = docs\internal\ci\ci-cd-quick-reference.md
+		docs\internal\ci\index.md = docs\internal\ci\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "release", "docs\internal\release", "{65F8A0E9-C3AF-52F3-A53B-C986F5D784ED}"
+	ProjectSection(SolutionItems) = preProject
+		docs\internal\release\accept-ready-criteria.md = docs\internal\release\accept-ready-criteria.md
+		docs\internal\release\blocking-issues.md = docs\internal\release\blocking-issues.md
+		docs\internal\release\definition-of-done.md = docs\internal\release\definition-of-done.md
+		docs\internal\release\index.md = docs\internal\release\index.md
+		docs\internal\release\scripts-and-evidence.md = docs\internal\release\scripts-and-evidence.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "specs", "docs\internal\specs", "{D3A12E16-ED52-5301-A965-C572B015B3E7}"
+	ProjectSection(SolutionItems) = preProject
+		docs\internal\specs\index.md = docs\internal\specs\index.md
+		docs\internal\specs\kernel.admission-test.md = docs\internal\specs\kernel.admission-test.md
+		docs\internal\specs\kernel.refactorization.specification.md = docs\internal\specs\kernel.refactorization.specification.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "changelog", "docs\learn\changelog", "{3FFDCA0E-CD84-5B9E-A878-EC4412207080}"
+	ProjectSection(SolutionItems) = preProject
+		docs\learn\changelog\index.md = docs\learn\changelog\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "concepts", "docs\learn\concepts", "{25B40E64-908E-5114-9820-8931B04CF821}"
+	ProjectSection(SolutionItems) = preProject
+		docs\learn\concepts\facades.md = docs\learn\concepts\facades.md
+		docs\learn\concepts\index.md = docs\learn\concepts\index.md
+		docs\learn\concepts\results.md = docs\learn\concepts\results.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "docs\learn\guides", "{98183C01-0EDB-5AC0-BA07-1DF425911C01}"
+	ProjectSection(SolutionItems) = preProject
+		docs\learn\guides\handle-errors.md = docs\learn\guides\handle-errors.md
+		docs\learn\guides\index.md = docs\learn\guides\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "release-notes", "docs\learn\release-notes", "{F050C486-50B5-5CF0-96DC-601594704175}"
+	ProjectSection(SolutionItems) = preProject
+		docs\learn\release-notes\0.1.0.md = docs\learn\release-notes\0.1.0.md
+		docs\learn\release-notes\index.md = docs\learn\release-notes\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "concepts", "docs\public\concepts", "{45284164-7D82-59CD-BEC3-D0D688DD874C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\concepts\construction-authority.md = docs\public\concepts\construction-authority.md
+		docs\public\concepts\facts-and-causation.md = docs\public\concepts\facts-and-causation.md
+		docs\public\concepts\index.md = docs\public\concepts\index.md
+		docs\public\concepts\invariants.md = docs\public\concepts\invariants.md
+		docs\public\concepts\results-and-errors.md = docs\public\concepts\results-and-errors.md
+		docs\public\concepts\scopes-and-roles.md = docs\public\concepts\scopes-and-roles.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "docs\public\guides", "{D3B480E2-0081-536E-ABC2-15B52053D054}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\guides\build-a-construction-boundary.md = docs\public\guides\build-a-construction-boundary.md
+		docs\public\guides\configure-analyzers.md = docs\public\guides\configure-analyzers.md
+		docs\public\guides\handle-results.md = docs\public\guides\handle-results.md
+		docs\public\guides\index.md = docs\public\guides\index.md
+		docs\public\guides\respond-to-diagnostics.md = docs\public\guides\respond-to-diagnostics.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "docs\public\packages", "{F18AF6FA-B7DB-5BCB-B01A-AB3CD4F37E2B}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\packages\analyzers.md = docs\public\packages\analyzers.md
+		docs\public\packages\annotations.md = docs\public\packages\annotations.md
+		docs\public\packages\facts.md = docs\public\packages\facts.md
+		docs\public\packages\index.md = docs\public\packages\index.md
+		docs\public\packages\kernel.md = docs\public\packages\kernel.md
+		docs\public\packages\primitives.md = docs\public\packages\primitives.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reference", "docs\public\reference", "{F7B94A6C-5FFF-545F-B190-8E03A243F10C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\reference\configuration.md = docs\public\reference\configuration.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "release-notes", "docs\public\release-notes", "{B3F97B1A-0994-55E4-B5EA-ADC7EDFEBD23}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\release-notes\0.1.0-alpha.md = docs\public\release-notes\0.1.0-alpha.md
+		docs\public\release-notes\index.md = docs\public\release-notes\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "docs\reference\api", "{DE71D36D-4B43-5CA4-9AE5-877AEFCEAECC}"
+	ProjectSection(SolutionItems) = preProject
+		docs\reference\api\annotations.md = docs\reference\api\annotations.md
+		docs\reference\api\facts.md = docs\reference\api\facts.md
+		docs\reference\api\index.md = docs\reference\api\index.md
+		docs\reference\api\kernel.md = docs\reference\api\kernel.md
+		docs\reference\api\primitives.md = docs\reference\api\primitives.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "docs\public\reference\api", "{AC87B788-B4E3-5EFC-A2E8-4B362D3B80EF}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\reference\api\index.md = docs\public\reference\api\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "diagnostics", "docs\public\reference\diagnostics", "{78E85B3F-45A8-59C8-A862-51388DE815CA}"
+	ProjectSection(SolutionItems) = preProject
+		docs\public\reference\diagnostics\DXA010.md = docs\public\reference\diagnostics\DXA010.md
+		docs\public\reference\diagnostics\DXA011.md = docs\public\reference\diagnostics\DXA011.md
+		docs\public\reference\diagnostics\DXA020.md = docs\public\reference\diagnostics\DXA020.md
+		docs\public\reference\diagnostics\DXA022.md = docs\public\reference\diagnostics\DXA022.md
+		docs\public\reference\diagnostics\DXA030.md = docs\public\reference\diagnostics\DXA030.md
+		docs\public\reference\diagnostics\DXA040.md = docs\public\reference\diagnostics\DXA040.md
+		docs\public\reference\diagnostics\DXA050.md = docs\public\reference\diagnostics\DXA050.md
+		docs\public\reference\diagnostics\DXA060.md = docs\public\reference\diagnostics\DXA060.md
+		docs\public\reference\diagnostics\DXA065.md = docs\public\reference\diagnostics\DXA065.md
+		docs\public\reference\diagnostics\DXA070.md = docs\public\reference\diagnostics\DXA070.md
+		docs\public\reference\diagnostics\DXA080.md = docs\public\reference\diagnostics\DXA080.md
+		docs\public\reference\diagnostics\index.md = docs\public\reference\diagnostics\index.md
+	EndProjectSection
+EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -149,13 +517,39 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{68EA1AB2-609D-4346-8A55-C424566E475D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{FE15694B-E46C-49D7-A19D-C45B249B7A1B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{B0F5765F-B879-4DF4-88D4-29ECB198EE35} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{25B40E64-908E-5114-9820-8931B04CF821} = {5CA5B786-4C9E-5C4A-A8C7-C7A906A6B5E1}
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{3610DC3F-C663-5EC4-A896-CBD7B26205DF} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{3FFDCA0E-CD84-5B9E-A878-EC4412207080} = {5CA5B786-4C9E-5C4A-A8C7-C7A906A6B5E1}
+		{45284164-7D82-59CD-BEC3-D0D688DD874C} = {929DA54B-D8DE-5131-AE7A-077AD44F86E5}
+		{57D3D9D7-F2E0-5376-8982-754540124CB5} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{5BE5027B-9590-534C-BFDC-FC6CE80676B8} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{5CA5B786-4C9E-5C4A-A8C7-C7A906A6B5E1} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{65EFA1FA-FE7A-5733-B328-E2F6503C3A55} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{65F8A0E9-C3AF-52F3-A53B-C986F5D784ED} = {EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB}
+		{68EA1AB2-609D-4346-8A55-C424566E475D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{71E1C121-FAD4-507F-82DC-03778A547B03} = {EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB}
+		{73326733-3E9F-548D-884B-F52228B1C8FE} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{78E85B3F-45A8-59C8-A862-51388DE815CA} = {F7B94A6C-5FFF-545F-B190-8E03A243F10C}
+		{85C4DF52-68B8-5C6C-8D3A-F11E65510E4F} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{929DA54B-D8DE-5131-AE7A-077AD44F86E5} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{98183C01-0EDB-5AC0-BA07-1DF425911C01} = {5CA5B786-4C9E-5C4A-A8C7-C7A906A6B5E1}
+		{AC87B788-B4E3-5EFC-A2E8-4B362D3B80EF} = {F7B94A6C-5FFF-545F-B190-8E03A243F10C}
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{B3F97B1A-0994-55E4-B5EA-ADC7EDFEBD23} = {929DA54B-D8DE-5131-AE7A-077AD44F86E5}
 		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{D3A12E16-ED52-5301-A965-C572B015B3E7} = {EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB}
+		{D3B480E2-0081-536E-ABC2-15B52053D054} = {929DA54B-D8DE-5131-AE7A-077AD44F86E5}
+		{DE71D36D-4B43-5CA4-9AE5-877AEFCEAECC} = {73326733-3E9F-548D-884B-F52228B1C8FE}
+		{E351F5C0-3C52-51D7-9030-72768485DD92} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{E813968C-CF5C-5D8A-A305-5334F9D1EA70} = {EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB}
+		{EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{F050C486-50B5-5CF0-96DC-601594704175} = {5CA5B786-4C9E-5C4A-A8C7-C7A906A6B5E1}
+		{F18AF6FA-B7DB-5BCB-B01A-AB3CD4F37E2B} = {929DA54B-D8DE-5131-AE7A-077AD44F86E5}
+		{F7B94A6C-5FFF-545F-B190-8E03A243F10C} = {929DA54B-D8DE-5131-AE7A-077AD44F86E5}
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A326CE0-DFBE-435C-AD8C-3CA905A96D98}

@@ -262,13 +262,13 @@ class FeedbackTests(unittest.TestCase):
                     self.assertEqual("-o", argv[6])
 
                     self.assertTrue(
-                        (staging / "feedback.json").is_file()
+                        (staging / "release-gate" / "handoff.json").is_file()
                     )
                     self.assertTrue(
-                        (staging / "feedback.md").is_file()
+                        (staging / "release-gate" / "summary.md").is_file()
                     )
                     self.assertTrue(
-                        (staging / "attachment-manifest.json").is_file()
+                        (staging / "release-gate" / "report.json").is_file()
                     )
                     self.assertFalse(
                         any(

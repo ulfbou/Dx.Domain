@@ -4,7 +4,7 @@
 > **Applies to:** Dx.Domain.Kernel, Primitives, Facts, Analyzers  
 > **Authority:** This document supersedes interpretive claims in ADRs where discrepancies exist.
 
-*Source: docs/specifications/dx.domain-enforcement-specification.md*
+*Source: [docs/specifications/dx.domain-enforcement-specification.md](./specifications/dx.domain-enforcement-specification.md)*
 
 ## Definition of Enforcement
 A constraint is considered **enforced** if and only if a violation is **deterministically detected at build time** within the analyzer's declared scope.
@@ -34,4 +34,4 @@ Enforcement does **not** mean runtime prevention, semantic correctness, complete
 | Suppression Governance | ADR-0017 | Process | Process |
 | Kernel Public Surface | ADR-0018 | DXA040 + exemption | Strong |
 
-*Source: docs/adr/index.md*
+*Source: [docs/adr/index.md](./adr/index.md)*

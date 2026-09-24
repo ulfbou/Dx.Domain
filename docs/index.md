@@ -1,23 +1,29 @@
-**Enforcement scope:** Static analysis only. Applies to S1–S3. Not enforced at runtime. Bypassable via reflection, serialization, dynamic, and suppression.
+# Dx.Domain documentation
 
-## Navigation
+Dx.Domain provides a small domain kernel, supporting packages, and enforceable architecture rules for .NET domain models.
 
-- [README](../readme.md)
-- [MANIFESTO](manifesto.md)
-- [NON_GOALS](non_goals.md)
-- [DPI](dpi.md)
-- [ROADMAP](roadmap.md)
-- [SECURITY](security.md)
-- [TODO](todo.md)
-- [When the Compiler Fails](when-the-compiler-fails.md)
-- [ADR Index](adr/index.md)
-- [Learn](learn/index.md)
-- [Public](public/index.md)
-- [Governance](governance/index.md)
+Choose the path that matches what you need to accomplish.
 
-- [API Reference](api/kernel.md)
-- [Specifications](specifications/dx.domain-enforcement-specification.md)
-- [Reference Configuration](reference/configuration.md)
-- [Reference APIs](reference/api/kernel.md)
-- [Reference Facts API](reference/api/facts.md)
+## Use Dx.Domain
 
+Evaluate the project, install the right packages, build domain values, configure enforcement, and resolve common problems.
+
+[Start using Dx.Domain](use/index.md)
+
+## Understand Dx.Domain
+
+Learn the project's boundaries, architecture, enforcement model, design principles, and recorded decisions.
+
+[Understand Dx.Domain](understand/index.md)
+
+## Contribute to Dx.Domain
+
+Set up the repository, make focused changes, validate them locally, and follow the governance and release process.
+
+[Contribute to Dx.Domain](contribute/index.md)
+
+## Reference
+
+Look up packages, diagnostics, configuration, and API details.
+
+[Open the reference](reference/index.md)

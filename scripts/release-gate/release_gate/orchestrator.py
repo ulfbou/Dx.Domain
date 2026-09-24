@@ -345,18 +345,22 @@ def execute_accept_ready_profile(repository_root, script_root, evidence_base=Non
         decision = GateDecision.ACCEPT_READY_NOT_PROVEN
     final = capture_git_state(repository_root)
     write_json_atomic(root / "git-after.json", final)
+    normalized = []
+    for item in stages:
+        status = "PASS" if item["decision"] == "PASS" else ("FAIL" if item["decision"] == "FAIL" else item["decision"])
+        normalized.append({"criterion_id": "accept-ready-stage-" + item["name"], "title": "Accept-ready stage " + item["name"],
+                           "stage": item["name"], "status": status,
+                           "motivation": f"The {item['name']} stage completed with {item['decision']}.",
+                           "verifier": "release_gate.orchestrator.execute_accept_ready_profile",
+                           "expected": {"decision": "PASS"}, "observed": {"decision": item["decision"]},
+                           "evidence": [item.get("evidence_directory", "")] if item.get("evidence_directory") else [],
+                           "blocked_by": item.get("blocked_by"),
+                           "corrective_action": None if status == "PASS" else f"Correct the {item.get('blocked_by') or item['name']} stage and rerun accept-ready."})
     report = {"schema": "dx-domain.release-gate-report.v1", "run_id": run_id,
-              "profile": "accept-ready", "head": initial["head"],
-              "decision": decision.value, "stages": stages,
-              "source_unchanged": initial["head"] == final["head"] and
-                                  initial["tracked_diff"] == final["tracked_diff"]}
-    write_json_atomic(root / "criteria.json", [
-        {"criterion_id": "accept-ready-stage-" + item["name"],
-         "status": "PASS" if item["decision"] == "PASS" else item["decision"],
-         "observed": item["decision"], "evidence": [item.get("evidence_directory", "")],
-         "blocked_by": item.get("blocked_by")}
-        for item in stages
-    ])
+              "profile": "accept-ready", "head": initial["head"], "branch": initial["branch"],
+              "decision": decision.value, "stages": stages, "criteria": normalized,
+              "source_unchanged": initial["head"] == final["head"] and initial["tracked_diff"] == final["tracked_diff"]}
+    write_json_atomic(root / "criteria.json", normalized)
     write_json_atomic(root / "report.json", report)
     write_text_atomic(root / "report.md", "# Dx.Domain ACCEPT READY Gate\n\n" +
                       f"- Decision: **{decision.value}**\n" +

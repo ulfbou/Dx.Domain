@@ -1,12 +1,10 @@
-- name: Manifesto
-  href: MANIFESTO.md
-- name: Non-Goals
-  href: NON_GOALS.md
-- name: DPI
-  href: DPI.md
-- name: ADRs
-  href: adr/
-- name: Analyzers
-  href: analyzers/
-- name: Learn
-  href: learn/
+- name: Documentation home
+  href: index.md
+- name: Use Dx.Domain
+  href: use/index.md
+- name: Understand Dx.Domain
+  href: understand/index.md
+- name: Contribute to Dx.Domain
+  href: contribute/index.md
+- name: Reference
+  href: reference/index.md

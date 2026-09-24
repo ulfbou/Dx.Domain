@@ -138,6 +138,7 @@ def _criterion_finding(item: dict[str, Any], report: dict[str, Any]) -> dict[str
     return {
         "finding_id": f"finding:{criterion_id}",
         "criterion_id": criterion_id,
+        "stage": item.get("stage"),
         "title": str(item.get("title") or criterion_id),
         "kind": "CONSEQUENTIAL" if blocked_by else "PRIMARY",
         "status": status,
@@ -199,6 +200,21 @@ def _source_proof(report: dict[str, Any], evidence_root: Path) -> dict[str, Any]
 def build_feedback(*, profile: str, decision: str, gate_exit_code: int, repository_root: Path,
                    evidence_root: Path, report: dict[str, Any]) -> dict[str, Any]:
     criteria = [item for item in report.get("criteria", []) if isinstance(item, dict)]
+    # Accept-ready owns one normalized criterion stream. Project child criteria
+    # without embedding child reports in the final report or handoff.
+    for stage in report.get("stages", []):
+        if not isinstance(stage, dict):
+            continue
+        stage_name = str(stage.get("name") or "unknown")
+        child_report = stage.get("report")
+        if isinstance(child_report, dict):
+            for child in child_report.get("criteria", []):
+                if not isinstance(child, dict):
+                    continue
+                projected = json.loads(json.dumps(child))
+                projected["criterion_id"] = f"{stage_name}:{projected.get('criterion_id', 'unidentified')}"
+                projected["stage"] = stage_name
+                criteria.append(projected)
     findings = [_criterion_finding(item, report) for item in criteria]
     packages, package_set_identity, manifest = _package_identity(evidence_root)
     source = _source_proof(report, evidence_root)
@@ -223,7 +239,10 @@ def build_feedback(*, profile: str, decision: str, gate_exit_code: int, reposito
         "blocked_work": blocked_work,
         "actions": actions,
         "packages": {"required_package_ids": list(PACKAGE_IDS), "identities": packages, "package_set_identity": package_set_identity, "candidate_manifest": manifest},
-        "continuity": report.get("stages", []),
+        "continuity": [
+            {key: value for key, value in stage.items() if key != "report"}
+            for stage in report.get("stages", []) if isinstance(stage, dict)
+        ],
         "attachments": [],
         "validation": {"status": "PENDING", "errors": [], "dossier_sha256": None},
     }
@@ -323,38 +342,98 @@ def _carrier_path(profile: str, decision: str, run_id: str) -> Path:
     if not transfer: raise RuntimeError("DX is not set; cannot create transferable feedback carrier")
     return Path(transfer).resolve() / f"release-gate-{profile}-{decision.lower().replace('_','-')}-{run_id}.dx.txt"
 
+def _resolve_evidence(reference: str, evidence_root: Path) -> Path | None:
+    candidate = Path(reference)
+    candidates = [candidate] if candidate.is_absolute() else [evidence_root / candidate, evidence_root.parent / candidate]
+    return next((path for path in candidates if path.is_file()), None)
+
+def _transport_path(staging: Path, finding: dict[str, Any], source: Path, ordinal: int) -> str:
+    safe_id = "".join(ch if ch.isalnum() or ch in "-_" else "-" for ch in str(finding["finding_id"]))
+    name = source.name if ordinal == 0 else f"{ordinal + 1}-{source.name}"
+    target = staging / "release-gate" / "findings" / safe_id / name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source, target)
+    return target.relative_to(staging).as_posix()
+
+def _stage_summaries(dossier: dict[str, Any]) -> list[dict[str, Any]]:
+    return [dict(item) for item in dossier.get("continuity", []) if isinstance(item, dict)]
+
+def _handoff(dossier: dict[str, Any], carrier_name: str) -> dict[str, Any]:
+    material = [item for item in dossier["findings"] if item["status"] not in NON_ATTENTION]
+    return {
+        "schema": "dx-domain.release-gate-handoff/1.0",
+        "carrier": {"format": "DX v2.0", "filename": carrier_name,
+                    "payload_manifest_sha256": None, "verification": "VERIFIED"},
+        "execution": {"run_id": dossier["run"]["run_id"], "profile": dossier["gate"]["profile"],
+                      "operation_status": "COMPLETED", "decision": dossier["gate"]["decision"],
+                      "exit_code": dossier["gate"]["exit_code"]},
+        "repository": {key: dossier["repository"].get(key) for key in ("commit", "branch", "source_unchanged")},
+        "summary": {"objective_achieved": dossier["gate"]["achieved"],
+                    "primary_failure_count": sum(item["kind"] == "PRIMARY" for item in material),
+                    "actionable_finding_count": len(material),
+                    "blocked_operation_count": len(dossier["blocked_work"]),
+                    "status_counts": dossier["status_counts"]},
+        "findings": material,
+        "blocked_work": dossier["blocked_work"], "next_actions": dossier["actions"],
+        "artifacts": {"packages": dossier["packages"]},
+        "evidence_index": sorted({ref for item in material for ref in item.get("provenance", [])}),
+        "continuation": {"recommended_action": "CONTINUE" if dossier["gate"]["achieved"] else "CORRECT_AND_RERUN",
+                         "rerun_profile": dossier["gate"]["profile"],
+                         "preserve_candidate": dossier["conclusion"]["artifact_disposition"] in {"RETAIN_IMMUTABLE", "PROMOTION_PROHIBITED"}},
+        "validation": dossier["validation"],
+    }
+
+def _payload_hash(release_root: Path) -> str:
+    entries = []
+    for path in sorted(item for item in release_root.rglob("*") if item.is_file() and item.name != "handoff.json"):
+        entries.append({"path": path.relative_to(release_root.parent).as_posix(), "size": path.stat().st_size,
+                        "sha256": _sha256_file(path)})
+    return _sha256_bytes(_canonical_bytes(entries))
+
 def _package_feedback(repository_root: Path, evidence_root: Path, profile: str, decision: str, run_id: str, dossier: dict[str, Any]) -> Path:
     command = _collector_command()
     carrier = _carrier_path(profile, decision, run_id)
-    carrier.parent.mkdir(parents=True, exist_ok=True)
-    carrier.unlink(missing_ok=True)
+    carrier.parent.mkdir(parents=True, exist_ok=True); carrier.unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(prefix="dx-release-gate-feedback-") as temporary:
-        staging = Path(temporary)
-        attachments_dir = staging / "attachments"
-        attachments_dir.mkdir(parents=True)
-        manifest_entries = []
-        for identity, purpose, source in _attachment_candidates(evidence_root, dossier):
-            suffix = source.suffix.lower() or ".bin"
-            target = attachments_dir / f"{identity}{suffix}"
-            shutil.copyfile(source, target)
-            manifest_entries.append({"attachment_id": identity, "purpose": purpose, "path": target.relative_to(staging).as_posix(), "media_type": mimetypes.guess_type(target.name)[0] or "application/octet-stream", "byte_size": target.stat().st_size, "sha256": _sha256_file(target)})
+        staging = Path(temporary); release = staging / "release-gate"; release.mkdir(parents=True)
         transported = json.loads(json.dumps(dossier))
-        transported["attachments"] = manifest_entries
-        transported = _finalize(transported)
-        write_json_atomic(staging / "feedback.json", transported)
-        write_text_atomic(staging / "feedback.md", render_markdown(transported))
-        write_json_atomic(staging / "attachment-manifest.json", {"schema": ATTACHMENT_MANIFEST_SCHEMA, "attachments": manifest_entries})
+        for finding in transported["findings"]:
+            if finding["status"] in NON_ATTENTION: continue
+            paths = []
+            for ordinal, reference in enumerate(finding.get("provenance", [])):
+                source = _resolve_evidence(reference, evidence_root)
+                if source is not None and source.stat().st_size <= 2 * 1024 * 1024:
+                    paths.append(_transport_path(staging, finding, source, ordinal))
+            finding["provenance"] = paths
+            safe_id = "".join(ch if ch.isalnum() or ch in "-_" else "-" for ch in finding["finding_id"])
+            write_json_atomic(release / "findings" / safe_id / "finding.json", finding)
+        index = [{"finding_id": item["finding_id"], "path": "release-gate/findings/" +
+                  "".join(ch if ch.isalnum() or ch in "-_" else "-" for ch in item["finding_id"]) + "/finding.json"}
+                 for item in transported["findings"] if item["status"] not in NON_ATTENTION]
+        if index: write_json_atomic(release / "findings" / "index.json", {"findings": index})
+        for name in ("report.json", "criteria.json", "run.json"):
+            source = evidence_root / name
+            if source.is_file(): shutil.copyfile(source, release / name)
+        for name in ("git-before.json", "git-after.json"):
+            source = evidence_root / name
+            if source.is_file():
+                target = release / "source-state" / name; target.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(source, target)
+        manifest = dossier.get("packages", {}).get("candidate_manifest")
+        if isinstance(manifest, dict) and manifest.get("path"):
+            source = Path(manifest["path"])
+            if source.is_file():
+                target = release / "candidate" / "candidate-manifest.json"; target.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(source, target)
+        for stage in _stage_summaries(transported): write_json_atomic(release / "stages" / f"{stage['name']}.json", stage)
+        write_text_atomic(release / "summary.md", render_markdown(transported))
+        handoff = _handoff(transported, carrier.name); handoff["carrier"]["payload_manifest_sha256"] = _payload_hash(release)
+        write_json_atomic(release / "handoff.json", handoff)
         completed = subprocess.run([*command, "pack", str(staging), "--root", str(staging), "-o", str(carrier)], cwd=repository_root, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False)
-        if completed.returncode != 0:
-            raise RuntimeError(f"DX collector exited with {completed.returncode}: {(completed.stderr or completed.stdout).strip()}")
-    if not carrier.is_file() or not carrier.stat().st_size:
-        raise RuntimeError(f"DX collector did not create a non-empty carrier: {carrier}")
+        if completed.returncode != 0: raise RuntimeError(f"DX collector exited with {completed.returncode}: {(completed.stderr or completed.stdout).strip()}")
+    if not carrier.is_file() or not carrier.stat().st_size: raise RuntimeError(f"DX collector did not create a non-empty carrier: {carrier}")
     inspect = subprocess.run([*command, "inspect", str(carrier), "--verify"], cwd=repository_root, text=True, encoding="utf-8", errors="replace", stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, shell=False)
     if inspect.returncode != 0:
-        carrier.unlink(missing_ok=True)
-        raise RuntimeError(f"DX post-pack verification failed with {inspect.returncode}: {(inspect.stderr or inspect.stdout).strip()}")
+        carrier.unlink(missing_ok=True); raise RuntimeError(f"DX post-pack verification failed with {inspect.returncode}: {(inspect.stderr or inspect.stdout).strip()}")
     return carrier
-
 
 def transport_feedback(
     *,

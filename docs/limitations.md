@@ -21,4 +21,4 @@ They do not analyze:
 - dynamic invocation
 - code in assemblies built without analyzers
 
-*Source: docs/specifications/dx.domain-enforcement-specification.md*
+*Source: [docs/specifications/dx.domain-enforcement-specification.md](./specifications/dx.domain-enforcement-specification.md)*
