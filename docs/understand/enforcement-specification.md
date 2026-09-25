@@ -263,7 +263,7 @@ Dx.Domain Enforcement Specification
 ↓
 ADR-0001 … ADR-0016
 ↓
-[README](../../README.md) / comments / blog posts
+[README](../../readme.md) / comments / blog posts
 ```
 
 ---

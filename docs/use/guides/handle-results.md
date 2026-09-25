@@ -1,18 +1,29 @@
-# Handle Results
+# Handle results
 
-Create Results through the public `Dx.Result` facade:
-
-```csharp
-var error = DomainError.Create("order.not_found", "The order was not found.");
-Result<Order> result = Dx.Result.Failure<Order>(error);
-```
-
-Handle both outcomes:
+Use `Map` for a successful value transformation, `Bind` for a second fallible operation, and `Match` when leaving the result pipeline.
 
 ```csharp
-string response = result.Match(
-    order => order.Id.ToString(),
-    failure => failure.Code);
+Result<UserId> parsed = ParseUserId(input);
+
+Result<string> label = parsed.Map(id => $"user:{id}");
+
+Result<Account> account = parsed.Bind(id => LoadAccount(id));
+
+string response = account.Match(
+    value => value.DisplayName,
+    error => $"error:{error.Code}");
 ```
 
-Returning, mapping, binding, or matching a Result can make intent explicit. DXA020 detects directly ignored values but does not prove correct downstream behavior.
+Bad:
+
+```csharp
+ParseUserId(input);
+```
+
+Good:
+
+```csharp
+return ParseUserId(input);
+```
+
+A direct discard can trigger DXA020. Passing a result to an unrecognized handler can trigger DXA030. These rules do not prove that a selected handler implements correct business behavior. Keep terminal handling at an application or transport boundary and test both branches.

@@ -1,6 +1,5 @@
 # Governance Documents
 
-**Last reviewed:** 2026-04-22
 
 These three documents define the identity of Dx.Domain. They are not background reading. They are the decision procedure.
 

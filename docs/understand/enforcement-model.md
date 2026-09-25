@@ -14,7 +14,7 @@ A constraint is enforced if and only if a violation is deterministically detecte
 - **Bypass:** only by disabling analyzer or using justified suppression
 - **Guarantee:** violation cannot reach runtime undetected under normal build
 
-### Heuristic
+### Moderate
 - **Detection:** build warning in S1–S3
 - **Scope:** statically analyzable code, S1–S3 only
 - **Bypass:** reflection, serialization, dynamic, suppression
@@ -32,7 +32,7 @@ A constraint is enforced if and only if a violation is deterministically detecte
 - **Bypass:** not mechanically preventable
 - **Guarantee:** auditability only
 
-### Moderate
+### Advisory
 - **Detection:** design guideline
 - **Scope:** documentation
 - **Bypass:** not mechanically enforced
