@@ -803,8 +803,19 @@ def _decision_json(decision: ContentDecision) -> dict[str,Any]:
     return {"path":p.candidate.path,"included":decision.terminal_outcome=="selected","terminal_outcome":decision.terminal_outcome,"explicit_selection_bases":list(p.explicit_selection_bases),"decisive_reason":{"provider":p.decisive_provider,"pattern":p.decisive_pattern},"matches":[{"provider":m.provider,"pattern":m.pattern,"action":m.action,"source":m.source,"line":m.line,"overrides":list(m.overrides)} for m in p.matches]}
 
 
+def _fail_fast_pack_output(o: NormalizedPackOptions) -> None:
+    """Reject an unwritable pack target before expensive candidate selection."""
+    if o.dry_run or o.output == Path('-'):
+        return
+    if o.output.is_symlink():
+        raise WriteConflictError(f"refusing to replace symlink: {o.output}")
+    if o.output.exists() and not o.force:
+        raise WriteConflictError(f"output already exists; use --force to replace it: {o.output}")
+
 def pack_command(a) -> int:
-    o=normalize_pack_options(a); ctx=build_selection_context(o); report=select_for_pack(ctx)
+    o=normalize_pack_options(a)
+    _fail_fast_pack_output(o)
+    ctx=build_selection_context(o); report=select_for_pack(ctx)
     selected=[d for d in report.decisions if d.terminal_outcome=="selected"]
     if o.explain=="human":
         for d in report.decisions:
@@ -1278,6 +1289,7 @@ def main(argv=None):
                     print("WARNING: positional OUTPUT is deprecated. Use -o OUTPUT.", file=sys.stderr)
                 a.output_opt = a.output
             a.output = a.output_opt
+            _fail_fast_pack_output(normalize_pack_options(a))
 
         return a.func(a)
     except InvalidCarrierError as e:
