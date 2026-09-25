@@ -14,9 +14,9 @@ dotnet restore
 dotnet build -c Release
 dotnet test -c Release --no-build
 bash scripts/docs-lint.sh
-bash scripts/docs-snippets-compile.sh docs/public net8.0
+bash scripts/docs-snippets-compile.sh docs net8.0
 bash scripts/docs-examples-compile.sh
-dotnet docfx docfx.public.json --warningsAsErrors
+dotnet docfx docs/docfx.json --warningsAsErrors
 ```
 
 ## Check a pull request
@@ -37,14 +37,14 @@ Canonical public site:
 
 ```bash
 dotnet tool restore
-dotnet docfx docfx.public.json --warningsAsErrors
+dotnet docfx docs/docfx.json --warningsAsErrors
 ```
 
 Maintainer build including internal documentation:
 
 ```bash
 dotnet tool restore
-dotnet docfx docfx.full.json --warningsAsErrors
+dotnet docfx docs/docfx.json --warningsAsErrors
 ```
 
 Only the public configuration is deployed by `.github/workflows/docfx.yml`.

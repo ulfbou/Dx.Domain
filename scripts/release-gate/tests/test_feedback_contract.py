@@ -9,7 +9,7 @@ from release_gate.feedback import FeedbackValidationError, build_feedback, colle
 
 class FeedbackContractTests(unittest.TestCase):
     def base(self, root):
-        evidence = root / '.dx/verification/release-gate/run-1'; evidence.mkdir(parents=True)
+        evidence = root / '.dx/evidence/release-gate/run-1'; evidence.mkdir(parents=True)
         (evidence / 'run.json').write_text(json.dumps({'run_id':'run-1','head':'a'*40,'branch':'test','initial_status':[]}), encoding='utf-8')
         (evidence / 'git-before.json').write_text(json.dumps({'head':'a'*40,'tracked_diff':''}), encoding='utf-8')
         (evidence / 'git-after.json').write_text(json.dumps({'head':'a'*40,'tracked_diff':''}), encoding='utf-8')

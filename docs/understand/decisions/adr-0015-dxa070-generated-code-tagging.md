@@ -21,7 +21,7 @@ Severity: Info
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Improves analyzer accuracy; reduces false positives.
 
 ### Consequences

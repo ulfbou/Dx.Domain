@@ -33,7 +33,7 @@ Configuration: dx.result.handlers in .editorconfig
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Consistent `Result` handling patterns.
 
 ### Dependencies

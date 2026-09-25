@@ -18,7 +18,7 @@ Require justification for all suppressions via `[SuppressMessage]` with ADR refe
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Suppressions are auditable.
 
 ### Dependencies

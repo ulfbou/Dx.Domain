@@ -31,7 +31,7 @@ Remediation: Use DomainTime.Now()
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Enforces [ADR-0001](adr-0001-utc-only-domaintime.md).
 
 ### Dependencies

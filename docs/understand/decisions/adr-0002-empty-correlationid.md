@@ -44,10 +44,10 @@ Empty is a valid value, not a null or error state.
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Empty correlation is explicit, not accidental. Normal causation creation fails fast on empty values.
 
-**Does NOT guarantee:**
+**Outside this boundary:**
 - semantic correctness of using Empty
 
 ---

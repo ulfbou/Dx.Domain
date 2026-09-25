@@ -46,7 +46,7 @@ No facade is required to use these types. They are the building blocks for facad
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 NuGet consumers can instantiate Results and Errors without a facade. Breaking this contract requires a new ADR and major version bump.
 
 ### Dependencies

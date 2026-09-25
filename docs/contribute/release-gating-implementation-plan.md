@@ -16,7 +16,7 @@ The plan favors direct correction of the production release path plus focused pr
 4. Keep Bash and PowerShell as no-logic launchers.
 5. Keep GitHub Actions as orchestration rather than verification logic.
 6. Require no arguments, credentials, or manual path discovery for default local verification.
-7. Store executable code under `.dx/scripts/` and evidence under `.dx/verification/`.
+7. Store executable code under `.dx/scripts/` and evidence under `.dx/evidence/`.
 8. Treat WS-001 and WS-002 as accepted inputs rather than duplicating their proof.
 9. Do not create the final tag, publish packages, or run post-publication checks until the corresponding phase is authorized.
 

@@ -38,10 +38,10 @@ All domain time must flow through `DomainTime` (UTC only).
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 All statically analyzable domain code avoids direct `DateTime` access and uses controlled UTC sources.
 
-**Does NOT guarantee:**
+**Outside this boundary:**
 - correctness of time values
 - runtime consistency across systems
 

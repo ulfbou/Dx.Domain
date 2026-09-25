@@ -41,10 +41,10 @@ This ADR does not forbid the two-type Result in Kernel. It forbids exposing Opti
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Kernel exposes single failure representation to domain code.
 
-**Does NOT guarantee:**
+**Outside this boundary:**
 - edge code choices
 
 ---

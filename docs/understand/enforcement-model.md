@@ -1,7 +1,7 @@
 # Enforcement Model
 
 ## Purpose
-Defines what "enforced" means in Dx.Domain and the limits of each guarantee. This document interprets the classifications in SPEC.md; it does not create new rules.
+Defines what "enforced" means in Dx.Domain and the limits of each guarantee. This document interprets the classifications in docs/understand/enforcement-specification.md; it does not create new rules.
 
 ## Definition
 A constraint is enforced if and only if a violation is deterministically detected at build time within the analyzer's declared scope.
@@ -41,4 +41,4 @@ A constraint is enforced if and only if a violation is deterministically detecte
 ## Boundaries
 Enforcement applies only within statically analyzable scope and declared analyzer coverage. It does not imply runtime prevention, semantic correctness, completeness across assemblies, or resistance to intentional suppression.
 
-*Source: SPEC.md definition, ADR coverage levels*
+*Source: docs/understand/enforcement-specification.md definition, ADR coverage levels*

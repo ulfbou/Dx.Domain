@@ -21,7 +21,7 @@ Severity: Error
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Facade does not become bypass vector.
 
 ### Dependencies

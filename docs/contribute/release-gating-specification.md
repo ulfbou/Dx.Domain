@@ -237,7 +237,7 @@ Workflow files shall not independently define package allowlists, test inventori
 
 ## 7. Repository layout
 
-Tracked executable scripts shall live under `.dx/scripts/`. Generated evidence shall live under `.dx/verification/`.
+Tracked executable scripts shall live under `.dx/scripts/`. Generated evidence shall live under `.dx/evidence/`.
 
 ```text
 .dx/
@@ -276,7 +276,7 @@ Tracked executable scripts shall live under `.dx/scripts/`. Generated evidence s
         └── <run-id>/
 ```
 
-The repository's ignore rules shall track `.dx/scripts/**` while continuing to ignore generated `.dx/verification/**` evidence.
+The repository's ignore rules shall track `.dx/scripts/**` while continuing to ignore generated `.dx/evidence/**` evidence.
 
 ## 8. Local developer experience
 
@@ -335,7 +335,7 @@ YYYYMMDDTHHMMSSZ-<short-head-sha>-<random-suffix>
 Evidence shall be written to:
 
 ```text
-.dx/verification/release-gate/<run-id>/
+.dx/evidence/release-gate/<run-id>/
 ```
 
 The developer shall not need to choose or clean evidence directories.
@@ -349,7 +349,7 @@ Dx.Domain release gate
 Profile: local
 Commit: 0123456789abcdef...
 Working tree: modified
-Evidence: .dx/verification/release-gate/20260916T070000Z-01234567-a1b2/
+Evidence: .dx/evidence/release-gate/20260916T070000Z-01234567-a1b2/
 
 PASS  Environment
 PASS  Restore
@@ -360,7 +360,7 @@ PASS  Analyzer tests
 PASS  Tracked-source immutability
 
 Decision: FAIL
-Report: .dx/verification/release-gate/.../report.md
+Report: .dx/evidence/release-gate/.../report.md
 ```
 
 ### 8.7 Dependency-aware execution
@@ -719,7 +719,7 @@ WS-003 is accepted only when:
 
 - the default local verification requires one command and no arguments;
 - no credentials or manual path setup are required;
-- evidence is created automatically under `.dx/verification/`;
+- evidence is created automatically under `.dx/evidence/`;
 - Bash, PowerShell, and GitHub Actions invoke the same Python entry point;
 - wrappers contain no criterion logic;
 - inventories and strict build properties are defined once;
@@ -774,7 +774,7 @@ The carrier is the final product. It is not:
 - a reduced summary that requires the originating repository; or
 - secondary to `feedback.json` or another local report.
 
-Persistent evidence may remain under `.dx/verification/release-gate/<run-id>/` as execution evidence and a retention source. It is not the consumer interface.
+Persistent evidence may remain under `.dx/evidence/release-gate/<run-id>/` as execution evidence and a retention source. It is not the consumer interface.
 
 The gate decision and carrier-production result are separate facts. A gate decision may be passing or non-passing while the carrier result is created or failed. The process shall not report successful completion unless the required carrier was created and verified.
 
@@ -960,7 +960,7 @@ Child stage reports shall be normalized instead of recursively embedded.
 
 ### 26.8 External staging and repository-owned DX tooling
 
-Persistent execution evidence remains under `.dx/verification/`. The final handoff tree shall be assembled in a purpose-built temporary export directory outside the Git worktree.
+Persistent execution evidence remains under `.dx/evidence/`. The final handoff tree shall be assembled in a purpose-built temporary export directory outside the Git worktree.
 
 The runner shall:
 
@@ -973,7 +973,7 @@ The runner shall:
 
 The runner shall not:
 
-- pack `.dx/verification/` directly;
+- pack `.dx/evidence/` directly;
 - bypass ignore semantics;
 - modify `scripts/release-gate/dx.py` to special-case release-gate evidence;
 - track generated verification evidence; or

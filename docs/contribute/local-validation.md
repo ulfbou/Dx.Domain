@@ -1,15 +1,16 @@
 # Local validation
 
-Run validation from the repository root in this order. Stop at the first failure, correct its cause, and restart the sequence.
+Run from the repository root, stop at the first failure, correct it, and restart the sequence.
 
 ```bash
 dotnet tool restore
 dotnet restore
 dotnet build -c Release
 dotnet test -c Release --no-build
-scripts/docs-lint.sh
-scripts/docs-snippets-compile.sh docs net8.0
-dotnet docfx docfx.public.json
+bash scripts/docs-lint.sh
+bash scripts/docs-snippets-compile.sh docs net8.0
+bash scripts/docs-examples-compile.sh
+dotnet docfx docs/docfx.json --warningsAsErrors
 ```
 
-Documentation changes must not introduce empty published pages, unresolved conflict markers, broken local links, placeholder contacts, or unclassified enforcement claims.
+Documentation acceptance requires one reachable public tree, valid local links, compiled material examples, and a warning-free DocFX build from `docs/toc.yml`.

@@ -38,7 +38,7 @@ Severity: Warning
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Expected failures use Result, not exceptions.
 
 ### Dependencies

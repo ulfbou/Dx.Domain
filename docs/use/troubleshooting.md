@@ -2,7 +2,7 @@
 
 ## Diagnostics do not appear
 
-1. Confirm `Dx.Domain.Analyzers` is installed explicitly.
+1. Confirm that one of the four published packages is referenced and contains `analyzers/dotnet/cs/Dx.Domain.Analyzers.dll`.
 2. Run `dotnet restore` and rebuild.
 3. Inspect build output for the analyzer assembly.
 4. Confirm the file is included in the participating project.
@@ -21,4 +21,4 @@ Return, transform, or terminally handle the Result. Assigning it without later o
 
 ## Documentation build fails
 
-Run `scripts/docs-lint.sh`, correct the first reported local link or empty page, then run `dotnet docfx docfx.public.json --warningsAsErrors`.
+Run `scripts/docs-lint.sh`, correct the first reported local link or empty page, then run `dotnet docfx docs/docfx.json --warningsAsErrors`.

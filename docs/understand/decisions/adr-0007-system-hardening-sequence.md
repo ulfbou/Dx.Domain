@@ -29,7 +29,7 @@ To reach "closed under explanation" architecture, we must split Facts cleanly, f
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Substrate stability through ordered hardening.
 
 ### Consequences

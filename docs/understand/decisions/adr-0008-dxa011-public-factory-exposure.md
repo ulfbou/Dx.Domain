@@ -45,7 +45,7 @@ DXA011 explicitly ignores S0 Kernel assemblies. This resolves the NuGet instanti
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 All public construction routes in S1–S3 are visible to facade.
 
 ### Dependencies

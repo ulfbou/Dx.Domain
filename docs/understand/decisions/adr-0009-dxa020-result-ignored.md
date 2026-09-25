@@ -38,7 +38,7 @@ Severity: Warning
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Domain failures cannot be silently ignored in static code.
 
 ### Dependencies

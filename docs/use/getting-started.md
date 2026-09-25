@@ -14,10 +14,9 @@
 ```bash
 dotnet add package Dx.Domain.Kernel --version 0.1.0-alpha
 dotnet add package Dx.Domain.Primitives --version 0.1.0-alpha
-dotnet add package Dx.Domain.Analyzers --version 0.1.0-alpha
 ```
 
-Install analyzers explicitly during alpha. Add `Dx.Domain.Facts` when you need structural facts and `Dx.Domain.Annotations` when you need semantic metadata directly.
+Each published package carries the analyzer assembly. Do not install a standalone analyzer package. Add `Dx.Domain.Facts` when you need structural facts and `Dx.Domain.Annotations` when you need semantic metadata directly.
 
 ## Configure analyzer facts
 

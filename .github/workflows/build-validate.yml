@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ws-003-release-gate-build-validate-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .dx/verification/release-gate/
+          path: .dx/evidence/release-gate/
           if-no-files-found: error
           retention-days: 30
 
@@ -63,8 +63,8 @@ jobs:
         with:
           name: candidate-${{ github.sha }}
           path: |
-            .dx/verification/release-gate/**/candidate-manifest.json
-            .dx/verification/release-gate/**/packages/*.nupkg
+            .dx/evidence/release-gate/**/candidate-manifest.json
+            .dx/evidence/release-gate/**/packages/*.nupkg
           if-no-files-found: error
           retention-days: 30
       - name: Run WS-005 consumers gate
@@ -75,10 +75,10 @@ jobs:
         with:
           name: ws-005-consumers-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            .dx/verification/release-gate/
-            !.dx/verification/release-gate/**/consumers/**/http-cache/**
-            !.dx/verification/release-gate/**/consumers/**/packages/**
-            !.dx/verification/release-gate/**/consumers/**/dotnet-home/**
+            .dx/evidence/release-gate/
+            !.dx/evidence/release-gate/**/consumers/**/http-cache/**
+            !.dx/evidence/release-gate/**/consumers/**/packages/**
+            !.dx/evidence/release-gate/**/consumers/**/dotnet-home/**
           if-no-files-found: error
           retention-days: 30
       - name: Verify diagnostic metadata conformance

@@ -32,7 +32,7 @@ Severity: Error
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Prevents scope creep.
 
 ### Dependencies

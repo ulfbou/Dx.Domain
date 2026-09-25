@@ -23,7 +23,7 @@ Severity: Warning in alpha, Error in stable
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Prevents pattern museum.
 
 ### Dependencies

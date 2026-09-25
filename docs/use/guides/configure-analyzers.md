@@ -1,13 +1,11 @@
-# Configure Analyzers
+# Configure analyzers
 
-Install `Dx.Domain.Analyzers` explicitly, then provide classification facts in `.editorconfig`:
+The analyzer assembly is embedded in each of the four published packages. Install the package that owns the capability you use; do not install a standalone analyzer package.
 
 ```ini
-root = true
-
 [*.cs]
 dx.scope.map = S0:Dx.Domain;S1:MyApp.Domain;S2:MyApp.Application;S3:MyApp.Infrastructure
 dx.facade.root = MyApp.Domain.DomainFactory
 ```
 
-Build with `dotnet build` and treat repository policy separately from descriptor defaults. Standard compiler suppression mechanisms remain technically available, although a repository may prohibit them by policy.
+Build with `dotnet build`, then use the [diagnostic reference](../../reference/diagnostics/index.md).

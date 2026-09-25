@@ -54,7 +54,7 @@ Rationale: You cannot require a facade to create the type used to return failure
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Construction entry points are controlled in S1–S3 consumer code.
 
 **Not guaranteed at runtime.**

@@ -64,10 +64,10 @@ Constructors remain `internal`. Public API is the two static methods only. This 
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Result values are never null in statically typed code.
 
-**Does NOT guarantee:**
+**Outside this boundary:**
 - performance for large T
 
 ---

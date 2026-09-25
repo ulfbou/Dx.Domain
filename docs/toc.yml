@@ -28,12 +28,14 @@
     href: understand/concepts/index.md
   - name: Enforcement model
     href: understand/enforcement-model.md
-  - name: Design principles
-    href: understand/manifesto.md
+  - name: Enforcement specification
+    href: understand/enforcement-specification.md
+  - name: Compiler diagnostics
+    href: understand/compiler-failures.md
   - name: Decisions
     href: understand/decisions/index.md
-  - name: Specifications
-    href: understand/specifications/index.md
+  - name: Roadmap
+    href: understand/roadmap.md
 - name: Contribute to Dx.Domain
   href: contribute/index.md
   items:
@@ -41,13 +43,11 @@
     href: contribute/local-validation.md
   - name: Documentation authority
     href: contribute/documentation-authority.md
-  - name: Style guide
-    href: contribute/style-guide.md
   - name: Analyzer authoring
     href: contribute/analyzer-authoring.md
   - name: API surface process
     href: contribute/api-surface-process.md
-  - name: CI
+  - name: CI/CD
     href: contribute/ci/index.md
   - name: Release process
     href: contribute/release-process.md
@@ -58,6 +58,29 @@
     href: reference/packages/index.md
   - name: Diagnostics
     href: reference/diagnostics/index.md
+    items:
+    - name: DXA010
+      href: reference/diagnostics/DXA010.md
+    - name: DXA011
+      href: reference/diagnostics/DXA011.md
+    - name: DXA020
+      href: reference/diagnostics/DXA020.md
+    - name: DXA022
+      href: reference/diagnostics/DXA022.md
+    - name: DXA030
+      href: reference/diagnostics/DXA030.md
+    - name: DXA040
+      href: reference/diagnostics/DXA040.md
+    - name: DXA050
+      href: reference/diagnostics/DXA050.md
+    - name: DXA060
+      href: reference/diagnostics/DXA060.md
+    - name: DXA065
+      href: reference/diagnostics/DXA065.md
+    - name: DXA070
+      href: reference/diagnostics/DXA070.md
+    - name: DXA080
+      href: reference/diagnostics/DXA080.md
   - name: Configuration
     href: reference/configuration.md
   - name: API

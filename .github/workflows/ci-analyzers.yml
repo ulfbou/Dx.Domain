@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ws-003-release-gate-analyzers-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .dx/verification/release-gate/
+          path: .dx/evidence/release-gate/
           if-no-files-found: error
           retention-days: 30
 

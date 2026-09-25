@@ -10,7 +10,7 @@ Dx.Domain is a small, compiler-assisted substrate for explicit invariants, resul
 - **Facts:** structural fact and causation values targeting .NET 8, 9, and 10.
 - **Analyzers:** compile-time diagnostics targeting .NET Standard 2.0.
 
-Facts depends on Primitives, Kernel, and Annotations. Kernel and Primitives depend on Annotations. Runtime projects reference the analyzer project as a compiler analyzer in repository builds; consumers install the analyzer package explicitly during alpha.
+Facts depends on Primitives, Kernel, and Annotations. Kernel and Primitives depend on Annotations. Runtime projects reference the analyzer project as a compiler analyzer in repository builds; consumers receive the analyzer assembly through each published package.
 
 ## Scope model
 

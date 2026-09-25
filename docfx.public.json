@@ -1,25 +1,9 @@
 {
   "build": {
-    "content": [
-      {
-        "src": "docs",
-        "files": ["**/*.md", "**/*.yml"],
-        "exclude": ["internal/**", ".generated/**", "public/toc.yml", "learn/**/toc.yml", "adr/toc.yml", "analyzers/toc.yml"]
-      }
-    ],
-    "resource": [
-      { "files": ["images/**"], "src": "docs" }
-    ],
+    "content": [{"src": "docs", "files": ["**/*.md", "toc.yml"], "exclude": ["internal/**", ".generated/**"]}],
+    "resource": [{"src": "docs", "files": ["images/**"]}],
     "dest": "_site",
     "template": ["default"],
-    "globalMetadata": {
-      "_appTitle": "Dx.Domain",
-      "_appName": "Dx.Domain",
-      "_enableSearch": true,
-      "_gitContribute": {
-        "repo": "https://github.com/ulfbou/dx.domain",
-        "branch": "master"
-      }
-    }
+    "globalMetadata": {"_appTitle": "Dx.Domain", "_appName": "Dx.Domain", "_enableSearch": true}
   }
 }

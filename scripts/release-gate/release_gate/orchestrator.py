@@ -195,7 +195,7 @@ def execute_candidate_profile(repository_root, script_root, evidence_base=None, 
     from .packages import is_valid_zip, read_nuspec, validate_analyzer_placement, validate_dependencies, validate_framework_groups, validate_nuspec, validate_readme_presence, extract_analyzer_bytes
     repository_root=Path(repository_root).resolve(); script_root=Path(script_root).resolve()
     release=load_contract(script_root/'contracts/release-contract.json'); package=load_contract(script_root/'contracts/package-contract.json')
-    initial=capture_git_state(repository_root); run_id=make_run_id(initial['head']); evidence_root=Path(evidence_base or repository_root/'.dx/verification/release-gate').resolve()/run_id; evidence_root.mkdir(parents=True,exist_ok=False)
+    initial=capture_git_state(repository_root); run_id=make_run_id(initial['head']); evidence_root=Path(evidence_base or repository_root/'.dx/evidence/release-gate').resolve()/run_id; evidence_root.mkdir(parents=True,exist_ok=False)
     write_json_atomic(evidence_root/'run.json',{"schema":"dx-domain.release-gate-run.v1","run_id":run_id,"profile":"candidate","phase":"ACCEPT_READY","created_utc":utc_now(),"repository_root":repository_root.as_posix(),"head":initial['head'],"branch":initial['branch'],"contracts":{"release_contract_sha256":release.sha256,"package_contract_sha256":package.sha256}})
     write_json_atomic(evidence_root/'environment.json',{"platform":{"system":platform.system(),"release":platform.release(),"machine":platform.machine()},"python":sys.version})
     write_json_atomic(evidence_root/'git-before.json',initial)
@@ -247,7 +247,7 @@ def _discover_candidate(repository_root, candidate_dir=None):
         directory = Path(candidate_dir).resolve(); manifest = directory.parent / "candidate-manifest.json"
         if not manifest.is_file(): manifest = directory / "candidate-manifest.json"
         return manifest, directory
-    manifests = sorted((repository_root / ".dx/verification/release-gate").glob("*/candidate-manifest.json"), key=lambda path:path.stat().st_mtime, reverse=True)
+    manifests = sorted((repository_root / ".dx/evidence/release-gate").glob("*/candidate-manifest.json"), key=lambda path:path.stat().st_mtime, reverse=True)
     return (None, None) if not manifests else (manifests[0], manifests[0].parent / "packages")
 
 def execute_consumers_profile(repository_root, script_root, evidence_base=None, timeout_seconds=1800, candidate_dir=None):
@@ -256,7 +256,7 @@ def execute_consumers_profile(repository_root, script_root, evidence_base=None, 
     from .diagnostics import parse_diagnostics_from_build_output, validate_analyzer_activation
     from .manifests import verify_manifest
     repository_root = Path(repository_root).resolve(); script_root = Path(script_root).resolve(); initial = capture_git_state(repository_root)
-    run_id = make_run_id(initial["head"]); root = Path(evidence_base or repository_root/".dx/verification/release-gate").resolve()/run_id; root.mkdir(parents=True, exist_ok=False)
+    run_id = make_run_id(initial["head"]); root = Path(evidence_base or repository_root/".dx/evidence/release-gate").resolve()/run_id; root.mkdir(parents=True, exist_ok=False)
     matrix, behaviors = load_consumer_contracts(script_root); manifest_path, packages = _discover_candidate(repository_root, candidate_dir); criteria=[]; commands=[]
     write_json_atomic(root/"run.json", {"schema":"dx-domain.release-gate-run.v1","run_id":run_id,"profile":"consumers","phase":"ACCEPT_READY","created_utc":utc_now(),"repository_root":repository_root.as_posix(),"head":initial["head"],"contracts":{"consumer_matrix_sha256":matrix.sha256,"required_behaviors_sha256":behaviors.sha256}})
     write_json_atomic(root/"environment.json", {"platform":platform.platform(),"python":sys.version}); write_json_atomic(root/"git-before.json", initial)
@@ -295,7 +295,7 @@ def execute_accept_ready_profile(repository_root, script_root, evidence_base=Non
     script_root = Path(script_root).resolve()
     initial = capture_git_state(repository_root)
     run_id = make_run_id(initial["head"])
-    root = Path(evidence_base or repository_root / ".dx/verification/release-gate").resolve() / run_id
+    root = Path(evidence_base or repository_root / ".dx/evidence/release-gate").resolve() / run_id
     root.mkdir(parents=True, exist_ok=False)
     write_json_atomic(root / "run.json", {
         "schema": "dx-domain.release-gate-run.v1", "run_id": run_id,
@@ -345,22 +345,18 @@ def execute_accept_ready_profile(repository_root, script_root, evidence_base=Non
         decision = GateDecision.ACCEPT_READY_NOT_PROVEN
     final = capture_git_state(repository_root)
     write_json_atomic(root / "git-after.json", final)
-    normalized = []
-    for item in stages:
-        status = "PASS" if item["decision"] == "PASS" else ("FAIL" if item["decision"] == "FAIL" else item["decision"])
-        normalized.append({"criterion_id": "accept-ready-stage-" + item["name"], "title": "Accept-ready stage " + item["name"],
-                           "stage": item["name"], "status": status,
-                           "motivation": f"The {item['name']} stage completed with {item['decision']}.",
-                           "verifier": "release_gate.orchestrator.execute_accept_ready_profile",
-                           "expected": {"decision": "PASS"}, "observed": {"decision": item["decision"]},
-                           "evidence": [item.get("evidence_directory", "")] if item.get("evidence_directory") else [],
-                           "blocked_by": item.get("blocked_by"),
-                           "corrective_action": None if status == "PASS" else f"Correct the {item.get('blocked_by') or item['name']} stage and rerun accept-ready."})
     report = {"schema": "dx-domain.release-gate-report.v1", "run_id": run_id,
-              "profile": "accept-ready", "head": initial["head"], "branch": initial["branch"],
-              "decision": decision.value, "stages": stages, "criteria": normalized,
-              "source_unchanged": initial["head"] == final["head"] and initial["tracked_diff"] == final["tracked_diff"]}
-    write_json_atomic(root / "criteria.json", normalized)
+              "profile": "accept-ready", "head": initial["head"],
+              "decision": decision.value, "stages": stages,
+              "source_unchanged": initial["head"] == final["head"] and
+                                  initial["tracked_diff"] == final["tracked_diff"]}
+    write_json_atomic(root / "criteria.json", [
+        {"criterion_id": "accept-ready-stage-" + item["name"],
+         "status": "PASS" if item["decision"] == "PASS" else item["decision"],
+         "observed": item["decision"], "evidence": [item.get("evidence_directory", "")],
+         "blocked_by": item.get("blocked_by")}
+        for item in stages
+    ])
     write_json_atomic(root / "report.json", report)
     write_text_atomic(root / "report.md", "# Dx.Domain ACCEPT READY Gate\n\n" +
                       f"- Decision: **{decision.value}**\n" +

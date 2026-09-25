@@ -5,6 +5,6 @@ Use the canonical product narrative. Address the reader directly, define acronym
 ## Release-gate documentation
 State the reader and intended outcome for every substantive release-gate document. Write the current contract directly without document revision labels, amendment narratives, or comparisons with discarded designs. Exact executable identifiers such as DX v2.0 and schema identifiers remain unchanged.
 
-Use `carrier` for the one final `.dx.txt` handoff, `local evidence` for retained files under `.dx/verification/`, `handoff` for transported continuation information, and `result envelope` for the single `DX_RELEASE_GATE_RESULT=` stdout line. Distinguish primary findings, consequential findings, and operational failures.
+Use `carrier` for the one final `.dx.txt` handoff, `local evidence` for retained files under `.dx/evidence/`, `handoff` for transported continuation information, and `result envelope` for the single `DX_RELEASE_GATE_RESULT=` stdout line. Distinguish primary findings, consequential findings, and operational failures.
 
 Use repository-relative paths and relevant variables including `$REPO_ROOT`, `$DX`, `$DX_FILE`, and `$OUTPUT_DIR`. Never use `/path/to`.

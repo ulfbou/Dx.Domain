@@ -1,73 +1,28 @@
-# Documentation Authority
+# Documentation authority
 
-**Status:** Normative for repository documentation
+**Status:** Normative for repository documentation.
 
-## Canonical narrative
+## Canonical structure
 
-Dx.Domain is a small, compiler-assisted substrate for explicit invariants, results, errors, identities, and structural facts.
+- `docs/use/`: adoption, tasks, troubleshooting, limitations, stability, security, and releases.
+- `docs/understand/`: architecture, concepts, enforcement, normative specifications, historical decisions, and roadmap.
+- `docs/contribute/`: contribution, validation, authoring, CI/CD, and release procedures.
+- `docs/reference/`: packages, diagnostics, configuration, and API lookup.
+- `docs/index.md`: the single documentation entry page.
+- `docs/toc.yml`: the single navigation authority.
 
-## Documentation-tree classification
+The public site is built from `docs/` through `docs/docfx.json` and `docs/toc.yml`. No parallel public, learn, internal, analyzer, ADR, or specification tree is authoritative.
 
-- **`docs/public`:** canonical public documentation and the only source used to build the public site.
-- **`docs/internal`:** active maintainer, governance, release-process, and audit documentation. It is repository-visible but excluded from the public site.
-- **`docs/adr`:** retained historical architectural decision records. ADRs explain past decisions but do not override current implementation, specifications, or public documentation.
-- **`docs/specifications`:** normative specifications where the specification is applicable and consistent with demonstrated implementation behavior.
-- **`docs/learn`:** retained legacy entry points only. These pages are not authoritative and must route readers to `docs/public`.
-- **`docs/analyzers`:** retained legacy diagnostic routes subordinate to the canonical public diagnostic reference.
-- **`docs/reference`:** retained legacy reference routes subordinate to `docs/public/reference`.
-- **Root-level documentation:** `readme.md` defines the product entry point, `CHANGELOG.md` records release history, `SECURITY.md` defines security reporting, and `CONTRIBUTING.md` defines contribution guidance. Other root documents are classified individually by their stated purpose.
+## Normative precedence
 
-No retained or historical page may present itself as an alternative public authority.
-
-## Sources of truth
-
-- **Product definition:** this document and the root README.
-- **Package identities, target frameworks, dependencies, and public types:** evaluated project files and compiled assemblies.
-- **Diagnostic IDs, titles, categories, default severities, and messages:** `DiagnosticDescriptor` declarations in `Dx.Domain.Analyzers`.
-- **Enforcement boundary:** `docs/specifications/dx.domain-enforcement-specification.md`, subject to demonstrated implementation behavior.
-- **Version:** `version.json`; the alpha documentation uses `0.1.0-alpha`.
-- **Security reporting:** root `SECURITY.md`.
-- **Release history:** root `CHANGELOG.md` and the matching public release note.
-
-## Precedence
-
-When sources disagree, use this order:
-
-1. Compiled implementation and shipped package metadata
+1. Compiled behavior and package metadata
 2. Analyzer descriptors and automated tests
-3. Normative enforcement specification
-4. This authority document
-5. Public reference documentation
-6. Public concepts and guides
-7. Root README and release summaries
-8. Historical ADRs and commentary
+3. Current normative specifications
+4. Current reference documentation
+5. Explanatory concepts and guides
+6. Historical ADRs
+7. Roadmap and commentary
 
-A lower source must not override a higher source. Contradictions are defects to correct, not alternatives to preserve.
+The [enforcement specification](../understand/enforcement-specification.md) supersedes conflicting ADR interpretation. Lower-precedence material must be corrected when it conflicts with a higher authority.
 
-## Current product documentation rules
-
-- Consumers install `Dx.Domain.Analyzers` explicitly during alpha. Repository project references do not prove transitive NuGet behavior.
-- Analyzer defaults come from descriptors: DXA020, DXA040, and DXA060 are errors; other shipped DXA rules are warnings.
-- DXA065 is shipped and belongs in the diagnostic catalog. DXA090 is planned and must not be presented as shipped.
-- Suppression is technically possible through standard compiler mechanisms. Repository policy may reject suppression, but documentation must not claim technical impossibility.
-- Runtime package APIs are provisional. Architectural principles may be described as stable, but “frozen” is reserved for a verified API baseline.
-- Public documentation is built only from `docs/public`. Internal governance remains repository-visible but outside public navigation.
-- Security reports use GitHub Security Advisories. There is no public security email address.
-
-## Claim labels
-
-Technical claims use one of these labels where the enforcement mechanism matters:
-
-- **Compiler-enforced**
-- **Analyzer-enforced**
-- **Runtime-enforced**
-- **Process-governed**
-- **Planned**
-- **Not guaranteed**
-
-## Release-gate documentation
-Documentation describing `scripts/release-gate/run.py` presents one current contract: every execution attempts one verified DX v2.0 `.dx.txt` carrier as the complete, self-contained handoff.
-
-The release-gating specification serves implementers and reviewers. The implementation plan serves maintainers changing the gate. The release process serves release operators. CI/CD documents serve workflow maintainers and automation consumers. Public product documentation includes this transport contract only when a public consumer action depends on it.
-
-Release-gate documentation distinguishes the gate decision from carrier production, stderr from the single stdout result envelope, retained local evidence from transported decisive evidence, primary findings from consequential blocked work, and gate-specific outcomes from operational carrier failure.
+Generated artifacts are implementation outputs, not independent documentation authorities.

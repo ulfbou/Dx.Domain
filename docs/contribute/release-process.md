@@ -26,21 +26,21 @@ dotnet restore
 dotnet build -c Release
 dotnet test -c Release --no-build
 bash scripts/docs-lint.sh
-bash scripts/docs-snippets-compile.sh docs/public net8.0
+bash scripts/docs-snippets-compile.sh docs net8.0
 bash scripts/docs-examples-compile.sh
-dotnet docfx docfx.public.json --warningsAsErrors
+dotnet docfx docs/docfx.json --warningsAsErrors
 ```
 
 ## Documentation publication
 
-A push to `master` that changes `docs/public/**`, `docfx.public.json`, the pinned tool manifest, or the DocFX workflow triggers public documentation publication. The workflow:
+A push to `master` that changes `docs/**`, `docs/docfx.json`, the pinned tool manifest, or the DocFX workflow triggers public documentation publication. The workflow:
 
 1. restores the pinned tools;
-2. builds `docfx.public.json` with warnings treated as errors;
+2. builds `docs/docfx.json` with warnings treated as errors;
 3. uploads one `docfx-public-site` artifact;
 4. deploys that same `_site` output once to `gh-pages`.
 
-`docfx.public.json` publishes only `docs/public`. `docfx.full.json` is a local maintainer build that includes `docs/internal`; it is not the GitHub Pages publication input.
+`docs/docfx.json` publishes only `docs`. `docs/docfx.json` is a local maintainer build that includes `docs/internal`; it is not the GitHub Pages publication input.
 
 ## Package publication
 

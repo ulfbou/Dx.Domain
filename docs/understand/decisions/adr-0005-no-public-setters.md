@@ -45,10 +45,10 @@ Applies to Primitives, Kernel types, and Facts.
 
 ---
 
-### Guarantee
+### Decision intent and demonstrated boundary
 Public API surface does not expose mutable setters.
 
-**Does NOT guarantee:**
+**Outside this boundary:**
 - internal immutability
 
 ---

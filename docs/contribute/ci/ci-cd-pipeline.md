@@ -20,7 +20,7 @@ Runs for pull requests targeting `master` or `release/0.1.0-alpha`. It builds th
 
 File: `.github/workflows/docfx.yml`
 
-Runs manually or after relevant public-documentation changes reach `master`. It builds only `docs/public` through `docfx.public.json`, uploads one site artifact, and deploys that output once to `gh-pages`.
+Runs manually or after relevant public-documentation changes reach `master`. It builds only `docs` through `docs/docfx.json`, uploads one site artifact, and deploys that output once to `gh-pages`.
 
 ### Release CD
 
