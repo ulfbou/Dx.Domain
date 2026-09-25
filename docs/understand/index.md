@@ -1,23 +1,23 @@
 # Understand Dx.Domain
 
-Use this path to understand why Dx.Domain exists, what it deliberately excludes, and how its enforcement layers work together.
+Understand the project's purpose, boundaries, architecture, enforcement model, and recorded decisions.
 
 ## Purpose and boundaries
 
-- [Manifesto](../manifesto.md)
-- [Non-goals](../non_goals.md)
-- [Domain purity index](../dpi.md)
-- [Limitations](../limitations.md)
+- [Manifesto](manifesto.md)
+- [Non-goals](non-goals.md)
+- [Domain purity index](domain-purity-index.md)
+- [Concepts](concepts/index.md)
 
 ## Architecture and enforcement
 
-- [System architecture](../system.md)
-- [Enforcement model](../enforcement_model.md)
-- [When the compiler fails](../when-the-compiler-fails.md)
-- [Specification](../spec.md)
+- [Architecture](architecture.md)
+- [Enforcement model](enforcement-model.md)
+- [When the compiler fails](compiler-failures.md)
+- [Enforcement specification](specifications/dx.domain-enforcement-specification.md)
 
-## Decisions and direction
+## Decision history
 
-- [Architecture decision records](../adr/index.md)
-- [Specifications](../specifications/index.md)
+- [Architecture decision records](decisions/index.md)
+- [Specifications](specifications/index.md)
 - [Roadmap](../roadmap.md)

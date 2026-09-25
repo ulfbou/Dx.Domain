@@ -1,25 +1,25 @@
 # Contribute to Dx.Domain
 
-Use this path to prepare a change, understand its governing constraints, and prove that it is ready to review.
+Prepare a focused change, understand its governing constraints, and prove that it is ready for review.
 
 ## Prepare and work
 
 - [Contributor guide](../../CONTRIBUTING.md)
-- [Internal documentation](../internal/index.md)
-- [Documentation authority](../internal/documentation-authority.md)
-- [Style guide](../internal/style-guide.md)
-- [Analyzer authoring](../internal/analyzer-authoring.md)
-- [API surface process](../internal/api-surface-process.md)
+- [Documentation authority](documentation-authority.md)
+- [Style guide](style-guide.md)
+- [Analyzer authoring](analyzer-authoring.md)
+- [API surface process](api-surface-process.md)
 
 ## Validate and review
 
 - [Local validation](local-validation.md)
-- [CI documentation](../internal/ci/index.md)
+- [CI documentation](ci/index.md)
+- [Conventional commits](conventional_commits.md)
 - [Governance](../governance/index.md)
-- [Internal specifications](../internal/specs/index.md)
 
 ## Release and maintain
 
-- [Release process](../internal/release-process.md)
+- [Release process](release-process.md)
+- [Release-gating specification](release-gating-specification.md)
+- [Release-gating implementation plan](release-gating-implementation-plan.md)
 - [Security policy](../../SECURITY.md)
-- [Changelog](../../CHANGELOG.md)

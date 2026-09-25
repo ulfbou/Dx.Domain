@@ -2,9 +2,63 @@
   href: index.md
 - name: Use Dx.Domain
   href: use/index.md
+  items:
+  - name: Getting started
+    href: use/getting-started.md
+  - name: Quickstart
+    href: use/quickstart.md
+  - name: Guides
+    href: use/guides/index.md
+  - name: Troubleshooting
+    href: use/troubleshooting.md
+  - name: Limitations
+    href: use/limitations.md
+  - name: Stability
+    href: use/stability.md
+  - name: Security
+    href: use/security.md
+  - name: Release notes
+    href: use/releases/index.md
 - name: Understand Dx.Domain
   href: understand/index.md
+  items:
+  - name: Architecture
+    href: understand/architecture.md
+  - name: Concepts
+    href: understand/concepts/index.md
+  - name: Enforcement model
+    href: understand/enforcement-model.md
+  - name: Design principles
+    href: understand/manifesto.md
+  - name: Decisions
+    href: understand/decisions/index.md
+  - name: Specifications
+    href: understand/specifications/index.md
 - name: Contribute to Dx.Domain
   href: contribute/index.md
+  items:
+  - name: Local validation
+    href: contribute/local-validation.md
+  - name: Documentation authority
+    href: contribute/documentation-authority.md
+  - name: Style guide
+    href: contribute/style-guide.md
+  - name: Analyzer authoring
+    href: contribute/analyzer-authoring.md
+  - name: API surface process
+    href: contribute/api-surface-process.md
+  - name: CI
+    href: contribute/ci/index.md
+  - name: Release process
+    href: contribute/release-process.md
 - name: Reference
   href: reference/index.md
+  items:
+  - name: Packages
+    href: reference/packages/index.md
+  - name: Diagnostics
+    href: reference/diagnostics/index.md
+  - name: Configuration
+    href: reference/configuration.md
+  - name: API
+    href: reference/api/index.md
