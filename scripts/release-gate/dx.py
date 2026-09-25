@@ -484,6 +484,9 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
     if str(output) != "-" and not output.is_absolute(): output=Path.cwd()/output
     mode="only" if a.only else "git" if a.from_git else "path" if a.path else "file" if source_lex.is_file() or source_lex.is_symlink() else "walk"
     inc=tuple(_validate_pattern(x,"include",i,"include") for i,x in enumerate(a.include))
+    for rule in inc:
+        if rule.pattern.endswith("/"):
+            raise UsageError(f"--include matches files, not directory operands: {rule.pattern!r}; use --scope or --only for a subtree")
     exc=tuple(_validate_pattern(x,"exclude",i,"exclude") for i,x in enumerate(a.exclude))
     force_inc=tuple(_validate_pattern(x,"force_include",i,"include") for i,x in enumerate(a.force_include))
     ie=tuple(ExtensionRule("include_extension",normalize_extension(x),"include",i) for i,x in enumerate(dict.fromkeys(a.include_extension)))
@@ -803,19 +806,8 @@ def _decision_json(decision: ContentDecision) -> dict[str,Any]:
     return {"path":p.candidate.path,"included":decision.terminal_outcome=="selected","terminal_outcome":decision.terminal_outcome,"explicit_selection_bases":list(p.explicit_selection_bases),"decisive_reason":{"provider":p.decisive_provider,"pattern":p.decisive_pattern},"matches":[{"provider":m.provider,"pattern":m.pattern,"action":m.action,"source":m.source,"line":m.line,"overrides":list(m.overrides)} for m in p.matches]}
 
 
-def _fail_fast_pack_output(o: NormalizedPackOptions) -> None:
-    """Reject an unwritable pack target before expensive candidate selection."""
-    if o.dry_run or o.output == Path('-'):
-        return
-    if o.output.is_symlink():
-        raise WriteConflictError(f"refusing to replace symlink: {o.output}")
-    if o.output.exists() and not o.force:
-        raise WriteConflictError(f"output already exists; use --force to replace it: {o.output}")
-
 def pack_command(a) -> int:
-    o=normalize_pack_options(a)
-    _fail_fast_pack_output(o)
-    ctx=build_selection_context(o); report=select_for_pack(ctx)
+    o=normalize_pack_options(a); ctx=build_selection_context(o); report=select_for_pack(ctx)
     selected=[d for d in report.decisions if d.terminal_outcome=="selected"]
     if o.explain=="human":
         for d in report.decisions:
@@ -1289,7 +1281,14 @@ def main(argv=None):
                     print("WARNING: positional OUTPUT is deprecated. Use -o OUTPUT.", file=sys.stderr)
                 a.output_opt = a.output
             a.output = a.output_opt
-            _fail_fast_pack_output(normalize_pack_options(a))
+            if not a.dry_run and a.output_opt and a.output_opt != "-":
+                output = Path(a.output_opt)
+                if not output.is_absolute():
+                    output = Path.cwd() / output
+                if output.is_symlink():
+                    raise WriteConflictError(f"refusing to replace symlink: {output}")
+                if output.exists() and not a.force:
+                    raise WriteConflictError(f"output already exists; use --force to replace it: {output}")
 
         return a.func(a)
     except InvalidCarrierError as e:

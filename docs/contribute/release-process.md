@@ -33,14 +33,14 @@ dotnet docfx docs/docfx.json --warningsAsErrors
 
 ## Documentation publication
 
-A push to `master` that changes `docs/**`, `docs/docfx.json`, the pinned tool manifest, or the DocFX workflow triggers public documentation publication. The workflow:
+A push to `master` that changes `docs/**`, `docs/docfx.json`, or the DocFX workflow triggers documentation publication. The workflow:
 
 1. restores the pinned tools;
-2. builds `docs/docfx.json` with warnings treated as errors;
-3. uploads one `docfx-public-site` artifact;
+2. builds the canonical `docs/` tree through `docs/docfx.json` with warnings treated as errors;
+3. uploads one `docfx-site` artifact;
 4. deploys that same `_site` output once to `gh-pages`.
 
-`docs/docfx.json` publishes only `docs`. `docs/docfx.json` is a local maintainer build that includes `docs/internal`; it is not the GitHub Pages publication input.
+`docs/docfx.json` is the canonical publication input for the repository documentation tree, including `docs/internal/`.
 
 ## Package publication
 
@@ -63,7 +63,7 @@ Before production publication:
 2. install packages in a clean external project;
 3. compile the public Quickstart against the candidate packages;
 4. confirm every shipped diagnostic appears with its descriptor-default severity;
-5. verify that the public DocFX output contains no internal pages.
+5. verify that the published docs output matches the canonical `docs/` tree and contains no broken links.
 
 ## Failure and rollback
 

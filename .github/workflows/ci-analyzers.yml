@@ -50,9 +50,9 @@ jobs:
         if: hashFiles('scripts/docs-lint.sh') != ''
         run: scripts/docs-lint.sh
 
-      - name: Snippet compile (public docs)
+      - name: Snippet compile (docs)
         if: hashFiles('scripts/docs-snippets-compile.sh') != ''
-        run: scripts/docs-snippets-compile.sh docs/public net8.0
+        run: scripts/docs-snippets-compile.sh docs net8.0
 
       - name: Block unapproved breaking changes
         if: hashFiles('scripts/api-diff-gate.sh') != ''

@@ -88,7 +88,7 @@ jobs:
         run: scripts/docs-lint.sh
 
       - name: Snippet structure validation
-        run: scripts/docs-snippets-compile.sh docs/public net8.0
+        run: scripts/docs-snippets-compile.sh docs net8.0
 
       - name: Compile material documentation examples
         run: bash scripts/docs-examples-compile.sh

@@ -1,4 +1,4 @@
-# Builds and publishes only the canonical public documentation tree.
+# Builds and publishes the canonical documentation tree.
 name: Build & Publish DocFX Documentation
 
 on:
@@ -6,9 +6,10 @@ on:
   push:
     branches: [master]
     paths:
-      - 'docs/public/**'
-      - 'docfx.public.json'
-      - '.config/dotnet-tools.json'
+      - 'docs/**'
+      - 'docs/docfx.json'
+      - 'docs/toc.yml'
+      - 'dotnet-tools.json'
       - '.github/workflows/docfx.yml'
 
 permissions:
@@ -40,17 +41,17 @@ jobs:
       - name: Restore pinned tools
         run: dotnet tool restore
 
-      - name: Build canonical public documentation
-        run: dotnet docfx docfx.public.json --warningsAsErrors
+      - name: Build canonical documentation
+        run: dotnet docfx docs/docfx.json --warningsAsErrors
 
-      - name: Upload generated public site
+      - name: Upload generated docs site
         uses: actions/upload-artifact@v4
         with:
-          name: docfx-public-site
+          name: docfx-site
           path: _site
           if-no-files-found: error
 
-      - name: Deploy public site to GitHub Pages
+      - name: Deploy docs site to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

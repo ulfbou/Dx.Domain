@@ -72,4 +72,4 @@ Provide pure metadata markers that classify domain concepts. Attributes express 
 
 - [Dx.Domain.Analyzers](../Dx.Domain.Analyzers/readme.md) — Compile-time enforcement
 - [Dx.Domain.Kernel](../Dx.Domain.Kernel/readme.md) — Runtime implementation
-- [Architecture Decision Records](../../docs/adr/index.md) — Design rationale
+- [Architecture Decision Records](../../docs/understand/decisions/index.md) — Design rationale

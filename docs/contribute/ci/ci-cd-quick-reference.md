@@ -33,21 +33,21 @@ gh run view RUN_ID --repo ulfbou/Dx.Domain --log-failed
 
 ## Build documentation locally
 
-Canonical public site:
+Canonical documentation site:
 
 ```bash
 dotnet tool restore
 dotnet docfx docs/docfx.json --warningsAsErrors
 ```
 
-Maintainer build including internal documentation:
+Maintainer build:
 
 ```bash
 dotnet tool restore
 dotnet docfx docs/docfx.json --warningsAsErrors
 ```
 
-Only the public configuration is deployed by `.github/workflows/docfx.yml`.
+The DocFX workflow deploys the canonical `docs/` tree built from `docs/docfx.json`.
 
 ## Release publication
 

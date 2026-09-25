@@ -30,10 +30,10 @@ if sources!=items:
     fail("generated metadata differs from descriptors")
 for item in items:
     did=item["Id"]
-    page=(ROOT/f"docs/public/reference/diagnostics/{did}.md").read_text(encoding="utf-8")
+    page=(ROOT/f"docs/reference/diagnostics/{did}.md").read_text(encoding="utf-8")
     for marker in (f"# {did}: {item['Title']}",f"**Default severity:** {item['DefaultSeverity']}",f"**Category:** `{item['Category']}`"):
-        if marker not in page: fail(f"{did} public page missing {marker}")
-for name in ("docs/public/reference/diagnostics/index.md","docs/analyzers/index.md","docs/analyzers/toc.yml","docs/when-the-compiler-fails.md","CHANGELOG.md","docs/public/packages/analyzers.md","docs/public/release-notes/0.1.0-alpha.md"):
+        if marker not in page: fail(f"{did} reference page missing {marker}")
+for name in ("docs/reference/diagnostics/index.md","docs/reference/packages/index.md","docs/use/guides/respond-to-diagnostics.md","docs/use/troubleshooting.md","docs/use/releases/0.1.0-alpha.md","CHANGELOG.md"):
     text=(ROOT/name).read_text(encoding="utf-8")
     missing=[did for did in EXPECTED if did not in text]
     if missing: fail(f"{name} omits {missing}")

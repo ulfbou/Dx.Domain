@@ -1,0 +1,511 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11222.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{D829B9CA-75B7-4129-962A-2E31338C4A20}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		docfx.json = docfx.json
+		Dockerfile = Dockerfile
+		filterConfig.yml = filterConfig.yml
+		test.runsettings = test.runsettings
+		toc.yml = toc.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Analyzers", "src\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj", "{68EA1AB2-609D-4346-8A55-C424566E475D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Annotations", "src\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj", "{FE15694B-E46C-49D7-A19D-C45B249B7A1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Facts", "src\Dx.Domain.Facts\Dx.Domain.Facts.csproj", "{B0F5765F-B879-4DF4-88D4-29ECB198EE35}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Kernel", "src\Dx.Domain.Kernel\Dx.Domain.Kernel.csproj", "{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Primitives", "src\Dx.Domain.Primitives\Dx.Domain.Primitives.csproj", "{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Analyzers.Tests", "tests\Dx.Domain.Analyzers.Tests\Dx.Domain.Analyzers.Tests.csproj", "{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "builds", "builds", "{02EABD14-4135-4844-8FF4-712F8B0ED546}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		Directory.Quality.targets = Directory.Quality.targets
+		builds\ci\Dx.CI.props = builds\ci\Dx.CI.props
+		builds\common\Dx.Constants.props = builds\common\Dx.Constants.props
+		builds\common\Dx.Defaults.props = builds\common\Dx.Defaults.props
+		builds\policy\Dx.DomainAnalyzerGovernance.targets = builds\policy\Dx.DomainAnalyzerGovernance.targets
+		builds\policy\Dx.Forbidden.props = builds\policy\Dx.Forbidden.props
+		builds\policy\Dx.Governance.targets = builds\policy\Dx.Governance.targets
+		builds\identity\Dx.Identity.props = builds\identity\Dx.Identity.props
+		builds\common\Dx.ProjectKinds.props = builds\common\Dx.ProjectKinds.props
+		builds\Dx.Props.hierarchical.props = builds\Dx.Props.hierarchical.props
+		builds\Dx.Props.hierarchical.targets = builds\Dx.Props.hierarchical.targets
+		builds\identity\Dx.ResolveIdentity.targets = builds\identity\Dx.ResolveIdentity.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dx.Domain.Tests", "tests\Dx.Domain.Tests\Dx.Domain.Tests.csproj", "{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}"
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Section
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}"
+	ProjectSection(SolutionItems) = preProject
+		docs\index.md = docs\index.md
+		docs\roadmap.md = docs\roadmap.md
+		docs\todo.md = docs\todo.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".generated", "docs\.generated", "{57D3D9D7-F2E0-5376-8982-754540124CB5}"
+	ProjectSection(SolutionItems) = preProject
+		docs\.generated\index.md = docs\.generated\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "contribute", "docs\contribute", "{FDE48066-D431-56FE-A71C-A65D35085D44}"
+	ProjectSection(SolutionItems) = preProject
+		docs\contribute\analyzer-authoring.md = docs\contribute\analyzer-authoring.md
+		docs\contribute\api-surface-process.md = docs\contribute\api-surface-process.md
+		docs\contribute\conventional_commits.md = docs\contribute\conventional_commits.md
+		docs\contribute\documentation-authority.md = docs\contribute\documentation-authority.md
+		docs\contribute\index.md = docs\contribute\index.md
+		docs\contribute\local-validation.md = docs\contribute\local-validation.md
+		docs\contribute\release-gating-implementation-plan.md = docs\contribute\release-gating-implementation-plan.md
+		docs\contribute\release-gating-specification.md = docs\contribute\release-gating-specification.md
+		docs\contribute\release-process.md = docs\contribute\release-process.md
+		docs\contribute\style-guide.md = docs\contribute\style-guide.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "governance", "docs\governance", "{65EFA1FA-FE7A-5733-B328-E2F6503C3A55}"
+	ProjectSection(SolutionItems) = preProject
+		docs\governance\index.md = docs\governance\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "internal", "docs\internal", "{EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reference", "docs\reference", "{73326733-3E9F-548D-884B-F52228B1C8FE}"
+	ProjectSection(SolutionItems) = preProject
+		docs\reference\configuration.md = docs\reference\configuration.md
+		docs\reference\index.md = docs\reference\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "understand", "docs\understand", "{C25F1FB0-A228-5C3A-B1B4-42D0FEF73E41}"
+	ProjectSection(SolutionItems) = preProject
+		docs\understand\architecture.md = docs\understand\architecture.md
+		docs\understand\compiler-failures.md = docs\understand\compiler-failures.md
+		docs\understand\domain-purity-index.md = docs\understand\domain-purity-index.md
+		docs\understand\enforcement-model.md = docs\understand\enforcement-model.md
+		docs\understand\enforcement-specification.md = docs\understand\enforcement-specification.md
+		docs\understand\index.md = docs\understand\index.md
+		docs\understand\manifesto.md = docs\understand\manifesto.md
+		docs\understand\non-goals.md = docs\understand\non-goals.md
+		docs\understand\roadmap.md = docs\understand\roadmap.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "use", "docs\use", "{4F944198-9609-5AA3-8EBD-DA9D698F60D4}"
+	ProjectSection(SolutionItems) = preProject
+		docs\use\getting-started.md = docs\use\getting-started.md
+		docs\use\index.md = docs\use\index.md
+		docs\use\limitations.md = docs\use\limitations.md
+		docs\use\quickstart.md = docs\use\quickstart.md
+		docs\use\security.md = docs\use\security.md
+		docs\use\stability.md = docs\use\stability.md
+		docs\use\troubleshooting.md = docs\use\troubleshooting.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "docs\contribute\ci", "{252B7F39-CE53-5931-8530-7ED45DE54292}"
+	ProjectSection(SolutionItems) = preProject
+		docs\contribute\ci\ci-cd-pipeline.md = docs\contribute\ci\ci-cd-pipeline.md
+		docs\contribute\ci\ci-cd-quick-reference.md = docs\contribute\ci\ci-cd-quick-reference.md
+		docs\contribute\ci\index.md = docs\contribute\ci\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "release", "docs\internal\release", "{65F8A0E9-C3AF-52F3-A53B-C986F5D784ED}"
+	ProjectSection(SolutionItems) = preProject
+		docs\internal\release\accept-ready-criteria.md = docs\internal\release\accept-ready-criteria.md
+		docs\internal\release\blocking-issues.md = docs\internal\release\blocking-issues.md
+		docs\internal\release\definition-of-done.md = docs\internal\release\definition-of-done.md
+		docs\internal\release\index.md = docs\internal\release\index.md
+		docs\internal\release\scripts-and-evidence.md = docs\internal\release\scripts-and-evidence.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "docs\reference\api", "{DE71D36D-4B43-5CA4-9AE5-877AEFCEAECC}"
+	ProjectSection(SolutionItems) = preProject
+		docs\reference\api\index.md = docs\reference\api\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "diagnostics", "docs\reference\diagnostics", "{076819CF-503C-51C8-8B4D-FADAB0007B79}"
+	ProjectSection(SolutionItems) = preProject
+		docs\reference\diagnostics\DXA010.md = docs\reference\diagnostics\DXA010.md
+		docs\reference\diagnostics\DXA011.md = docs\reference\diagnostics\DXA011.md
+		docs\reference\diagnostics\DXA020.md = docs\reference\diagnostics\DXA020.md
+		docs\reference\diagnostics\DXA022.md = docs\reference\diagnostics\DXA022.md
+		docs\reference\diagnostics\DXA030.md = docs\reference\diagnostics\DXA030.md
+		docs\reference\diagnostics\DXA040.md = docs\reference\diagnostics\DXA040.md
+		docs\reference\diagnostics\DXA050.md = docs\reference\diagnostics\DXA050.md
+		docs\reference\diagnostics\DXA060.md = docs\reference\diagnostics\DXA060.md
+		docs\reference\diagnostics\DXA065.md = docs\reference\diagnostics\DXA065.md
+		docs\reference\diagnostics\DXA070.md = docs\reference\diagnostics\DXA070.md
+		docs\reference\diagnostics\DXA080.md = docs\reference\diagnostics\DXA080.md
+		docs\reference\diagnostics\index.md = docs\reference\diagnostics\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packages", "docs\reference\packages", "{38FB2096-EA1A-5A9D-9A42-27C2973EDB3D}"
+	ProjectSection(SolutionItems) = preProject
+		docs\reference\packages\analyzers.md = docs\reference\packages\analyzers.md
+		docs\reference\packages\annotations.md = docs\reference\packages\annotations.md
+		docs\reference\packages\facts.md = docs\reference\packages\facts.md
+		docs\reference\packages\index.md = docs\reference\packages\index.md
+		docs\reference\packages\kernel.md = docs\reference\packages\kernel.md
+		docs\reference\packages\primitives.md = docs\reference\packages\primitives.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "concepts", "docs\understand\concepts", "{71C577A7-1A84-5A66-91BA-01AB2641083B}"
+	ProjectSection(SolutionItems) = preProject
+		docs\understand\concepts\construction-authority.md = docs\understand\concepts\construction-authority.md
+		docs\understand\concepts\facts-and-causation.md = docs\understand\concepts\facts-and-causation.md
+		docs\understand\concepts\index.md = docs\understand\concepts\index.md
+		docs\understand\concepts\invariants.md = docs\understand\concepts\invariants.md
+		docs\understand\concepts\results-and-errors.md = docs\understand\concepts\results-and-errors.md
+		docs\understand\concepts\scopes-and-roles.md = docs\understand\concepts\scopes-and-roles.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "decisions", "docs\understand\decisions", "{8018E1F4-9F68-59F2-B22B-17C08240B43A}"
+	ProjectSection(SolutionItems) = preProject
+		docs\understand\decisions\adr-0001-utc-only-domaintime.md = docs\understand\decisions\adr-0001-utc-only-domaintime.md
+		docs\understand\decisions\adr-0002-empty-correlationid.md = docs\understand\decisions\adr-0002-empty-correlationid.md
+		docs\understand\decisions\adr-0003-dxa010-warning.md = docs\understand\decisions\adr-0003-dxa010-warning.md
+		docs\understand\decisions\adr-0004-result-struct.md = docs\understand\decisions\adr-0004-result-struct.md
+		docs\understand\decisions\adr-0005-no-public-setters.md = docs\understand\decisions\adr-0005-no-public-setters.md
+		docs\understand\decisions\adr-0006-result-as-failure-model.md = docs\understand\decisions\adr-0006-result-as-failure-model.md
+		docs\understand\decisions\adr-0007-system-hardening-sequence.md = docs\understand\decisions\adr-0007-system-hardening-sequence.md
+		docs\understand\decisions\adr-0008-dxa011-public-factory-exposure.md = docs\understand\decisions\adr-0008-dxa011-public-factory-exposure.md
+		docs\understand\decisions\adr-0009-dxa020-result-ignored.md = docs\understand\decisions\adr-0009-dxa020-result-ignored.md
+		docs\understand\decisions\adr-0010-dxa022-domain-control-exception.md = docs\understand\decisions\adr-0010-dxa022-domain-control-exception.md
+		docs\understand\decisions\adr-0011-dxa030-unapproved-handler.md = docs\understand\decisions\adr-0011-dxa030-unapproved-handler.md
+		docs\understand\decisions\adr-0012-dxa040-kernel-public-surface-freeze.md = docs\understand\decisions\adr-0012-dxa040-kernel-public-surface-freeze.md
+		docs\understand\decisions\adr-0013-dxa050-temporal-helper-usage.md = docs\understand\decisions\adr-0013-dxa050-temporal-helper-usage.md
+		docs\understand\decisions\adr-0014-dxa060-forbidden-vocabulary.md = docs\understand\decisions\adr-0014-dxa060-forbidden-vocabulary.md
+		docs\understand\decisions\adr-0015-dxa070-generated-code-tagging.md = docs\understand\decisions\adr-0015-dxa070-generated-code-tagging.md
+		docs\understand\decisions\adr-0016-dxa080-facade-invariant-enforcement.md = docs\understand\decisions\adr-0016-dxa080-facade-invariant-enforcement.md
+		docs\understand\decisions\adr-0017-suppress-governance.md = docs\understand\decisions\adr-0017-suppress-governance.md
+		docs\understand\decisions\adr-0018-kernel-public-surface.md = docs\understand\decisions\adr-0018-kernel-public-surface.md
+		docs\understand\decisions\index.md = docs\understand\decisions\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "specifications", "docs\understand\specifications", "{4FE401F5-119C-5539-954C-7BB092B07B9C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\understand\specifications\dx.domain-enforcement-specification.md = docs\understand\specifications\dx.domain-enforcement-specification.md
+		docs\understand\specifications\index.md = docs\understand\specifications\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "docs\use\guides", "{179AFB36-F271-5E9B-9FE2-350824C33300}"
+	ProjectSection(SolutionItems) = preProject
+		docs\use\guides\build-a-construction-boundary.md = docs\use\guides\build-a-construction-boundary.md
+		docs\use\guides\configure-analyzers.md = docs\use\guides\configure-analyzers.md
+		docs\use\guides\handle-results.md = docs\use\guides\handle-results.md
+		docs\use\guides\index.md = docs\use\guides\index.md
+		docs\use\guides\respond-to-diagnostics.md = docs\use\guides\respond-to-diagnostics.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "releases", "docs\use\releases", "{DCDC4905-212B-509D-AE15-C0967884CD2E}"
+	ProjectSection(SolutionItems) = preProject
+		docs\use\releases\0.1.0-alpha.md = docs\use\releases\0.1.0-alpha.md
+		docs\use\releases\index.md = docs\use\releases\index.md
+	EndProjectSection
+EndProject
+
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Debug|x64.Build.0 = Debug|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Debug|x86.Build.0 = Debug|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Release|x64.ActiveCfg = Release|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Release|x64.Build.0 = Release|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Release|x86.ActiveCfg = Release|Any CPU
+		{68EA1AB2-609D-4346-8A55-C424566E475D}.Release|x86.Build.0 = Release|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Debug|x64.Build.0 = Debug|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Debug|x86.Build.0 = Debug|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Release|x64.ActiveCfg = Release|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Release|x64.Build.0 = Release|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Release|x86.ActiveCfg = Release|Any CPU
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B}.Release|x86.Build.0 = Release|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Debug|x64.Build.0 = Debug|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Debug|x86.Build.0 = Debug|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Release|x64.ActiveCfg = Release|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Release|x64.Build.0 = Release|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Release|x86.ActiveCfg = Release|Any CPU
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35}.Release|x86.Build.0 = Release|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Debug|x64.Build.0 = Debug|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Debug|x86.Build.0 = Debug|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Release|x64.ActiveCfg = Release|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Release|x64.Build.0 = Release|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Release|x86.ActiveCfg = Release|Any CPU
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D}.Release|x86.Build.0 = Release|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Debug|x64.Build.0 = Debug|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Debug|x86.Build.0 = Debug|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Release|x64.ActiveCfg = Release|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Release|x64.Build.0 = Release|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Release|x86.ActiveCfg = Release|Any CPU
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A}.Release|x86.Build.0 = Release|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Debug|x64.Build.0 = Debug|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Debug|x86.Build.0 = Debug|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|x64.ActiveCfg = Release|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|x64.Build.0 = Release|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|x86.ActiveCfg = Release|Any CPU
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B}.Release|x86.Build.0 = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|x64.Build.0 = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Debug|x86.Build.0 = Debug|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|x64.ActiveCfg = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|x64.Build.0 = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|x86.ActiveCfg = Release|Any CPU
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{076819CF-503C-51C8-8B4D-FADAB0007B79} = {73326733-3E9F-548D-884B-F52228B1C8FE}
+		{09CC08FA-AEEB-4BBA-BA47-16ED7D17232B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{179AFB36-F271-5E9B-9FE2-350824C33300} = {4F944198-9609-5AA3-8EBD-DA9D698F60D4}
+		{197ABEE7-88EE-4A31-A1FC-F0CC5C30BE5A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{252B7F39-CE53-5931-8530-7ED45DE54292} = {FDE48066-D431-56FE-A71C-A65D35085D44}
+		{34F10FCD-F26D-4BD6-B74A-BAB276ACB97D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{38FB2096-EA1A-5A9D-9A42-27C2973EDB3D} = {73326733-3E9F-548D-884B-F52228B1C8FE}
+		{4F944198-9609-5AA3-8EBD-DA9D698F60D4} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{4FE401F5-119C-5539-954C-7BB092B07B9C} = {C25F1FB0-A228-5C3A-B1B4-42D0FEF73E41}
+		{57D3D9D7-F2E0-5376-8982-754540124CB5} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{65EFA1FA-FE7A-5733-B328-E2F6503C3A55} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{65F8A0E9-C3AF-52F3-A53B-C986F5D784ED} = {EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB}
+		{68EA1AB2-609D-4346-8A55-C424566E475D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{71C577A7-1A84-5A66-91BA-01AB2641083B} = {C25F1FB0-A228-5C3A-B1B4-42D0FEF73E41}
+		{73326733-3E9F-548D-884B-F52228B1C8FE} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{8018E1F4-9F68-59F2-B22B-17C08240B43A} = {C25F1FB0-A228-5C3A-B1B4-42D0FEF73E41}
+		{B0F5765F-B879-4DF4-88D4-29ECB198EE35} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{C25F1FB0-A228-5C3A-B1B4-42D0FEF73E41} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{CA3AC565-FFBB-5520-6A61-9963ED84EA1C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{DCDC4905-212B-509D-AE15-C0967884CD2E} = {4F944198-9609-5AA3-8EBD-DA9D698F60D4}
+		{DE71D36D-4B43-5CA4-9AE5-877AEFCEAECC} = {73326733-3E9F-548D-884B-F52228B1C8FE}
+		{EFC8ABD8-A852-5A7D-8F50-D24F8B02B3BB} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{FDE48066-D431-56FE-A71C-A65D35085D44} = {566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}
+		{FE15694B-E46C-49D7-A19D-C45B249B7A1B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A326CE0-DFBE-435C-AD8C-3CA905A96D98}
+	EndGlobalSection
+EndGlobal
