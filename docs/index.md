@@ -1,23 +1,8 @@
-**Enforcement scope:** Static analysis only. Applies to S1–S3. Not enforced at runtime. Bypassable via reflection, serialization, dynamic, and suppression.
+# Dx.Domain documentation
 
-## Navigation
+Use the documentation tree below to choose the right route:
 
-- [README](../readme.md)
-- [MANIFESTO](manifesto.md)
-- [NON_GOALS](non_goals.md)
-- [DPI](dpi.md)
-- [ROADMAP](roadmap.md)
-- [SECURITY](security.md)
-- [TODO](todo.md)
-- [When the Compiler Fails](when-the-compiler-fails.md)
-- [ADR Index](adr/index.md)
-- [Learn](learn/index.md)
-- [Public](public/index.md)
-- [Governance](governance/index.md)
-
-- [API Reference](api/kernel.md)
-- [Specifications](specifications/dx.domain-enforcement-specification.md)
-- [Reference Configuration](reference/configuration.md)
-- [Reference APIs](reference/api/kernel.md)
-- [Reference Facts API](reference/api/facts.md)
-
+- [Use Dx.Domain](use/index.md) — get started, install, troubleshoot, and review release notes.
+- [Understand Dx.Domain](understand/index.md) — read the architecture, enforcement model, specifications, decisions, and roadmap.
+- [Contribute to Dx.Domain](contribute/index.md) — follow repository procedures, validation, and documentation rules.
+- [Reference](reference/index.md) — look up packages, diagnostics, configuration, and API entry points.

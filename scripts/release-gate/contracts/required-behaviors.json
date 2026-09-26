@@ -1,0 +1,41 @@
+{
+  "schema": "dx-domain.required-behaviors.v1",
+  "behaviors": [
+    {
+      "id": "annotations-usage",
+      "description": "Apply EntityAttribute to a consumer type",
+      "package": "Dx.Domain.Annotations",
+      "fixture": "annotations_valid"
+    },
+    {
+      "id": "kernel-result",
+      "description": "Create and inspect a successful Result value",
+      "package": "Dx.Domain.Kernel",
+      "fixture": "kernel_valid"
+    },
+    {
+      "id": "primitives-correlation",
+      "description": "Create and inspect a CorrelationId",
+      "package": "Dx.Domain.Primitives",
+      "fixture": "primitives_valid"
+    },
+    {
+      "id": "facts-fact",
+      "description": "Create and inspect a Fact payload",
+      "package": "Dx.Domain.Facts",
+      "fixture": "facts_valid"
+    },
+    {
+      "id": "combined-workflow",
+      "description": "Use all four packages in one compilation and process",
+      "package": "combined",
+      "fixture": "combined_valid"
+    },
+    {
+      "id": "analyzer-trigger",
+      "description": "Plain-text Dx.Domain XML documentation reference triggers DXA065",
+      "package": "any_carrier",
+      "fixture": "analyzer_invalid_usage"
+    }
+  ]
+}

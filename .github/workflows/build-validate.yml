@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ws-003-release-gate-build-validate-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .dx/verification/release-gate/
+          path: .dx/evidence/release-gate/
           if-no-files-found: error
           retention-days: 30
 
@@ -63,18 +63,33 @@ jobs:
         with:
           name: candidate-${{ github.sha }}
           path: |
-            .dx/verification/release-gate/**/candidate-manifest.json
-            .dx/verification/release-gate/**/packages/*.nupkg
+            .dx/evidence/release-gate/**/candidate-manifest.json
+            .dx/evidence/release-gate/**/packages/*.nupkg
+          if-no-files-found: error
+          retention-days: 30
+      - name: Run WS-005 consumers gate
+        run: python3 scripts/release-gate/run.py --profile consumers
+      - name: Upload WS-005 consumer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ws-005-consumers-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .dx/evidence/release-gate/
+            !.dx/evidence/release-gate/**/consumers/**/http-cache/**
+            !.dx/evidence/release-gate/**/consumers/**/packages/**
+            !.dx/evidence/release-gate/**/consumers/**/dotnet-home/**
           if-no-files-found: error
           retention-days: 30
       - name: Verify diagnostic metadata conformance
         run: python3 scripts/verify-diagnostic-conformance.py
 
+      # Canonical boundary enforcement is handled inside the docs lint script.
       - name: Docs lint
         run: scripts/docs-lint.sh
 
       - name: Snippet structure validation
-        run: scripts/docs-snippets-compile.sh docs/public net8.0
+        run: scripts/docs-snippets-compile.sh docs net8.0
 
       - name: Compile material documentation examples
         run: bash scripts/docs-examples-compile.sh
