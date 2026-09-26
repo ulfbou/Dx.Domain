@@ -8,7 +8,7 @@ This specification defines the architecture, behavior, interfaces, evidence mode
 
 The release gate shall:
 
-1. verify mechanically decidable ACCEPT READY ([accept-ready-criteria.md](../internal/release/accept-ready-criteria.md)) and Definition of Done ([definition-of-done.md](../internal/release/definition-of-done.md)) criteria;
+1. verify mechanically decidable ACCEPT READY (`docs/internal/release/accept-ready-criteria.md`) and Definition of Done (`docs/internal/release/definition-of-done.md`) criteria;
 2. reject contradicted criteria with specific motivations and retained evidence;
 3. distinguish failure from unavailable, premature, external, or human-owned evidence;
 4. reuse the same verification implementation locally and in CI/CD;
@@ -116,7 +116,7 @@ Development verification provides quick local feedback, validates affected repos
 
 ### 3.2 ACCEPT READY
 
-`ACCEPT READY` establishes that all implementation, workflow, fixture, collector, and documentation mechanisms required for final acceptance exist and are executable, and that no known implementation gap prevents final Definition of Done ([definition-of-done.md](../internal/release/definition-of-done.md)) execution.
+`ACCEPT READY` establishes that all implementation, workflow, fixture, collector, and documentation mechanisms required for final acceptance exist and are executable, and that no known implementation gap prevents final Definition of Done (`docs/internal/release/definition-of-done.md`) execution.
 
 It does not require final tag creation, final tagged CI execution, production publication, public package propagation, or post-publication completion.
 
@@ -1080,9 +1080,9 @@ The final result is one verified DX v2.0 `.dx.txt` carrier containing the comple
 
 ## References
 
-- ACCEPT READY criteria ([accept-ready-criteria.md](../internal/release/accept-ready-criteria.md))
-- Definition of Done ([definition-of-done.md](../internal/release/definition-of-done.md))
-- Blocking issues ([blocking-issues.md](../internal/release/blocking-issues.md))
+- ACCEPT READY criteria (`docs/internal/release/accept-ready-criteria.md`)
+- Definition of Done (`docs/internal/release/definition-of-done.md`)
+- Blocking issues (`docs/internal/release/blocking-issues.md`)
 - [Alpha release process](release-process.md)
 - [CI/CD pipeline](ci/ci-cd-pipeline.md)
 - [CI/CD quick reference](ci/ci-cd-quick-reference.md)

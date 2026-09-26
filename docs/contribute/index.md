@@ -1,5 +1,8 @@
 # Contribute to Dx.Domain
 
+- [Repository structure](repository-structure.md)
+- [Development setup](development-setup.md)
+- [Coding and testing](coding-and-testing.md)
 - [Local validation](local-validation.md)
 - [Documentation authority](documentation-authority.md)
 - [Style guide](style-guide.md)

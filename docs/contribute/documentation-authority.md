@@ -10,8 +10,9 @@
 - `docs/reference/`: packages, diagnostics, configuration, and API lookup.
 - `docs/index.md`: the single documentation entry page.
 - `docs/toc.yml`: the single navigation authority.
+- `docs/docfx.json`: the single DocFX configuration for authored documentation.
 
-The public site is built from `docs/` through `docs/docfx.json` and `docs/toc.yml`. No parallel public, learn, internal, analyzer, ADR, or specification tree is authoritative.
+The public site is built from `docs/` through `docs/docfx.json` and `docs/toc.yml`. `docs/internal/` is transitional, excluded from publication, and reserved for Phase 3 reconciliation. No parallel public, learn, internal, analyzer, ADR, or specification tree is authoritative.
 
 ## Normative precedence
 

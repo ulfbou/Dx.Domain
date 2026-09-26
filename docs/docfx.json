@@ -1,6 +1,6 @@
 {
   "build": {
-    "content": [{ "files": ["**/*.md", "toc.yml"], "exclude": [".generated/**"] }],
+    "content": [{ "files": ["**/*.md", "toc.yml"], "exclude": [".generated/**", ".dx/**", "internal/**"] }],
     "resource": [{ "files": ["images/**"] }],
     "dest": "../_site",
     "template": ["default"],

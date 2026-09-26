@@ -40,7 +40,9 @@ A push to `master` that changes `docs/**`, `docs/docfx.json`, or the DocFX workf
 3. uploads one `docfx-site` artifact;
 4. deploys that same `_site` output once to `gh-pages`.
 
-`docs/docfx.json` is the canonical publication input for the repository documentation tree, including `docs/internal/`.
+Pushes to `release/0.1.0-alpha` do not trigger documentation publication.
+
+`docs/docfx.json` is the canonical publication input for the repository documentation tree. `docs/internal/` is transitional and excluded from publication during Phase 2.
 
 ## Package publication
 

@@ -46,6 +46,7 @@ jobs:
       - name: Verify diagnostic metadata conformance
         run: python3 scripts/verify-diagnostic-conformance.py
 
+      # Preserve canonical docs lint invocation used across governance workflows.
       - name: Docs lint (broken links + metadata)
         if: hashFiles('scripts/docs-lint.sh') != ''
         run: scripts/docs-lint.sh

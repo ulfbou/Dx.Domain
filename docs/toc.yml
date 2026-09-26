@@ -32,6 +32,12 @@
     href: understand/enforcement-specification.md
   - name: Compiler diagnostics
     href: understand/compiler-failures.md
+  - name: Manifesto
+    href: understand/manifesto.md
+  - name: Non-goals
+    href: understand/non-goals.md
+  - name: Domain purity index
+    href: understand/domain-purity-index.md
   - name: Decisions
     href: understand/decisions/index.md
   - name: Roadmap
@@ -39,10 +45,18 @@
 - name: Contribute to Dx.Domain
   href: contribute/index.md
   items:
+  - name: Repository structure
+    href: contribute/repository-structure.md
+  - name: Development setup
+    href: contribute/development-setup.md
+  - name: Coding and testing
+    href: contribute/coding-and-testing.md
   - name: Local validation
     href: contribute/local-validation.md
   - name: Documentation authority
     href: contribute/documentation-authority.md
+  - name: Documentation style
+    href: contribute/style-guide.md
   - name: Analyzer authoring
     href: contribute/analyzer-authoring.md
   - name: API surface process

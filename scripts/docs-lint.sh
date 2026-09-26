@@ -6,13 +6,13 @@ import re, sys, posixpath
 root=Path('.')
 docs=root/'docs'
 errors=[]
-tracked=[root/'readme.md', root/'CHANGELOG.md', root/'CONTRIBUTING.md', root/'SECURITY.md', *list(docs.rglob('*.md'))]
+tracked=[root/'README.md', root/'CHANGELOG.md', root/'CONTRIBUTING.md', root/'SECURITY.md', *[p for p in docs.rglob('*.md') if 'docs/internal/' not in str(p).replace('\\','/')]]
 for p in tracked:
     try: text=p.read_text(encoding='utf-8')
     except UnicodeDecodeError: continue
     if any(m in text for m in ('<<<<<<< ', '>>>>>>> ')):
         errors.append(f'{p}: merge marker')
-for p in docs.rglob('*.md'):
+for p in [p for p in docs.rglob('*.md') if 'docs/internal/' not in str(p).replace('\\','/')]:
     text=p.read_text(encoding='utf-8')
     if not text.strip(): errors.append(f'{p}: empty page')
     if re.search(r'placeholder|example\.com', text, re.I): errors.append(f'{p}: placeholder text')

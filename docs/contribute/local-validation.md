@@ -13,4 +13,4 @@ bash scripts/docs-examples-compile.sh
 dotnet docfx docs/docfx.json --warningsAsErrors
 ```
 
-Documentation acceptance requires one reachable public tree, valid local links, compiled material examples, and a warning-free DocFX build from `docs/toc.yml`.
+Documentation acceptance requires one canonical authored tree, valid local links, compiled material examples, and a warning-free DocFX build from `docs/toc.yml`.

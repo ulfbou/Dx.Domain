@@ -10,12 +10,9 @@ Dx.Domain publishes exactly four packages: `Dx.Domain.Annotations`, `Dx.Domain.K
 
 ## Start here
 
-1. [Getting started](docs/use/getting-started.md)
-2. [Quickstart](docs/use/quickstart.md)
-3. [Package reference](docs/reference/packages/index.md)
-4. [Diagnostic reference](docs/reference/diagnostics/index.md)
-5. [Configuration](docs/reference/configuration.md)
-6. [Architecture](docs/understand/architecture.md)
-7. [Alpha release notes](docs/use/releases/0.1.0-alpha.md)
+1. [Use Dx.Domain](docs/use/index.md)
+2. [Understand Dx.Domain](docs/understand/index.md)
+3. [Reference](docs/reference/index.md)
+4. [Alpha release notes](docs/use/releases/0.1.0-alpha.md)
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing changes and [SECURITY.md](SECURITY.md) before reporting a vulnerability.

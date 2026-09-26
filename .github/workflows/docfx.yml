@@ -1,4 +1,5 @@
 # Builds and publishes the canonical documentation tree.
+# Canonical DocFX entry point: docs/docfx.json (single publication workflow).
 name: Build & Publish DocFX Documentation
 
 on:
