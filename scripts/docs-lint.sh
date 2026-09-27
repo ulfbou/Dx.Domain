@@ -6,7 +6,7 @@ import re, sys, posixpath
 root=Path('.')
 docs=root/'docs'
 errors=[]
-tracked=[root/'README.md', root/'CHANGELOG.md', root/'CONTRIBUTING.md', root/'SECURITY.md', *[p for p in docs.rglob('*.md') if 'docs/internal/' not in str(p).replace('\\','/')]]
+tracked=[root/'readme.md', root/'CHANGELOG.md', root/'CONTRIBUTING.md', root/'SECURITY.md', *[p for p in docs.rglob('*.md') if 'docs/internal/' not in str(p).replace('\\','/')]]
 for p in tracked:
     try: text=p.read_text(encoding='utf-8')
     except UnicodeDecodeError: continue
