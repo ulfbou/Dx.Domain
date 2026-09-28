@@ -21,14 +21,16 @@ Severity: Error
 ### Enforcement Coverage
 **Enforced by:** [DXA040](../../reference/diagnostics/DXA040.md)
 
-**Coverage Level:** **Strong**
+**Coverage Level (Historical):** Strong (as recorded in 2026-02-05)
+
+**Current Strength:** Conditional Strong — See [Dx.Domain Enforcement Specification](../enforcement-specification.md) for current authoritative classification. Protection depends on baseline presence and enforcement.
 
 ---
 
 ### Enforcement Model
-- **Type:** Static analyzer
+- **Type:** Static analyzer with baseline governance
 - **Scope:** Kernel packages
-- **Strength:** Strong
+- **Strength:** Strong when baseline is present and enforced; provides no protection without baseline
 
 ---
 

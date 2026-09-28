@@ -14,32 +14,35 @@ Triggers:
 - Not assigned, not awaited, not passed to handler
 - Excludes explicit discard with comment justification
 
-Severity: Warning
+Severity: Warning (alpha); subject to configuration in stable release
 
 ---
 
 ### Enforcement Coverage
 **Enforced by:** [DXA020](../../reference/diagnostics/DXA020.md)
 
-**Coverage Level:** **Strong**
+**Coverage Level (Historical):** Strong (as recorded in 2026-02-02)
+
+**Current Strength:** Moderate — See [Dx.Domain Enforcement Specification](../enforcement-specification.md) for current authoritative classification.
 
 ---
 
 ### Enforcement Model
 - **Type:** Static analyzer
-- **Scope:** All code
-- **Strength:** Strong
+- **Scope:** S1–S3; explicitly exempt from S0 (kernel code)
+- **Strength:** Heuristic-based; catches common direct ignores but bypassable via reflection or dynamic invocation
 
 ---
 
 ### Bypass Vectors
 - Explicit discard with suppression
 - Dynamic invocation
+- Reflection-based Result creation
 
 ---
 
 ### Decision intent and demonstrated boundary
-Domain failures cannot be silently ignored in static code.
+Domain failures cannot be silently ignored in statically analyzable code.
 
 ### Dependencies
 - [ADR-0006](adr-0006-result-as-failure-model.md)
