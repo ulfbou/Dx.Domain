@@ -87,7 +87,7 @@
     "DefaultSeverity": "Warning",
     "EnabledByDefault": true,
     "Description": "Documentation references to Dx.Domain types should use <see cref=\"T:System.Object\"/> to ensure compile-time verification and rename safety.",
-    "HelpLinkUri": "https://github.com/ulfbou/Dx.Domain/blob/master/docs/public/reference/diagnostics/DXA065.md"
+    "HelpLinkUri": "https://github.com/ulfbou/Dx.Domain/blob/master/docs/reference/diagnostics/DXA065.md"
   },
   {
     "Id": "DXA070",

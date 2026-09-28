@@ -2,6 +2,26 @@
 
 Treat a diagnostic as evidence of one supported static pattern, then correct the owning design.
 
+## Shipped rules
+
+The analyzer assembly in every Dx.Domain package includes these rules:
+
+| ID | Title |
+| --- | --- |
+| DXA010 | Construction Authority Violation |
+| DXA011 | Public Factory Exposure |
+| DXA020 | Result Ignored |
+| DXA022 | Domain Control Exception |
+| DXA030 | Unapproved Handler |
+| DXA040 | Kernel Public Surface Freeze |
+| DXA050 | Temporal Helper Usage |
+| DXA060 | Forbidden Vocabulary |
+| DXA065 | Unresolved Xml Doc Reference |
+| DXA070 | Generated Code Tagging |
+| DXA080 | Facade Invariant Enforcement |
+
+See the [diagnostics reference](../../reference/diagnostics/index.md) for detailed guidance on each rule.
+
 ## Workflow
 
 1. Record the exact diagnostic ID, message, file, and location.
