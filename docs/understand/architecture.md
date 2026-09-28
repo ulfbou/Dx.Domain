@@ -2,15 +2,22 @@
 
 Dx.Domain is a small, compiler-assisted substrate for explicit invariants, results, errors, identities, and structural facts.
 
-## Packages
+## Published packages
 
-- **Annotations:** semantic metadata targeting .NET Standard 2.0.
-- **Primitives:** immutable identity values targeting .NET 8, 9, and 10.
-- **Kernel:** Results, errors, invariants, and requirements targeting .NET 8, 9, and 10.
-- **Facts:** structural fact and causation values targeting .NET 8, 9, and 10.
-- **Analyzers:** compile-time diagnostics targeting .NET Standard 2.0.
+Dx.Domain publishes exactly four packages for consumer use:
 
-Facts depends on Primitives, Kernel, and Annotations. Kernel and Primitives depend on Annotations. Runtime projects reference the analyzer project as a compiler analyzer in repository builds; consumers receive the analyzer assembly through each published package.
+- **Dx.Domain.Annotations:** semantic metadata targeting .NET Standard 2.0.
+- **Dx.Domain.Primitives:** immutable identity values targeting .NET 8, 9, and 10.
+- **Dx.Domain.Kernel:** Results, errors, invariants, and requirements targeting .NET 8, 9, and 10.
+- **Dx.Domain.Facts:** structural fact and causation values targeting .NET 8, 9, and 10.
+
+Dependencies flow as: Facts → (Primitives, Kernel, Annotations); Kernel, Primitives → Annotations.
+
+Each published package carries the analyzer assembly (`analyzers/dotnet/cs/Dx.Domain.Analyzers.dll`). There is no separately published analyzer package. Consumers must not install a standalone analyzer package.
+
+## Repository structure
+
+The repository implements the analyzer in the `src/Dx.Domain.Analyzers` project. During repository builds, runtime projects reference this project as a compiler analyzer. During consumer package installation, the analyzer assembly is embedded in each published package and loaded automatically by NuGet.
 
 ## Scope model
 

@@ -150,7 +150,29 @@ Every analyzer is classified using the following taxonomy.
 
 ---
 
-### 5.4 Temporal Authority
+### 5.4 Documentation Integrity
+
+**Intent:** Ensure XML documentation references are accurate and rename‑safe.
+
+#### Enforcing Analyzers
+
+| Rule | Strength |
+|-----|----------|
+| DXA065 | Moderate |
+
+#### Guarantee
+
+> Within public API documentation of participating assemblies, XML doc references (`<see cref="…"/>`, `<see href="…"/>`) are verified at compile time.
+
+#### Explicit Gaps
+
+- internal documentation
+- external or third‑party references
+- serialization behavior
+
+---
+
+### 5.5 Temporal Authority
 
 **Intent:** Eliminate non‑deterministic and timezone‑ambiguous time access.
 
@@ -172,7 +194,7 @@ Every analyzer is classified using the following taxonomy.
 
 ---
 
-### 5.5 Analyzer Infrastructure Integrity
+### 5.6 Analyzer Infrastructure Integrity
 
 **Intent:** Improve accuracy of other analyzers.
 
@@ -255,11 +277,11 @@ In the event of conflict:
 ```
 Dx.Domain Enforcement Specification
 ↓
+[STABILITY.md](../use/stability.md)
+↓
 [LIMITATIONS.md](../use/limitations.md)
 ↓
 [ENFORCEMENT_MODEL.md](enforcement-model.md)
-↓
-[ENFORCEMENT_MAP.md](enforcement-model.md)
 ↓
 ADR-0001 … ADR-0016
 ↓

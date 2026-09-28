@@ -1,44 +1,62 @@
 # Enforcement Model
 
-## Purpose
-Defines what "enforced" means in Dx.Domain and the limits of each guarantee. This document interprets the classifications in docs/understand/enforcement-specification.md; it does not create new rules.
+## Overview
+
+This document explains how enforcement works in Dx.Domain. For normative claims and formal guarantees, see [Dx.Domain Enforcement Specification](enforcement-specification.md).
 
 ## Definition
-A constraint is enforced if and only if a violation is deterministically detected at build time within the analyzer's declared scope.
 
-## Strength Levels
+A constraint is **enforced** if and only if a violation is deterministically detected at build time within the analyzer's declared scope.
 
-### Strong
-- **Detection:** build error
-- **Scope:** statically analyzable code in current compilation
-- **Bypass:** only by disabling analyzer or using justified suppression
-- **Guarantee:** violation cannot reach runtime undetected under normal build
+Enforcement does **not** mean:
+- runtime prevention of violations
+- semantic correctness of domain logic
+- completeness across all code paths
+- immunity to intentional suppression
 
-### Moderate
-- **Detection:** build warning in S1–S3
-- **Scope:** statically analyzable code, S1–S3 only
-- **Bypass:** reflection, serialization, dynamic, suppression
-- **Guarantee:** detects common misuse, not exhaustive
+## Analyzer Strength Classification
 
-### Partial
-- **Detection:** runtime invariant check
-- **Scope:** execution path
-- **Bypass:** bypassing Kernel APIs
-- **Guarantee:** fails fast at runtime, not compile time
+Dx.Domain classifies analyzers by the confidence and scope of their guarantees:
 
-### Process
-- **Detection:** human review, CI policy
-- **Scope:** repository governance
-- **Bypass:** not mechanically preventable
-- **Guarantee:** auditability only
+### Strong Enforcement
 
-### Advisory
-- **Detection:** design guideline
-- **Scope:** documentation
-- **Bypass:** not mechanically enforced
-- **Guarantee:** convention only
+- **Detection:** Deterministic at build time, cannot be bypassed except by disabling the analyzer or justified suppression
+- **Scope:** Statically visible code paths within participating compilations
+- **Example:** DXA050 (temporal authority) in domain layers—all time access must use controlled UTC sources
+- **Characteristic:** Sound analysis; violations cannot silently escape
 
-## Boundaries
-Enforcement applies only within statically analyzable scope and declared analyzer coverage. It does not imply runtime prevention, semantic correctness, completeness across assemblies, or resistance to intentional suppression.
+### Moderate Enforcement
 
-*Source: docs/understand/enforcement-specification.md definition, ADR coverage levels*
+- **Detection:** Build-time warnings that catch common misuse patterns
+- **Scope:** Heuristic-based; may require indirection to bypass
+- **Examples:** DXA010 (construction), DXA020 (result handling), DXA065 (documentation)
+- **Characteristic:** Practical coverage with known gaps in reflection, serialization, dynamic invocation
+
+### Weak Enforcement
+
+- **Detection:** Advisory; improves diagnostics but does not guarantee correctness
+- **Scope:** Metadata and infrastructure support
+- **Example:** DXA070 (generated code tagging) improves false-positive filtering
+- **Characteristic:** Best-effort; success depends on external cooperation
+
+## Guarantee Boundaries
+
+All enforcement is **local and structural**, not global or behavioral:
+
+- An ignored Result flagged by DXA020 may still be unhandled downstream
+- An invariant detected by DXA010 may not be complete
+- A facade factory flagged by DXA080 may still receive invalid inputs
+
+This is by design: mechanical analysis cannot verify business logic.
+
+## Scope Boundaries
+
+Analyzers do **not** detect violations in:
+- reflection and dynamic invocation
+- ORM or JSON materialization
+- code compiled without analyzer support
+- behavior in non-participating assemblies
+
+This is a fundamental limit of static analysis.
+
+For detailed specifications, see [Dx.Domain Enforcement Specification](enforcement-specification.md).

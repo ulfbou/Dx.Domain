@@ -1,7 +1,16 @@
 ## Dx.Domain Enforcement Specification
 
-> **Status:** Normative  
-> **Applies to:** Dx.Domain.Kernel, Primitives, Facts, Analyzers  
+> **Status:** Superseded
+> **Effective date:** Phase 3.2
+> **Action:** Use [../enforcement-specification.md](../enforcement-specification.md) instead.
+> **Reason:** Documentation consolidation and specification alignment.
+>
+> This copy is retained for Phase 4 historical reference only and will be deleted before stable release.
+
+---
+
+> **Status:** Normative
+> **Applies to:** Dx.Domain.Kernel, Primitives, Facts, Analyzers
 > **Authority:** This document supersedes interpretive claims in ADRs where discrepancies exist.
 
 ---
