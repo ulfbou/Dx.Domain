@@ -830,7 +830,7 @@ release-gate/
     └── consumers.json
 ```
 
-Only applicable files are included. Missing optional sections are omitted and shall not be represented by placeholders.
+Only applicable files are included. Missing optional sections are omitted and shall not be represented by extra stub sections.
 
 ### 26.5 Authoritative entry point
 

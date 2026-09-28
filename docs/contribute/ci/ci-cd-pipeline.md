@@ -39,8 +39,7 @@ There is no active repository-local `main` or `develop` workflow path.
 ## Validation model
 
 - Build and tests validate compiled repository behavior.
-- Analyzer tests validate supported diagnostic behavior.
-- Documentation lint validates public emptiness, placeholders, Markdown links, TOC targets, and merge markers.
+- Analyzer tests validate supported diagnostic behavior.- Documentation lint validates public emptiness, temporary markers, Markdown links, TOC targets, and merge markers.
 - Structural snippet validation checks fenced C# shape only.
 - `scripts/docs-examples-compile.sh` performs actual compilation of the material Quickstart.
 - DocFX validates the canonical public site with warnings treated as errors.
