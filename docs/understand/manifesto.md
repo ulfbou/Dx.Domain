@@ -1,5 +1,6 @@
-> Enforced by [ADR-0003](decisions/adr-0003-dxa010-warning.md) through [ADR-0016](decisions/adr-0016-dxa080-facade-invariant-enforcement.md)
- Dx.Domain Manifesto
+> Supported by [enforcement-specification.md](enforcement-specification.md); original decisions documented in [Decisions](decisions/index.md)
+
+# Dx.Domain Manifesto
 
 ## A Declaration of Refusal
 

@@ -19,7 +19,7 @@ Roadmap items are classified by their effect on guarantees, not by feature compl
 
 ### 1. Finalize primitive public surfaces
 
-**Existing contract:** decisions/adr-0018-kernel-public-surface.md establishes the S0 public construction contract and exempts the substrate types from DXA010, DXA011, and DXA080.
+**Existing contract:** Historical decision [ADR-0018](decisions/adr-0018-kernel-public-surface.md) established the S0 public construction contract and exempts the substrate types from DXA010, DXA011, and DXA080.
 
 **Problem:** The complete API signatures and default-value behavior of the identity primitives remain provisional for the alpha.
 
