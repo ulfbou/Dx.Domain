@@ -280,7 +280,7 @@ class FeedbackRelevanceTests(unittest.TestCase):
                 "dx", "CREATED", "CREATED", "feedback.json",
                 carrier.as_posix(), feedback_sha256="a" * 64,
                 validation_status="PASS", carrier_sha256="b" * 64,
-                carrier_size=8, carrier_verification="PASS",
+                carrier_size=8, carrier_verification="STRUCTURE_VALID",
             )
             output = io.StringIO()
             errors = io.StringIO()
@@ -393,7 +393,7 @@ class FeedbackRelevanceTests(unittest.TestCase):
                 value = "FAIL"
             carrier = Path(temporary) / "failure.dx.txt"
             carrier.write_text("carrier\n", encoding="utf-8")
-            transported = FeedbackResult("dx", "CREATED", "CREATED", "feedback.json", carrier.as_posix(), feedback_sha256="a" * 64, validation_status="PASS", carrier_sha256="b" * 64, carrier_size=8, carrier_verification="PASS")
+            transported = FeedbackResult("dx", "CREATED", "CREATED", "feedback.json", carrier.as_posix(), feedback_sha256="a" * 64, validation_status="PASS", carrier_sha256="b" * 64, carrier_size=8, carrier_verification="STRUCTURE_VALID")
             output = io.StringIO()
             with (
                 patch.object(runner, "discover_repository_root", return_value=repository),
@@ -425,7 +425,7 @@ class FeedbackRelevanceTests(unittest.TestCase):
                 value = "PASS"
             carrier = Path(temporary) / "success.dx.txt"
             carrier.write_text("carrier\n", encoding="utf-8")
-            transported = FeedbackResult("dx", "CREATED", "CREATED", "feedback.json", carrier.as_posix(), feedback_sha256="a" * 64, validation_status="PASS", carrier_sha256="b" * 64, carrier_size=8, carrier_verification="PASS")
+            transported = FeedbackResult("dx", "CREATED", "CREATED", "feedback.json", carrier.as_posix(), feedback_sha256="a" * 64, validation_status="PASS", carrier_sha256="b" * 64, carrier_size=8, carrier_verification="STRUCTURE_VALID")
             output = io.StringIO()
             with (
                 patch.object(runner, "discover_repository_root", return_value=repository),
@@ -544,6 +544,10 @@ class FeedbackRelevanceTests(unittest.TestCase):
         command = _collector_command()
         self.assertEqual(sys.executable, command[0])
         self.assertEqual(ROOT / "dx.py", Path(command[1]))
+
+    def test_feedback_validation_error_is_an_expected_operational_error(self):
+        runner = load_runner_module()
+        self.assertIn(runner.FeedbackValidationError, runner.EXPECTED_OPERATIONAL_ERRORS)
 
 if __name__ == "__main__":
     unittest.main()

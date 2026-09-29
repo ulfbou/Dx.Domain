@@ -10,6 +10,7 @@ from release_gate.configuration import ConfigurationError
 from release_gate.evidence import write_json_atomic
 from release_gate.feedback import (
     FeedbackResult,
+    FeedbackValidationError,
     build_error_feedback,
     cli_result,
     collect_feedback,
@@ -18,7 +19,7 @@ from release_gate.feedback import (
 from release_gate.orchestrator import execute_accept_ready_profile, execute_candidate_profile, execute_consumers_profile, execute_gate
 from release_gate.repository import RepositoryDiscoveryError, discover_repository_root
 
-EXPECTED_OPERATIONAL_ERRORS = (ConfigurationError, RepositoryDiscoveryError, OSError, RuntimeError)
+EXPECTED_OPERATIONAL_ERRORS = (ConfigurationError, RepositoryDiscoveryError, FeedbackValidationError, OSError, RuntimeError)
 
 
 def parse_args(argv=None):
@@ -100,7 +101,11 @@ def run(argv=None):
         except (OSError, RuntimeError, ValueError) as collection_error:
             feedback_result = FeedbackResult("dx", "FAILED", "FAILED", transport_error=str(collection_error))
         print(f"ERROR: {exc}", file=sys.stderr)
-    process_code = 3 if feedback_result.transport_status != "CREATED" or feedback_result.carrier_verification != "PASS" else gate_code
+    carrier_completed = (
+        feedback_result.transport_status == "CREATED"
+        and feedback_result.carrier_verification == "STRUCTURE_VALID"
+    )
+    process_code = gate_code if carrier_completed else 3
     print(cli_result(
         profile=args.profile, decision=decision_value,
         gate_exit_code=gate_code, process_exit_code=process_code,

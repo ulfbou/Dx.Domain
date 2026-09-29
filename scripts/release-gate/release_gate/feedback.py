@@ -105,8 +105,9 @@ def _proof_completeness(criteria: list[dict[str, Any]]) -> str:
 
 def _artifact_disposition(profile: str, decision: str) -> str:
     if profile == "candidate": return "RETAIN_IMMUTABLE" if decision == "PASS" else "DISCARD_CANDIDATE"
-    if profile in {"consumers", "accept-ready", "prepublish"}:
-        return "PROMOTION_ELIGIBLE" if decision in {"READY_FOR_PUBLICATION"} else "PROMOTION_PROHIBITED"
+    if profile == "consumers": return "RETAIN_IMMUTABLE" if decision == "PASS" else "PROMOTION_PROHIBITED"
+    if profile in {"accept-ready", "prepublish"}:
+        return "PROMOTION_ELIGIBLE" if decision in {"ACCEPT_READY", "READY_FOR_PUBLICATION"} else "PROMOTION_PROHIBITED"
     if profile == "postpublish": return "RELEASE_COMPLETE" if decision == "DONE" else "RETRY_UNCHANGED_ONLY"
     return "NONE"
 
@@ -363,7 +364,7 @@ def _handoff(dossier: dict[str, Any], carrier_name: str) -> dict[str, Any]:
     return {
         "schema": "dx-domain.release-gate-handoff/1.0",
         "carrier": {"format": "DX v2.0", "filename": carrier_name,
-                    "payload_manifest_sha256": None, "verification": "VERIFIED"},
+                    "payload_manifest_sha256": None, "verification": "STRUCTURE_VALID"},
         "execution": {"run_id": dossier["run"]["run_id"], "profile": dossier["gate"]["profile"],
                       "operation_status": "COMPLETED", "decision": dossier["gate"]["decision"],
                       "exit_code": dossier["gate"]["exit_code"]},
@@ -482,7 +483,7 @@ def transport_feedback(
         validation_status="PASS",
         carrier_sha256=_sha256_file(carrier),
         carrier_size=carrier.stat().st_size,
-        carrier_verification="PASS",
+        carrier_verification="STRUCTURE_VALID",
     )
 
 
@@ -497,7 +498,7 @@ def collect_feedback(*, mode: str, profile: str, decision: str, gate_exit_code: 
         carrier = _package_feedback(repository_root, evidence_root, profile, decision, str(dossier["run"]["run_id"]), dossier)
     except (OSError, RuntimeError, ValueError) as exc:
         return FeedbackResult(mode, "CREATED", "FAILED", _relative(feedback_path, repository_root), transport_error=str(exc), feedback_sha256=digest, validation_status="PASS")
-    return FeedbackResult(mode, "CREATED", "CREATED", _relative(feedback_path, repository_root), carrier.as_posix(), feedback_sha256=digest, validation_status="PASS", carrier_sha256=_sha256_file(carrier), carrier_size=carrier.stat().st_size, carrier_verification="PASS")
+    return FeedbackResult(mode, "CREATED", "CREATED", _relative(feedback_path, repository_root), carrier.as_posix(), feedback_sha256=digest, validation_status="PASS", carrier_sha256=_sha256_file(carrier), carrier_size=carrier.stat().st_size, carrier_verification="STRUCTURE_VALID")
 
 def build_error_feedback(*, profile: str, repository_root: Path, evidence_root: Path, error: BaseException) -> dict[str, Any]:
     report = {"run_id": evidence_root.name, "profile": profile, "head": None, "branch": None, "source_unchanged": None, "criteria": [{"criterion_id": "release-gate-operational-error", "title": "Release-gate operational error", "status": "ERROR", "motivation": f"{type(error).__name__}: {error}", "verifier": "release_gate.run", "expected": {"operation": "complete selected profile"}, "observed": {"error_type": type(error).__name__, "message": str(error)}, "evidence": ["error.json"], "corrective_action": "Inspect the embedded error facts and error.json, correct the verifier or environment failure, and rerun."}]}

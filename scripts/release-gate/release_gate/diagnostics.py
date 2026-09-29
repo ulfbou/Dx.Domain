@@ -7,9 +7,9 @@ from .model import CriterionResult, CriterionStatus, Diagnostic
 PATTERN = re.compile(r'(?:(?P<file>[^\r\n:(]+)\((?P<line>\d+)(?:,\d+)?\):\s*)?(?P<severity>warning|error|info)\s+(?P<id>DXA\d{3,}|AD0001)\s*:\s*(?P<message>.*?)(?:\s+\[[^\]]+\])?$', re.IGNORECASE | re.MULTILINE)
 
 def parse_diagnostics_from_build_output(build_stdout: str, build_binlog_path: Path | None = None) -> list[Diagnostic]:
-    text = build_stdout
-    if build_binlog_path and Path(build_binlog_path).is_file():
-        text += "\n" + Path(build_binlog_path).read_text(encoding="utf-8", errors="strict")
+    text = (Path(build_binlog_path).read_text(encoding="utf-8", errors="strict")
+            if build_binlog_path and Path(build_binlog_path).is_file()
+            else build_stdout)
     return [Diagnostic(m.group("id").upper(), m.group("severity").lower(), m.group("message").strip(), m.group("file"), int(m.group("line")) if m.group("line") else None) for m in PATTERN.finditer(text)]
 
 def _key(item): return (item.id, item.file or "", item.line or 0, item.message)

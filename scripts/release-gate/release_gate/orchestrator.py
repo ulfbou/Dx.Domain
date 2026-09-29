@@ -161,7 +161,7 @@ def execute_gate(repository_root, script_root, profile="local", evidence_base=No
         else:
             for project in mandatory.value["projects"]:
                 for framework in project["target_frameworks"]:
-                    criteria.append(prerequisite_result(f"WS003-TEST-{project['id']}-{framework}", f"Mandatory tests {project['id']} {framework}", False, "Mandatory tests were blocked by build failure.", "successful strict build", None))
+                    criteria.append(prerequisite_result(f"WS003-TEST-{project['id']}-{framework}", f"Mandatory tests {project['id']} {framework}", False, "Mandatory tests were blocked by build failure.", {"strict_build": "SUCCESS"}, {"strict_build": build.classification.value if build is not None else "NOT_EXECUTED"}))
 
     final_git = capture_git_state(repository_root)
     write_json_atomic(evidence_root / "git-after.json", final_git)
@@ -247,8 +247,10 @@ def _discover_candidate(repository_root, candidate_dir=None):
         directory = Path(candidate_dir).resolve(); manifest = directory.parent / "candidate-manifest.json"
         if not manifest.is_file(): manifest = directory / "candidate-manifest.json"
         return manifest, directory
-    manifests = sorted((repository_root / ".dx/evidence/release-gate").glob("*/candidate-manifest.json"), key=lambda path:path.stat().st_mtime, reverse=True)
-    return (None, None) if not manifests else (manifests[0], manifests[0].parent / "packages")
+    manifests = sorted((repository_root / ".dx/evidence/release-gate").glob("*/candidate-manifest.json"))
+    if len(manifests) != 1:
+        return None, None
+    return manifests[0], manifests[0].parent / "packages"
 
 def execute_consumers_profile(repository_root, script_root, evidence_base=None, timeout_seconds=1800, candidate_dir=None):
     from .configuration import load_consumer_contracts
@@ -269,7 +271,9 @@ def execute_consumers_profile(repository_root, script_root, evidence_base=None, 
             manifest=json.loads(manifest_path.read_text(encoding="utf-8")); baseline=None; baseline_case=None
             import shutil
             shutil.copyfile(manifest_path, root / "candidate-manifest.json")
-            for case in matrix.value["cases"]:
+            cases = list(matrix.value["cases"])
+            cases.sort(key=lambda item: 0 if item.get("analyzerBaseline") is True else 1)
+            for case in cases:
                 try:
                     ws=create_isolated_workspace(root,case,packages,manifest); content=ws.csproj_path.read_text(encoding="utf-8"); isolated=assert_no_project_references(content) and assert_no_repo_props_import(content)
                     criteria.append(_consumer_result(case["id"]+":consumer-isolation", isolated, True, isolated, [str(ws.csproj_path),str(ws.nuget_config_path)]))
@@ -286,7 +290,7 @@ def execute_consumers_profile(repository_root, script_root, evidence_base=None, 
                         criteria.append(_consumer_result(case["id"]+":consumer-runtime-output",ok,expected,observed,[run.stdout_path]))
                 except Exception as exc:
                     criteria.append(_consumer_result(case["id"]+":consumer-isolation",False,True,str(exc),[],CriterionStatus.ERROR))
-    final=capture_git_state(repository_root); write_json_atomic(root/"git-after.json",final); criteria.append(_consumer_result("consumer-source-immutability",initial["head"]==final["head"] and initial["tracked_diff"]==final["tracked_diff"],initial["tracked_diff"],final["tracked_diff"],["git-before.json","git-after.json"]))
+    final=capture_git_state(repository_root); write_json_atomic(root/"git-after.json",final); criteria.append(_consumer_result("consumer-source-immutability",initial["head"]==final["head"] and initial["tracked_diff"]==final["tracked_diff"] and initial["status"]==final["status"],initial["tracked_diff"],final["tracked_diff"],["git-before.json","git-after.json"]))
     decision=aggregate(criteria); report={"schema":"dx-domain.release-gate-report.v1","run_id":run_id,"profile":"consumers","head":initial["head"],"decision":decision.value,"commands":[command_record(x,repository_root) for x in commands],"criteria":[x.to_dict() for x in criteria]}
     write_json_atomic(root/"criteria.json",report["criteria"]); write_json_atomic(root/"report.json",report); write_text_atomic(root/"report.md","# Dx.Domain Consumer Gate\n\n- Decision: **"+decision.value+"**\n"+"".join(f"- **{x.status.value}** `{x.criterion_id}`: {x.motivation}\n" for x in criteria)); return decision,root,report
 def execute_accept_ready_profile(repository_root, script_root, evidence_base=None, timeout_seconds=1800, candidate_dir=None):

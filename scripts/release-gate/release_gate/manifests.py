@@ -18,12 +18,18 @@ def generate_manifest(package_paths,signing_disposition="unsigned"):
 def write_manifest(manifest,output_path):write_json_atomic(Path(output_path),manifest)
 def verify_manifest(manifest_path,package_dir):
  data=json.loads(Path(manifest_path).read_text(encoding='utf-8')); results=[]
+ if not isinstance(data,dict) or data.get('schema')!='dx-domain.candidate-manifest.v1' or not isinstance(data.get('packages'),list): raise ValueError('Invalid candidate manifest schema')
+ seen=set()
  for e in data.get('packages',[]):
+  if not isinstance(e,dict) or any(k not in e for k in ('packageId','version','filename','byteSize','sha256')): raise ValueError('Invalid candidate manifest package entry')
+  identity=(e['packageId'],e['filename'])
+  if identity in seen: raise ValueError(f'Duplicate candidate manifest package entry: {identity}')
+  seen.add(identity)
   p=Path(package_dir)/e['filename']; observed={"exists":p.is_file()}
   if p.is_file():
    n=read_nuspec(p); observed.update({"packageId":_text(n,'id'),"version":_text(n,'version'),"filename":p.name,"byteSize":p.stat().st_size,"sha256":compute_sha256(p)})
   expected={k:e[k] for k in ('packageId','version','filename','byteSize','sha256')}; ok=all(observed.get(k)==v for k,v in expected.items())
-  results.append(CriterionResult("candidate-manifest-verified",f"Manifest {e['filename']}",CriterionStatus.PASS if ok else CriterionStatus.FAIL,"Retained package matches manifest." if ok else "Retained package does not match manifest.","release_gate.manifests.verify_manifest",[str(manifest_path),str(p)],expected,observed,None if ok else "Discard the candidate and produce it again."))
+  results.append(CriterionResult(f"candidate-manifest-verified:{e['packageId']}",f"Manifest {e['filename']}",CriterionStatus.PASS if ok else CriterionStatus.FAIL,"Retained package matches manifest." if ok else "Retained package does not match manifest.","release_gate.manifests.verify_manifest",[str(manifest_path),str(p)],expected,observed,None if ok else "Discard the candidate and produce it again."))
  return results
 def get_authoritative_analyzer_sha256(build_output_path):
  root=Path(build_output_path); found=sorted(root.glob('**/Dx.Domain.Analyzers.dll'))
