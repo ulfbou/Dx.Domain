@@ -214,13 +214,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "releases", "docs\use\releas
 		docs\use\releases\index.md = docs\use\releases\index.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{566E55DA-9FDD-5DC3-93D3-C85C8E4BFA98}"
-	ProjectSection(SolutionItems) = preProject
-		docs\index.md = docs\index.md
-		docs\roadmap.md = docs\roadmap.md
-		docs\todo.md = docs\todo.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".generated", "docs\.generated", "{57D3D9D7-F2E0-5376-8982-754540124CB5}"
 	ProjectSection(SolutionItems) = preProject
 		docs\.generated\index.md = docs\.generated\index.md
