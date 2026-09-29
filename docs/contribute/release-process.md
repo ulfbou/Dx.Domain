@@ -20,16 +20,7 @@ Structural snippet checks are not compilation. Material examples must be compile
 
 ## Local validation
 
-```bash
-dotnet tool restore
-dotnet restore
-dotnet build -c Release
-dotnet test -c Release --no-build
-bash scripts/docs-lint.sh
-bash scripts/docs-snippets-compile.sh docs net8.0
-bash scripts/docs-examples-compile.sh
-dotnet docfx docs/docfx.json --warningsAsErrors
-```
+See [local validation](local-validation.md) for the complete canonical sequence. It is the required validation that must pass before any pull request is accepted.
 
 ## Documentation publication
 
