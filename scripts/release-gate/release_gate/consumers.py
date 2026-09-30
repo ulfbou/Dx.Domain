@@ -22,6 +22,7 @@ class ConsumerWorkspace:
     csproj_path: Path
     global_packages_folder: Path
     action: str
+    capture_diagnostics: bool
     environment: dict[str, str]
 
 def assert_no_project_references(content: str) -> bool:
@@ -36,9 +37,13 @@ def assert_no_repo_props_import(content: str) -> bool:
     return True
 
 def create_isolated_workspace(base_evidence_dir: Path, case: dict, candidate_dir: Path, candidate_manifest: dict) -> ConsumerWorkspace:
-    root = Path(base_evidence_dir) / "consumers" / case["id"]
-    root.mkdir(parents=True, exist_ok=False)
-    cache = root / "packages"; cache.mkdir()
+    consumers_root = Path(base_evidence_dir) / "consumers"
+    consumers_root.mkdir(parents=True, exist_ok=True)
+    root = consumers_root / case["id"]
+    root.mkdir(exist_ok=False)
+    shared_cache_root = consumers_root / ".cache"
+    cache = root / "packages"
+    cache.mkdir()
     feed = Path(candidate_dir).resolve()
     config = root / "nuget.config"
     config.write_text('<?xml version="1.0" encoding="utf-8"?>\n<configuration><config><add key="globalPackagesFolder" value="' + html.escape(str(cache.resolve())) + '" /></config><packageSources><clear /><add key="candidate" value="' + html.escape(str(feed)) + '" /><add key="nuget.org" value="https://api.nuget.org/v3/index.json" /></packageSources><packageSourceMapping><packageSource key="candidate"><package pattern="Dx.Domain.*" /></packageSource><packageSource key="nuget.org"><package pattern="*" /></packageSource></packageSourceMapping></configuration>\n', encoding="utf-8")
@@ -52,8 +57,17 @@ def create_isolated_workspace(base_evidence_dir: Path, case: dict, candidate_dir
     assert_no_project_references(project); assert_no_repo_props_import(project)
     csproj = root / "Consumer.csproj"; csproj.write_text(project, encoding="utf-8")
     (root / "Program.cs").write_text(FIXTURES[case["fixture"]], encoding="utf-8")
-    env = {"NUGET_PACKAGES":str(cache.resolve()), "NUGET_HTTP_CACHE_PATH":str((root/"http-cache").resolve()), "DOTNET_CLI_HOME":str((root/"dotnet-home").resolve()), "DOTNET_NOLOGO":"1"}
-    return ConsumerWorkspace(case["id"], root, config, csproj, cache, case["action"], env)
+    capture_diagnostics = case.get("expects", {}).get("analyzer") == "must_report"
+    env = {
+        "NUGET_PACKAGES": str(cache.resolve()),
+        "NUGET_HTTP_CACHE_PATH": str((shared_cache_root / "http-cache").resolve()),
+        "DOTNET_CLI_HOME": str((root / "dotnet-home").resolve()),
+        "DOTNET_NOLOGO": "1",
+        "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+        "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1",
+        "NUGET_XMLDOC_MODE": "skip",
+    }
+    return ConsumerWorkspace(case["id"], root, config, csproj, cache, case["action"], capture_diagnostics, env)
 
 def _run(ws, name, argv, timeout_seconds):
     result = run_process(command_id=name, argv=argv, cwd=ws.path, evidence_directory=ws.path, timeout_seconds=timeout_seconds, environment=ws.environment)
@@ -65,7 +79,15 @@ def restore_workspace(ws, timeout_seconds=1800):
     return _run(ws, "restore", ("dotnet","restore",str(ws.csproj_path),"--configfile",str(ws.nuget_config_path),f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}"), timeout_seconds)
 
 def build_workspace(ws, timeout_seconds=1800):
-    return _run(ws, "build", ("dotnet","build",str(ws.csproj_path),"-c","Release","--no-restore",f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}",f"-flp:logfile={ws.path/'build.diagnostics.log'};verbosity=diagnostic"), timeout_seconds)
+    argv = [
+        "dotnet", "build", str(ws.csproj_path), "-c", "Release",
+        "--no-restore",
+        "--verbosity", "minimal",
+        f"-p:DirectoryBuildPropsPath={ws.path / 'Directory.Build.props'}",
+    ]
+    if ws.capture_diagnostics:
+        argv.append(f"-flp:logfile={ws.path / 'build.diagnostics.log'};verbosity=diagnostic")
+    return _run(ws, "build", tuple(argv), timeout_seconds)
 
 def run_workspace(ws, timeout_seconds=1800):
     return _run(ws, "run", ("dotnet","run","--project",str(ws.csproj_path),"-c","Release","--no-build",f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}"), timeout_seconds)
