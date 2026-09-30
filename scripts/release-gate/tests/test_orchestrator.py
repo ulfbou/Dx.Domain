@@ -72,5 +72,11 @@ class OrchestratorTests(unittest.TestCase):
             self.assertTrue(manifest["initial_status"])
 
 
+    def test_blocked_test_criteria_retain_non_null_observed_facts(self):
+        source = (ROOT / "release_gate" / "orchestrator.py").read_text(encoding="utf-8")
+        self.assertIn('{"strict_build": "SUCCESS"}', source)
+        self.assertIn('"NOT_EXECUTED"', source)
+        self.assertNotIn('"Mandatory tests were blocked by build failure.", "successful strict build", None)', source)
+
 if __name__ == "__main__":
     unittest.main()

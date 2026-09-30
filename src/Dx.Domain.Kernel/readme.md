@@ -74,4 +74,4 @@ Available as extension methods on Result:
 - [Dx.Domain.Primitives](../Dx.Domain.Primitives/readme.md) — Core value types
 - [Dx.Domain.Facts](../Dx.Domain.Facts/readme.md) — Immutable facts with causation
 - [Dx.Domain.Annotations](../Dx.Domain.Annotations/readme.md) — Metadata vocabulary
-- [Architecture Decision Records](../../docs/adr/index.md) — Design rationale
+- [Architecture Decision Records](../../docs/understand/decisions/index.md) — Design rationale

@@ -29,4 +29,7 @@ def exit_code(decision: GateDecision) -> int:
         GateDecision.FAIL: 1,
         GateDecision.INCOMPLETE: 2,
         GateDecision.ERROR: 3,
+        GateDecision.ACCEPT_READY: 0,
+        GateDecision.NOT_ACCEPT_READY: 1,
+        GateDecision.ACCEPT_READY_NOT_PROVEN: 2,
     }[decision]

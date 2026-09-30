@@ -1,6 +1,6 @@
 # Changelog
 
-All notable user-visible changes to Dx.Domain are recorded here.
+All notable user-visible changes to Dx.Domain are recorded here. For usage and current release notes, see [docs/use/releases/index.md](docs/use/releases/index.md).
 
 ## [0.1.0-alpha]
 

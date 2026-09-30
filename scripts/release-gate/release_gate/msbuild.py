@@ -8,18 +8,25 @@ PROPERTIES=("PackageId","Version","PackageVersion","IsPackable","TargetFramework
 
 def _json_output(result):
     if result.classification is not ExecutionClassification.SUCCESS:
-        raise RuntimeError(f"MSBuild evaluation failed: {result.classification.value}")
+        stdout = Path(result.stdout_path).read_text(encoding="utf-8", errors="replace")
+        stderr = Path(result.stderr_path).read_text(encoding="utf-8", errors="replace")
+        raise RuntimeError(
+            "MSBuild evaluation failed: "
+            f"{result.classification.value}; exit_code={result.exit_code}; "
+            f"stdout={result.stdout_path}; stderr={result.stderr_path}; "
+            f"detail={(stderr or stdout).strip()}"
+        )
     text=Path(result.stdout_path).read_text(encoding="utf-8",errors="replace")
     try: return json.loads(text)
     except json.JSONDecodeError as exc: raise RuntimeError(f"Invalid MSBuild JSON output: {exc}") from exc
 
 def get_evaluated_properties(project_path, configuration="Release", *, repository_root=None, evidence_directory=None, timeout_seconds=300):
-    project=Path(project_path); root=Path(repository_root or Path.cwd()); evidence=Path(evidence_directory or root/".dx/verification/release-gate/msbuild")
+    project=Path(project_path); root=Path(repository_root or Path.cwd()); evidence=Path(evidence_directory or root/".dx/evidence/release-gate/msbuild")
     result=run_process(command_id=f"msbuild-properties-{project.stem}",argv=("dotnet","msbuild",str(project),f"-property:Configuration={configuration}","-property:TreatWarningsAsErrors=true","-property:ContinuousIntegrationBuild=true",*(f"-getProperty:{x}" for x in PROPERTIES)),cwd=root,evidence_directory=evidence,timeout_seconds=timeout_seconds)
     return _json_output(result).get("Properties",{})
 
 def get_project_references(project_path, *, repository_root=None, evidence_directory=None, timeout_seconds=300):
-    project=Path(project_path); root=Path(repository_root or Path.cwd()); evidence=Path(evidence_directory or root/".dx/verification/release-gate/msbuild")
+    project=Path(project_path); root=Path(repository_root or Path.cwd()); evidence=Path(evidence_directory or root/".dx/evidence/release-gate/msbuild")
     result=run_process(command_id=f"msbuild-references-{project.stem}",argv=("dotnet","msbuild",str(project),"-property:Configuration=Release","-getItem:ProjectReference"),cwd=root,evidence_directory=evidence,timeout_seconds=timeout_seconds)
     return _json_output(result).get("Items",{}).get("ProjectReference",[])
 

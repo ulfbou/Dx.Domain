@@ -1,7 +1,6 @@
 # Reference
 
-## Documents
+- [Packages](packages/index.md)
+- [Diagnostics](diagnostics/index.md)
 - [Configuration](configuration.md)
-
-## Subdirectories
-- [Api](api/index.md)
+- [API](api/index.md)

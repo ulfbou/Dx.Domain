@@ -85,4 +85,4 @@ if (attempted.IsSuccess)
 - [Dx.Domain.Kernel](../Dx.Domain.Kernel/readme.md) — Runtime implementation
 - [Dx.Domain.Primitives](../Dx.Domain.Primitives/readme.md) — Core value types
 - [Dx.Domain.Annotations](../Dx.Domain.Annotations/readme.md) — Metadata vocabulary
-- [Architecture Decision Records](../../docs/adr/index.md) — Design rationale
+- [Architecture Decision Records](../../docs/understand/decisions/index.md) — Design rationale

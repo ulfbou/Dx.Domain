@@ -1,0 +1,9 @@
+{
+  "build": {
+    "content": [{ "files": ["**/*.md", "toc.yml"], "exclude": [".generated/**", ".dx/**", "internal/**"] }],
+    "resource": [{ "files": ["images/**"] }],
+    "dest": "../_site",
+    "template": ["default"],
+    "globalMetadata": { "_appTitle": "Dx.Domain", "_appName": "Dx.Domain", "_enableSearch": true }
+  }
+}

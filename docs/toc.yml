@@ -1,12 +1,101 @@
-- name: Manifesto
-  href: MANIFESTO.md
-- name: Non-Goals
-  href: NON_GOALS.md
-- name: DPI
-  href: DPI.md
-- name: ADRs
-  href: adr/
-- name: Analyzers
-  href: analyzers/
-- name: Learn
-  href: learn/
+- name: Documentation home
+  href: index.md
+- name: Use Dx.Domain
+  href: use/index.md
+  items:
+  - name: Getting started
+    href: use/getting-started.md
+  - name: Quickstart
+    href: use/quickstart.md
+  - name: Guides
+    href: use/guides/index.md
+  - name: Troubleshooting
+    href: use/troubleshooting.md
+  - name: Limitations
+    href: use/limitations.md
+  - name: Stability
+    href: use/stability.md
+  - name: Security
+    href: use/security.md
+  - name: Release notes
+    href: use/releases/index.md
+- name: Understand Dx.Domain
+  href: understand/index.md
+  items:
+  - name: Architecture
+    href: understand/architecture.md
+  - name: Concepts
+    href: understand/concepts/index.md
+  - name: Enforcement model
+    href: understand/enforcement-model.md
+  - name: Enforcement specification
+    href: understand/enforcement-specification.md
+  - name: Compiler diagnostics
+    href: understand/compiler-failures.md
+  - name: Manifesto
+    href: understand/manifesto.md
+  - name: Non-goals
+    href: understand/non-goals.md
+  - name: Domain purity index
+    href: understand/domain-purity-index.md
+  - name: Decisions
+    href: understand/decisions/index.md
+  - name: Roadmap
+    href: understand/roadmap.md
+- name: Contribute to Dx.Domain
+  href: contribute/index.md
+  items:
+  - name: Repository structure
+    href: contribute/repository-structure.md
+  - name: Development setup
+    href: contribute/development-setup.md
+  - name: Coding and testing
+    href: contribute/coding-and-testing.md
+  - name: Local validation
+    href: contribute/local-validation.md
+  - name: Documentation authority
+    href: contribute/documentation-authority.md
+  - name: Documentation style
+    href: contribute/style-guide.md
+  - name: Analyzer authoring
+    href: contribute/analyzer-authoring.md
+  - name: API surface process
+    href: contribute/api-surface-process.md
+  - name: CI/CD
+    href: contribute/ci/index.md
+  - name: Release process
+    href: contribute/release-process.md
+- name: Reference
+  href: reference/index.md
+  items:
+  - name: Packages
+    href: reference/packages/index.md
+  - name: Diagnostics
+    href: reference/diagnostics/index.md
+    items:
+    - name: DXA010
+      href: reference/diagnostics/DXA010.md
+    - name: DXA011
+      href: reference/diagnostics/DXA011.md
+    - name: DXA020
+      href: reference/diagnostics/DXA020.md
+    - name: DXA022
+      href: reference/diagnostics/DXA022.md
+    - name: DXA030
+      href: reference/diagnostics/DXA030.md
+    - name: DXA040
+      href: reference/diagnostics/DXA040.md
+    - name: DXA050
+      href: reference/diagnostics/DXA050.md
+    - name: DXA060
+      href: reference/diagnostics/DXA060.md
+    - name: DXA065
+      href: reference/diagnostics/DXA065.md
+    - name: DXA070
+      href: reference/diagnostics/DXA070.md
+    - name: DXA080
+      href: reference/diagnostics/DXA080.md
+  - name: Configuration
+    href: reference/configuration.md
+  - name: API
+    href: reference/api/index.md
