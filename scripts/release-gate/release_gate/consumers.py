@@ -70,10 +70,14 @@ def create_isolated_workspace(base_evidence_dir: Path, case: dict, candidate_dir
     return ConsumerWorkspace(case["id"], root, config, csproj, cache, case["action"], capture_diagnostics, env)
 
 def _run(ws, name, argv, timeout_seconds):
-    result = run_process(command_id=name, argv=argv, cwd=ws.path, evidence_directory=ws.path, timeout_seconds=timeout_seconds, environment=ws.environment)
-    text = Path(result.stdout_path).read_text(encoding="utf-8", errors="replace") + Path(result.stderr_path).read_text(encoding="utf-8", errors="replace")
-    (ws.path / f"{name}.log").write_text(text, encoding="utf-8")
-    return result
+    return run_process(
+        command_id=name,
+        argv=argv,
+        cwd=ws.path,
+        evidence_directory=ws.path,
+        timeout_seconds=timeout_seconds,
+        environment=ws.environment,
+    )
 
 def restore_workspace(ws, timeout_seconds=1800):
     return _run(ws, "restore", ("dotnet","restore",str(ws.csproj_path),"--configfile",str(ws.nuget_config_path),f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}"), timeout_seconds)

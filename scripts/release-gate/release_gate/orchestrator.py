@@ -11,6 +11,7 @@ from pathlib import Path
 from .aggregation import aggregate, exit_code
 from .configuration import load_contract, validate_contracts
 from .criteria import process_criterion, test_criterion
+from .diagnostics import parse_diagnostics_from_build_output, validate_analyzer_activation
 from .dotnet import build_command, restore_command, test_command
 from .evidence import write_json_atomic, write_text_atomic
 from .git_state import capture_git_state
@@ -253,11 +254,15 @@ def _discover_candidate(repository_root, candidate_dir=None):
         return None, None
     return manifests[0], manifests[0].parent / "packages"
 
+def load_analyzer_diagnostics(path):
+    diagnostic_text = Path(path).read_text(encoding="utf-8", errors="strict")
+    diagnostics = parse_diagnostics_from_build_output(diagnostic_text)
+    return diagnostic_text, diagnostics
+
 def execute_consumers_profile(repository_root, script_root, evidence_base=None, timeout_seconds=1800, candidate_dir=None):
     from .configuration import load_consumer_contracts
     from .consumer_timings import ConsumerStageTimings
     from .consumers import create_isolated_workspace, restore_workspace, build_workspace, run_workspace, assert_no_project_references, assert_no_repo_props_import, validate_runtime_output
-    from .diagnostics import parse_diagnostics_from_build_output, validate_analyzer_activation
     from .manifests import verify_manifest
     repository_root = Path(repository_root).resolve(); script_root = Path(script_root).resolve(); initial = capture_git_state(repository_root)
     run_id = make_run_id(initial["head"]); root = Path(evidence_base or repository_root/".dx/evidence/release-gate").resolve()/run_id; root.mkdir(parents=True, exist_ok=False)
@@ -282,18 +287,18 @@ def execute_consumers_profile(repository_root, script_root, evidence_base=None, 
                     criteria.append(_consumer_result(case["id"]+":consumer-isolation", isolated, True, isolated, [str(ws.csproj_path),str(ws.nuget_config_path)]))
                     restore=restore_workspace(ws,timeout_seconds); case_timing.restore_seconds=restore.duration_seconds; commands.append(restore); criteria.append(process_criterion(case["id"]+":consumer-restore",case["id"]+" restore",restore))
                     if restore.classification is not ExecutionClassification.SUCCESS: continue
-                    build=build_workspace(ws,timeout_seconds); case_timing.build_seconds=build.duration_seconds; commands.append(build); text=read_output(build.stdout_path)+read_output(build.stderr_path)
-                    diagnostics=[]
+                    build=build_workspace(ws,timeout_seconds); case_timing.build_seconds=build.duration_seconds; commands.append(build)
+                    diagnostics=[]; diagnostic_text=""
                     if case.get("expects",{}).get("analyzer") == "must_report":
                         diagnostic_started = time.monotonic()
-                        diagnostics=parse_diagnostics_from_build_output(text,ws.path/"build.diagnostics.log")
+                        diagnostic_text, diagnostics = load_analyzer_diagnostics(ws.path / "build.diagnostics.log")
                         case_timing.diagnostic_parse_seconds = round(time.monotonic() - diagnostic_started, 6)
                         evidence_started = time.monotonic()
                         write_json_atomic(ws.path/"diagnostics.json",[x.to_dict() for x in diagnostics])
                         case_timing.evidence_seconds += round(time.monotonic() - evidence_started, 6)
                     criteria.append(process_criterion(case["id"]+":consumer-build",case["id"]+" build",build))
                     if case.get("expects",{}).get("analyzer") == "must_report":
-                        criteria.extend(validate_analyzer_activation(case,diagnostics,build,baseline if case["carrier"]=="combined" else None,text));
+                        criteria.extend(validate_analyzer_activation(case,diagnostics,build,baseline if case["carrier"]=="combined" else None,diagnostic_text));
                         if case.get("analyzerBaseline") is True: baseline=diagnostics; baseline_case=case["id"]
                     if case["action"]=="run" and build.classification is ExecutionClassification.SUCCESS:
                         run=run_workspace(ws,timeout_seconds); case_timing.run_seconds=run.duration_seconds; commands.append(run); criteria.append(process_criterion(case["id"]+":consumer-run",case["id"]+" run",run))

@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from release_gate.consumers import build_workspace, create_isolated_workspace
+from release_gate.consumers import _run, build_workspace, create_isolated_workspace
 
 
 class ConsumerTests(unittest.TestCase):
@@ -26,6 +26,27 @@ class ConsumerTests(unittest.TestCase):
             "fixture": "annotations_valid",
             "expects": expects or {},
         }
+
+    def test_run_preserves_process_streams_without_duplicate_log(self):
+        with tempfile.TemporaryDirectory() as value:
+            root = Path(value)
+            workspace = type("Workspace", (), {"path": root, "environment": {}})()
+            stdout = root / "stdout.txt"
+            stderr = root / "stderr.txt"
+            stdout.write_text("complete stdout\n", encoding="utf-8")
+            stderr.write_text("complete stderr\n", encoding="utf-8")
+            result = type("Result", (), {
+                "stdout_path": stdout.as_posix(),
+                "stderr_path": stderr.as_posix(),
+            })()
+            from unittest.mock import patch
+            with patch("release_gate.consumers.run_process", return_value=result) as execute:
+                observed = _run(workspace, "build", ("dotnet", "build"), 10)
+            self.assertIs(result, observed)
+            execute.assert_called_once()
+            self.assertEqual([], list(root.glob("*.log")))
+            self.assertEqual("complete stdout\n", stdout.read_text(encoding="utf-8"))
+            self.assertEqual("complete stderr\n", stderr.read_text(encoding="utf-8"))
 
     def test_workspace_is_package_only_and_isolated(self):
         with tempfile.TemporaryDirectory() as value:
