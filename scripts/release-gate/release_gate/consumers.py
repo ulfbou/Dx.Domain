@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import html
+import json
 import re
 from .process import run_process
 
@@ -24,6 +25,7 @@ class ConsumerWorkspace:
     action: str
     capture_diagnostics: bool
     environment: dict[str, str]
+    target_framework: str
 
 def assert_no_project_references(content: str) -> bool:
     if re.search(r"<\s*ProjectReference\b", content, re.IGNORECASE):
@@ -67,7 +69,7 @@ def create_isolated_workspace(base_evidence_dir: Path, case: dict, candidate_dir
         "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1",
         "NUGET_XMLDOC_MODE": "skip",
     }
-    return ConsumerWorkspace(case["id"], root, config, csproj, cache, case["action"], capture_diagnostics, env)
+    return ConsumerWorkspace(case["id"], root, config, csproj, cache, case["action"], capture_diagnostics, env, case["targetFramework"])
 
 def _run(ws, name, argv, timeout_seconds):
     return run_process(
@@ -93,8 +95,29 @@ def build_workspace(ws, timeout_seconds=1800):
         argv.append(f"-flp:logfile={ws.path / 'build.diagnostics.log'};verbosity=diagnostic")
     return _run(ws, "build", tuple(argv), timeout_seconds)
 
+def runtime_artifacts(ws):
+    output = ws.path / "bin" / "Release" / ws.target_framework
+    return (output / "Consumer.dll", output / "Consumer.deps.json", output / "Consumer.runtimeconfig.json")
+
+def validate_runtime_artifacts(ws):
+    assembly, dependencies, runtime_config = runtime_artifacts(ws)
+    missing = [path.name for path in (assembly, dependencies, runtime_config) if not path.is_file()]
+    if missing:
+        raise ValueError(f"Missing runtime artifacts: {', '.join(missing)}")
+    if assembly.stat().st_size == 0:
+        raise ValueError("Malformed runtime artifact: Consumer.dll is empty")
+    for path in (dependencies, runtime_config):
+        try:
+            value = json.loads(path.read_text(encoding="utf-8", errors="strict"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"Malformed runtime artifact: {path.name}: {exc}") from exc
+        if not isinstance(value, dict):
+            raise ValueError(f"Malformed runtime artifact: {path.name} root must be an object")
+    return assembly
+
 def run_workspace(ws, timeout_seconds=1800):
-    return _run(ws, "run", ("dotnet","run","--project",str(ws.csproj_path),"-c","Release","--no-build",f"-p:DirectoryBuildPropsPath={ws.path/'Directory.Build.props'}"), timeout_seconds)
+    assembly = validate_runtime_artifacts(ws)
+    return _run(ws, "run", ("dotnet", str(assembly)), timeout_seconds)
 
 def validate_runtime_output(case: dict, stdout_text: str):
     expected = case.get("expects", {})

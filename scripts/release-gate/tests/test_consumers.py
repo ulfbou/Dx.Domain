@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from release_gate.consumers import _run, build_workspace, create_isolated_workspace
+from release_gate.consumers import build_workspace, create_isolated_workspace, run_workspace, validate_runtime_artifacts
 
 
 class ConsumerTests(unittest.TestCase):
@@ -27,26 +27,47 @@ class ConsumerTests(unittest.TestCase):
             "expects": expects or {},
         }
 
-    def test_run_preserves_process_streams_without_duplicate_log(self):
+    def write_runtime_artifacts(self, workspace, *, malformed=None):
+        output = workspace.path / "bin" / "Release" / workspace.target_framework
+        output.mkdir(parents=True)
+        (output / "Consumer.dll").write_bytes(b"assembly" if malformed != "dll" else b"")
+        (output / "Consumer.deps.json").write_text("{" if malformed == "deps" else "{}", encoding="utf-8")
+        (output / "Consumer.runtimeconfig.json").write_text("[]" if malformed == "runtimeconfig" else "{}", encoding="utf-8")
+        return output
+
+    def test_runtime_executes_built_assembly_directly_without_project_evaluation(self):
         with tempfile.TemporaryDirectory() as value:
-            root = Path(value)
-            workspace = type("Workspace", (), {"path": root, "environment": {}})()
-            stdout = root / "stdout.txt"
-            stderr = root / "stderr.txt"
-            stdout.write_text("complete stdout\n", encoding="utf-8")
-            stderr.write_text("complete stderr\n", encoding="utf-8")
-            result = type("Result", (), {
-                "stdout_path": stdout.as_posix(),
-                "stderr_path": stderr.as_posix(),
-            })()
+            root = Path(value); feed = root / "feed"; feed.mkdir()
+            workspace = create_isolated_workspace(root, self.case("runtime", action="run"), feed, self.manifest())
+            output = self.write_runtime_artifacts(workspace)
             from unittest.mock import patch
-            with patch("release_gate.consumers.run_process", return_value=result) as execute:
-                observed = _run(workspace, "build", ("dotnet", "build"), 10)
-            self.assertIs(result, observed)
-            execute.assert_called_once()
-            self.assertEqual([], list(root.glob("*.log")))
-            self.assertEqual("complete stdout\n", stdout.read_text(encoding="utf-8"))
-            self.assertEqual("complete stderr\n", stderr.read_text(encoding="utf-8"))
+            with patch("release_gate.consumers._run") as execute:
+                run_workspace(workspace)
+            argv = execute.call_args.args[2]
+            self.assertEqual(("dotnet", str(output / "Consumer.dll")), argv)
+            forbidden = {"run", "restore", "build", "msbuild", "--project", "--no-build"}
+            self.assertTrue(forbidden.isdisjoint(argv))
+            self.assertEqual(workspace.environment, execute.call_args.args[0].environment)
+
+    def test_runtime_requires_all_three_artifacts(self):
+        with tempfile.TemporaryDirectory() as value:
+            root = Path(value); feed = root / "feed"; feed.mkdir()
+            workspace = create_isolated_workspace(root, self.case("runtime", action="run"), feed, self.manifest())
+            output = self.write_runtime_artifacts(workspace)
+            for name in ("Consumer.dll", "Consumer.deps.json", "Consumer.runtimeconfig.json"):
+                path = output / name; content = path.read_bytes(); path.unlink()
+                with self.assertRaisesRegex(ValueError, "Missing runtime artifacts"):
+                    validate_runtime_artifacts(workspace)
+                path.write_bytes(content)
+
+    def test_malformed_runtime_artifacts_raise_verifier_error(self):
+        for malformed in ("dll", "deps", "runtimeconfig"):
+            with self.subTest(malformed=malformed), tempfile.TemporaryDirectory() as value:
+                root = Path(value); feed = root / "feed"; feed.mkdir()
+                workspace = create_isolated_workspace(root, self.case("runtime", action="run"), feed, self.manifest())
+                self.write_runtime_artifacts(workspace, malformed=malformed)
+                with self.assertRaisesRegex(ValueError, "Malformed runtime artifact"):
+                    validate_runtime_artifacts(workspace)
 
     def test_workspace_is_package_only_and_isolated(self):
         with tempfile.TemporaryDirectory() as value:
