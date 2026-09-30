@@ -79,5 +79,21 @@ class ConsumerFixtureContractTests(unittest.TestCase):
         self.assertNotIn("using Dx.Domain.Kernel;", source)
 
 
+    def test_runtime_fixtures_do_not_violate_ca2201(self):
+        for name in ("kernel_valid", "primitives_valid", "facts_valid", "combined_valid"):
+            self.assertNotIn("throw new Exception", FIXTURES[name])
+
+    def test_analyzer_fixture_deterministically_exercises_dxa065(self):
+        source = FIXTURES["analyzer_invalid_usage"]
+        self.assertIn("Returns Result when processing completes.", source)
+        self.assertNotIn("<see cref=", source)
+
+    def test_guid_output_contract_matches_correlation_id_n_format(self):
+        import json
+        contract = json.loads((ROOT / "contracts" / "consumer-matrix.json").read_text(encoding="utf-8"))
+        relevant = [case for case in contract["cases"] if case["id"].startswith(("primitives-", "combined-")) and case["action"] == "run"]
+        self.assertEqual(6, len(relevant))
+        self.assertTrue(all(case["expects"]["outputPattern"] == "^[0-9a-fA-F]{32}$" for case in relevant))
+
 if __name__ == "__main__":
     unittest.main()

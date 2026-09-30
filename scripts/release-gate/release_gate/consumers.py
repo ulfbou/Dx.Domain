@@ -7,11 +7,11 @@ from .process import run_process
 
 FIXTURES = {
     "annotations_valid": "using Dx.Domain.Annotations;\n[Entity] public sealed class ConsumerEntity { }\n",
-    "kernel_valid": "using System;\nvar result = Dx.Result.Success(\"kernel-ok\"); if (!result.IsSuccess) throw new Exception(\"failure\"); Console.WriteLine(result.Value);\n",
-    "primitives_valid": "using System; using Dx.Domain.Primitives;\nvar id = CorrelationId.New(); if (id.Value == Guid.Empty) throw new Exception(\"empty\"); Console.WriteLine(id);\n",
-    "facts_valid": "using System; using Dx.Domain.Facts;\nvar fact = Fact<string>.Create(\"consumer.fact\", \"facts-ok\", default); if (fact.GetPayload() != \"facts-ok\") throw new Exception(\"payload\"); Console.WriteLine(fact.FactType);\n",
+    "kernel_valid": "using System;\nvar result = Dx.Result.Success(\"kernel-ok\"); if (!result.IsSuccess) throw new InvalidOperationException(\"failure\"); Console.WriteLine(result.Value);\n",
+    "primitives_valid": "using System; using Dx.Domain.Primitives;\nvar id = CorrelationId.New(); if (id.Value == Guid.Empty) throw new InvalidOperationException(\"empty\"); Console.WriteLine(id);\n",
+    "facts_valid": "using System; using Dx.Domain.Facts;\nvar fact = Fact<string>.Create(\"consumer.fact\", \"facts-ok\", default); if (fact.GetPayload() != \"facts-ok\") throw new InvalidOperationException(\"payload\"); Console.WriteLine(fact.FactType);\n",
     "combined_valid": "using System; using Dx.Domain.Annotations; using Dx.Domain.Primitives; using Dx.Domain.Facts;\nvar id = CorrelationId.New(); var result = Dx.Result.Success(id); var fact = Fact<CorrelationId>.Create(\"consumer.combined\", result.Value, default); Console.WriteLine(fact.GetPayload());\n[Entity] sealed class ConsumerEntity { }\n",
-    "analyzer_invalid_usage": "using Dx.Domain.Annotations;\n/// <summary>Uses Dx.Domain.Annotations.EntityAttribute directly.</summary>\n[Entity] public sealed class InvalidDocumentationReference { }\n",
+    "analyzer_invalid_usage": "using Dx.Domain.Annotations;\n/// <summary>Returns Result when processing completes.</summary>\n[Entity] public sealed class InvalidDocumentationReference { }\n",
 }
 
 @dataclass(frozen=True)
