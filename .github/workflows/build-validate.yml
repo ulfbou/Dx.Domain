@@ -44,7 +44,11 @@ jobs:
           dotnet msbuild src/Dx.Domain.Facts/Dx.Domain.Facts.csproj -getProperty:IsPackable
 
       - name: Run shared WS-003 release gate
-        run: python3 scripts/release-gate/run.py --profile ci
+        run: |
+          mkdir -p "$DX"
+          python3 scripts/release-gate/run.py --profile ci
+        env:
+          DX: ${{ runner.temp }}/dx
 
       - name: Upload WS-003 release-gate evidence
         if: always()
@@ -52,11 +56,16 @@ jobs:
         with:
           name: ws-003-release-gate-build-validate-${{ github.run_id }}-${{ github.run_attempt }}
           path: .dx/verification/release-gate/
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
 
       - name: Run WS-004 candidate gate
-        run: python3 scripts/release-gate/run.py --profile candidate
+        run: |
+          mkdir -p "$DX"
+          python3 scripts/release-gate/run.py --profile candidate
+        env:
+          DX: ${{ runner.temp }}/dx
       - name: Upload candidate artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -65,6 +74,7 @@ jobs:
           path: |
             .dx/verification/release-gate/**/candidate-manifest.json
             .dx/verification/release-gate/**/packages/*.nupkg
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
       - name: Verify diagnostic metadata conformance
@@ -78,3 +88,11 @@ jobs:
 
       - name: Compile material documentation examples
         run: bash scripts/docs-examples-compile.sh
+      - name: Upload mandatory release-gate carriers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-carrier-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dx/*.dx.txt
+          if-no-files-found: error
+          retention-days: 30
