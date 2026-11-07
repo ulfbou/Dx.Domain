@@ -43,41 +43,17 @@ jobs:
           echo "=== MSBuild evaluated IsPackable ==="
           dotnet msbuild src/Dx.Domain.Facts/Dx.Domain.Facts.csproj -getProperty:IsPackable
 
-      - name: Restore with binary log
-        run: dotnet restore -bl:restore.binlog
+      - name: Run shared WS-003 release gate
+        run: python3 scripts/release-gate/run.py --profile ci
 
-      - name: Upload restore log on failure
-        if: failure()
+      - name: Upload WS-003 release-gate evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: restore-binlog
-          path: restore.binlog
-
-      # Analyzer profile resolution (maintainer → consumer → fallback)
-      - name: Use maintainer analyzer profile
-        if: ${{ hashFiles('.editorconfig.maintainers') != '' }}
-        run: cp .editorconfig.maintainers .editorconfig
-
-      - name: Use consumer analyzer profile (fallback)
-        if: ${{ hashFiles('.editorconfig.maintainers') == '' && hashFiles('.editorconfig.consumers') != '' }}
-        run: cp .editorconfig.consumers .editorconfig
-
-      - name: Ensure .editorconfig exists (final fallback)
-        if: ${{ hashFiles('.editorconfig') == '' }}
-        run: |
-          echo "root = true" > .editorconfig
-          echo "" >> .editorconfig
-          echo "[*]" >> .editorconfig
-
-      - name: Restore
-        run: dotnet restore
-
-      - name: Build (Release)
-        # Governance decides DX*, not CLI
-        run: dotnet build -c Release --no-restore -p:TreatWarningsAsErrors=false
-
-      - name: Run tests
-        run: dotnet test -c Release --no-build --verbosity normal
+          name: ws-003-release-gate-build-validate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .dx/verification/release-gate/
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Verify diagnostic metadata conformance
         run: python3 scripts/verify-diagnostic-conformance.py

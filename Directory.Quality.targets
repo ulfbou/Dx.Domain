@@ -78,17 +78,6 @@
           Condition="Exists('$(SecurityAnalysisOutputFile)')" />
   </Target>
 
-  <Target Name="ValidateQualityGates" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-    <Message Text="Validating quality gates..." Importance="high" />
-
-    <!-- Quality gates are enforced by TreatWarningsAsErrors and analyzer configuration -->
-    <PropertyGroup>
-      <QualityGatesPassed>true</QualityGatesPassed>
-    </PropertyGroup>
-
-    <Message Text="✅ All quality gates passed!" Importance="high" Condition="'$(QualityGatesPassed)' == 'true'" />
-  </Target>
-
   <Target Name="CleanQualityArtifacts" BeforeTargets="Clean">
     <ItemGroup>
       <QualityArtifacts Include="$(OutputPath)CodeAnalysisLog.xml" />
