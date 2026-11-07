@@ -24,8 +24,8 @@
     <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
     
     <!-- Packaging -->
-    <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Dx.Domain.Analyzers</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -77,6 +77,7 @@
   <!-- Analyzer packaging layout -->
   <ItemGroup>
     <None Include="readme.md" Pack="true" PackagePath="/" />
+    <None Remove="bin\Debug\netstandard2.0\Dx.Domain.Analyzers.dll" />
     <None Include="$(OutputPath)Dx.Domain.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
 
     <None Include="$(OutputPath)Dx.Domain.Analyzers.resources.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Condition="Exists('$(OutputPath)Dx.Domain.Analyzers.resources.dll')" />

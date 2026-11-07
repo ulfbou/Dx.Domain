@@ -21,12 +21,6 @@
     <Version>0.1.0-alpha.2</Version>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <Version>0.1.0-alpha.2</Version>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
-  </PropertyGroup>
-
   <ItemGroup>
     <CompilerVisibleProperty Include="DxLayer" />
   </ItemGroup>

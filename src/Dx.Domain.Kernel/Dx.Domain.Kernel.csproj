@@ -7,16 +7,17 @@
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.</Description>
     <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
+    <Authors>Dx.Domain Team</Authors>
+    <Company>Dx.Domain Team</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <!--<NoWarn>$(NoWarn);CS1591</NoWarn>-->
     <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Version>0.1.0-alpha.2</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
+    <Version>0.1.0-alpha.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
