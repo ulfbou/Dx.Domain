@@ -1,10 +1,8 @@
 <Project Label="Directory.Build.props">
-
   <!-- Directory.Build.props -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <!-- Common properties for all projects -->
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
@@ -12,5 +10,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
+      <PrivateAssets>all</PrivateAssets>
+      <Version>3.9.50</Version>
+    </PackageReference>
+  </ItemGroup>
 </Project>

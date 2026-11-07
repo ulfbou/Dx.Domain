@@ -5,6 +5,10 @@
     "docfx": {
       "version": "2.78.4",
       "commands": ["docfx"]
+    },
+    "nbgv": {
+      "version": "3.6.133",
+      "commands": ["nbgv"]
     }
   }
 }
