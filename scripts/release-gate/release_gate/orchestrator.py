@@ -185,3 +185,55 @@ def execute_gate(repository_root, script_root, profile="local", evidence_base=No
         lines.append(f"- **{item.status.value}** `{item.criterion_id}`: {item.motivation}")
     write_text_atomic(evidence_root / "report.md", "\n".join(lines) + "\n")
     return decision, evidence_root, report
+
+def _candidate_result(cid, ok, expected, observed, evidence=None, error=False):
+    return CriterionResult(cid,cid,CriterionStatus.ERROR if error else (CriterionStatus.PASS if ok else CriterionStatus.FAIL),"Candidate evidence matched the release contract." if ok else "Candidate evidence did not match the release contract.","release_gate.orchestrator.execute_candidate_profile",evidence or [],expected,observed,None if ok else "Correct the candidate mechanism and rerun from a clean tree.")
+
+def execute_candidate_profile(repository_root, script_root, evidence_base=None, timeout_seconds=1800):
+    from .manifests import compute_sha256, generate_manifest, verify_manifest, write_manifest
+    from .msbuild import assert_build_order_matches_contract, get_project_references
+    from .packages import is_valid_zip, read_nuspec, validate_analyzer_placement, validate_dependencies, validate_framework_groups, validate_nuspec, validate_readme_presence, extract_analyzer_bytes
+    repository_root=Path(repository_root).resolve(); script_root=Path(script_root).resolve()
+    release=load_contract(script_root/'contracts/release-contract.json'); package=load_contract(script_root/'contracts/package-contract.json')
+    initial=capture_git_state(repository_root); run_id=make_run_id(initial['head']); evidence_root=Path(evidence_base or repository_root/'.dx/verification/release-gate').resolve()/run_id; evidence_root.mkdir(parents=True,exist_ok=False)
+    write_json_atomic(evidence_root/'run.json',{"schema":"dx-domain.release-gate-run.v1","run_id":run_id,"profile":"candidate","phase":"ACCEPT_READY","created_utc":utc_now(),"repository_root":repository_root.as_posix(),"head":initial['head'],"branch":initial['branch'],"contracts":{"release_contract_sha256":release.sha256,"package_contract_sha256":package.sha256}})
+    write_json_atomic(evidence_root/'environment.json',{"platform":{"system":platform.system(),"release":platform.release(),"machine":platform.machine()},"python":sys.version})
+    write_json_atomic(evidence_root/'git-before.json',initial)
+    criteria=[]; commands=[]; dirty=bool(initial['status']); criteria.append(_candidate_result('candidate-clean-tree',not dirty,[],initial['status'],['git-before.json']))
+    if not dirty:
+      cleanup=[]
+      allowed=set(release.value['candidate']['cleanup_directories'])
+      for path in repository_root.rglob('*'):
+        if path.is_dir() and path.name in allowed and '.git' not in path.parts and '.dx' not in path.parts: cleanup.append(path)
+      cleanup=sorted(set(cleanup),key=lambda p:len(p.parts),reverse=True); write_json_atomic(evidence_root/'cleanup.json',{"affected":[p.relative_to(repository_root).as_posix() for p in cleanup]})
+      for p in cleanup: shutil.rmtree(p,ignore_errors=False)
+      refs={}
+      try:
+       for project in package.value['build_order']: refs[project]=get_project_references(project,repository_root=repository_root,evidence_directory=evidence_root,timeout_seconds=min(timeout_seconds,300))
+       assert_build_order_matches_contract(package.value,refs); criteria.append(_candidate_result('candidate-build-order',True,package.value['build_order'],package.value['build_order']))
+      except Exception as exc: criteria.append(_candidate_result('candidate-build-order',False,package.value['build_order'],str(exc),error=True))
+      if criteria[-1].status is CriterionStatus.PASS:
+       for i,project in enumerate(package.value['build_order']):
+        res=run_process(command_id=f"candidate-build-{i+1}-{Path(project).stem}",argv=("dotnet","build",project,"-c","Release","--nologo","-p:TreatWarningsAsErrors=true","-p:ContinuousIntegrationBuild=true","-p:PublicRelease=true"),cwd=repository_root,evidence_directory=evidence_root,timeout_seconds=timeout_seconds); commands.append(res); criteria.append(process_criterion('candidate-build-order',f'Build {project}',res))
+        if res.classification is not ExecutionClassification.SUCCESS: break
+      if all(c.status is CriterionStatus.PASS for c in criteria):
+       analyzer=repository_root/'src/Dx.Domain.Analyzers/bin/Release/netstandard2.0/Dx.Domain.Analyzers.dll'; authoritative=compute_sha256(analyzer)
+       package_dir=evidence_root/'packages'; package_dir.mkdir()
+       for item in package.value['allowlist']:
+        res=run_process(command_id=f"candidate-pack-{item['id'].split('.')[-1].lower()}",argv=("dotnet","pack",item['project'],"-c","Release","--no-build","--nologo","-o",str(package_dir),f"-p:PackageVersion={package.value['version']}","-p:TreatWarningsAsErrors=true","-p:ContinuousIntegrationBuild=true","-p:PublicRelease=true"),cwd=repository_root,evidence_directory=evidence_root,timeout_seconds=timeout_seconds); commands.append(res); criteria.append(process_criterion('candidate-exact-four',f"Pack {item['id']}",res))
+       paths=sorted(package_dir.glob('*.nupkg')); expected={x['filename'] for x in package.value['allowlist']}; observed={p.name for p in paths}; criteria.append(_candidate_result('candidate-exact-four',len(paths)==4 and observed==expected,sorted(expected),sorted(observed)))
+       prohibited=[p.name for p in paths if any(x.lower() in p.name.lower() for x in package.value['prohibited_ids'])]; criteria.append(_candidate_result('candidate-no-prohibited',not prohibited,[],prohibited))
+       analyzer_hashes=[]
+       for item in package.value['allowlist']:
+        p=package_dir/item['filename']; valid=is_valid_zip(p); criteria.append(_candidate_result('candidate-zip-valid',valid,True,valid,[p.as_posix()]))
+        if not valid: continue
+        try:
+         n=read_nuspec(p); criteria.extend([validate_nuspec(n,item['id'],package.value['version'],p),validate_framework_groups(n,item['frameworks'],p),validate_dependencies(n,item['dependencies'],package.value['version'],p),validate_readme_presence(p,item['readme']),validate_analyzer_placement(p,package.value['analyzer_asset_path'],package.value['forbidden_runtime_paths'])]); analyzer_hashes.append(compute_sha256_bytes(extract_analyzer_bytes(p,package.value['analyzer_asset_path'])))
+        except Exception as exc: criteria.append(_candidate_result('candidate-zip-valid',False,'valid independently inspectable package',str(exc),[p.as_posix()],error=True))
+       same=len(analyzer_hashes)==4 and len(set(analyzer_hashes))==1 and analyzer_hashes[0]==authoritative; criteria.append(_candidate_result('candidate-analyzer-byte-identity',same,authoritative,analyzer_hashes))
+       if all(c.status is CriterionStatus.PASS for c in criteria):
+        manifest=generate_manifest(paths,release.value['candidate']['signing_disposition']); manifest_path=evidence_root/'candidate-manifest.json'; write_manifest(manifest,manifest_path); criteria.append(_candidate_result('candidate-manifest-generated',True,4,len(manifest['packages']),[manifest_path.as_posix()])); criteria.extend(verify_manifest(manifest_path,package_dir))
+    final=capture_git_state(repository_root); write_json_atomic(evidence_root/'git-after.json',final); unchanged=initial['head']==final['head'] and initial['tracked_diff']==final['tracked_diff']; criteria.append(_candidate_result('candidate-source-immutability',unchanged,initial['tracked_diff'],final['tracked_diff'],['git-before.json','git-after.json']))
+    decision=aggregate(criteria); report={"schema":"dx-domain.release-gate-report.v1","run_id":run_id,"profile":"candidate","head":initial['head'],"decision":decision.value,"commands":[command_record(x,repository_root) for x in commands],"criteria":[x.to_dict() for x in criteria]}; write_json_atomic(evidence_root/'criteria.json',report['criteria']); write_json_atomic(evidence_root/'report.json',report); write_text_atomic(evidence_root/'report.md','# Dx.Domain Candidate Gate\n\n'+f'- Decision: **{decision.value}**\n'+''.join(f"- **{x.status.value}** `{x.criterion_id}`: {x.motivation}\n" for x in criteria)); return decision,evidence_root,report
+
+def compute_sha256_bytes(value): return hashlib.sha256(value).hexdigest()

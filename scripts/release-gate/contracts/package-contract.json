@@ -1,0 +1,76 @@
+{
+  "schema": "dx-domain.package-contract.v1",
+  "version": "0.1.0-alpha",
+  "allowlist": [
+    {
+      "id": "Dx.Domain.Annotations",
+      "filename": "Dx.Domain.Annotations.0.1.0-alpha.nupkg",
+      "project": "src/Dx.Domain.Annotations/Dx.Domain.Annotations.csproj",
+      "frameworks": [
+        "netstandard2.0"
+      ],
+      "dependencies": [],
+      "readme": "readme.md"
+    },
+    {
+      "id": "Dx.Domain.Kernel",
+      "filename": "Dx.Domain.Kernel.0.1.0-alpha.nupkg",
+      "project": "src/Dx.Domain.Kernel/Dx.Domain.Kernel.csproj",
+      "frameworks": [
+        "net8.0",
+        "net9.0",
+        "net10.0"
+      ],
+      "dependencies": [
+        "Dx.Domain.Annotations"
+      ],
+      "readme": "readme.md"
+    },
+    {
+      "id": "Dx.Domain.Primitives",
+      "filename": "Dx.Domain.Primitives.0.1.0-alpha.nupkg",
+      "project": "src/Dx.Domain.Primitives/Dx.Domain.Primitives.csproj",
+      "frameworks": [
+        "net8.0",
+        "net9.0",
+        "net10.0"
+      ],
+      "dependencies": [
+        "Dx.Domain.Annotations"
+      ],
+      "readme": "readme.md"
+    },
+    {
+      "id": "Dx.Domain.Facts",
+      "filename": "Dx.Domain.Facts.0.1.0-alpha.nupkg",
+      "project": "src/Dx.Domain.Facts/Dx.Domain.Facts.csproj",
+      "frameworks": [
+        "net8.0",
+        "net9.0",
+        "net10.0"
+      ],
+      "dependencies": [
+        "Dx.Domain.Annotations",
+        "Dx.Domain.Kernel",
+        "Dx.Domain.Primitives"
+      ],
+      "readme": "readme.md"
+    }
+  ],
+  "prohibited_ids": [
+    "Dx.Domain.Analyzers",
+    "Dx.Domain.Generators"
+  ],
+  "analyzer_asset_path": "analyzers/dotnet/cs/Dx.Domain.Analyzers.dll",
+  "build_order": [
+    "src/Dx.Domain.Analyzers/Dx.Domain.Analyzers.csproj",
+    "src/Dx.Domain.Annotations/Dx.Domain.Annotations.csproj",
+    "src/Dx.Domain.Kernel/Dx.Domain.Kernel.csproj",
+    "src/Dx.Domain.Primitives/Dx.Domain.Primitives.csproj",
+    "src/Dx.Domain.Facts/Dx.Domain.Facts.csproj"
+  ],
+  "forbidden_runtime_paths": [
+    "lib/",
+    "runtimes/"
+  ]
+}

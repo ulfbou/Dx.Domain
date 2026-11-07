@@ -29,7 +29,11 @@ jobs:
         run: dotnet --list-sdks
 
       - name: Run shared WS-003 release gate
-        run: python3 scripts/release-gate/run.py --profile ci
+        run: |
+          mkdir -p "$DX"
+          python3 scripts/release-gate/run.py --profile ci
+        env:
+          DX: ${{ runner.temp }}/dx
 
       - name: Upload WS-003 release-gate evidence
         if: always()
@@ -37,6 +41,7 @@ jobs:
         with:
           name: ws-003-release-gate-analyzers-${{ github.run_id }}-${{ github.run_attempt }}
           path: .dx/verification/release-gate/
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
 
@@ -57,3 +62,11 @@ jobs:
       - name: Block unapproved breaking changes
         if: hashFiles('scripts/api-diff-gate.sh') != ''
         run: scripts/api-diff-gate.sh
+      - name: Upload mandatory release-gate carriers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-carrier-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dx/*.dx.txt
+          if-no-files-found: error
+          retention-days: 30

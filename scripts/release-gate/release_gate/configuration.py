@@ -9,6 +9,10 @@ from typing import Any
 from .model import Profile
 
 
+PACKAGE_CONTRACT_PATH = Path("contracts/package-contract.json")
+CANDIDATE_DIR = Path("artifacts/candidate")
+MANIFEST_FILENAME = "candidate-manifest.json"
+
 class ConfigurationError(ValueError):
     pass
 
