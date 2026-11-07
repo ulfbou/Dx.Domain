@@ -1,32 +1,21 @@
 ---
 name: Bug Report
-about: Create a report to help us improve
-title: '[BUG] '
-labels: type:bug, status:needs-triage
-assignees: ''
+about: Defect or regression
+title: "[BUG] "
+labels:
+  - type:bug
+  - status:needs-triage
+assignees: 'ulfbou'
 
 ---
 
-## Bug Description
-
-<!-- A clear and concise description of what the bug is -->
-
-## To Reproduce
-
-Steps to reproduce the behavior:
-
-1.
-2.
-3.
-4.
+## Problem
 
 ## Expected Behavior
 
-<!-- A clear and concise description of what you expected to happen -->
-
 ## Actual Behavior
 
-<!-- What actually happened -->
+## Reproduction
 
 ## Environment
 
@@ -51,22 +40,12 @@ Steps to reproduce the behavior:
 Paste stack trace here
 ```
 
-## Screenshots
-
-<!-- If applicable, add screenshots to help explain your problem -->
-
-## Additional Context
-
-<!-- Add any other context about the problem here -->
-
 ## Impact
 
-<!-- How does this affect your work? -->
+- [ ] impact:breaking
+- [ ] impact:behavioral
+- [ ] impact:internal
 
-- [ ] Blocks development
-- [ ] Workaround available
-- [ ] Low priority
+## Validation
 
-## Possible Solution
-
-<!-- If you have suggestions on how to fix this, please share -->
+## Additional Context
