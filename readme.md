@@ -1,59 +1,59 @@
-# Zentient.Metadata
+# Dx.Domain
 
-<<<<<<< HEAD
-A modern, extensible metadata platform for .NET. This monorepo contains the core packages used to declare, compose, discover, and analyze metadata in libraries and applications.
+Dx.Domain is a small, compiler-assisted substrate for explicit invariants, results, errors, identities, and structural facts in .NET.
 
-[![CI](https://github.com/ulfbou/Zentient.Metadata/actions/workflows/ci-cd.yml/badge.svg)](.github/workflows/ci-cd.yml)
-=======
-[![.github/workflows/ci-cd.yml](https://github.com/ulfbou/Zentient.Metadata/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/ulfbou/Zentient.Metadata/actions/workflows/ci-cd.yml)
->>>>>>> origin/main
-[![NuGet](https://img.shields.io/nuget/v/Zentient.Metadata.svg)](https://www.nuget.org/packages/Zentient.Metadata)
+> **Alpha:** `0.1.0-alpha` is pre-release software. Principles are stable, but APIs and analyzer behavior may change before a stable release. Review the [stability policy](docs/public/stability.md) and [limitations](docs/public/limitations.md) before adoption.
 
-What’s inside
-- Zentient.Metadata — Core metadata engine (immutable metadata, fluent builder, scanners)
-- Zentient.Metadata.Attributes — Attribute-based metadata discovery and conversion
-- Zentient.Metadata.Abstractions — Interfaces and contracts used across packages
-- Zentient.Metadata.Analyzers — Roslyn analyzers for best practices and correctness
-- Zentient.Metadata.Diagnostics — Diagnostic helpers and profiles
+## What it provides
 
-Goals
-- Provide a small, stable set of abstractions for metadata composition and discovery
-- Offer a flexible runtime model with first-class support for attribute-driven metadata
-- Deliver tooling (analyzers and diagnostics) to improve developer experience
+- `Dx.Domain.Kernel`: `Result<T>`, `DomainError`, `Invariant`, `Dx.Result`, and `Dx.Require`
+- `Dx.Domain.Primitives`: strongly typed identifiers such as `UserId`, `CorrelationId`, and `TraceId`
+- `Dx.Domain.Facts`: immutable structural facts and causation data
+- `Dx.Domain.Annotations`: metadata used to express architectural intent
+- `Dx.Domain.Analyzers`: compile-time diagnostics for participating C# projects
 
-Quick start
-1. Add the package you need:
+Enforcement is compiler-, analyzer-, or runtime-based depending on the rule. It is not formal verification and does not cover reflection, serialization materialization, dynamic invocation, or business-semantic correctness.
+
+## Install
 
 ```bash
-dotnet add package Zentient.Metadata
-# or
-dotnet add package Zentient.Metadata.Attributes
+dotnet add package Dx.Domain.Kernel --version 0.1.0-alpha
+dotnet add package Dx.Domain.Primitives --version 0.1.0-alpha
+dotnet add package Dx.Domain.Analyzers --version 0.1.0-alpha
 ```
 
-2. Build metadata using the fluent API:
+Add `Dx.Domain.Facts` and `Dx.Domain.Annotations` only when their capabilities are needed. Installing the analyzer package explicitly is the documented alpha configuration.
+
+## Minimal example
 
 ```csharp
-var metadata = Metadata.Create()
-    .SetTag("Version", "1.0.0")
-    .SetTag("Author", "Zentient Team")
-    .Build();
+using Dx.Domain;
+using Dx.Domain.Errors;
+using Dx.Domain.Primitives;
 
-var version = metadata.GetValueOrDefault<string>("Version");
+static Result<UserId> ParseUserId(string text)
+{
+    if (UserId.TryParse(text, provider: null, out var id))
+        return Dx.Result.Success(id);
+
+    return Dx.Result.Failure<UserId>(
+        DomainError.Create("user.id.invalid", "Expected a non-empty GUID in N format."));
+}
 ```
 
-Documentation
-- API reference: https://ulfbou.github.io/Zentient.Metadata/
-- Specification and design docs: docs/
-- CHANGELOG: CHANGELOG.md
+## Start here
 
-CI / Release
-- The repository uses GitHub Actions (.github/workflows/ci-cd.yml) to run restore, build, test, pack, and publish.
-- Releases are triggered by tags using the form `vMAJOR.MINOR.PATCH` and publish packages to NuGet.org.
+1. [Getting Started](docs/public/getting-started.md)
+2. [Quickstart](docs/public/quickstart.md)
+3. [Package guide](docs/public/packages/index.md)
+4. [Analyzer reference](docs/public/reference/diagnostics/index.md)
+5. [Configuration](docs/public/reference/configuration.md)
+6. [Alpha release notes](docs/public/release-notes/0.1.0-alpha.md)
 
-Contributing
-- See CONTRIBUTING.md for contribution and release guidelines.
-- Open issues and PRs on GitHub; all changes should include tests and updates to CHANGELOG.md when applicable.
+## Support and contribution
 
-License
-- MIT — see LICENSE file.
+- Report vulnerabilities privately using [GitHub Security Advisories](SECURITY.md).
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing changes.
+- See [CHANGELOG.md](CHANGELOG.md) for user-visible history.
 
+Dx.Domain is licensed under the [MIT License](LICENSE).

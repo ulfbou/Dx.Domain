@@ -1,36 +1,45 @@
 - name: Overview
   href: index.md
-
 - name: Getting Started
   href: getting-started.md
-
+- name: Quickstart
+  href: quickstart.md
 - name: Architecture
-  href: architecture-overview.md
-
-- name: Core Specification
-  href: specification/core-platform.md
-
+  href: architecture.md
+- name: Stability and Limitations
+  items:
+  - name: Alpha Stability
+    href: stability.md
+  - name: Limitations
+    href: limitations.md
+  - name: Troubleshooting
+    href: troubleshooting.md
+  - name: Security
+    href: security.md
 - name: Packages
+  href: packages/index.md
   items:
-    - name: Annotations
-      href: packages/annotations.md
-    - name: Kernel
-      href: packages/kernel.md
-    - name: Primitives
-      href: packages/primitives.md
-    - name: Facts
-      href: packages/facts.md
-    - name: Analyzers
-      href: packages/analyzers.md
-
-- name: Examples
+  - name: Annotations
+    href: packages/annotations.md
+  - name: Primitives
+    href: packages/primitives.md
+  - name: Kernel
+    href: packages/kernel.md
+  - name: Facts
+    href: packages/facts.md
+  - name: Analyzers
+    href: packages/analyzers.md
+- name: Concepts
+  href: concepts/index.md
+- name: Guides
+  href: guides/index.md
+- name: Reference
   items:
-    - name: Basic Result Usage
-      href: examples/basic-result.md
-
+  - name: Configuration
+    href: reference/configuration.md
+  - name: Diagnostics
+    href: reference/diagnostics/index.md
+  - name: API
+    href: reference/api/index.md
 - name: Release Notes
-  items:
-    - name: Index
-      href: release-notes/index.md
-    - name: 0.1.0
-      href: release-notes/0.1.0.md
+  href: release-notes/index.md

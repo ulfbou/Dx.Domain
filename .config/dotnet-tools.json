@@ -3,12 +3,18 @@
   "isRoot": true,
   "tools": {
     "docfx": {
-      "version": "2.78.4",
-      "commands": ["docfx"]
+      "version": "2.78.5",
+      "commands": [
+        "docfx"
+      ],
+      "rollForward": false
     },
     "nbgv": {
-      "version": "3.6.133",
-      "commands": ["nbgv"]
+      "version": "3.10.94",
+      "commands": [
+        "nbgv"
+      ],
+      "rollForward": false
     }
   }
 }
