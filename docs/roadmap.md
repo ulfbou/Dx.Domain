@@ -1,7 +1,11 @@
 # Roadmap
 
-**Last reviewed:** 2026-04-22  
+**Last reviewed:** 2026-04-23
 **Current version:** 0.1.0-alpha
+
+## Alpha status
+
+Dx.Domain `0.1.0-alpha` is the current shipped prerelease. Public APIs, package composition, analyzer behavior, configuration, and non-error diagnostic severities remain provisional until `0.1.0` stable.
 
 ## Philosophy
 
@@ -13,50 +17,71 @@ Roadmap items are classified by their effect on guarantees, not by feature compl
 
 ## Committed for 0.1.0 stable
 
-### 1. Stabilize primitive shapes
-**Problem:** Current struct layouts may change.  
-**Goal:** Freeze public surface of CorrelationId, TraceId, ActorId, FactId, SpanId.  
-**Trade-off:** Locks in representation, limits future optimization.
+### 1. Finalize primitive public surfaces
+
+**Existing contract:** adr/adr-0018-kernel-public-surface.md establishes the S0 public construction contract and exempts the substrate types from DXA010, DXA011, and DXA080.
+
+**Problem:** The complete API signatures and default-value behavior of the identity primitives remain provisional for the alpha.
+
+**Goal:** Finalize and baseline the public surfaces of `CorrelationId`, `TraceId`, `UserId`, `FactId`, and `SpanId`.
+
+**Trade-off:** Finalizing the signatures constrains future representation and API changes.
 
 ### 2. `Result<T>` API finalization
-**Problem:** Match and Map signatures are provisional.  
-**Goal:** Define stable API for success/failure handling.  
-**Trade-off:** Verbosity accepted for explicitness.
 
-### 3. DXA010 to Error severity
-**Problem:** Construction authority currently warns, allowing bypass.  
-**Goal:** Make direct construction a build error outside kernel.  
-**Trade-off:** Breaks existing experiments, forces factory adoption.
+**Problem:** Match, Map, Bind, default-value behavior, and related Result signatures remain provisional.
+
+**Goal:** Define and baseline the stable API and behavior for success and failure handling.
+
+**Trade-off:** Verbosity is accepted where it preserves explicit failure semantics.
+
+### 3. DXA010 default severity to Error
+
+**Current state:** The DXA010 descriptor defaults to Warning for consumers. Repository maintainer builds already promote applicable DXA diagnostics, including DXA010, to errors through maintainer configuration and build governance.
+
+**Goal:** Change the stable-release descriptor-default severity from Warning to Error so direct construction outside the authorized substrate or construction boundary fails consumer builds by default.
+
+**Trade-off:** Existing experiments that rely on direct construction will require an approved construction boundary.
 
 ## Experimental
 
-### Analyzer for unchecked Result.Value
-**Problem:** Callers can ignore `Result` and access .Value directly.  
-**Exploration:** Roslyn analyzer to flag unchecked access.  
-**Risk:** May produce false positives in legitimate scenarios.
+### Analyzer for unchecked `Result.Value`
 
-### Test clock for DomainTime
-**Problem:** `DomainTime.Now()` is non-deterministic in tests.  
-**Exploration:** Internal test clock injection, not exposed publicly.  
-**Risk:** Could leak into public API if not carefully bounded.
+**Problem:** Callers can access `Result.Value` without proving that the Result succeeded.
+
+**Exploration:** Add a Roslyn analyzer that detects unchecked access patterns not covered by DXA020.
+
+**Risk:** Flow analysis may produce false positives in legitimate scenarios.
+
+### Test clock for `DomainTime`
+
+**Problem:** `DomainTime.Now()` reads the live UTC system clock and is nondeterministic in tests.
+
+**Exploration:** Introduce an internal test-time mechanism without exposing clock policy through the public Kernel API.
+
+**Risk:** The mechanism could leak into the public surface or introduce ambient state if not tightly bounded.
 
 ### Generator for ID factories
-**Problem:** Manual factory implementation is repetitive.  
-**Exploration:** Source generator that emits Create methods with invariant checks.  
-**Risk:** Generated code must remain visible and auditable.
 
-## Deferred (intentionally)
+**Problem:** Repeating identity-factory implementations is mechanical but verbose.
 
-- **EF Core integration:** Violates [Non-Goal #3](NON_GOALS.md#3-a-persistence-framework) (Persistence Framework). Belongs in adapter, not core.
-- **JSON converters in core:** Violates [Non-Goal #1](NON_GOALS.md#1-a-general-purpose-utility-library) (Utility Library). Belongs in separate package.
-- **Localization of errors:** Violates [Manifesto](manifesto.md) demand for centralized error semantics. Application concern.
+**Exploration:** Implement a source generator that emits auditable creation code while preserving the existing identity semantics.
+
+**Risk:** Generated code must remain visible, deterministic, and consistent with analyzer and package contracts. `Dx.Domain.Generators` is not shipped in `0.1.0-alpha`.
+
+## Deferred intentionally
+
+- **EF Core integration:** Conflicts with non_goals.md#3-a-persistence-framework. Persistence support belongs in an adapter package, not the core.
+- **JSON converters in core:** Conflicts with non_goals.md#1-a-general-purpose-utility-library. Serialization support belongs in a separate package.
+- **Localization of errors:** Application-level localization must not alter the Kernel’s stable error identities and explicit failure semantics.
 
 ## What will not change
 
-These are philosophically fixed, per [Manifesto](manifesto.md):
-- Strongly typed identities will remain
-- `Result` over exceptions for domain failure will remain
-- Construction authority will remain
-- UTC-only time will remain
+These principles are fixed by the manifesto.md and supporting architectural decisions:
 
-Mechanics may evolve. Principles will not.
+- Strongly typed identities will remain.
+- `Result` will remain the representation for expected domain failure.
+- Construction authority will remain.
+- UTC-only domain time will remain.
+
+The mechanisms, signatures, package composition, and analyzer implementation may evolve until stable release. The principles do not.

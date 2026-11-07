@@ -6,6 +6,7 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Description>Semantic vocabulary for Dx.Domain (pure metadata: markers, attributes, canon).</Description>
     <PackageTags>dx;ddd;annotations;attributes;domain-model</PackageTags>
+      <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>

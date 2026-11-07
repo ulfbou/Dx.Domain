@@ -6,6 +6,7 @@
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.</Description>
     <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
+      <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,10 @@
                       ReferenceOutputAssembly="false"
                       PrivateAssets="all"
                       DxIncludeAsAnalyzer="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="readme.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>

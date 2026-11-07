@@ -1,0 +1,23 @@
+<Project Label="Dx.AnalyzerPackaging">
+  <PropertyGroup Label="Dx.AnalyzerPackagingPaths">
+    <DxAnalyzerProject>$(MSBuildThisFileDirectory)..\..\src\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj</DxAnalyzerProject>
+    <DxAnalyzerTargetFramework>netstandard2.0</DxAnalyzerTargetFramework>
+    <DxAnalyzerOutput>$(MSBuildThisFileDirectory)..\..\src\Dx.Domain.Analyzers\bin\$(Configuration)\$(DxAnalyzerTargetFramework)\Dx.Domain.Analyzers.dll</DxAnalyzerOutput>
+    <DxAnalyzerPackagePath>analyzers/dotnet/cs/Dx.Domain.Analyzers.dll</DxAnalyzerPackagePath>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(DxIsApprovedReleasePackage)' == 'true'" Label="Dx.AnalyzerPackageAsset">
+    <None Include="$(DxAnalyzerOutput)" Pack="true" PackagePath="$(DxAnalyzerPackagePath)" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="DxBuildAuthoritativeAnalyzerForPackage" BeforeTargets="GenerateNuspec" Condition="'$(DxIsApprovedReleasePackage)' == 'true'">
+    <MSBuild Projects="$(DxAnalyzerProject)"
+             Targets="Build"
+             BuildInParallel="false"
+             Condition="'$(NoBuild)' != 'true'"
+             Properties="Configuration=$(Configuration);ContinuousIntegrationBuild=$(ContinuousIntegrationBuild);TreatWarningsAsErrors=true" />
+    <Error Code="DXP001"
+           Condition="!Exists('$(DxAnalyzerOutput)')"
+           Text="[Dx Packaging] The authoritative Analyzer output was not produced: $(DxAnalyzerOutput)" />
+  </Target>
+</Project>

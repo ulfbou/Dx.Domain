@@ -1,13 +1,15 @@
 <Project>
-  <!-- Root props conductor. Imports only props-stage assets and establishes immutable workspace defaults. -->
-  <PropertyGroup Label="Dx.Root">
-    <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">builds/</DxBuildRoot>
-  </PropertyGroup>
+    <!-- Root props conductor. Imports only props-stage assets and establishes immutable workspace defaults. -->
+    <PropertyGroup Label="Dx.Root">
+        <DxBuildRoot Condition="'$(DxBuildRoot)' == ''">builds/</DxBuildRoot>
+    </PropertyGroup>
 
-  <Import Project="$(DxBuildRoot)common/Dx.Constants.props"
-          Condition="Exists('$(DxBuildRoot)common/Dx.Constants.props')" />
-  <Import Project="$(DxBuildRoot)common/Dx.Defaults.props"
-          Condition="Exists('$(DxBuildRoot)common/Dx.Defaults.props')" />
-  <Import Project="$(DxBuildRoot)policy/Dx.Forbidden.props"
-          Condition="Exists('$(DxBuildRoot)policy/Dx.Forbidden.props')" />
+    <Import Project="$(DxBuildRoot)common/Dx.Constants.props"
+            Condition="Exists('$(DxBuildRoot)common/Dx.Constants.props')" />
+    <Import Project="$(DxBuildRoot)common/Dx.Defaults.props"
+            Condition="Exists('$(DxBuildRoot)common/Dx.Defaults.props')" />
+    <Import Project="$(DxBuildRoot)policy/Dx.Forbidden.props"
+            Condition="Exists('$(DxBuildRoot)policy/Dx.Forbidden.props')" />
+    <Import Project="$(DxBuildRoot)release/Dx.ReleaseTopology.props"
+            Condition="Exists('$(DxBuildRoot)release/Dx.ReleaseTopology.props')" />
 </Project>

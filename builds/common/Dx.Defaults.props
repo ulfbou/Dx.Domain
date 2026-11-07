@@ -45,11 +45,6 @@
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('packages.config')">
-    <PackageReference Include="Microsoft.Net.Compilers.Toolset"
-                      Version="$(DxRoslynCompilerVersion)"
-                      PrivateAssets="all"
-                      IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-
     <PackageReference Include="Nerdbank.GitVersioning"
                       Version="3.9.50"
                       PrivateAssets="all" />
