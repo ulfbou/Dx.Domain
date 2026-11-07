@@ -1,5 +1,7 @@
 # Dx.Domain in 90 seconds
 
+> **Retained legacy documentation:** This page preserves a concise repository orientation. The [canonical public documentation](../public/index.md) is authoritative.
+
 1. Purpose: Dx.Domain provides a small mechanical kernel for explicit results, domain errors, and invariants with compile-time enforcement.
 2. When to use:
    - You want failures represented as values via Result<T>
@@ -14,8 +16,8 @@
    - S0 Kernel types (Result, DomainError) are publicly constructible per ADR-0018
    - Scope-aware enforcement varies by S0 to S3
 5. Constraints:
-   - Kernel surface is frozen
-   - Analyzers must be enabled in the build
+   - Runtime APIs and analyzer behavior are provisional for `0.1.0-alpha`
+   - Consumers install and enable `Dx.Domain.Analyzers` explicitly during alpha
 
 ## What it enforces
 
@@ -29,7 +31,7 @@
 - Dx.Domain.Primitives: CorrelationId, TraceId, ActorId, FactId, SpanId, UserId
 - Dx.Domain.Facts: Fact<TPayload>, Causation, TransitionResult<TState>
 - Dx.Domain.Annotations: Scope, DxAssemblyRole, AggregateRootAttribute, ValueObjectAttribute
-- Dx.Domain.Analyzers: Roslyn analyzers DXA010–DXA080
+- Dx.Domain.Analyzers: shipped Roslyn analyzers including DXA065; DXA090 is planned and unshipped
 
 ## Start here
 
@@ -39,10 +41,10 @@
 
 ## Related links
 
-- Up: [Public Overview](../public/overview.md)
+- Up: [Canonical public documentation](../public/index.md)
 - Concept: [Results](concepts/results.md)
 - Governance: [ADR-0018: Kernel Public Surface](../adr/adr-0018-kernel-public-surface.md)
-- Architecture: [Architecture Overview](../public/architecture-overview.md)
+- Architecture: [Public architecture](../public/architecture.md)
 
 ### Additional resources
 
@@ -58,20 +60,11 @@
 
 ## Concepts
 
-- [Errors](concepts/errors.md)
-- [Facades](concepts/facades.md)
-- [Facts vs Events](concepts/facts-vs-events.md)
-- [Generated Code](concepts/generated-code.md)
-- [Invariants](concepts/invariants.md)
-- [Results](concepts/results.md)
-- [Scopes and Roles](concepts/scopes-and-roles.md)
+- [Retained Results](concepts/results.md)
+- [Retained Facades](concepts/facades.md)
+- [Canonical concepts](../public/concepts/index.md)
 
 ## Guides
 
-- [Build a Facade](guides/build-a-facade.md)
-- [Define a Primitive](guides/define-a-primitive.md)
-- [Emit Facts](guides/emit-facts.md)
-- [Exceptions Policy](guides/exceptions-policy.md)
-- [Handle Errors](guides/handle-errors.md)
-- [Result Handling Patterns](guides/result-handling-patterns.md)
-
+- [Retained Handle Errors](guides/handle-errors.md)
+- [Canonical guides](../public/guides/index.md)

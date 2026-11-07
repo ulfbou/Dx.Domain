@@ -1,10 +1,10 @@
-# Concepts
+# Legacy concept routes
 
-## Documents
-- [Errors](errors.md)
-- [Facades](facades.md)
-- [Facts vs Events](facts-vs-events.md)
-- [Generated Code](generated-code.md)
-- [Invariants](invariants.md)
-- [Results](results.md)
-- [Scopes and Roles](scopes-and-roles.md)
+> **Legacy routes:** This directory is retained for compatibility. Canonical concept documentation is under ../../public/concepts/index.md.
+
+## Retained routes
+
+- results.md
+- facades.md
+
+For current documentation covering results and errors, invariants, construction authority, scopes and roles, and facts and causation, use the ../../public/concepts/index.md.

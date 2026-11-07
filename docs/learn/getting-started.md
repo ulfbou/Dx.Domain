@@ -1,5 +1,7 @@
 # Getting Started
 
+> **Retained legacy documentation:** Use the [canonical Getting Started guide](../public/getting-started.md) for supported installation steps and the [canonical Quickstart](../public/quickstart.md) for the compile-tested consumer path.
+
 1. Purpose: Install Dx.Domain packages and get a compile-clean project with analyzers active.
 2. When to use:
    - First time adding Dx.Domain to a solution
@@ -8,9 +10,9 @@
    - Inside the Dx.Domain kernel repository itself
    - For projects that rely on exceptions for normal flow
 4. Guarantees:
-   - Analyzers ship with the Kernel package and apply to S1–S3
-   - S0 Kernel types are exempt from DXA010/DXA011 per ADR-0018
-   - Default severities are Warning for DXA010 and DXA020
+   - Consumers install `Dx.Domain.Analyzers` explicitly during alpha
+   - Rule applicability is diagnostic-specific and scope-aware
+   - Descriptor defaults are authoritative; DXA020 is an error
 5. Constraints:
    - Requires .NET 8, 9, or 10 SDK
    - Requires .editorconfig for scope and facade root
@@ -40,9 +42,9 @@ dx.scope.map = S0:Dx.Domain;S1:MyApp.Domain;S2:MyApp.Application;S3:MyApp.Api
 dx.facade.root = MyApp.Domain.Dx
 ```
 
-## First compile-clean example
+## Legacy conceptual example
 
-Compiles cleanly:
+The following retained example is conceptual. It is not part of the compile-tested public example set:
 ```csharp
 using Dx.Domain;
 using Dx.Domain.Kernel;
@@ -50,17 +52,17 @@ using Dx.Domain.Primitives;
 
 public static class Demo
 {
-    public static Result<UserId> GetOrCreate(string? raw)
-    {
-        if (!Guid.TryParseExact(raw, "N", out var g) || g == Guid.Empty)
-        {
-            return Result<UserId>.Failure(
-                DomainError.Create("Demo.BadId", "Provide a non-empty GUID in N format")
-            );
-        }
+public static Result<UserId> GetOrCreate(string? raw)
+{
+if (!Guid.TryParseExact(raw, "N", out var g) || g == Guid.Empty)
+{
+return Result<UserId>.Failure(
+DomainError.Create("Demo.BadId", "Provide a non-empty GUID in N format")
+);
+}
 
-        return Result<UserId>.Success(UserId.FromGuid(g));
-    }
+return Result<UserId>.Success(UserId.FromGuid(g));
+}
 }
 ```
 
@@ -68,8 +70,8 @@ Use it:
 ```csharp
 var result = Demo.GetOrCreate("d3c9f1a2b3c4d5e6f7a8b9c0d1e2f3a4");
 var message = result.Match(
-    onSuccess: id => $"ok:{id}",
-    onFailure: e => $"err:{e.Code}"
+onSuccess: id => $"ok:{id}",
+onFailure: e => $"err:{e.Code}"
 );
 ```
 
@@ -81,7 +83,7 @@ var message = result.Match(
 
 ## Related links
 
-- Up: [Dx.Domain in 90 seconds](index.md)
-- Next: [Quickstart](quickstart.md)
-- Reference: [DXA020](../analyzers/dxa020.md)
-- Governance: [ADR-0018](../adr/adr-0018-kernel-public-surface.md)
+- Canonical guide: [Getting Started](../public/getting-started.md)
+- Compile-tested path: [Quickstart](../public/quickstart.md)
+- Reference: [DXA020](../public/reference/diagnostics/DXA020.md)
+- Architecture: [Public architecture](../public/architecture.md)

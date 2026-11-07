@@ -35,6 +35,6 @@ Each ADR now includes:
 This structure addresses the professional reader gaps identified earlier: single source of truth, trust signals, and decision-making information.
 
 ## Navigation
-- [Public Overview](../public/overview.md)
+- [Public Overview](../public/index.md)
 - [Manifesto](../manifesto.md)
 

@@ -1,9 +1,9 @@
-# Guides
+# Legacy guide routes
 
-## Documents
-- [Build a Facade](build-a-facade.md)
-- [Define a Primitive](define-a-primitive.md)
-- [Emit Facts](emit-facts.md)
-- [Exceptions Policy](exceptions-policy.md)
-- [Handle Errors](handle-errors.md)
-- [Result Handling Patterns](result-handling-patterns.md)
+> **Legacy routes:** This directory is retained for compatibility. Canonical task-oriented guidance is under ../../public/guides/index.md.
+
+## Retained routes
+
+- handle-errors.md
+
+For current construction, analyzer configuration, Result handling, and diagnostic-response guidance, use the ../../public/guides/index.md.

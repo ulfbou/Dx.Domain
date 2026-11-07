@@ -1,5 +1,7 @@
 # Quickstart
 
+> **Retained legacy documentation:** This scenario is preserved as explanatory material. Use the [canonical Quickstart](../public/quickstart.md) for the compile-tested consumer path.
+
 1. Purpose: Show one complete flow using Result, DomainError, a primitive, a Fact, and a facade.
 2. When to use:
    - You installed the packages and want a compile-clean baseline
@@ -8,9 +10,9 @@
    - As a production domain model
    - For infrastructure or persistence concerns
 4. Guarantees:
-   - Code compiles cleanly with analyzers enabled in S1–S3
-   - No direct construction outside the facade in S1
-   - Result factories are public in S0 per ADR-0018
+   - The scenario illustrates Result handling, construction boundaries, and structural facts
+   - Analyzer applicability remains diagnostic-specific and scope-aware
+   - This retained example is conceptual, not compile-tested
 5. Constraints:
    - Requires Dx.Domain.Kernel, Primitives, Facts
    - Requires .editorconfig with scope and facade root
@@ -19,7 +21,7 @@
 
 Create an order identifier, validate input, emit a fact, and return a Result.
 
-Compiles cleanly:
+Conceptual example:
 ```csharp
 using Dx.Domain;
 using Dx.Domain.Primitives;
@@ -29,26 +31,26 @@ public sealed record OrderPlaced(string OrderId);
 
 public static class OrderFacade
 {
-    public static Result<OrderId> Create(string? rawId, Causation causation)
-    {
-        if (!Guid.TryParseExact(rawId, "N", out var g) || g == Guid.Empty)
-        {
-            var err = DomainError.Create("Order.BadId", "OrderId must be a non-empty GUID in N format");
-            return Result<OrderId>.Failure(err);
-        }
+public static Result<OrderId> Create(string? rawId, Causation causation)
+{
+if (!Guid.TryParseExact(rawId, "N", out var g) || g == Guid.Empty)
+{
+var err = DomainError.Create("Order.BadId", "OrderId must be a non-empty GUID in N format");
+return Result<OrderId>.Failure(err);
+}
 
-        var id = OrderId.FromGuid(g);
+var id = OrderId.FromGuid(g);
 
-        var fact = Fact.Create(
-            type: "OrderPlaced",
-            payload: new OrderPlaced(id.ToString()),
-            causation: causation
-        );
+var fact = Fact.Create(
+type: "OrderPlaced",
+payload: new OrderPlaced(id.ToString()),
+causation: causation
+);
 
-        _ = fact;
+_ = fact;
 
-        return Result<OrderId>.Success(id);
-    }
+return Result<OrderId>.Success(id);
+}
 }
 ```
 
@@ -56,19 +58,19 @@ public static class OrderFacade
 
 ```csharp
 var causation = Causation.Create(
-    correlationId: CorrelationId.New(),
-    traceId: TraceId.New(),
-    actorId: UserId.New()
+correlationId: CorrelationId.New(),
+traceId: TraceId.New(),
+actorId: UserId.New()
 );
 
 Result<OrderId> result = OrderFacade.Create(
-    rawId: "d3c9f1a2b3c4d5e6f7a8b9c0d1e2f3a4", 
-    causation: causation
+rawId: "d3c9f1a2b3c4d5e6f7a8b9c0d1e2f3a4",
+causation: causation
 );
 
 string response = result.Match(
-    onSuccess: id => $"OK:{id}",
-    onFailure: e => $"ERR:{e.Code}"
+onSuccess: id => $"OK:{id}",
+onFailure: e => $"ERR:{e.Code}"
 );
 ```
 
@@ -90,8 +92,7 @@ dx.facade.root = MyApp.Domain.Dx
 
 ## Related links
 
-- Up: [Getting Started](getting-started.md)
+- Canonical Quickstart: [Quickstart](../public/quickstart.md)
 - Concept: [Results](concepts/results.md)
-- Reference: [DXA010](../analyzers/dxa010.md)
-- Architecture: [Architecture Overview](../public/architecture-overview.md)
-
+- Reference: [DXA010](../public/reference/diagnostics/DXA010.md)
+- Architecture: [Public architecture](../public/architecture.md)
