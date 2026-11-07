@@ -1,26 +1,81 @@
 <Project Label="Dx.Policy.IntentValidation">
+
+  <!-- Validation: exactly one role -->
   <Target Name="DxValidateProjectIntent" BeforeTargets="PrepareForBuild">
     <ItemGroup>
-      <_DxDeclaredKind Include="@(DxProjectKind)" Condition="'%(DxProjectKind.Identity)' == 'true'" />
+      <_DxDeclaredKind Include="@(DxProjectKind)" />
     </ItemGroup>
-    <Error Condition="'@(_DxDeclaredKind->Count())' > '1'" Code="DX011" File="$(MSBuildProjectFullPath)" Text="[Dx Intent] Multiple DxIs flags detected: (@(_DxDeclaredKind)). Exactly one project role must be declared." />
-    <Error Condition="'@(_DxDeclaredKind->Count())' == '0' AND '$(IsPackable)' == 'true'" Code="DX012" File="$(MSBuildProjectFullPath)" Text="[Dx Intent] Packable projects must declare exactly one DxIs* role from the kernel vocabulary." />
+
+    <Error Code="DX011"
+           File="$(MSBuildProjectFullPath)"
+           Condition="'@(_DxDeclaredKind->Count())' != '1'"
+           Text="[Dx Intent] Exactly one project role must be declared." />
   </Target>
-  <Target Name="DxValidateConstantsPurity" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <_DxConstantsPath>$(DxBuildRoot)common/Dx.Constants.props</_DxConstantsPath>
+
+  <!-- Block hardcoded versions -->
+  <Target Name="DxValidateNoHardcodedVersion"
+        BeforeTargets="PrepareForBuild">
+
+    <XmlPeek
+        XmlInputPath="$(MSBuildProjectFullPath)"
+        Query="/*[local-name()='Project']/*[local-name()='PropertyGroup']/*[local-name()='Version']">
+      <Output TaskParameter="Result"
+              ItemName="_DxVersionNodes" />
+    </XmlPeek>
+
+    <XmlPeek
+        XmlInputPath="$(MSBuildProjectFullPath)"
+        Query="/*[local-name()='Project']/*[local-name()='PropertyGroup']/*[local-name()='PackageVersion']">
+      <Output TaskParameter="Result"
+              ItemName="_DxPackageVersionNodes" />
+    </XmlPeek>
+
+    <Error
+        Code="DX021"
+        File="$(MSBuildProjectFullPath)"
+        Condition="'@(_DxVersionNodes)' != '' Or '@(_DxPackageVersionNodes)' != ''"
+        Text="[Dx Governance] Hardcoded version metadata is forbidden." />
+
+  </Target>
+
+  <!-- Role-derived defaults -->
+  <Target Name="DxApplyRoleDefaults"
+          BeforeTargets="PrepareForBuild"
+          DependsOnTargets="DxValidateProjectIntent;DxValidateNoHardcodedVersion">
+
+    <!-- Runtime -->
+    <PropertyGroup Condition="'$(DxResolvedRole)' == 'RuntimeSubstrate'">
+      <TargetFrameworks>$(DxRuntimeTargetFrameworks)</TargetFrameworks>
+      <IsPackable>true</IsPackable>
+      <IncludeBuildOutput>true</IncludeBuildOutput>
     </PropertyGroup>
 
-    <ItemGroup>
-      <_DxConstants Include="$(_DxConstantsPath)" Condition="Exists('$(_DxConstantsPath)')" />
-    </ItemGroup>
+    <PropertyGroup Condition="'$(DxResolvedRole)' == 'CompileTimeGovernance'">
+      <TargetFramework>$(DxHostCompatibleTargetFramework)</TargetFramework>
+      <IsPackable>false</IsPackable>
+      <IncludeBuildOutput>false</IncludeBuildOutput>
+      <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    </PropertyGroup>
 
-    <ReadLinesFromFile File="@(_DxConstants)" Condition="'@(_DxConstants)' != ''">
-      <Output TaskParameter="Lines" ItemName="_DxConstantsLines" />
-    </ReadLinesFromFile>
+    <!-- Metadata -->
+    <PropertyGroup Condition="'$(DxResolvedRole)' == 'SemanticMetadata'">
+      <TargetFramework>$(DxUniversalMetadataTargetFramework)</TargetFramework>
+      <IsPackable>true</IsPackable>
+      <IncludeBuildOutput>true</IncludeBuildOutput>
+    </PropertyGroup>
 
-    <Error Code="DX020"
-           Condition="'@(_DxConstantsLines->Contains(`Condition=`))' == 'true'"
-           Text="[Dx Architecture] Dx.Constants.props contains conditional logic. Constants must be unconditional facts only." />
+    <!-- Test (FULLY CENTRALIZED) -->
+    <PropertyGroup Condition="'$(DxResolvedRole)' == 'Test'">
+      <TargetFrameworks>$(DxTestTargetFrameworks)</TargetFrameworks>
+      <IsPackable>false</IsPackable>
+      <IsTestProject>true</IsTestProject>
+
+      <GenerateDocumentationFile>false</GenerateDocumentationFile>
+      <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+      <EnableNETAnalyzers>false</EnableNETAnalyzers>
+      <RunAnalyzers>false</RunAnalyzers>
+    </PropertyGroup>
+
   </Target>
+
 </Project>

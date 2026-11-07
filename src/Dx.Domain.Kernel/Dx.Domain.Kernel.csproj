@@ -1,23 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Label="Dx.Domain.Kernel">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Dx.Identity">
     <DxIsLibrary>true</DxIsLibrary>
     <DxLayer>Kernel</DxLayer>
-    <RootNamespace>Dx.Domain</RootNamespace>
-    <AssemblyName>Dx.Domain.Kernel</AssemblyName>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>The Dx.Domain.Kernel package provides a small, opinionated kernel for invariants, results, and errors.</Description>
     <PackageTags>dx;ddd;functional;result-pattern;invariants;errors</PackageTags>
-    <Authors>Dx.Domain Team</Authors>
-    <Company>Dx.Domain Team</Company>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
-    <!--<NoWarn>$(NoWarn);CS1591</NoWarn>-->
-    <Nullable>enable</Nullable>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/ulfbou/Dx.Domain</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/ulfbou/dx.domain</PackageProjectUrl>
-    <Version>0.1.0-alpha.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,30 +19,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dx.Domain.Annotations\Dx.Domain.Annotations.csproj" />
+    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all"
+                      DxIncludeAsAnalyzer="true" />
   </ItemGroup>
 
-  <ItemGroup>
-    <DxProjectKind Include="true" Condition="'$(DxIsLibrary)' == 'true'" />
-  </ItemGroup>
-
-  <!-- Repo builds: if package not available yet, use local analyzer project -->
-  <ItemGroup Condition="Exists('..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj')">
-    <ProjectReference Include="..\Dx.Domain.Analyzers\Dx.Domain.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-  </ItemGroup>
-
-  <ItemGroup Condition="Exists('..\Dx.Domain.Annotations\bin\$(Configuration)\netstandard2.0\Dx.Domain.Annotations.dll')">
-    <Analyzer Include="..\Dx.Domain.Annotations\bin\$(Configuration)\netstandard2.0\Dx.Domain.Annotations.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll" Condition="Exists('..\Dx.Domain.Analyzers\bin\$(Configuration)\netstandard2.0\Dx.Domain.Analyzers.dll')" Pack="true" PackagePath="analyzers/dotnet/cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="buildTransitive\Dx.Domain.Kernel.targets" Pack="true" PackagePath="buildTransitive" />
-    <None Update="..\..\LICENSE" Link="docs/LICENSE" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="readme.md" Pack="true" PackagePath="/" />
-  </ItemGroup>
 </Project>

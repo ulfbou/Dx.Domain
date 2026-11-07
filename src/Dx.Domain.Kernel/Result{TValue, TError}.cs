@@ -10,6 +10,7 @@
 // </license>
 // ----------------------------------------------------------------------------------
 
+using Dx.Domain;
 using Dx.Domain.Errors;
 
 using System.Diagnostics;

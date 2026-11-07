@@ -1,34 +1,62 @@
-<Project Label="Dx.Behavior.Defaults">
-  <ItemGroup>
-    <Using Include="System" />
-    <Using Include="System.Collections.Generic" />
-    <Using Include="System.Diagnostics" />
-    <Using Include="System.Diagnostics.CodeAnalysis" />
-    <Using Include="System.Runtime.CompilerServices" />
-    <Using Include="System.Threading.Tasks" />
-  </ItemGroup>
-  <PropertyGroup>
+<Project>
+
+  <!-- Centralized defaults. Leaf projects declare exactly one role and do not set governed properties. -->
+  <PropertyGroup Label="Dx.BuildDefaults">
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <LangVersion Condition="'$(LangVersion)' == ''">latest</LangVersion>
-    <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == ''">true</GenerateDocumentationFile>
-    <ProduceReferenceAssembly Condition="'$(ProduceReferenceAssembly)' == ''">true</ProduceReferenceAssembly>
-    <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <RunAnalyzers>true</RunAnalyzers>
+
+    <ContinuousIntegrationBuild Condition="'$(CI)' != '' Or '$(TF_BUILD)' != ''">true</ContinuousIntegrationBuild>
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+
+    <DxIdentityFrozen>false</DxIdentityFrozen>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(DxIsAbstractions)' == 'true'">
-    <LangVersion>10.0</LangVersion>
-    <IsPackable Condition="'$(IsPackable)' == ''">true</IsPackable>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+  <PropertyGroup Label="Dx.FrameworkStrategy">
+    <DxRuntimeTargetFrameworks>net8.0;net9.0;net10.0</DxRuntimeTargetFrameworks>
+    <DxHostCompatibleTargetFramework>netstandard2.0</DxHostCompatibleTargetFramework>
+    <DxUniversalMetadataTargetFramework>netstandard2.0</DxUniversalMetadataTargetFramework>
+    <DxTestTargetFrameworks>net10.0</DxTestTargetFrameworks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(DxIsAnalyzer)' == 'true'">
-    <IsPackable>true</IsPackable>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
+
+  <PropertyGroup Label="Dx.ToolchainStrategy">
+    <DxRoslynCompilerVersion>5.3.0</DxRoslynCompilerVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(DxIsTest)' == 'true'">
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-    <NoWarn>$(NoWarn);CA1707;CS1591</NoWarn>
+
+  <PropertyGroup Label="Dx.RoleFlags">
+    <DxIsLibrary Condition="'$(DxIsLibrary)' == ''">false</DxIsLibrary>
+    <DxIsAnalyzer Condition="'$(DxIsAnalyzer)' == ''">false</DxIsAnalyzer>
+    <DxIsAnnotations Condition="'$(DxIsAnnotations)' == ''">false</DxIsAnnotations>
+    <DxIsTest Condition="'$(DxIsTest)' == ''">false</DxIsTest>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Dx.PackageMetadataDefaults">
+    <Authors Condition="'$(Authors)' == ''">$(DxAuthors)</Authors>
+    <Company Condition="'$(Company)' == ''">$(DxCompany)</Company>
+    <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">$(DxRepositoryUrl)</RepositoryUrl>
+    <Copyright Condition="'$(Copyright)' == ''">$(DxCopyright)</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup Condition="!Exists('packages.config')">
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset"
+                      Version="$(DxRoslynCompilerVersion)"
+                      PrivateAssets="all"
+                      IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+
+    <PackageReference Include="Nerdbank.GitVersioning"
+                      Version="3.9.50"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(DxIsTest)' != 'true'">
+    <WarningsAsErrors>$(WarningsAsErrors);DXA*;DXK*;DXT*;DX100*;DX700*</WarningsAsErrors>
   </PropertyGroup>
 
 </Project>
