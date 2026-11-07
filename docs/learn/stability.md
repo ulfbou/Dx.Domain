@@ -1,7 +1,7 @@
 # Enforcement Map
 
 **Status:** Pre-release alpha
-**Applies to:** Dx.Domain v0.1.0-alpha.4
+**Applies to:** Dx.Domain v0.1.0-alpha
 **Last reviewed:** 2026-04-23
 
 > Philosophy is mechanically enforced.

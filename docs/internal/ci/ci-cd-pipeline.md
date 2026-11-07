@@ -270,7 +270,7 @@ This project uses **Semantic Versioning 2.0** with GitVersion for automated vers
 
 **Examples**:
 - `1.0.0` - Production release
-- `1.1.0-alpha.1` - Alpha preview
+- `1.1.0-alpha` - Alpha preview
 - `1.2.0-rc.1` - Release candidate
 - `1.2.0+abc1234` - Build with commit metadata
 
@@ -279,9 +279,9 @@ This project uses **Semantic Versioning 2.0** with GitVersion for automated vers
 | Branch Pattern | Version Tag | Increment | Example |
 |---------------|-------------|-----------|---------|
 | `main` | (none) | Patch | `1.0.1` |
-| `develop` | `alpha` | Minor | `1.1.0-alpha.1` |
+| `develop` | `alpha` | Minor | `1.1.0-alpha` |
 | `release/*` | `rc` | None | `2.0.0-rc.1` |
-| `feature/*` | `alpha` | Minor | `1.1.0-alpha.2` |
+| `feature/*` | `alpha` | Minor | `1.1.0-alpha` |
 | `hotfix/*` | `beta` | Patch | `1.0.2-beta.1` |
 
 ### Commit Message Versioning
