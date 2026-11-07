@@ -10,8 +10,8 @@ This audit is the mandatory first implementation artifact. A criterion marked `p
 
 | ID | Initial result | Evidence | Required correction | Proving validation |
 | --- | --- | --- | --- | --- |
-| P0.1 | not met | `docs/.generated/analyzers.json` omits shipped DXA065. | Add DXA065 from its descriptor and compare generated IDs with descriptors. | Exact ID-set comparison passes. |
-| P0.2 | not met | `docs/analyzers/index.md` omits DXA065. | Add the legacy route and reference page. | Link and TOC validation passes. |
+| P0.1 | met | The descriptor-derived generated inventory contains every shipped descriptor field for all 11 shipped diagnostics, including DXA065. | Completed in Phase 4. | `python3 scripts/verify-diagnostic-conformance.py` passes. |
+| P0.2 | met | DXA065 is present in the retained index, TOC, router, generated inventory, package page, changelog, and release notes. | Completed in Phases 3 and 4. | Diagnostic conformance and documentation-link validation pass. |
 | P0.3 | partially met | Canonical public pages require explicit analyzer installation, while retained legacy guidance contradicts it. | State explicit alpha installation consistently. | Repository-wide claim audit passes. |
 | P0.4 | partially met | Retained configuration prose overstates suppression as impossible. | Distinguish compiler mechanisms from repository policy. | Repository-wide claim audit passes. |
 | P0.5 | partially met | Retained pages use unqualified frozen-API language. | Use provisional alpha stability language unless a verified baseline supports a stronger claim. | Stability claim audit passes. |
@@ -58,16 +58,16 @@ This audit is the mandatory first implementation artifact. A criterion marked `p
 
 | Criterion | Initial result | Evidence and required action |
 | --- | --- | --- |
-| Public diagnostic IDs equal packaged descriptors | not met | Generated inventory omits shipped DXA065. |
-| Default severities equal descriptors | partially met | Public table matches known descriptors; automate exact comparison. |
-| S0-S3 applicability matches tested behavior | partially met | Pages summarize scope; verify against focused analyzer tests. |
-| DXA065 is documented as shipped | partially met | Public page exists, generated and legacy inventories omit it. |
+| Public diagnostic IDs equal packaged descriptors | met | Executable descriptor comparison proves the same 11 shipped IDs across generated and public inventories. |
+| Default severities equal descriptors | met | Executable comparison validates every public page and index severity against its descriptor. |
+| S0-S3 applicability matches tested behavior | partially met | The Phase 4 matrix records implemented guards, but focused positive and negative scope tests remain required for every shipped diagnostic. |
+| DXA065 is documented as shipped | met | DXA065 appears in every applicable shipped inventory and route. |
 | DXA090 is planned and unshipped | met | Documentation authority and public reference separate it from shipped diagnostics. |
 | Every shipped diagnostic has actionable remediation | met | Public diagnostic pages include remediation sections. |
 | Failing and corrected examples exist where meaningful | not met | Current pages generally describe rather than compile paired examples. |
 | Suppression mechanisms and policy are distinguished | partially met | Canonical pages are correct; retained configuration prose is contradictory. |
 | Known analyzer limitations are stated | met | Public diagnostic pages include limits. |
-| Router and individual references agree | not met | Generated and legacy routers omit DXA065. |
+| Router and individual references agree | met | Descriptor-derived router, TOC, generated inventory, public index, and individual pages contain the same shipped ID set. |
 | Planned diagnostics cannot be mistaken for shipped behavior | met | DXA090 is excluded from the shipped public table. |
 
 ## Issue #58 audit
