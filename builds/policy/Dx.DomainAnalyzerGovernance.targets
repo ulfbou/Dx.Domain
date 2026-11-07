@@ -18,7 +18,7 @@
       <Output TaskParameter="Lines" ItemName="_DxEditorConfigLines" />
     </ReadLinesFromFile>
     <Error Code="DXB003" Text="[Dx Governance] .editorconfig cannot override Dx diagnostics. Remove 'dotnet_diagnostic.DX*' entries. Files: @(_DxEditorConfigs)"
-           Condition=" '@(_DxEditorConfigLines)' != '' and ( @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DXA')) or @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DXK')) or @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DXT')) or @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DX100')) or @(_DxEditorConfigLines->Contains('dotnet_diagnostic.DX700')) )" />
+           Condition=" '@(_DxEditorConfigLines)' != '' and ( $([System.String]::Copy('@(_DxEditorConfigLines)')).Contains('dotnet_diagnostic.DXA') or $([System.String]::Copy('@(_DxEditorConfigLines)')).Contains('dotnet_diagnostic.DXK') or $([System.String]::Copy('@(_DxEditorConfigLines)')).Contains('dotnet_diagnostic.DXT') or $([System.String]::Copy('@(_DxEditorConfigLines)')).Contains('dotnet_diagnostic.DX100') or $([System.String]::Copy('@(_DxEditorConfigLines)')).Contains('dotnet_diagnostic.DX700') )" />
   </Target>
 
   <!-- Promote Dx diagnostics to errors in repo builds (non-negotiable). -->
