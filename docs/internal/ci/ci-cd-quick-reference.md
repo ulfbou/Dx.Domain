@@ -1,297 +1,66 @@
 # CI/CD Quick Reference
 
-Quick reference for common CI/CD tasks and commands.
+## Branches
 
-## Daily Developer Tasks
+- Alpha integration PR base: `release/0.1.0-alpha`
+- Default and publication branch: `master`
+- Generated documentation branch: `gh-pages`
 
-### Creating a PR
-```bash
-# Create feature branch
-git checkout -b feature/my-feature
-
-# Make changes and commit
-git add .
-git commit -m "feat: add new feature"
-
-# Push and create PR
-git push origin feature/my-feature
-# Then create PR in GitHub UI
-```
-
-### Checking PR Status
-- Go to Actions tab in GitHub
-- Look for "Pre-merge CI" workflow
-- Check all jobs are green ✅
-- Review DocFX preview if docs changed
-
-### Fixing CI Failures
-
-**Format Issues**:
-```bash
-cd Dx.Domain.2
-dotnet format
-git add .
-git commit -m "style: fix formatting"
-git push
-```
-
-**Test Failures**:
-```bash
-# Run failed tests locally
-dotnet test --filter "FullyQualifiedName~FailedTest"
-
-# Fix and verify
-dotnet test
-git add .
-git commit -m "fix: resolve test failure"
-git push
-```
-
-**Vulnerable Dependencies**:
-```bash
-# List vulnerabilities
-dotnet list package --vulnerable --include-transitive
-
-# Update package
-dotnet add package PackageName --version SafeVersion
-git add .
-git commit -m "fix: update vulnerable dependency"
-git push
-```
-
-## Release Tasks
-
-### Triggering a Release
-
-1. **Navigate**: Actions → Release CD → Run workflow
-2. **Select**:
-   - Branch: `main`
-   - Release type: `patch` | `minor` | `major`
-   - Environment: `staging`
-3. **Click**: Run workflow
-4. **Wait**: ~30-45 minutes
-5. **Verify**: Check staging deployment
-6. **Promote**: Re-run for `canary`, then `production`
-
-### Release Checklist
-
-- [ ] All PRs merged to main
-- [ ] Integration CI passing
-- [ ] No critical drift detected
-- [ ] Changelog reviewed
-- [ ] Version bump correct
-- [ ] Secrets configured (NUGET_API_KEY)
-
-### Emergency Rollback
+## Validate a documentation change
 
 ```bash
-# Option 1: Revert last commit
-git revert HEAD
-git push origin main
-
-# Option 2: Download previous release from GitHub
-# Go to Releases → Download assets → Redeploy
-
-# Option 3: NuGet users can downgrade
-dotnet add package PackageName --version PreviousVersion
+dotnet tool restore
+dotnet restore
+dotnet build -c Release
+dotnet test -c Release --no-build
+bash scripts/docs-lint.sh
+bash scripts/docs-snippets-compile.sh docs/public net8.0
+bash scripts/docs-examples-compile.sh
+dotnet docfx docfx.public.json --warningsAsErrors
 ```
 
-## Documentation Tasks
-
-### Building Docs Locally
+## Check a pull request
 
 ```bash
-cd Dx.Domain.2
-
-# Build solution first
-dotnet build --configuration Release
-
-# Build docs
-docfx docfx.json
-
-# Serve locally at http://localhost:8080
-docfx serve _site
+gh pr checks --watch
 ```
 
-### Updating API Docs
-
-API docs are auto-generated from XML comments:
-
-```csharp
-/// <summary>
-/// Description of the method
-/// </summary>
-/// <param name="param1">Description of parameter</param>
-/// <returns>Description of return value</returns>
-public Result<string> MyMethod(string param1)
-{
-    // Implementation
-}
-```
-
-### Adding Conceptual Docs
-
-1. Create markdown file in `Dx.Domain.2/docs/`
-2. Add to `toc.yml`
-3. Build and preview
-4. Create PR
-
-## Monitoring Tasks
-
-### Checking Pipeline Health
-
-**Recent Runs**:
-- Actions tab → View all workflows
-- Look for patterns of failures
-
-**Drift Status**:
-- Actions → Drift Protection → Latest run
-- Review drift report artifact
-
-**Documentation Status**:
-- Visit: `https://your-org.github.io/Notes/`
-- Check latest version published
-
-### Key Metrics to Watch
+For a failed run:
 
 ```bash
-# PR check duration (target: <10 min)
-# Integration CI duration (target: <20 min)
-# Test success rate (target: >95%)
-# Critical drift (target: 0)
+gh run view RUN_ID --repo ulfbou/Dx.Domain --log-failed
 ```
 
-## Common Commands
+## Build documentation locally
 
-### Build Commands
+Canonical public site:
 
 ```bash
-# Restore dependencies
-dotnet restore Dx.Domain.sln
-
-# Build release configuration
-dotnet build Dx.Domain.sln --configuration Release
-
-# Build with version
-dotnet build -p:Version=1.2.3
-
-# Clean build
-dotnet clean && dotnet build
+dotnet tool restore
+dotnet docfx docfx.public.json --warningsAsErrors
 ```
 
-### Test Commands
+Maintainer build including internal documentation:
 
 ```bash
-# Run all tests
-dotnet test
-
-# Run fast tests only
-dotnet test --filter "Category!=Integration&Category!=Slow"
-
-# Run specific test
-dotnet test --filter "FullyQualifiedName~MyTestClass.MyTest"
-
-# Run with coverage
-dotnet test --collect:"XPlat Code Coverage"
-
-# Run with detailed output
-dotnet test --logger "console;verbosity=detailed"
+dotnet tool restore
+dotnet docfx docfx.full.json --warningsAsErrors
 ```
 
-### Package Commands
+Only the public configuration is deployed by `.github/workflows/docfx.yml`.
 
-```bash
-# Create packages
-dotnet pack --configuration Release
+## Release publication
 
-# Create with specific version
-dotnet pack -p:PackageVersion=1.2.3
+1. Ensure the accepted release commit is on `master`.
+2. Run the complete validation sequence.
+3. Inspect candidate package artifacts and clean-consumer behavior.
+4. Manually dispatch `Release CD` with the intended environment.
+5. Treat workflow output as deployment evidence only when the corresponding external operation actually ran.
+6. Verify package, release, documentation, and checksum outputs after production publication.
 
-# Publish to GitHub Packages
-dotnet nuget push package.nupkg --source github --api-key TOKEN
+## Failure handling
 
-# Publish to NuGet.org
-dotnet nuget push package.nupkg --source https://api.nuget.org/v3/index.json --api-key KEY
-```
-
-### Git Commands
-
-```bash
-# Check status
-git status
-
-# View diff
-git --no-pager diff
-
-# View log
-git --no-pager log --oneline -10
-
-# Create tag
-git tag -a v1.0.0 -m "Release 1.0.0"
-git push origin v1.0.0
-
-# View tags
-git tag -l
-```
-
-## Workflow File Locations
-
-```
-.github/
-├── workflows/
-│   ├── pre-merge-ci.yml       # PR checks
-│   ├── integration-ci.yml     # Main branch builds
-│   ├── release-cd.yml         # Release deployments
-│   ├── docfx.yml             # Documentation
-│   ├── drift-protection.yml   # Drift detection
-│   └── sign-packages.yml      # Package signing
-├── GitVersion.yml             # Version configuration
-└── CI-CD-PIPELINE.md         # Full documentation
-```
-
-## Troubleshooting Quick Fixes
-
-### "Workflow not found"
-- Check file is in `.github/workflows/`
-- Verify YAML syntax is valid
-- Push to repository
-
-### "Permission denied"
-- Check workflow has correct `permissions:`
-- Verify secret is configured
-- Check secret name matches
-
-### "Version calculation failed"
-- Verify GitVersion.yml exists
-- Check branch name matches patterns
-- Ensure fetch-depth: 0 in checkout
-
-### "Tests hang"
-- Add `timeout-minutes:` to job
-- Check for infinite loops
-- Review test logs for blocking operations
-
-### "Drift false positive"
-- Review drift report
-- Adjust thresholds in workflow
-- Add exception if intentional
-
-## Getting Help
-
-1. **Documentation**: Read [`CI-CD-PIPELINE.md`](ci-cd-pipeline.md)
-2. **Workflow Logs**: Check Actions tab for detailed logs
-3. **Artifacts**: Download reports and logs from workflow runs
-4. **Issues**: Create GitHub issue with `ci-cd` label
-5. **Discussion**: Use GitHub Discussions for questions
-
-## Useful Links
-
-- [GitHub Actions Docs](https://docs.github.com/en/actions)
-- [GitVersion Docs](https://gitversion.net/docs/)
-- [DocFX Docs](https://dotnet.github.io/docfx/)
-- [Semantic Versioning](https://semver.org/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-
----
-
-**Quick Access**: Bookmark this page for fast reference!
+- Inspect the exact failed step before changing repository content.
+- Do not infer the defect from the workflow name alone.
+- Preserve failed-run logs as evidence when the correction affects release readiness.
+- Re-run validation after the correction and record the successful check URL in the pull request.

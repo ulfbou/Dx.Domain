@@ -11,5 +11,6 @@ Navigation hub for this directory.
 - [DXA040 – Kernel Public Surface Freeze](dxa040.md)
 - [DXA050 – Temporal Helper Usage in Kernel](dxa050.md)
 - [DXA060 – Forbidden Vocabulary in Kernel](dxa060.md)
+- [DXA065 – Unresolved XML Documentation Reference](dxa065.md)
 - [DXA070 – Generated Code Tagging](dxa070.md)
 - [DXA080 – Facade Invariant Enforcement Missing](dxa080.md)

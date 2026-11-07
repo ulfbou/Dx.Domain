@@ -9,11 +9,12 @@ This example parses a typed identity and returns an explicit domain failure.
 using Dx.Domain;
 using Dx.Domain.Errors;
 using Dx.Domain.Primitives;
+using DxFacade = Dx.Domain.Dx;
 
 static Result<UserId> ParseUserId(string text) =>
     UserId.TryParse(text, null, out var id)
-        ? Dx.Result.Success(id)
-        : Dx.Result.Failure<UserId>(
+        ? DxFacade.Result.Success(id)
+        : DxFacade.Result.Failure<UserId>(
             DomainError.Create("user.id.invalid", "Expected a non-empty GUID in N format."));
 ```
 

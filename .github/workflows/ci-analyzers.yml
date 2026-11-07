@@ -3,7 +3,7 @@ name: CI (Analyzers & Docs Governance)
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ master, release/0.1.0-alpha ]
 
 permissions:
   contents: read

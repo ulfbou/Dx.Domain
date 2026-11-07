@@ -3,13 +3,8 @@
     {
       "src": [
         {
-          "files": [
-            "src/**/*.csproj"
-          ],
-          "exclude": [
-            "**/bin/**",
-            "**/obj/**"
-          ]
+          "files": ["src/**/*.csproj"],
+          "exclude": ["**/bin/**", "**/obj/**"]
         }
       ],
       "dest": "api",
@@ -18,24 +13,15 @@
   ],
   "build": {
     "content": [
-      {
-        "files": [ "**/*.md", "**/*.yml" ],
-        "src": "docs/public"
-      },
-      {
-        "files": [ "**/*.md", "**/*.yml" ],
-        "src": "docs/internal"
-      }
+      { "files": ["**/*.md", "**/*.yml"], "src": "docs/public" },
+      { "files": ["**/*.md", "**/*.yml"], "src": "docs/internal" }
     ],
     "resource": [
-      {
-        "files": [ "images/**" ],
-        "exclude": [ "**/bin/**", "**/obj/**" ]
-      },
-      { "files": [ "docs/images/**" ] }
+      { "files": ["images/**"], "exclude": ["**/bin/**", "**/obj/**"] },
+      { "files": ["docs/images/**"] }
     ],
     "dest": "_site",
-    "template": [ "default" ],
+    "template": ["default"],
     "globalMetadata": {
       "_appTitle": "Dx.Domain Documentation",
       "_appName": "Dx.Domain",
@@ -48,48 +34,28 @@
       "_disableContribution": false,
       "_gitContribute": {
         "repo": "https://github.com/ulfbou/dx.domain",
-        "branch": "main"
+        "branch": "master"
       },
       "_gitUrlPattern": "github",
       "_customMetadata": {
         "company": "Dx.Domain contributors",
-        "version": "0.1.0",
-          "framework": "net8.0;net9.0;net10.0"
+        "version": "0.1.0-alpha",
+        "framework": "net8.0;net9.0;net10.0"
       }
     },
     "fileMetadata": {
-      "_tocTitle": {
-        "api/**.yml": "API Reference"
-      },
-      "_tocRel": {
-        "api/**.md": "../toc.yml"
-      }
+      "_tocTitle": { "api/**/*.yml": "API Reference" },
+      "_tocRel": { "api/**/*.md": "../toc.yml" }
     },
     "markdownEngineName": "markdig",
     "markdownEngineProperties": {
       "markdigExtensions": [
-        "abbreviations",
-        "autoidentifiers",
-        "citations",
-        "customcontainers",
-        "definitionlists",
-        "emphasisextras",
-        "figures",
-        "footers",
-        "footnotes",
-        "gridtables",
-        "mathematics",
-        "medialinks",
-        "pipetables",
-        "listextras",
-        "tasklists",
-        "diagrams",
-        "autolinks",
-        "attributes"
+        "abbreviations", "autoidentifiers", "citations", "customcontainers",
+        "definitionlists", "emphasisextras", "figures", "footers", "footnotes",
+        "gridtables", "mathematics", "medialinks", "pipetables", "listextras",
+        "tasklists", "diagrams", "autolinks", "attributes"
       ]
     }
   },
-  "serve": {
-    "port": 8080
-  }
+  "serve": { "port": 8080 }
 }

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DxIsLibrary>true</DxIsLibrary>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Dx.Domain.Kernel/Dx.Domain.Kernel.csproj" />
+    <ProjectReference Include="../../src/Dx.Domain.Primitives/Dx.Domain.Primitives.csproj" />
+  </ItemGroup>
+</Project>

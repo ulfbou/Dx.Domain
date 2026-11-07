@@ -23,7 +23,7 @@ dotnet add package Dx.Domain.Primitives --prerelease
 dotnet add package Dx.Domain.Facts --prerelease
 dotnet add package Dx.Domain.Annotations --prerelease
 ```
-Analyzers are included transitively via Dx.Domain.Kernel.
+Install `Dx.Domain.Analyzers` explicitly during alpha; repository project references do not prove transitive NuGet behavior.
 
 ## Enable analyzers
 
@@ -85,4 +85,3 @@ var message = result.Match(
 - Next: [Quickstart](quickstart.md)
 - Reference: [DXA020](../analyzers/dxa020.md)
 - Governance: [ADR-0018](../adr/adr-0018-kernel-public-surface.md)
-

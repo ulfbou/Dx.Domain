@@ -1,18 +1,22 @@
-# DocFX Documentation Build Workflow
-# Triggers: manual (workflow_dispatch), push to docs/*, docfx.json, assets/*, and when docfx.yml changes
-
+# Builds and publishes only the canonical public documentation tree.
 name: Build & Publish DocFX Documentation
 
 on:
+  workflow_dispatch:
   push:
-    branches: [main]
+    branches: [master]
     paths:
-      - 'docs/**'
-      - 'docfx.public.json' 
-      - 'docfx.full.json' 
-      - 'filterConfig.yml'
+      - 'docs/public/**'
+      - 'docfx.public.json'
       - '.config/dotnet-tools.json'
       - '.github/workflows/docfx.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docfx-pages
+  cancel-in-progress: true
 
 jobs:
   build-docfx:
@@ -22,7 +26,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDKs (8.x, 9.0.100, 10.x)
+      - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -30,63 +34,26 @@ jobs:
             9.x
             10.x
 
-      - name: Dotnet --list-sdks (diagnostic)
-        run: dotnet --info
+      - name: List installed SDKs
+        run: dotnet --list-sdks
 
-      - name: Dotnet info (diagnostic)
-        run: dotnet --info
-
-      - name: Install DocFX (pinned)
+      - name: Restore pinned tools
         run: dotnet tool restore
 
-      - name: Build public docs
-        run: dotnet docfx docfx.public.json -o _site
+      - name: Build canonical public documentation
+        run: dotnet docfx docfx.public.json --warningsAsErrors
 
       - name: Upload generated public site
         uses: actions/upload-artifact@v4
         with:
           name: docfx-public-site
           path: _site
+          if-no-files-found: error
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy public site to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: _site
           publish_branch: gh-pages
           force_orphan: true
-
-      # - name: Copy additional documentation (Markdown, YAML, images)
-      #   run: |
-      #     set -euo pipefail
-      #     mkdir -p _site/docs
-      #     cp -r docs/* _site/docs/ || true
-      #     find . -maxdepth 1 -type f \( -name '*.md' -o -name '*.yml' \) -exec cp {} _site/ \;
-      #     # Copy common static assets if present
-      #     for ext in png jpg jpeg gif svg pdf; do
-      #       find docs/ -type f -name "*.$ext" -exec cp --parents {} _site/ \; || true
-      #     done
-      #     # Copy all assets (images, diagrams, etc.) from assets/ to _site/assets
-      #     if [ -d assets ]; then
-      #       mkdir -p _site/assets
-      #       cp -r assets/* _site/assets/ || true
-      #     fi
-
-      - name: Upload generated site as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docfx-site
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _site
-          publish_branch: gh-pages
-          force_orphan: true
-
-# Notes:
-# - This workflow only triggers on manual runs, pushes to docs/*, docfx.json, assets/*, .github/workflows/docfx.yml, or new releases.
-# - All docs, markdown, yaml, and static assets are included in the published site.
-# - Documentation is published to the gh-pages branch for GitHub Pages hosting.
